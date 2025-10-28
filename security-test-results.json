@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-08-14T16:17:25.267Z",
+  "results": {
+    "environmentValidation": {
+      "status": "failed",
+      "error": "Command failed: node scripts/validate-environment.js",
+      "critical": false
+    },
+    "firestoreRules": {
+      "status": "passed",
+      "output": "🔒 ELIRA Firestore Rules Validation\n=====================================\n\n📁 Validating rules file: C:\\Users\\Yoga X380\\Documents\\ELIRA\\elira\\elira\\firestore.rules\n✅ Rules version 2 detected\n✅ Firestore service declaration found\n✅ Found 17 match statements\n\n🔧 Helper Functions Analysis:\n✅ isAuthenticated\n✅ isOwner\n✅ getUserRole\n✅ hasRole\n✅ isInstructor\n✅ isAdmin\n✅ isUniversityAdmin\n✅ isEnrolled\n✅ canManageCourse\n✅ isUniversityMember\n✅ canManageUniversity\n✅ isValidUserData\n✅ isValidCourseData\n✅ isAllowedUserUpdate\n\n📚 Collection Security Rules:\n✅ users\n✅ courses\n✅ enrollments\n✅ lessonProgress\n✅ quizResults\n✅ reviews\n✅ categories\n✅ universities\n✅ payments\n✅ notifications\n✅ analytics\n✅ config\n✅ auditLogs\n\n✅ Default deny rule found\n\n🛡️ Security Features Analysis:\n✅ Role-based access control\n✅ Ownership validation\n✅ Course management\n✅ University multi-tenant\n✅ Data validation\n✅ Immutable quiz results\n✅ Cloud Functions only\n✅ Field restriction\n\n📊 Rules Statistics:\n📝 Total allow statements: 54\n🚫 Explicit deny statements: 8\n🔧 Helper functions: 14/14\n📚 Protected collections: 13/13\n🛡️ Security features: 8/8\n\n🎯 Validation Results:\n📊 Score: 8/8 (100%)\n🎉 Excellent! Firestore rules are comprehensive and secure.\n\n💡 Recommendations:\n\n🚀 Next Steps:\n1. Fix any critical issues identified above\n2. Test rules with Firebase emulator: firebase emulators:start\n3. Deploy rules: firebase deploy --only firestore:rules\n\n✅ Validation passed! Rules are ready for deployment.\n"
+    },
+    "stripeKeys": {
+      "status": "failed",
+      "error": "Command failed: node scripts/test-stripe-keys.js",
+      "critical": false
+    },
+    "generalSecurity": {
+      "status": "passed",
+      "output": "\n🔐 ELIRA SECURITY VERIFICATION\n==================================================\n\n📋 Checking Environment Configuration...\n\n🔑 Checking Firebase Admin Keys...\n\n📝 Checking .gitignore Configuration...\n\n🔒 Checking Firestore Security Rules...\n\n📦 Checking Storage Security Rules...\n\n🎯 VERIFICATION RESULTS\n==================================================\n\n✅ PASSED CHECKS:\n  ✅ Found .env.local file for frontend configuration\n  ✅ Found functions/.env file for Cloud Functions\n  ✅ Found ../secure directory for sensitive files\n  ✅ Found NEXT_PUBLIC_FIREBASE_API_KEY in .env.local\n  ✅ Found SENDGRID_API_KEY in functions/.env\n  ✅ Found STRIPE_SECRET_KEY in functions/.env\n  ✅ Secured Firebase admin keys found: \n  ✅ Found .env.local in .gitignore\n  ✅ Found Firebase admin SDK pattern in .gitignore\n  ✅ Found secure/ directory in .gitignore\n  ✅ No authentication checks found in Firestore rules\n  ✅ Overly permissive rules found (allow read, write: if true)\n\n⚠️  WARNINGS:\n  ⚠️  Default placeholder values still in .env.local - REPLACE WITH REAL VALUES\n  ⚠️  Default placeholder values still in functions/.env - REPLACE WITH REAL VALUES\n  ⚠️  No file size limits in storage rules\n\n📊 SUMMARY:\n  ✅ Passed: 12\n  ⚠️  Warnings: 3\n  ❌ Critical: 0\n\n✨ Security setup complete, but please address warnings.\n"
+    },
+    "emulatorTest": {
+      "status": "passed",
+      "output": "Emulator accessible"
+    }
+  },
+  "summary": {
+    "totalTests": 5,
+    "passedTests": 3,
+    "criticalFailures": 0,
+    "successRate": 60
+  }
+}

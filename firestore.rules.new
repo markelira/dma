@@ -1,0 +1,396 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ──────────── HELPER FUNCTIONS ────────────
+    
+    /**
+     * Check if the request is authenticated
+     */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    /**
+     * Check if the user is the owner of a resource
+     */
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    /**
+     * Get the current user's role from the users collection
+     */
+    function getUserRole() {
+      return isAuthenticated() ? 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role : null;
+    }
+    
+    /**
+     * Check if the user has a specific role
+     */
+    function hasRole(role) {
+      return isAuthenticated() && getUserRole() == role;
+    }
+    
+    /**
+     * Check if the user is an instructor
+     */
+    function isInstructor() {
+      return hasRole('instructor') || hasRole('admin');
+    }
+    
+    /**
+     * Check if the user is an admin
+     */
+    function isAdmin() {
+      return hasRole('admin');
+    }
+    
+    /**
+     * Check if the user is a university admin
+     */
+    function isUniversityAdmin() {
+      return hasRole('university_admin') || hasRole('admin');
+    }
+    
+    /**
+     * Check if user is enrolled in a specific course
+     */
+    function isEnrolled(courseId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/enrollments/$(request.auth.uid + '_' + courseId));
+    }
+    
+    /**
+     * Check if user owns or instructs a course
+     */
+    function canManageCourse(courseId) {
+      return isAdmin() || 
+        (isAuthenticated() && 
+         get(/databases/$(database)/documents/courses/$(courseId)).data.instructorId == request.auth.uid);
+    }
+    
+    /**
+     * Check if user is member of a university
+     */
+    function isUniversityMember(universityId) {
+      return isAuthenticated() && (
+        isAdmin() ||
+        get(/databases/$(database)/documents/universities/$(universityId)).data.members[request.auth.uid] != null
+      );
+    }
+    
+    /**
+     * Check if user can manage a university
+     */
+    function canManageUniversity(universityId) {
+      return isAdmin() || 
+        (isAuthenticated() && 
+         get(/databases/$(database)/documents/universities/$(universityId)).data.admins[request.auth.uid] == true);
+    }
+    
+    /**
+     * Validate user data structure
+     */
+    function isValidUserData(data) {
+      return data.keys().hasAll(['email', 'role', 'createdAt']) &&
+             data.role in ['student', 'instructor', 'admin', 'university_admin'] &&
+             data.email is string &&
+             data.createdAt is timestamp;
+    }
+    
+    /**
+     * Validate course data structure
+     */
+    function isValidCourseData(data) {
+      return data.keys().hasAll(['title', 'description', 'instructorId', 'status', 'createdAt']) &&
+             data.title is string &&
+             data.description is string &&
+             data.instructorId is string &&
+             data.status in ['draft', 'published', 'archived'] &&
+             data.createdAt is timestamp;
+    }
+    
+    /**
+     * Check if fields being updated are allowed for regular users
+     */
+    function isAllowedUserUpdate(resourceData, requestData) {
+      let restrictedFields = ['role', 'isVerified', 'permissions', 'universityId'];
+      return !requestData.diff(resourceData).affectedKeys().hasAny(restrictedFields);
+    }
+    
+    // ──────────── SECURITY RULES ────────────
+    
+    /**
+     * Users Collection
+     * - Users can read/write their own data (with restrictions)
+     * - Admins can read/write any user data
+     * - Role changes only by admins
+     */
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId &&
+                       isValidUserData(request.resource.data) &&
+                       request.resource.data.role == 'student';  // New users default to student
+      
+      allow update: if isOwner(userId) && 
+                       isAllowedUserUpdate(resource.data, request.resource.data);
+      
+      allow update: if isAdmin();  // Admins can update any field
+      
+      allow delete: if isAdmin();  // Only admins can delete users
+    }
+    
+    /**
+     * Courses Collection
+     * - Anyone can read published courses
+     * - Only instructors/admins can create courses
+     * - Only course owner/admin can update
+     * - Only admins can delete
+     */
+    match /courses/{courseId} {
+      allow read: if resource.data.status == 'published' || 
+                     canManageCourse(courseId) ||
+                     isEnrolled(courseId);
+      
+      allow create: if isInstructor() && 
+                       isValidCourseData(request.resource.data) &&
+                       request.resource.data.instructorId == request.auth.uid;
+      
+      allow update: if canManageCourse(courseId) &&
+                       request.resource.data.instructorId == resource.data.instructorId;  // Can't change instructor
+      
+      allow delete: if isAdmin();
+      
+      /**
+       * Course Modules Subcollection
+       */
+      match /modules/{moduleId} {
+        allow read: if get(/databases/$(database)/documents/courses/$(courseId)).data.status == 'published' ||
+                       canManageCourse(courseId) ||
+                       isEnrolled(courseId);
+        
+        allow write: if canManageCourse(courseId);
+        
+        /**
+         * Lessons within Modules
+         */
+        match /lessons/{lessonId} {
+          allow read: if isEnrolled(courseId) || canManageCourse(courseId);
+          
+          allow write: if canManageCourse(courseId);
+        }
+      }
+      
+      /**
+       * Direct Course Lessons (legacy support)
+       */
+      match /lessons/{lessonId} {
+        allow read: if isEnrolled(courseId) || canManageCourse(courseId);
+        
+        allow write: if canManageCourse(courseId);
+      }
+    }
+    
+    /**
+     * Enrollments Collection
+     * - Students can read their own enrollments
+     * - Instructors can read enrollments for their courses
+     * - Creation through Cloud Functions only
+     * - Updates limited to progress fields
+     */
+    match /enrollments/{enrollmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        canManageCourse(resource.data.courseId) ||
+        isAdmin()
+      );
+      
+      allow create: if false;  // Only via Cloud Functions for payment processing
+      
+      allow update: if isOwner(resource.data.userId) && 
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['progress', 'lastAccessedAt', 'currentLessonId']);
+      
+      allow update: if canManageCourse(resource.data.courseId) || isAdmin();
+      
+      allow delete: if isAdmin();
+    }
+    
+    /**
+     * Lesson Progress Collection
+     * - Users can read/write their own progress
+     * - Instructors can read progress for their courses
+     * - Admins have full access
+     */
+    match /lessonProgress/{progressId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     canManageCourse(resource.data.courseId) ||
+                     isAdmin();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isEnrolled(request.resource.data.courseId);
+      
+      allow update: if isOwner(resource.data.userId) &&
+                       request.resource.data.userId == resource.data.userId;  // Can't change userId
+      
+      allow delete: if isAdmin();
+    }
+    
+    /**
+     * Quiz Results Collection
+     * - Users can read their own results
+     * - Instructors can read results for their courses
+     * - Results are immutable once created
+     */
+    match /quizResults/{resultId} {
+      allow read: if isOwner(resource.data.userId) ||
+                     canManageCourse(resource.data.courseId) ||
+                     isAdmin();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isEnrolled(request.resource.data.courseId);
+      
+      allow update: if false;  // Quiz results are immutable
+      
+      allow delete: if isAdmin();
+    }
+    
+    /**
+     * Reviews Collection
+     * - Anyone can read published reviews
+     * - Only enrolled students can create reviews
+     * - Users can update their own reviews
+     */
+    match /reviews/{reviewId} {
+      allow read: if resource.data.isPublished == true || 
+                     isOwner(resource.data.userId) ||
+                     canManageCourse(resource.data.courseId) ||
+                     isAdmin();
+      
+      allow create: if isAuthenticated() && 
+                       request.resource.data.userId == request.auth.uid &&
+                       isEnrolled(request.resource.data.courseId);
+      
+      allow update: if isOwner(resource.data.userId) ||
+                       canManageCourse(resource.data.courseId) ||
+                       isAdmin();
+      
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    /**
+     * Categories Collection
+     * - Anyone can read categories
+     * - Only admins can modify
+     */
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    
+    /**
+     * Universities Collection (Multi-tenant Support)
+     * - University members can read university data
+     * - University admins can manage their university
+     * - Global admins have full access
+     */
+    match /universities/{universityId} {
+      allow read: if isUniversityMember(universityId);
+      
+      allow create: if isAdmin();
+      
+      allow update: if canManageUniversity(universityId);
+      
+      allow delete: if isAdmin();
+      
+      /**
+       * University Subcollections
+       * - Departments, courses, members, etc.
+       */
+      match /{subcollection}/{documentId} {
+        allow read: if isUniversityMember(universityId);
+        
+        allow write: if canManageUniversity(universityId);
+      }
+    }
+    
+    /**
+     * Payments Collection
+     * - Users can read their own payments
+     * - Only Cloud Functions can write
+     * - Admins have full access
+     */
+    match /payments/{paymentId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      allow create: if false;  // Only via Cloud Functions
+      allow update: if false;  // Only via Cloud Functions
+      
+      allow delete: if isAdmin();
+    }
+    
+    /**
+     * Notifications Collection
+     * - Users can read their own notifications
+     * - System can create notifications via Cloud Functions
+     */
+    match /notifications/{notificationId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      
+      allow create: if false;  // Only via Cloud Functions
+      
+      allow update: if isOwner(resource.data.userId) && 
+                       request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['isRead', 'readAt']);
+      
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+    
+    /**
+     * Analytics Collection
+     * - Only instructors can read analytics for their courses
+     * - Only admins can read system analytics
+     * - Only Cloud Functions can write
+     */
+    match /analytics/{documentId} {
+      allow read: if isAdmin() ||
+                     (isAuthenticated() && 
+                      resource.data.instructorId == request.auth.uid);
+      
+      allow write: if false;  // Only via Cloud Functions
+    }
+    
+    /**
+     * System Configuration Collection
+     * - Only admins can access
+     */
+    match /config/{configId} {
+      allow read, write: if isAdmin();
+    }
+    
+    /**
+     * Audit Logs Collection
+     * - Only admins can read
+     * - Only Cloud Functions can write
+     */
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;  // Only via Cloud Functions
+    }
+    
+    // ──────────── DEFAULT DENY RULE ────────────
+    /**
+     * Block access to any other collections not explicitly defined above
+     * This is crucial for security - any new collections must be explicitly allowed
+     */
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

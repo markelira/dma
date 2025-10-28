@@ -1,0 +1,23 @@
+[
+  {
+    "id": "data",
+    "title": "Adatelemzés",
+    "outcome": "+200 000 HUF fizetésemelés",
+    "duration": "4 hét",
+    "category": "data"
+  },
+  {
+    "id": "business",
+    "title": "Üzleti készségek",
+    "outcome": "Új vállalkozási lehetőségek",
+    "duration": "3 hét",
+    "category": "business"
+  },
+  {
+    "id": "tech",
+    "title": "Technológiai ismeretek",
+    "outcome": "+20% hatékonyság",
+    "duration": "5 hét",
+    "category": "tech"
+  }
+] 

@@ -1,0 +1,126 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function: Check if user is admin
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+
+    // Allow all authenticated users to read/write enrollments
+    match /enrollments/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Allow public read for courses
+    match /courses/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Allow authenticated users to read/write users
+    match /users/{document=**} {
+      allow read, write: if request.auth != null;
+    }
+
+    // COMPANY ADMIN DASHBOARD RULES
+    // ========================================================================
+
+    // Helper function to check if user is company admin
+    function isCompanyAdmin(companyId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/companies/$(companyId)/admins/$(request.auth.uid));
+    }
+
+    // Helper function to check if admin has specific permission
+    function hasPermission(companyId, permission) {
+      let adminDoc = get(/databases/$(database)/documents/companies/$(companyId)/admins/$(request.auth.uid));
+      return adminDoc.data.permissions[permission] == true;
+    }
+
+    // Helper function to check if user is employee
+    function isEmployee(companyId) {
+      return isAuthenticated() &&
+        exists(/databases/$(database)/documents/companies/$(companyId)/employees/$(request.auth.uid));
+    }
+
+    // Prevent permission escalation
+    function canAssignRole(currentRole, targetRole) {
+      // Only owners can create owners
+      return targetRole != 'owner' || currentRole == 'owner';
+    }
+
+    // Companies: Main collection
+    match /companies/{companyId} {
+      allow read: if isCompanyAdmin(companyId) || isEmployee(companyId);
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow update: if isCompanyAdmin(companyId);
+      allow delete: if false; // No deletion in MVP
+
+      // Admins subcollection
+      match /admins/{adminId} {
+        allow read: if isCompanyAdmin(companyId);
+
+        // Check role escalation on create
+        allow create: if isCompanyAdmin(companyId) &&
+          canAssignRole(
+            get(/databases/$(database)/documents/companies/$(companyId)/admins/$(request.auth.uid)).data.role,
+            request.resource.data.role
+          );
+
+        allow update: if isCompanyAdmin(companyId) && adminId == request.auth.uid;
+        allow delete: if false; // No deletion in MVP
+      }
+
+      // Employees subcollection
+      match /employees/{employeeId} {
+        // Company admins can list and read all employees
+        allow list: if isCompanyAdmin(companyId);
+
+        // Employees can read their own record, admins can read any
+        allow get: if isCompanyAdmin(companyId) ||
+          (isAuthenticated() && resource.data.userId == request.auth.uid);
+
+        allow create, update: if isCompanyAdmin(companyId) &&
+          hasPermission(companyId, 'canManageEmployees');
+
+        allow delete: if false; // Soft delete only
+      }
+
+      // Masterclasses subcollection
+      match /masterclasses/{masterclassId} {
+        allow read: if isCompanyAdmin(companyId);
+        allow create, update: if isCompanyAdmin(companyId);
+        allow delete: if false;
+      }
+
+      // Purchase history subcollection
+      match /purchases/{purchaseId} {
+        // Admins and employees can read purchase history
+        allow read: if isCompanyAdmin(companyId) || isEmployee(companyId);
+        // Only Cloud Functions can write
+        allow write: if false;
+      }
+    }
+
+    // User Progress: Extended for company-sponsored users
+    match /userProgress/{progressId} {
+      allow read: if request.auth.uid == resource.data.userId ||
+        (resource.data.companyId != null && isCompanyAdmin(resource.data.companyId));
+
+      allow update: if request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated();
+      allow delete: if false;
+    }
+
+    // Allow all other authenticated operations (fallback)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

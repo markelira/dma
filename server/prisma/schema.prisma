@@ -1,0 +1,422 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  email              String              @unique
+  password           String
+  firstName          String
+  lastName           String
+  role               UserRole            @default(STUDENT)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  experienceLevel    ExperienceLevel?
+  interests          String[]
+  learningGoals      String[]
+  learningPreference LearningPreference?
+  profilePictureUrl  String?
+  weeklyAvailability String?
+  deleted            Boolean             @default(false)
+  lastLogin          DateTime?
+  onboarded          Boolean             @default(false)
+  bio                String?
+  companyRole        String?
+  company            String?
+  credentials        String[]
+  institution        String?
+  specialties        String[]
+  title              String?
+  certificates       Certificate[]
+  courses            Course[]            @relation("CourseInstructor")
+  enrollments        Enrollment[]
+  lessonProgress     LessonProgress[]
+  notifications      Notification[]
+  userQuizAttempts   UserQuizAttempt[]
+  universities       UniversityUser[]
+  wishlist           Wishlist[]
+  settings           Settings?
+  subscriptions      Subscription[]
+  reviews            Review[]
+}
+
+model Course {
+  id                 String           @id @default(cuid())
+  title              String
+  description        String?
+  status             CourseStatus     @default(DRAFT)
+  instructorId       String
+  categoryId         String
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  certificateEnabled Boolean          @default(false)
+  language           String           @default("hu")
+  difficulty         ExperienceLevel?
+  thumbnailUrl       String?
+  // SEO and Publishing fields
+  slug               String?          @unique
+  metaDescription    String?
+  keywords           String[]
+  visibility         CourseVisibility @default(PRIVATE)
+  publishDate        DateTime?
+  autoplayNext       Boolean          @default(false) // új mező – automatikus továbblépés
+  learningObjectives String?          // új mező – tanulási célok kurzus szintjén
+  enrollmentStart    DateTime?
+  enrollmentEnd      DateTime?
+  capacity           Int?
+  universityId       String?
+  university         University?      @relation(fields: [universityId], references: [id])
+  category           Category         @relation(fields: [categoryId], references: [id])
+  instructor         User             @relation("CourseInstructor", fields: [instructorId], references: [id])
+  enrollments        Enrollment[]
+  wishlist           Wishlist[]
+  modules            Module[]
+  reviews            Review[]
+}
+
+model Module {
+  id               String           @id @default(cuid())
+  title            String
+  description      String?
+  courseId         String
+  order            Int
+  subscriptionTier SubscriptionTier @default(FREE)
+  status           ModuleStatus     @default(DRAFT)
+  lessons          Lesson[]
+  course           Course           @relation(fields: [courseId], references: [id])
+}
+
+model Lesson {
+  id             String           @id @default(cuid())
+  title          String
+  content        String?
+  moduleId       String
+  order          Int
+  type           LessonType
+  status         LessonStatus     @default(DRAFT)
+  files          File[]
+  videoUrl       String?
+  muxAssetId     String?
+  muxPlaybackId  String?
+  durationSec    Int?             // videó hossz másodpercben
+  transcriptUrl  String?          // felirat / transzkript URL
+  isFreePreview  Boolean          @default(false)
+  resources      LessonResource[]
+  module         Module           @relation(fields: [moduleId], references: [id])
+  progress       LessonProgress[]
+  quiz           Quiz?
+}
+
+/// Letölthető erőforrások egy leckéhez (PDF, ZIP, stb.)
+model LessonResource {
+  id        String  @id @default(cuid())
+  lessonId  String
+  lesson    Lesson  @relation(fields: [lessonId], references: [id])
+  name      String
+  url       String  @db.VarChar(2048)
+  mimeType  String?
+  createdAt DateTime @default(now())
+}
+
+model LessonProgress {
+  id                    String    @id @default(cuid())
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  completed             Boolean   @default(false)
+  lessonId              String
+  userId                String
+  completionTimestamp   DateTime?
+  interactionsCompleted Boolean   @default(false)
+  quizScore             Float?
+  scrollProgress        Float?    @default(0)
+  timeSpent             Int?      @default(0)
+  watchPercentage       Float?    @default(0)
+  lesson                Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([lessonId, userId])
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Wishlist {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
+model Quiz {
+  id          String            @id @default(cuid())
+  title       String
+  lessonId    String            @unique
+  description String?
+  order       Int               @default(0)
+  passScore   Float? // Percentage (0-100) required to pass
+  timeLimitMinutes Int? // optional time limit in minutes
+  maxAttempts   Int?   @default(1) // 0 = unlimited
+  isGraded    Boolean           @default(true) // Whether quiz counts toward course grade
+  points      Int? // Points awarded for quiz, used in weighted grading
+  questions   Question[]
+  lesson      Lesson            @relation(fields: [lessonId], references: [id])
+  attempts    UserQuizAttempt[]
+}
+
+model Question {
+  id          String       @id @default(cuid())
+  text        String
+  quizId      String
+  order       Int          @default(0)
+  points      Int          @default(10) // point value per question
+  answers     Answer[]
+  quiz        Quiz         @relation(fields: [quizId], references: [id])
+  userAnswers UserAnswer[]
+}
+
+model Answer {
+  id         String   @id @default(cuid())
+  text       String
+  isCorrect  Boolean
+  feedback   String?
+  questionId String
+  order      Int      @default(0)
+  question   Question @relation(fields: [questionId], references: [id])
+}
+
+model UserQuizAttempt {
+  id          String       @id @default(cuid())
+  userId      String
+  quizId      String
+  score       Float?
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  answers     UserAnswer[]
+  quiz        Quiz         @relation(fields: [quizId], references: [id])
+  user        User         @relation(fields: [userId], references: [id])
+}
+
+model UserAnswer {
+  id                String          @id @default(cuid())
+  userQuizAttemptId String
+  questionId        String
+  selectedAnswerId  String?
+  isCorrect         Boolean?
+  question          Question        @relation(fields: [questionId], references: [id])
+  userQuizAttempt   UserQuizAttempt @relation(fields: [userQuizAttemptId], references: [id], onDelete: Cascade)
+}
+
+model Subscription {
+  id                   String    @id @default(cuid())
+  userId               String
+  planType             String
+  status               String    @default("active")
+  startDate            DateTime  @default(now())
+  endDate              DateTime?
+  cancelAtPeriodEnd    Boolean?  @default(false)
+  currentPeriodEnd     DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  user                 User      @relation(fields: [userId], references: [id])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  courses     Course[]
+}
+
+model Objective {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  rating     Int
+  comment    String
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  course     Course   @relation(fields: [courseId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  type      String   @default("info")
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Certificate {
+  id         String   @id @default(cuid())
+  userId     String
+  courseName String
+  issueDate  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+model Settings {
+  id                 String  @id @default(cuid())
+  emailNotifications Boolean @default(true)
+  pushNotifications  Boolean @default(true)
+  userId             String  @unique
+  user               User    @relation(fields: [userId], references: [id])
+}
+
+model File {
+  id        String   @id @default(cuid())
+  name      String
+  url       String
+  size      Int
+  lessonId  String
+  createdAt DateTime @default(now())
+  lesson    Lesson   @relation(fields: [lessonId], references: [id])
+}
+
+enum UserRole {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum CourseStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  ARCHIVED
+  SOON
+  FREE
+  PAID
+}
+
+enum ModuleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SOON
+  FREE
+  PAID
+}
+
+enum LessonStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  SOON
+  FREE
+  PAID
+}
+
+enum LessonType {
+  VIDEO
+  TEXT
+  READING
+  QUIZ
+}
+
+enum ExperienceLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum LearningPreference {
+  SELF_PACED
+  STRUCTURED
+  GROUP
+  MENTOR
+}
+
+enum PaymentStatus {
+  FREE
+  PAID
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM
+}
+
+enum CourseVisibility {
+  PRIVATE
+  PUBLIC
+  UNLISTED
+}
+
+// =====================
+// University Models
+// =====================
+
+model University {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  revenueSharePct Float            @default(70)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  // Branding & profile fields (Phase 3A)
+  logoUrl         String?          @db.VarChar(2048)
+  description     String?
+  website         String?
+  phone           String?
+  address         String?
+  primaryColor    String?          @db.Char(7) // #RRGGBB
+  secondaryColor  String?          @db.Char(7)
+  type            UniversityType?  @default(PUBLIC)
+  users           UniversityUser[]
+  courses         Course[]
+}
+
+model UniversityUser {
+  userId       String
+  universityId String
+  role         UniversityRole
+  createdAt    DateTime       @default(now())
+
+  user       User       @relation(fields: [userId], references: [id])
+  university University @relation(fields: [universityId], references: [id])
+
+  @@id([userId, universityId])
+}
+
+enum UniversityRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum UniversityType {
+  PUBLIC
+  PRIVATE
+  TECHNICAL
+  COMMUNITY
+  ONLINE
+}

@@ -1,0 +1,424 @@
+/**
+ * Subscription Management Cloud Functions
+ *
+ * Handles subscription status checks, cancellations, and retention flows
+ */
+import * as admin from 'firebase-admin';
+import { onCall } from 'firebase-functions/v2/https';
+import { logger } from 'firebase-functions/v2';
+
+const firestore = admin.firestore();
+
+/**
+ * Get user's subscription status
+ */
+export const getSubscriptionStatus = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const userId = request.auth.uid;
+
+    // Get user document
+    const userDoc = await firestore.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      throw new Error('Felhasználó nem található');
+    }
+
+    const userData = userDoc.data();
+
+    // Check for direct subscription
+    const subscriptionsSnapshot = await firestore
+      .collection('subscriptions')
+      .where('userId', '==', userId)
+      .where('status', 'in', ['active', 'trialing'])
+      .limit(1)
+      .get();
+
+    if (!subscriptionsSnapshot.empty) {
+      const subscriptionDoc = subscriptionsSnapshot.docs[0];
+      const subscriptionData = subscriptionDoc.data();
+
+      return {
+        success: true,
+        hasSubscription: true,
+        isActive: true,
+        hasActiveSubscription: true,
+        subscription: {
+          id: subscriptionDoc.id,
+          subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
+          status: subscriptionData.status,
+          planName: subscriptionData.planName || 'DMA Előfizetés',
+          currentPeriodStart: subscriptionData.currentPeriodStart,
+          currentPeriodEnd: subscriptionData.currentPeriodEnd,
+          cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd || false,
+          createdAt: subscriptionData.createdAt,
+          trialEnd: subscriptionData.trialEnd || null,
+          isTrialing: subscriptionData.status === 'trialing',
+        }
+      };
+    }
+
+    // Check for team/company subscription inheritance
+    const teamId = userData?.teamId;
+    if (teamId) {
+      const teamDoc = await firestore.collection('teams').doc(teamId).get();
+      if (teamDoc.exists) {
+        const teamData = teamDoc.data();
+        const teamOwnerId = teamData?.ownerId;
+
+        if (teamOwnerId) {
+          // Check team owner's subscription
+          const ownerSubscriptionSnapshot = await firestore
+            .collection('subscriptions')
+            .where('userId', '==', teamOwnerId)
+            .where('status', 'in', ['active', 'trialing'])
+            .limit(1)
+            .get();
+
+          if (!ownerSubscriptionSnapshot.empty) {
+            const subscriptionDoc = ownerSubscriptionSnapshot.docs[0];
+            const subscriptionData = subscriptionDoc.data();
+
+            return {
+              success: true,
+              hasSubscription: true,
+              isActive: true,
+              hasActiveSubscription: true,
+              inheritedFromTeam: true,
+              subscription: {
+                id: subscriptionDoc.id,
+                subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
+                status: subscriptionData.status,
+                planName: subscriptionData.planName || 'DMA Csapat Előfizetés',
+                currentPeriodStart: subscriptionData.currentPeriodStart,
+                currentPeriodEnd: subscriptionData.currentPeriodEnd,
+                cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd || false,
+                createdAt: subscriptionData.createdAt,
+                trialEnd: subscriptionData.trialEnd || null,
+                isTrialing: subscriptionData.status === 'trialing',
+              }
+            };
+          }
+        }
+      }
+    }
+
+    // No active subscription
+    return {
+      success: true,
+      hasSubscription: false,
+      isActive: false,
+      hasActiveSubscription: false,
+      subscription: null
+    };
+
+  } catch (error: any) {
+    logger.error('Get subscription status error:', error);
+    throw new Error(error.message || 'Előfizetés státusz lekérdezése sikertelen');
+  }
+});
+
+/**
+ * Cancel subscription with optional retention offer
+ */
+export const cancelSubscription = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const { subscriptionId, reason, acceptRetentionOffer } = request.data;
+
+    if (!subscriptionId) {
+      throw new Error('Előfizetés azonosító kötelező');
+    }
+
+    const userId = request.auth.uid;
+
+    // Get subscription document
+    const subscriptionDoc = await firestore.collection('subscriptions').doc(subscriptionId).get();
+    if (!subscriptionDoc.exists) {
+      throw new Error('Előfizetés nem található');
+    }
+
+    const subscriptionData = subscriptionDoc.data();
+
+    // Verify ownership
+    if (subscriptionData?.userId !== userId) {
+      throw new Error('Nincs jogosultságod ehhez az előfizetéshez');
+    }
+
+    // If user accepted retention offer (free month)
+    if (acceptRetentionOffer) {
+      // Extend subscription by 1 month for free
+      const currentPeriodEnd = new Date(subscriptionData.currentPeriodEnd);
+      const newPeriodEnd = new Date(currentPeriodEnd);
+      newPeriodEnd.setMonth(newPeriodEnd.getMonth() + 1);
+
+      await firestore.collection('subscriptions').doc(subscriptionId).update({
+        currentPeriodEnd: newPeriodEnd.toISOString(),
+        retentionOfferApplied: true,
+        retentionOfferAppliedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+
+      logger.info(`Retention offer applied for subscription ${subscriptionId}`);
+
+      return {
+        success: true,
+        message: 'Köszönjük! 1 havi ingyenes hozzáférést adtunk Önnek.',
+        retentionOfferApplied: true,
+        newPeriodEnd: newPeriodEnd.toISOString()
+      };
+    }
+
+    // Cancel subscription
+    // TODO: Call Stripe API to cancel the subscription
+    // For now, just mark as canceled in Firestore
+
+    await firestore.collection('subscriptions').doc(subscriptionId).update({
+      cancelAtPeriodEnd: true,
+      cancelReason: reason || null,
+      canceledAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    logger.info(`Subscription ${subscriptionId} marked for cancellation`);
+
+    return {
+      success: true,
+      message: 'Az előfizetés lemondva. A jelenlegi időszak végéig még hozzáférhet.',
+      canceledAt: new Date().toISOString(),
+      accessUntil: subscriptionData.currentPeriodEnd
+    };
+
+  } catch (error: any) {
+    logger.error('Cancel subscription error:', error);
+    throw new Error(error.message || 'Előfizetés lemondása sikertelen');
+  }
+});
+
+/**
+ * Reactivate a canceled subscription
+ */
+export const reactivateSubscription = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const { subscriptionId } = request.data;
+
+    if (!subscriptionId) {
+      throw new Error('Előfizetés azonosító kötelező');
+    }
+
+    const userId = request.auth.uid;
+
+    // Get subscription document
+    const subscriptionDoc = await firestore.collection('subscriptions').doc(subscriptionId).get();
+    if (!subscriptionDoc.exists) {
+      throw new Error('Előfizetés nem található');
+    }
+
+    const subscriptionData = subscriptionDoc.data();
+
+    // Verify ownership
+    if (subscriptionData?.userId !== userId) {
+      throw new Error('Nincs jogosultságod ehhez az előfizetéshez');
+    }
+
+    // Reactivate subscription
+    // TODO: Call Stripe API to reactivate
+
+    await firestore.collection('subscriptions').doc(subscriptionId).update({
+      cancelAtPeriodEnd: false,
+      reactivatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+
+    logger.info(`Subscription ${subscriptionId} reactivated`);
+
+    return {
+      success: true,
+      message: 'Az előfizetés újraaktiválva'
+    };
+
+  } catch (error: any) {
+    logger.error('Reactivate subscription error:', error);
+    throw new Error(error.message || 'Előfizetés újraaktiválása sikertelen');
+  }
+});
+
+/**
+ * Get subscription invoices
+ */
+export const getSubscriptionInvoices = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const userId = request.auth.uid;
+
+    // Get all invoices for user
+    const invoicesSnapshot = await firestore
+      .collection('invoices')
+      .where('userId', '==', userId)
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const invoices: any[] = [];
+
+    invoicesSnapshot.forEach(doc => {
+      const data = doc.data();
+      invoices.push({
+        id: doc.id,
+        amount: data.amount,
+        currency: data.currency || 'HUF',
+        status: data.status,
+        invoiceNumber: data.invoiceNumber,
+        invoiceUrl: data.invoiceUrl,
+        paidAt: data.paidAt,
+        createdAt: data.createdAt,
+        description: data.description || 'DMA Előfizetés'
+      });
+    });
+
+    return {
+      success: true,
+      invoices
+    };
+
+  } catch (error: any) {
+    logger.error('Get invoices error:', error);
+    throw new Error(error.message || 'Számlák lekérdezése sikertelen');
+  }
+});
+
+/**
+ * Apply promo code to subscription
+ */
+export const applyPromoCode = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const { promoCode } = request.data;
+
+    if (!promoCode) {
+      throw new Error('Promóciós kód kötelező');
+    }
+
+    const userId = request.auth.uid;
+
+    // Find promo code
+    const promoSnapshot = await firestore
+      .collection('promoCodes')
+      .where('code', '==', promoCode.toUpperCase())
+      .where('active', '==', true)
+      .limit(1)
+      .get();
+
+    if (promoSnapshot.empty) {
+      throw new Error('Érvénytelen promóciós kód');
+    }
+
+    const promoDoc = promoSnapshot.docs[0];
+    const promoData = promoDoc.data();
+
+    // Check if promo code is expired
+    if (promoData.expiresAt) {
+      const expiryDate = new Date(promoData.expiresAt);
+      if (expiryDate < new Date()) {
+        throw new Error('Ez a promóciós kód lejárt');
+      }
+    }
+
+    // Check max uses
+    if (promoData.maxUses && promoData.usedCount >= promoData.maxUses) {
+      throw new Error('Ez a promóciós kód elfogyott');
+    }
+
+    // Check if user already used this promo code
+    const usageSnapshot = await firestore
+      .collection('promoCodeUsages')
+      .where('userId', '==', userId)
+      .where('promoCodeId', '==', promoDoc.id)
+      .limit(1)
+      .get();
+
+    if (!usageSnapshot.empty) {
+      throw new Error('Ezt a promóciós kódot már felhasználtad');
+    }
+
+    // Calculate subscription end date based on duration
+    const durationMonths = parseInt(promoData.durationMonths) || 1;
+    const subscriptionEnd = new Date();
+    subscriptionEnd.setMonth(subscriptionEnd.getMonth() + durationMonths);
+
+    // Create subscription with promo code
+    const subscriptionData = {
+      userId,
+      status: 'active',
+      planName: `DMA ${durationMonths} hónapos előfizetés`,
+      currentPeriodStart: new Date().toISOString(),
+      currentPeriodEnd: subscriptionEnd.toISOString(),
+      cancelAtPeriodEnd: false,
+      promoCodeId: promoDoc.id,
+      promoCode: promoCode.toUpperCase(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    const subscriptionRef = await firestore.collection('subscriptions').add(subscriptionData);
+
+    // Record promo code usage
+    await firestore.collection('promoCodeUsages').add({
+      userId,
+      promoCodeId: promoDoc.id,
+      promoCode: promoCode.toUpperCase(),
+      subscriptionId: subscriptionRef.id,
+      usedAt: new Date().toISOString()
+    });
+
+    // Increment promo code usage count
+    await firestore.collection('promoCodes').doc(promoDoc.id).update({
+      usedCount: admin.firestore.FieldValue.increment(1),
+      updatedAt: new Date().toISOString()
+    });
+
+    logger.info(`Promo code ${promoCode} applied for user ${userId}`);
+
+    return {
+      success: true,
+      message: `Promóciós kód sikeresen alkalmazva! ${durationMonths} hónap ingyenes hozzáférést kaptál.`,
+      subscription: {
+        id: subscriptionRef.id,
+        ...subscriptionData
+      }
+    };
+
+  } catch (error: any) {
+    logger.error('Apply promo code error:', error);
+    throw new Error(error.message || 'Promóciós kód alkalmazása sikertelen');
+  }
+});

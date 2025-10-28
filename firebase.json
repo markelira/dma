@@ -1,0 +1,78 @@
+{
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "functions/**",
+      ".github/**",
+      "docs/**",
+      "*.md",
+      "test-*.js",
+      "*.test.js",
+      "*.test.ts",
+      "vitest.config.ts",
+      "jest.config.js",
+      "jest.setup.js"
+    ],
+    "frameworksBackend": {
+      "region": "europe-west1"
+    },
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=31536000"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8088,
+      "host": "0.0.0.0"
+    },
+    "auth": {
+      "port": 9099,
+      "host": "0.0.0.0"
+    },
+    "functions": {
+      "port": 5003,
+      "host": "0.0.0.0"
+    },
+    "storage": {
+      "port": 9199,
+      "host": "0.0.0.0"
+    },
+    "ui": {
+      "enabled": false,
+      "port": 4002,
+      "host": "0.0.0.0"
+    },
+    "hosting": {
+      "port": 5004,
+      "host": "0.0.0.0"
+    },
+    "singleProjectMode": true
+  }
+}

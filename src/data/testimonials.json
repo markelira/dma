@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "name": "Eszter Nagy",
+    "role": "Marketing Manager",
+    "company": "Acme Kft.",
+    "salaryIncrease": "+300 000 HUF fizetés 3 hónap alatt",
+    "quote": "Az DMA segítségével új karrierutat építettem.",
+    "courseCompleted": "Online Marketing Kurzus"
+  },
+  {
+    "id": "2",
+    "name": "Péter Kovács",
+    "role": "Adatelemző",
+    "company": "DataCorp",
+    "salaryIncrease": "+250 000 HUF fizetés 2 hónap alatt",
+    "quote": "Gyakorlati tudást kaptam, ami azonnal hasznosítható volt.",
+    "courseCompleted": "Adatvizualizáció 101"
+  },
+  {
+    "id": "3",
+    "name": "Zoltán Szabó",
+    "role": "Projekt Manager",
+    "company": "TechSolutions",
+    "salaryIncrease": "+200 000 HUF fizetés 1 hónap alatt",
+    "quote": "A kurzusok interaktívak és motiválóak voltak.",
+    "courseCompleted": "Agilis Projektmenedzsment"
+  }
+] 

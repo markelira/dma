@@ -1,0 +1,38 @@
+[
+  {
+    "id": "data_scientist",
+    "title": "Data Scientist",
+    "description": "Az adattudós nagy adatkészleteket elemez, hogy betekintéseket tárjon fel, statisztikák, gépi tanulás és vizualizáció segítségével tájékoztatja az üzleti stratégiákat.",
+    "skills": ["Komplex adatkészletek elemzése", "Gépi tanulási modellek fejlesztése", "Statisztikai problémák megoldása"],
+    "medianSalary": "67 778 000 Ft",
+    "jobCount": 408,
+    "references": ["IBM Data Science"],
+    "image": "/images/jobRoles/data_scientist.png",
+    "category": "Adattudomány és analitika",
+    "experienceLevels": ["Kezdő", "Középhaladó"]
+  },
+  {
+    "id": "software_engineer",
+    "title": "Szoftverfejlesztő / mérnök",
+    "description": "A szoftverfejlesztő/mérnök felelős a vállalkozásoknak és szervezeteknek tápláló szoftverrendszerek és platformok fejlesztéséért.",
+    "skills": ["Alkalmazásfejlesztés", "Programozási nyelvek elsajátítása", "Telepítés és integráció"],
+    "medianSalary": "14 140 863 Ft",
+    "jobCount": 8408,
+    "references": ["Amazon Junior szoftverfejlesztő", "IBM Java fejlesztő", "+1 további"],
+    "image": "/images/jobRoles/software_engineer.png",
+    "category": "Szoftverfejlesztés és IT",
+    "experienceLevels": ["Középhaladó", "Haladó"]
+  },
+  {
+    "id": "data_engineer",
+    "title": "Adatmérnök",
+    "description": "Az adatmérnök adatvezetékképeket épít nagy adatkészletekhez, optimalizálja a rendszereket és biztosítja a megbízható adatáramlást olyan eszközökkel, mint a Hadoop és a Spark.",
+    "skills": ["Adatgyűjtési rendszerek tervezése", "Kódírás adatelőkészítéshez", "Adatfolyamatok automatizálása"],
+    "medianSalary": "241 967 Ft",
+    "jobCount": 614,
+    "references": ["IBM Data Engineering"],
+    "image": "/images/jobRoles/data_engineer.png",
+    "category": "Üzlet",
+    "experienceLevels": ["Kezdő", "Középhaladó"]
+  }
+] 

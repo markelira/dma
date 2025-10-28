@@ -1,0 +1,259 @@
+"use client";
+
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Search, Eye, Trash2, Plus, Edit } from "lucide-react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/lib/firebase';
+import { toast } from "sonner";
+import { useDeleteCourse } from "@/hooks/useCourseQueries";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED" | "PENDING_REVIEW";
+  instructorId: string;
+  categoryId: string;
+  language: string;
+  slug?: string;
+  certificateEnabled: boolean;
+  createdAt: string;
+  updatedAt: string;
+  instructor: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  category: {
+    id: string;
+    name: string;
+  };
+}
+
+interface CoursesResponse {
+  courses: Course[];
+  total: number;
+}
+
+export default function CoursesPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const deleteCourseMutation = useDeleteCourse();
+
+  const { data: coursesData, isLoading } = useQuery<CoursesResponse>({
+    queryKey: ["courses"],
+    queryFn: async () => {
+      const getCoursesCallableFn = httpsCallable(functions, 'getCoursesCallable');
+      const result: any = await getCoursesCallableFn({});
+      
+      if (!result.data.success) {
+        throw new Error(result.data.error || 'Hiba a kurzusok betöltésekor');
+      }
+      
+      return {
+        courses: result.data.courses || [],
+        total: result.data.total || 0
+      };
+    },
+  });
+
+  const courses = coursesData?.courses || [];
+
+  const filteredCourses = courses.filter((course) =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.instructor?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.instructor?.lastName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "PUBLISHED":
+        return <Badge className="bg-green-100 text-green-800">Published</Badge>;
+      case "PENDING_REVIEW":
+        return <Badge className="bg-amber-100 text-amber-800">Pending Review</Badge>;
+      case "DRAFT":
+        return <Badge>Draft</Badge>;
+      case "ARCHIVED":
+        return <Badge>Archived</Badge>;
+      default:
+        return <Badge>{status}</Badge>;
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="mt-2 text-muted-foreground">Loading courses...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Course Management</h1>
+          <p className="text-muted-foreground">
+            Manage all courses in the platform
+          </p>
+        </div>
+        <Link href="/admin/courses/new/edit">
+          <Button>
+            <Plus className="mr-2 h-4 w-4" />
+            Új kurzus
+          </Button>
+        </Link>
+      </div>
+
+
+
+      {/* Search and Filters */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center space-x-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Search courses by title, description, or instructor..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Courses Grid */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredCourses.map((course) => (
+          <Card key={course.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-lg line-clamp-2">{course.title}</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    by {course.instructor?.firstName || 'Unknown'} {course.instructor?.lastName || 'Instructor'}
+                  </p>
+                </div>
+                {getStatusBadge(course.status)}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                {course.description}
+              </p>
+              
+              <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                <span>Category: {course.category?.name || 'Uncategorized'}</span>
+                <span>Language: {course.language ? course.language.toUpperCase() : 'HU'}</span>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {course.certificateEnabled && (
+                    <Badge className="text-xs">
+                      Certificate
+                    </Badge>
+                  )}
+                  {course.status === "PENDING_REVIEW" && (
+                    <Button variant="outline" size="sm" onClick={async () => {
+                      try {
+                        const publishCallableFn = httpsCallable(functions, 'publishCourseCallable');
+                        const result: any = await publishCallableFn({ courseId: course.id });
+                        if (result.data.success) {
+                          toast.success("Course published");
+                        } else {
+                          toast.error(result.data.error || "Publish failed");
+                        }
+                      } catch (err: any) {
+                        toast.error(err?.response?.data?.message || "Publish failed");
+                      }
+                    }}>
+                      Approve
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Link href={`/admin/courses/${course.id}/edit`}>
+                    <Button variant="ghost" size="sm">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <Link href={`/courses/${course.id}`} target="_blank">
+                    <Button variant="ghost" size="sm">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="ghost" size="sm" className="text-destructive">
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Kurzus törlése</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Biztosan törölni szeretnéd a "{course.title}" kurzust? 
+                          Ez a művelet törli a kurzust és minden kapcsolódó adatot (feliratkozások, értékelések, modulok, leckék).
+                          Ez a művelet nem vonható vissza.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Mégse</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => {
+                            deleteCourseMutation.mutate(course.id, {
+                              onSuccess: () => {
+                                toast.success("Kurzus sikeresen törölve");
+                              },
+                              onError: (error: any) => {
+                                toast.error(error?.response?.data?.message || "Hiba történt a törlés során");
+                              }
+                            });
+                          }}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Törlés
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {filteredCourses.length === 0 && (
+        <Card>
+          <CardContent className="pt-6">
+                          <div className="text-center py-12">
+                <div className="text-muted-foreground mb-4">
+                  {searchTerm ? "No courses found matching your search." : "No courses available."}
+                </div>
+
+              </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+} 

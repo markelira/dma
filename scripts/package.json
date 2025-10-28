@@ -1,0 +1,16 @@
+{
+  "name": "dma-scripts",
+  "version": "1.0.0",
+  "description": "DMA security and configuration management scripts",
+  "scripts": {
+    "security-check": "node security-verification.js",
+    "validate-env": "node validate-environment.js",
+    "rotate-keys": "node rotate-keys.js",
+    "backup-config": "node backup-config.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "firebase-admin": "^13.4.0",
+    "readline": "^1.3.0"
+  }
+}
