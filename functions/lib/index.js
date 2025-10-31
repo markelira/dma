@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.seedCategories = exports.getInstructors = exports.getCategories = exports.getSignedUploadUrl = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = void 0;
+exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -1505,4 +1505,10 @@ var emailVerification_1 = require("./emailVerification");
 Object.defineProperty(exports, "sendEmailVerificationCode", { enumerable: true, get: function () { return emailVerification_1.sendEmailVerificationCode; } });
 Object.defineProperty(exports, "verifyEmailCode", { enumerable: true, get: function () { return emailVerification_1.verifyEmailCode; } });
 Object.defineProperty(exports, "resendVerificationCode", { enumerable: true, get: function () { return emailVerification_1.resendVerificationCode; } });
+// ============================================
+// USER PROFILE
+// ============================================
+// Export user profile management
+var createUserProfile_1 = require("./createUserProfile");
+Object.defineProperty(exports, "createUserProfile", { enumerable: true, get: function () { return createUserProfile_1.createUserProfile; } });
 //# sourceMappingURL=index.js.map

@@ -1650,3 +1650,10 @@ export {
   verifyEmailCode,
   resendVerificationCode,
 } from './emailVerification';
+
+// ============================================
+// USER PROFILE
+// ============================================
+
+// Export user profile management
+export { createUserProfile } from './createUserProfile';

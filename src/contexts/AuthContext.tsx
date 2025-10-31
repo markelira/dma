@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { 
+import {
   User,
+  UserCredential,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
@@ -12,8 +13,9 @@ import {
   GoogleAuthProvider,
   signInWithPopup
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, functions } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
+import { httpsCallable } from 'firebase/functions';
 import { useRouter } from 'next/navigation';
 
 export enum UserRole {
@@ -37,7 +39,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, userData: any) => Promise<void>;
+  register: (email: string, password: string, userData: any) => Promise<UserCredential>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -163,18 +165,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const register = async (email: string, password: string, userData: any) => {
+  const register = async (email: string, password: string, userData: any): Promise<UserCredential> => {
     try {
       setError(null);
-      
+
       // Create Firebase auth user
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       // Update profile
       await updateProfile(result.user, {
         displayName: `${userData.firstName} ${userData.lastName}`
       });
-      
+
       // Call Cloud Function to create user document
       const createUser = httpsCallable(functions, 'createUserProfile');
       await createUser({
@@ -182,11 +184,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         ...userData
       });
-      
+
       const enrichedUser = await fetchUserData(result.user);
       setUser(enrichedUser);
-      
-      router.push('/onboarding');
+
+      // Return userCredential so register page can show verification modal
+      // Don't redirect here - let register page handle the flow
+      return result;
     } catch (err: any) {
       setError(err.message);
       throw err;
