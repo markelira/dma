@@ -6,8 +6,28 @@
 import * as admin from 'firebase-admin';
 import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
+import Stripe from 'stripe';
 
 const firestore = admin.firestore();
+
+// Lazy Stripe initialization - will be initialized on first request
+let stripe: Stripe | null = null;
+
+/**
+ * Initialize Stripe instance (lazy initialization)
+ */
+function getStripeInstance(): Stripe {
+  if (!stripe) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+    }
+    stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2024-10-28.acacia' as any,
+    });
+  }
+  return stripe;
+}
 
 /**
  * Get user's subscription status
@@ -158,7 +178,27 @@ export const cancelSubscription = onCall({
 
     // If user accepted retention offer (free month)
     if (acceptRetentionOffer) {
-      // Extend subscription by 1 month for free
+      const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
+
+      if (stripeSubscriptionId) {
+        // Extend Stripe subscription by 1 month for free (pause collection)
+        try {
+          const stripeInstance = getStripeInstance();
+          await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+            pause_collection: {
+              behavior: 'keep_as_draft',
+              resumes_at: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+            }
+          });
+
+          logger.info(`Stripe subscription ${stripeSubscriptionId} paused for 1 month`);
+        } catch (stripeError: any) {
+          logger.error('Error pausing Stripe subscription:', stripeError);
+          throw new Error('Stripe előfizetés felfüggesztése sikertelen');
+        }
+      }
+
+      // Update Firestore
       const currentPeriodEnd = new Date(subscriptionData.currentPeriodEnd);
       const newPeriodEnd = new Date(currentPeriodEnd);
       newPeriodEnd.setMonth(newPeriodEnd.getMonth() + 1);
@@ -180,10 +220,28 @@ export const cancelSubscription = onCall({
       };
     }
 
-    // Cancel subscription
-    // TODO: Call Stripe API to cancel the subscription
-    // For now, just mark as canceled in Firestore
+    // Cancel subscription in Stripe
+    const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
 
+    if (stripeSubscriptionId) {
+      try {
+        // Cancel at period end in Stripe
+        const stripeInstance = getStripeInstance();
+        await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+          cancel_at_period_end: true,
+          cancellation_details: {
+            comment: reason || 'User requested cancellation'
+          }
+        });
+
+        logger.info(`Stripe subscription ${stripeSubscriptionId} marked for cancellation`);
+      } catch (stripeError: any) {
+        logger.error('Error canceling Stripe subscription:', stripeError);
+        throw new Error('Stripe előfizetés lemondása sikertelen');
+      }
+    }
+
+    // Update Firestore
     await firestore.collection('subscriptions').doc(subscriptionId).update({
       cancelAtPeriodEnd: true,
       cancelReason: reason || null,
@@ -239,9 +297,25 @@ export const reactivateSubscription = onCall({
       throw new Error('Nincs jogosultságod ehhez az előfizetéshez');
     }
 
-    // Reactivate subscription
-    // TODO: Call Stripe API to reactivate
+    // Reactivate subscription in Stripe
+    const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
 
+    if (stripeSubscriptionId) {
+      try {
+        // Remove cancel_at_period_end in Stripe
+        const stripeInstance = getStripeInstance();
+        await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+          cancel_at_period_end: false
+        });
+
+        logger.info(`Stripe subscription ${stripeSubscriptionId} reactivated`);
+      } catch (stripeError: any) {
+        logger.error('Error reactivating Stripe subscription:', stripeError);
+        throw new Error('Stripe előfizetés újraaktiválása sikertelen');
+      }
+    }
+
+    // Update Firestore
     await firestore.collection('subscriptions').doc(subscriptionId).update({
       cancelAtPeriodEnd: false,
       reactivatedAt: new Date().toISOString(),

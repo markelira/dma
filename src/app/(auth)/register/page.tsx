@@ -3,26 +3,46 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
-import RegisterForm from '@/components/auth/RegisterForm';
 import { AccountTypeSelector, AccountType } from '@/components/auth/AccountTypeSelector';
 import { CompanyRegisterForm } from '@/components/auth/CompanyRegisterForm';
+import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/lib/firebase';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
 
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading } = useAuth();
-  // Temporarily set to 'individual' - company registration disabled
-  const [accountType, setAccountType] = useState<AccountType>('individual');
+  const { user, loading: authLoading, register: registerUser } = useAuth();
+
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [isCompanyRegistering, setIsCompanyRegistering] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
 
   // Get redirect URL from query params or default to dashboard
   const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
 
+  // Set flag when company account type is selected
+  useEffect(() => {
+    if (accountType === 'company') {
+      setIsCompanyRegistering(true);
+    }
+  }, [accountType]);
+
   useEffect(() => {
     // If user is already authenticated, redirect based on role
-    if (user && !loading) {
-      // Check if user is COMPANY_ADMIN or COMPANY_EMPLOYEE and redirect to company dashboard
+    // BUT: Don't redirect if we're in the middle of company registration
+    // (CompanyRegisterForm handles its own redirect after claims propagate)
+    if (user && !authLoading && !isCompanyRegistering) {
       if (user.role === 'company_admin' || user.role === 'COMPANY_ADMIN') {
         console.log('[Register Page] COMPANY_ADMIN user authenticated, redirecting to /company/dashboard');
         router.push('/company/dashboard');
@@ -34,108 +54,294 @@ function RegisterPageContent() {
         router.push(redirectTo);
       }
     }
-  }, [user, loading, redirectTo, router]);
+  }, [user, authLoading, redirectTo, router, isCompanyRegistering]);
 
-  const handleAuthSuccess = () => {
-    console.log('[Register Page] Auth success, redirecting to:', redirectTo);
-    router.push(redirectTo);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-900"></div>
-      </div>
-    );
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    // Validation
+    if (!formData.firstName.trim() || formData.firstName.length < 2) {
+      setError('A keresztnév legalább 2 karakter hosszú kell legyen');
+      setLoading(false);
+      return;
+    }
+    if (!formData.lastName.trim() || formData.lastName.length < 2) {
+      setError('A vezetéknév legalább 2 karakter hosszú kell legyen');
+      setLoading(false);
+      return;
+    }
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError('Érvényes email címet adj meg');
+      setLoading(false);
+      return;
+    }
+    if (formData.password.length < 6) {
+      setError('A jelszónak legalább 6 karakter hosszúnak kell lennie');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const userCredential = await registerUser(formData.email, formData.password, {
+        firstName: formData.firstName,
+        lastName: formData.lastName
+      });
+
+      console.log('[Register Page] Auth success, sending verification code');
+
+      // Store user ID for verification modal
+      setRegisteredUserId(userCredential.user.uid);
+
+      // Send verification code
+      try {
+        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+        const result = await sendEmailVerificationCode({}) as any;
+
+        if (result.data.success) {
+          console.log('[Register Page] Verification code sent successfully');
+
+          // In emulator mode, log the code for testing
+          if (result.data.code) {
+            console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
+          }
+
+          // Show verification modal (hard block)
+          setShowVerificationModal(true);
+        } else {
+          console.error('[Register Page] Failed to send verification code:', result.data.error);
+          // Still show modal - user can try resend
+          setShowVerificationModal(true);
+        }
+      } catch (emailError) {
+        console.error('[Register Page] Error sending verification code:', emailError);
+        // Still show modal - user can try resend
+        setShowVerificationModal(true);
+      }
+    } catch (err: any) {
+      console.error('Registration error:', err);
+
+      if (err.code === 'auth/email-already-in-use') {
+        setError('Ez az email cím már használatban van');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Érvénytelen email cím');
+      } else if (err.code === 'auth/weak-password') {
+        setError('A jelszó túl gyenge');
+      } else {
+        setError('Regisztráció sikertelen. Kérjük, próbálja újra.');
+      }
+      setLoading(false);
+    }
+    // Note: Don't set loading to false if verification modal is shown
+    // The modal will handle the flow
+  };
+
+  if (authLoading) {
+    return null; // Auth layout will handle the loading state
   }
 
-  // If user is authenticated, show loading while redirecting
+  // If user is authenticated, show nothing (will redirect)
   if (user) {
+    return null;
+  }
+
+  // Show account type selector if no type selected
+  if (!accountType) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-900 mx-auto mb-4"></div>
-          <p className="text-sm text-gray-600">Átirányítás...</p>
-        </div>
-      </div>
+      <AccountTypeSelector
+        onSelect={(type) => setAccountType(type)}
+        onBack={() => router.push('/login')}
+      />
     );
   }
 
+  // Show company registration form if company type selected
+  if (accountType === 'company') {
+    return (
+      <CompanyRegisterForm
+        onSuccess={() => {
+          console.log('[Register Page] Company registration success');
+          // CompanyRegisterForm handles its own redirect to /company/dashboard
+          // Keep isCompanyRegistering=true to prevent register page redirect
+        }}
+        onBack={() => {
+          setAccountType(null);
+          setIsCompanyRegistering(false);
+        }}
+      />
+    );
+  }
+
+  // Show individual registration form (accountType === 'individual')
   return (
-    <div className="min-h-screen bg-white py-12 px-4">
-      <div className="max-w-md mx-auto">
-        {/* Back to Home Link */}
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-8 transition-colors"
+    <>
+      {/* Back button */}
+      <div className="mb-6">
+        <button
+          onClick={() => setAccountType(null)}
+          className="text-sm text-gray-700 hover:text-gray-900 flex items-center"
+          type="button"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          <span>Vissza a főoldalra</span>
-        </Link>
+          ← Vissza a fiók típushoz
+        </button>
+      </div>
 
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center justify-center space-x-2">
-            <img
-              src="/navbar-icon.png"
-              alt="DMA logo"
-              className="w-10 h-10 object-contain"
-            />
-            <span className="text-2xl font-semibold text-gray-900">DMA</span>
-          </Link>
-        </div>
+      <div className="mb-10">
+        <h1 className="text-4xl font-bold">Fiók létrehozása</h1>
+      </div>
 
-        {/* Auth Card */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Fiók létrehozása
-            </h1>
-            <p className="text-sm text-gray-600">
-              Csatlakozz az DMA közösséghez
-            </p>
+      {/* Form */}
+      <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">
+            {error}
           </div>
+        )}
 
-          {/* Form Content */}
-          {/* Temporarily disabled - company registration
-          {!accountType ? (
-            // Show account type selector
-            <AccountTypeSelector
-              onSelect={(type) => setAccountType(type)}
-              onBack={() => router.push('/login')}
+        <div className="space-y-4">
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="firstName"
+            >
+              Keresztnév
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              className="form-input w-full py-2"
+              type="text"
+              placeholder="János"
+              value={formData.firstName}
+              onChange={handleChange}
+              required
+              disabled={loading}
             />
-          ) : accountType === 'company' ? (
-            // Company registration flow
-            <CompanyRegisterForm
-              onSuccess={handleAuthSuccess}
-              onBack={() => setAccountType(null)}
+          </div>
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="lastName"
+            >
+              Vezetéknév
+            </label>
+            <input
+              id="lastName"
+              name="lastName"
+              className="form-input w-full py-2"
+              type="text"
+              placeholder="Kovács"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+              disabled={loading}
             />
-          ) : (
-          */}
-            {/* Individual registration flow - only option available */}
-            <RegisterForm
-              onSuccess={handleAuthSuccess}
-              onSwitchToLogin={() => router.push('/login')}
-              onBack={() => router.push('/login')}
-              className="!p-0 !shadow-none !bg-transparent !border-0"
+          </div>
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="email"
+            >
+              Email cím
+            </label>
+            <input
+              id="email"
+              name="email"
+              className="form-input w-full py-2"
+              type="email"
+              placeholder="pelda@email.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              disabled={loading}
             />
-          {/* End temporarily disabled */}
+          </div>
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="password"
+            >
+              Jelszó
+            </label>
+            <input
+              id="password"
+              name="password"
+              className="form-input w-full py-2"
+              type="password"
+              autoComplete="on"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
         </div>
+        <div className="mt-6">
+          <button
+            type="submit"
+            className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
+            disabled={loading}
+          >
+            {loading ? 'Regisztráció...' : 'Regisztráció'}
+          </button>
+        </div>
+      </form>
 
-        {/* Privacy Links */}
-        <div className="mt-6 text-center text-xs text-gray-600">
-          A folytatással elfogadod az{' '}
-          <Link href="/terms" className="text-gray-900 hover:text-gray-700 underline">
+      {/* Bottom link */}
+      <div className="mt-6 text-center">
+        <p className="text-sm text-gray-500">
+          A regisztrációval elfogadod az{' '}
+          <Link
+            className="whitespace-nowrap font-medium text-gray-700 underline hover:no-underline"
+            href="/terms"
+          >
             Általános Szerződési Feltételeket
           </Link>{' '}
           és az{' '}
-          <Link href="/privacy" className="text-gray-900 hover:text-gray-700 underline">
+          <Link
+            className="whitespace-nowrap font-medium text-gray-700 underline hover:no-underline"
+            href="/privacy"
+          >
             Adatvédelmi Nyilatkozatot
           </Link>
-        </div>
+          .
+        </p>
       </div>
-    </div>
+
+      {/* Login link */}
+      <div className="mt-6 text-center text-sm text-gray-600">
+        Már van fiókod?{' '}
+        <Link
+          className="font-medium text-gray-900 underline hover:no-underline"
+          href="/login"
+        >
+          Bejelentkezés
+        </Link>
+      </div>
+
+      {/* Email Verification Modal */}
+      {showVerificationModal && registeredUserId && (
+        <EmailVerificationModal
+          email={formData.email}
+          userId={registeredUserId}
+          onVerified={() => {
+            console.log('[Register Page] Email verified, redirecting to:', redirectTo);
+            setShowVerificationModal(false);
+            router.push(redirectTo);
+          }}
+        />
+      )}
+    </>
   );
 }
 

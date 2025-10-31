@@ -21,6 +21,7 @@ import {
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
+import { EmailVerificationModal } from './EmailVerificationModal';
 
 interface CompanyOnboardingData {
   // Step 1: Account owner
@@ -94,6 +95,8 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CompanyOnboardingData>({
     ownerFirstName: '',
@@ -224,29 +227,45 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     setError('');
     setLoading(true);
 
+    console.log('[Company Registration] Starting registration process...');
+    console.log('[Company Registration] Form data:', {
+      ownerName: `${formData.ownerFirstName} ${formData.ownerLastName}`,
+      ownerEmail: formData.ownerEmail,
+      companyName: formData.companyName,
+      billingEmail: formData.billingEmail,
+      industry: formData.industry,
+      companySize: formData.companySize,
+      employeeCount: formData.employees.length
+    });
+
     try {
       // Step 1: Create Firebase Auth user
+      console.log('[Company Registration] Step 1: Creating Firebase Auth user...');
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.ownerEmail.trim().toLowerCase(),
         formData.password
       );
 
+      console.log('[Company Registration] ✅ User created successfully:', userCredential.user.uid);
+
       // Update display name
+      console.log('[Company Registration] Step 2: Updating display name...');
       await updateProfile(userCredential.user, {
         displayName: `${formData.ownerFirstName} ${formData.ownerLastName}`
       });
 
-      console.log('[Company Registration] User created:', userCredential.user.uid);
+      console.log('[Company Registration] ✅ Display name updated');
 
       // Step 2: Call Cloud Function to create company and setup everything
+      console.log('[Company Registration] Step 3: Preparing to call completeCompanyOnboarding Cloud Function...');
+
       const completeOnboarding = httpsCallable<CompleteOnboardingInput, CompleteOnboardingResponse>(
         functions,
         'completeCompanyOnboarding'
       );
 
-      console.log('[Company Registration] Calling completeCompanyOnboarding...');
-      const result = await completeOnboarding({
+      const functionInput = {
         companyName: formData.companyName.trim(),
         billingEmail: formData.billingEmail.trim().toLowerCase(),
         industry: formData.industry,
@@ -257,7 +276,13 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
           email: emp.email.trim().toLowerCase(),
           jobTitle: emp.jobTitle.trim()
         }))
-      });
+      };
+
+      console.log('[Company Registration] Calling Cloud Function with input:', functionInput);
+
+      const result = await completeOnboarding(functionInput);
+
+      console.log('[Company Registration] ✅ Cloud Function returned:', result);
 
       if (result.data.success) {
         console.log('[Company Registration] Cloud Function succeeded, companyId:', result.data.companyId);
@@ -302,15 +327,48 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
         // Small delay to ensure auth state propagates
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // Redirect to company dashboard
-        console.log('[Company Registration] Redirecting to /company/dashboard');
-        router.push('/company/dashboard');
+        console.log('[Company Registration] Claims verified, now sending verification code');
+
+        // Store user ID for verification modal
+        setRegisteredUserId(userCredential.user.uid);
+
+        // Send verification code
+        try {
+          const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+          const verificationResult = await sendEmailVerificationCode({}) as any;
+
+          if (verificationResult.data.success) {
+            console.log('[Company Registration] Verification code sent successfully');
+
+            // In emulator mode, log the code for testing
+            if (verificationResult.data.code) {
+              console.log('🔐 VERIFICATION CODE (emulator):', verificationResult.data.code);
+            }
+
+            // Show verification modal (hard block)
+            setShowVerificationModal(true);
+          } else {
+            console.error('[Company Registration] Failed to send verification code:', verificationResult.data.error);
+            // Still show modal - user can try resend
+            setShowVerificationModal(true);
+          }
+        } catch (emailError) {
+          console.error('[Company Registration] Error sending verification code:', emailError);
+          // Still show modal - user can try resend
+          setShowVerificationModal(true);
+        }
       } else {
         setError('Hiba történt a regisztráció során');
         setLoading(false);
       }
     } catch (err: any) {
-      console.error('Onboarding error:', err);
+      console.error('❌ [Company Registration] ERROR occurred:', err);
+      console.error('❌ [Company Registration] Error details:', {
+        message: err.message,
+        code: err.code,
+        stack: err.stack,
+        fullError: JSON.stringify(err, null, 2)
+      });
 
       if (err.code === 'auth/email-already-in-use') {
         setError('Ez az email cím már használatban van');
@@ -318,6 +376,12 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
       } else if (err.code === 'auth/weak-password') {
         setError('A jelszó túl gyenge');
         setCurrentStep(1);
+      } else if (err.code === 'functions/not-found') {
+        console.error('❌ [Company Registration] Cloud Function not found! Is the emulator running?');
+        setError('A rendszer nem elérhető. Kérjük, próbálja újra később. (Cloud Function not found)');
+      } else if (err.code === 'functions/internal') {
+        console.error('❌ [Company Registration] Cloud Function internal error:', err.details);
+        setError(`Belső hiba történt: ${err.message}`);
       } else {
         setError(err.message || 'Hiba történt a regisztráció során');
       }
@@ -755,6 +819,19 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             </button>
           )}
         </div>
+      )}
+
+      {/* Email Verification Modal */}
+      {showVerificationModal && registeredUserId && (
+        <EmailVerificationModal
+          email={formData.ownerEmail}
+          userId={registeredUserId}
+          onVerified={() => {
+            console.log('[Company Registration] Email verified, redirecting to /company/dashboard');
+            setShowVerificationModal(false);
+            router.push('/company/dashboard');
+          }}
+        />
       )}
     </div>
   );

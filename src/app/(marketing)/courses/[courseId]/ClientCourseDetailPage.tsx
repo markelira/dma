@@ -9,8 +9,8 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import React, { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { PremiumHeader } from '@/components/PremiumHeader';
-import { PremiumFooter } from '@/components/PremiumFooter';
+import Header from '@/components/landing-home/ui/header';
+import Footer from '@/components/landing-home/ui/footer';
 import { CourseDetailHero } from '@/components/course/CourseDetailHero';
 import { CourseDetailStatsBar } from '@/components/course/CourseDetailStatsBar';
 import { CourseCurriculumSection } from '@/components/course/CourseCurriculumSection';
@@ -19,7 +19,6 @@ import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
 import { CourseGuaranteeSection } from '@/components/course/CourseGuaranteeSection';
 import { CheckoutForm } from '@/components/payment/CheckoutForm';
 import { motion } from "motion/react";
-import { brandGradient } from '@/lib/design-tokens';
 import { CheckCircle, ArrowRight, Shield } from 'lucide-react';
 
 export default function ClientCourseDetailPage({ id }: { id: string }) {
@@ -49,23 +48,14 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   if (isLoading) {
     return (
       <AuthProvider>
-        <PremiumHeader />
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: brandGradient }}
-        >
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <div
-              className="animate-spin rounded-full h-16 w-16 mx-auto mb-6"
-              style={{
-                border: '3px solid rgba(255, 255, 255, 0.2)',
-                borderTopColor: 'white'
-              }}
-            />
-            <p className="text-lg text-white/80">Kurzus betöltése...</p>
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
+            <p className="text-lg text-gray-600">Kurzus betöltése...</p>
           </div>
         </div>
-        <PremiumFooter />
+        <Footer border={true} />
       </AuthProvider>
     );
   }
@@ -74,25 +64,22 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   if (error || !course) {
     return (
       <AuthProvider>
-        <PremiumHeader />
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: brandGradient }}
-        >
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-white mb-4">Kurzus nem található</h1>
-            <p className="text-white/80 mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Kurzus nem található</h1>
+            <p className="text-gray-600 mb-6">
               A keresett kurzus nem létezik vagy nem elérhető.
             </p>
             <button
               onClick={() => router.push('/courses')}
-              className="px-6 py-3 bg-white hover:bg-gray-50 text-gray-900 rounded-full font-semibold transition-colors duration-200"
+              className="px-6 py-3 bg-gradient-to-t from-blue-600 to-blue-500 text-white rounded-lg font-semibold hover:shadow-md transition-all"
             >
               Vissza a kurzusokhoz
             </button>
           </div>
         </div>
-        <PremiumFooter />
+        <Footer border={true} />
       </AuthProvider>
     );
   }
@@ -188,9 +175,12 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
   return (
     <AuthProvider>
-      <PremiumHeader />
+      <Header />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
+        {/* Background blur shapes */}
+        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
         {/* Hero Section */}
         <CourseDetailHero
           title={c.title}
@@ -220,7 +210,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               {/* What You'll Learn Section */}
               {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
                 <motion.section
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -243,7 +233,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               {/* Requirements Section */}
               {c.requirements && c.requirements.length > 0 && (
                 <motion.section
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -266,7 +256,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               {/* Target Audience Section */}
               {c.targetAudience && c.targetAudience.length > 0 && (
                 <motion.section
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -313,7 +303,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               {/* FAQ Section */}
               {c.faq && c.faq.length > 0 && (
                 <motion.section
-                  className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -379,7 +369,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                 /* Payment Form Card */
                 <div className="sticky top-24">
                   <motion.div
-                    className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden"
+                    className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
@@ -449,7 +439,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         {!c.guaranteeEnabled && <CourseGuaranteeSection />}
       </div>
 
-      <PremiumFooter />
+      <Footer border={true} />
     </AuthProvider>
   );
 }

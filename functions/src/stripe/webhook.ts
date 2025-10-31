@@ -16,20 +16,43 @@ import {
   calculateSubscriptionEndDate,
   calculateTrialEndDate,
 } from '../types/team';
+import { handlePaymentSuccess } from '../payment/handlePaymentSuccess';
 
 const firestore = admin.firestore();
 
-// Initialize Stripe
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+// Lazy Stripe initialization - will be initialized on first request
+let stripe: Stripe | null = null;
+let stripeWebhookSecret: string | null = null;
 
-if (!stripeSecretKey) {
-  logger.error('STRIPE_SECRET_KEY environment variable is not set');
+/**
+ * Initialize Stripe instance (lazy initialization)
+ */
+function getStripeInstance(): Stripe {
+  if (!stripe) {
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeSecretKey) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+    }
+    stripe = new Stripe(stripeSecretKey, {
+      apiVersion: '2024-10-28.acacia' as any,
+    });
+  }
+  return stripe;
 }
 
-const stripe = new Stripe(stripeSecretKey || '', {
-  apiVersion: '2024-10-28.acacia',
-});
+/**
+ * Get webhook secret (lazy initialization)
+ */
+function getWebhookSecret(): string {
+  if (!stripeWebhookSecret) {
+    const secret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!secret) {
+      throw new Error('STRIPE_WEBHOOK_SECRET environment variable is not set');
+    }
+    stripeWebhookSecret = secret;
+  }
+  return stripeWebhookSecret;
+}
 
 /**
  * Stripe Webhook Handler
@@ -56,9 +79,16 @@ export const stripeWebhook = onRequest({
       return;
     }
 
-    if (!stripeWebhookSecret) {
-      logger.error('[stripeWebhook] Stripe webhook secret not configured');
-      res.status(500).send('Webhook secret not configured');
+    // Initialize Stripe and get webhook secret
+    let stripeInstance: Stripe;
+    let webhookSecret: string;
+
+    try {
+      stripeInstance = getStripeInstance();
+      webhookSecret = getWebhookSecret();
+    } catch (error: any) {
+      logger.error('[stripeWebhook] Stripe configuration error:', error.message);
+      res.status(500).send('Stripe not configured');
       return;
     }
 
@@ -67,7 +97,7 @@ export const stripeWebhook = onRequest({
 
     try {
       const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(req.body);
-      event = stripe.webhooks.constructEvent(rawBody, sig, stripeWebhookSecret);
+      event = stripeInstance.webhooks.constructEvent(rawBody, sig, webhookSecret);
     } catch (err: any) {
       logger.error('[stripeWebhook] Webhook signature verification failed:', err.message);
       res.status(400).send(`Webhook Error: ${err.message}`);
@@ -82,7 +112,7 @@ export const stripeWebhook = onRequest({
     // Handle different event types
     switch (event.type) {
       case 'checkout.session.completed':
-        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
+        await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session, stripeInstance);
         break;
 
       case 'customer.subscription.created':
@@ -98,7 +128,7 @@ export const stripeWebhook = onRequest({
         break;
 
       case 'invoice.payment_succeeded':
-        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice);
+        await handleInvoicePaymentSucceeded(event.data.object as Stripe.Invoice, stripeInstance);
         break;
 
       case 'invoice.payment_failed':
@@ -120,22 +150,43 @@ export const stripeWebhook = onRequest({
 
 /**
  * Handle checkout.session.completed
- * Creates team when user successfully subscribes
+ * Creates team when user successfully subscribes OR
+ * Creates enrollment when user purchases a course
  */
-async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session): Promise<void> {
+async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session, stripe: Stripe): Promise<void> {
   try {
     logger.info('[handleCheckoutSessionCompleted] Processing session', {
       sessionId: session.id,
       customerId: session.customer,
       subscriptionId: session.subscription,
+      mode: session.mode,
     });
 
-    // Only handle subscription mode
-    if (session.mode !== 'subscription') {
-      logger.info('[handleCheckoutSessionCompleted] Skipping non-subscription session');
+    // Handle subscription mode - create team
+    if (session.mode === 'subscription') {
+      await handleSubscriptionCheckout(session, stripe);
       return;
     }
 
+    // Handle payment mode - course purchase
+    if (session.mode === 'payment') {
+      await handlePaymentSuccess(session);
+      return;
+    }
+
+    logger.warn('[handleCheckoutSessionCompleted] Unknown session mode:', session.mode);
+
+  } catch (error: any) {
+    logger.error('[handleCheckoutSessionCompleted] Error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Handle subscription checkout - creates team
+ */
+async function handleSubscriptionCheckout(session: Stripe.Checkout.Session, stripe: Stripe): Promise<void> {
+  try {
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
     const userEmail = session.customer_email || session.customer_details?.email;
@@ -170,9 +221,19 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
     // Calculate subscription dates
     const startDate = new Date();
     const endDate = calculateSubscriptionEndDate(startDate, subscriptionPlan);
-    const trialEndDate = session.subscription_data?.trial_end
-      ? new Date(session.subscription_data.trial_end * 1000)
-      : calculateTrialEndDate(startDate);
+
+    // Get trial end date from subscription if available
+    let trialEndDate = calculateTrialEndDate(startDate);
+    if (subscriptionId) {
+      try {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        if (subscription.trial_end) {
+          trialEndDate = new Date(subscription.trial_end * 1000);
+        }
+      } catch (error) {
+        logger.warn('Could not retrieve trial_end from subscription, using default');
+      }
+    }
 
     // Create team
     await createTeam({
@@ -189,14 +250,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session):
       stripePriceId: priceId,
     });
 
-    logger.info('[handleCheckoutSessionCompleted] Team created successfully', {
+    logger.info('[handleSubscriptionCheckout] Team created successfully', {
       userId,
       customerId,
       subscriptionId,
     });
 
   } catch (error: any) {
-    logger.error('[handleCheckoutSessionCompleted] Error:', error);
+    logger.error('[handleSubscriptionCheckout] Error:', error);
     throw error;
   }
 }
@@ -298,7 +359,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
  * Handle invoice.payment_succeeded
  * Reactivates subscription after successful payment
  */
-async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice): Promise<void> {
+async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, stripe: Stripe): Promise<void> {
   try {
     logger.info('[handleInvoicePaymentSucceeded] Payment succeeded', {
       invoiceId: invoice.id,

@@ -299,15 +299,15 @@ export default function EmployeesPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-900"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-blue-600"></div>
       </div>
     );
   }
 
   if (error && !company) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">{error}</h2>
@@ -326,20 +326,22 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
-              <Link href="/company/dashboard" className="flex items-center text-gray-600 hover:text-gray-900">
+              <Link href="/company/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
                 <ArrowLeft className="w-5 h-5 mr-2" />
                 <span className="font-medium">Vissza</span>
               </Link>
-              <div className="h-6 w-px bg-gray-300"></div>
+              <div className="h-6 w-px bg-gray-300/50"></div>
               <div className="flex items-center space-x-2">
-                <Building2 className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-900">{company?.name}</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <span className="font-semibold text-gray-900">{company?.name}</span>
               </div>
             </div>
           </div>
@@ -362,7 +364,7 @@ export default function EmployeesPage() {
             </div>
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-colors"
+              className="btn inline-flex items-center bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
             >
               <UserPlus className="w-5 h-5 mr-2" />
               Új alkalmazott
@@ -372,22 +374,22 @@ export default function EmployeesPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
             <p className="text-sm text-gray-600 mb-1">Összes alkalmazott</p>
-            <p className="text-3xl font-semibold text-gray-900">{stats.total}</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
             <p className="text-sm text-gray-600 mb-1">Aktív</p>
-            <p className="text-3xl font-semibold text-green-600">{stats.active}</p>
+            <p className="text-3xl font-bold text-green-600">{stats.active}</p>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
             <p className="text-sm text-gray-600 mb-1">Meghívott</p>
-            <p className="text-3xl font-semibold text-amber-600">{stats.invited}</p>
+            <p className="text-3xl font-bold text-amber-600">{stats.invited}</p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
@@ -397,7 +399,7 @@ export default function EmployeesPage() {
                 placeholder="Keresés név, email vagy pozíció szerint..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="form-input w-full pl-10 pr-3 py-2"
               />
             </div>
 
@@ -407,7 +409,7 @@ export default function EmployeesPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                className="form-input px-3 py-2"
               >
                 <option value="all">Minden státusz</option>
                 <option value="active">Aktív</option>
@@ -419,10 +421,10 @@ export default function EmployeesPage() {
         </div>
 
         {/* Employee Table */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200/50">
+              <thead className="bg-white/40">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Név
@@ -444,7 +446,7 @@ export default function EmployeesPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white/20 divide-y divide-gray-200/50">
                 {filteredEmployees.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
@@ -455,7 +457,7 @@ export default function EmployeesPage() {
                   </tr>
                 ) : (
                   filteredEmployees.map((employee) => (
-                    <tr key={employee.id} className="hover:bg-gray-50">
+                    <tr key={employee.id} className="hover:bg-white/30 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
@@ -513,11 +515,11 @@ export default function EmployeesPage() {
 
           {/* Load More Button */}
           {hasMore && filteredEmployees.length > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200">
+            <div className="px-6 py-4 border-t border-gray-200/50">
               <button
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-900 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
+                className="btn w-full bg-white/60 hover:bg-white/80 text-gray-900 border border-gray-200/50 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
               >
                 {loadingMore ? (
                   <>
@@ -631,14 +633,14 @@ export default function EmployeesPage() {
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    className="btn flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
                     disabled={submitting}
                   >
                     Mégse
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-colors disabled:opacity-50 inline-flex items-center justify-center"
+                    className="btn flex-1 bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md disabled:opacity-50 inline-flex items-center justify-center"
                     disabled={submitting}
                   >
                     {submitting ? (

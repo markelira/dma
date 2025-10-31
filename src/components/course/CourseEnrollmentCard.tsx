@@ -33,9 +33,9 @@ export function CourseEnrollmentCard({
 
   return (
     <div className="sticky top-24">
-      <div className="bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden">
         {/* Price Header */}
-        <div className="p-6 bg-gradient-to-br from-primary to-primary-hover text-white">
+        <div className="p-6 bg-gradient-to-br from-blue-600 to-blue-500 text-white">
           <div className="flex items-baseline gap-2 mb-2">
             {isFree ? (
               <span className="text-4xl font-bold">Ingyenes</span>
@@ -56,22 +56,22 @@ export function CourseEnrollmentCard({
         <div className="p-6 space-y-4">
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-gray-700">
-              <Clock className="w-5 h-5 text-primary" />
+              <Clock className="w-5 h-5 text-blue-600" />
               <span>{duration} tartalom</span>
             </div>
             <div className="flex items-center gap-3 text-gray-700">
-              <Play className="w-5 h-5 text-primary" />
+              <Play className="w-5 h-5 text-blue-600" />
               <span>{lessons} lecke</span>
             </div>
             {certificateIncluded && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Award className="w-5 h-5 text-primary" />
+                <Award className="w-5 h-5 text-blue-600" />
                 <span>Tanúsítvány</span>
               </div>
             )}
             {lifetimeAccess && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Infinity className="w-5 h-5 text-primary" />
+                <Infinity className="w-5 h-5 text-blue-600" />
                 <span>Élethosszig tartó hozzáférés</span>
               </div>
             )}
@@ -93,7 +93,7 @@ export function CourseEnrollmentCard({
           <div className="space-y-3 pt-4">
             <Button
               onClick={onEnroll}
-              className="w-full bg-primary hover:bg-primary-hover text-white font-semibold py-6 text-lg"
+              className="w-full bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-md text-white font-semibold py-6 text-lg transition-all"
               disabled={isEnrolled}
             >
               {isEnrolled ? (

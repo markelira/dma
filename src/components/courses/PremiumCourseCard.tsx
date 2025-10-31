@@ -76,18 +76,8 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
       whileHover={{ y: -4 }}
     >
       <div
-        className={`${cardStyles.flat} overflow-hidden h-full flex flex-col group cursor-pointer`}
+        className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
         onClick={() => router.push(`/courses/${course.id}`)}
-        style={{
-          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          boxShadow: '0 2px 12px rgba(0, 0, 0, 0.04)'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.12)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '0 2px 12px rgba(0, 0, 0, 0.04)';
-        }}
       >
         {/* Course Image */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden">
@@ -109,49 +99,13 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
               <BookOpen className="w-12 h-12 text-[#466C95]  opacity-40" />
             </div>
           )}
-
-          {/* Price Badge - Glassmorphic */}
-          {course.price === 0 ? (
-            <div
-              className="absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{
-                background: 'rgba(16, 185, 129, 0.95)',
-                backdropFilter: 'blur(20px) saturate(150%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-                color: 'white',
-                boxShadow: '0 4px 16px rgba(16, 185, 129, 0.4)'
-              }}
-            >
-              INGYENES
-            </div>
-          ) : (
-            <div
-              className="absolute top-3 right-3 px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{
-                background: 'rgba(255, 255, 255, 0.95)',
-                backdropFilter: 'blur(20px) saturate(150%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(150%)',
-                color: '#1F2937',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)'
-              }}
-            >
-              {course.price?.toLocaleString() || '0'} Ft
-            </div>
-          )}
         </div>
 
         {/* Content */}
         <div className="flex-1 flex flex-col p-5">
           {/* Category and Level Badges */}
           <div className="flex items-center justify-between mb-3">
-            <div
-              className="px-2.5 py-1 rounded-md text-xs font-medium"
-              style={{
-                background: 'rgba(70, 108, 149, 0.08)',
-                border: '1px solid rgba(70, 108, 149, 0.15)',
-                color: '#466C95'
-              }}
-            >
+            <div className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
               {typeof course.category === 'string' ? course.category : (course.category as any)?.name || 'N/A'}
             </div>
             {course.level && (
@@ -169,7 +123,7 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-[#466C95] transition-colors duration-200">
+          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors duration-200">
             {course.title}
           </h3>
 
@@ -209,7 +163,7 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
 
           {/* Action Button */}
           <button
-            className={`w-full ${buttonStyles.primaryLight} !rounded-lg !py-2.5 text-sm`}
+            className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all !rounded-lg !py-2.5 text-sm flex items-center justify-center gap-2"
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/courses/${course.id}`);

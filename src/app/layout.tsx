@@ -7,7 +7,11 @@ import { Toaster } from 'sonner'
 import Script from 'next/script'
 import { AuthProvider } from '@/components/auth-provider'
 
-const inter = Inter({ subsets: ["latin"] })
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
   title: "DMA – Magyarország legjobb oktatási platformja",
@@ -40,7 +44,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config','${process.env.NEXT_PUBLIC_GA_ID}', { page_path: window.location.pathname });`}
       </Script>
-      <body className={`${inter.className} min-h-screen`}>
+      <body className={`${inter.variable} bg-gray-50 font-inter tracking-tight text-gray-900 antialiased min-h-screen`}>
         <ErrorBoundary>
           <ReactQueryProvider>
             <AuthProvider>

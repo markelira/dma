@@ -29,7 +29,7 @@ export function CourseInstructorCard({
 }: CourseInstructorCardProps) {
   return (
     <motion.section
-      className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+      className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -51,7 +51,7 @@ export function CourseInstructorCard({
               />
             </div>
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
               {name.charAt(0)}
             </div>
           )}

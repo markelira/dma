@@ -35,7 +35,7 @@ export function CourseCurriculumSection({
 }: CourseCurriculumSectionProps) {
   return (
     <motion.section
-      className="bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+      className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -87,7 +87,7 @@ export function CourseCurriculumSection({
                 >
                   <div className="flex items-center gap-3">
                     {lesson.type === 'video' ? (
-                      <PlayCircle className="w-5 h-5 text-primary" />
+                      <PlayCircle className="w-5 h-5 text-blue-600" />
                     ) : (
                       <FileText className="w-5 h-5 text-gray-400" />
                     )}

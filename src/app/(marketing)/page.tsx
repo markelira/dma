@@ -1,34 +1,38 @@
-'use client';
+"use client";
 
-import { PremiumHeader } from "@/components/PremiumHeader";
-import { UltraMinimalHero } from "@/components/home/UltraMinimalHero";
-import { PremiumFooter } from "@/components/PremiumFooter";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
-/**
- * DMA.hu HOMEPAGE - Ultra Minimal, Cluely-inspired
- *
- * Design System:
- * ✅ Single color: DMA Navy (#2C3E54)
- * ✅ Clean typography with Titillium Web
- * ✅ Ultra minimalist - hero only
- * ✅ Lots of white space
- * ✅ Centered, clean layout
- * ✅ Cluely.com aesthetic
- *
- * Target: Professional teams seeking clean, simple, trustworthy platform
- */
+import Hero from "@/components/landing-home/HeroHome";
+import BusinessCategories from "@/components/landing-home/BusinessCategories";
+import FeaturesPlanet from "@/components/landing-home/FeaturesPlanet";
+import LargeTestimonial from "@/components/landing-home/LargeTestimonial";
+import Cta from "@/components/landing-home/Cta";
+import Header from "@/components/landing-home/ui/header";
+import Footer from "@/components/landing-home/ui/footer";
+
 export default function Home() {
+  useEffect(() => {
+    AOS.init({
+      once: true,
+      disable: "phone",
+      duration: 700,
+      easing: "ease-out-cubic",
+    });
+  });
+
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-white flex flex-col">
-        <PremiumHeader />
-        <main className="flex-1">
-          {/* Ultra Minimal Hero - Cluely-inspired */}
-          <UltraMinimalHero />
-        </main>
-        <PremiumFooter />
-      </div>
-    </AuthProvider>
+    <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
+      <Header />
+      <main className="grow">
+        <Hero />
+        <BusinessCategories />
+        <FeaturesPlanet />
+        <LargeTestimonial />
+        <Cta />
+      </main>
+      <Footer border={true} />
+    </div>
   );
 }

@@ -30,19 +30,33 @@ export const functions = getFunctions(app);
 if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === 'true') {
   // Check if we haven't already connected to emulators
   if (typeof window !== 'undefined' && !(window as any).__FIREBASE_EMULATORS_CONNECTED__) {
-    console.log("Development environment, connecting to emulators...");
-    
+    console.log("🔧 Development environment, connecting to Firebase emulators...");
+
     try {
       // Connect to emulators with updated ports from firebase.json
       connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
       connectFirestoreEmulator(db, 'localhost', 8088);
       connectFunctionsEmulator(functions, "localhost", 5003);
       connectStorageEmulator(storage, "localhost", 9199);
-      
+
+      console.log("✅ Connected to Firebase emulators successfully");
+      console.log("   - Auth: localhost:9099");
+      console.log("   - Firestore: localhost:8088");
+      console.log("   - Functions: localhost:5003");
+      console.log("   - Storage: localhost:9199");
+
       // Mark as connected to prevent reconnection attempts
       (window as any).__FIREBASE_EMULATORS_CONNECTED__ = true;
     } catch (error) {
-      console.warn("Emulators may already be connected:", error);
+      console.warn("⚠️ Emulators may already be connected:", error);
+    }
+  }
+} else {
+  if (typeof window !== 'undefined') {
+    console.log("🌐 Using PRODUCTION Firebase (no emulators)");
+    console.log("   Project:", firebaseConfig.projectId);
+    if (process.env.NODE_ENV === 'development') {
+      console.warn("⚠️ To use emulators, set NEXT_PUBLIC_USE_FIREBASE_EMULATORS=true in .env.local");
     }
   }
 }

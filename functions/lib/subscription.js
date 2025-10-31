@@ -32,6 +32,9 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = void 0;
 /**
@@ -42,7 +45,25 @@ exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSub
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
+const stripe_1 = __importDefault(require("stripe"));
 const firestore = admin.firestore();
+// Lazy Stripe initialization - will be initialized on first request
+let stripe = null;
+/**
+ * Initialize Stripe instance (lazy initialization)
+ */
+function getStripeInstance() {
+    if (!stripe) {
+        const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+        if (!stripeSecretKey) {
+            throw new Error('STRIPE_SECRET_KEY environment variable is not set');
+        }
+        stripe = new stripe_1.default(stripeSecretKey, {
+            apiVersion: '2024-10-28.acacia',
+        });
+    }
+    return stripe;
+}
 /**
  * Get user's subscription status
  */
@@ -173,7 +194,25 @@ exports.cancelSubscription = (0, https_1.onCall)({
         }
         // If user accepted retention offer (free month)
         if (acceptRetentionOffer) {
-            // Extend subscription by 1 month for free
+            const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
+            if (stripeSubscriptionId) {
+                // Extend Stripe subscription by 1 month for free (pause collection)
+                try {
+                    const stripeInstance = getStripeInstance();
+                    await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+                        pause_collection: {
+                            behavior: 'keep_as_draft',
+                            resumes_at: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+                        }
+                    });
+                    v2_1.logger.info(`Stripe subscription ${stripeSubscriptionId} paused for 1 month`);
+                }
+                catch (stripeError) {
+                    v2_1.logger.error('Error pausing Stripe subscription:', stripeError);
+                    throw new Error('Stripe előfizetés felfüggesztése sikertelen');
+                }
+            }
+            // Update Firestore
             const currentPeriodEnd = new Date(subscriptionData.currentPeriodEnd);
             const newPeriodEnd = new Date(currentPeriodEnd);
             newPeriodEnd.setMonth(newPeriodEnd.getMonth() + 1);
@@ -191,9 +230,26 @@ exports.cancelSubscription = (0, https_1.onCall)({
                 newPeriodEnd: newPeriodEnd.toISOString()
             };
         }
-        // Cancel subscription
-        // TODO: Call Stripe API to cancel the subscription
-        // For now, just mark as canceled in Firestore
+        // Cancel subscription in Stripe
+        const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
+        if (stripeSubscriptionId) {
+            try {
+                // Cancel at period end in Stripe
+                const stripeInstance = getStripeInstance();
+                await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+                    cancel_at_period_end: true,
+                    cancellation_details: {
+                        comment: reason || 'User requested cancellation'
+                    }
+                });
+                v2_1.logger.info(`Stripe subscription ${stripeSubscriptionId} marked for cancellation`);
+            }
+            catch (stripeError) {
+                v2_1.logger.error('Error canceling Stripe subscription:', stripeError);
+                throw new Error('Stripe előfizetés lemondása sikertelen');
+            }
+        }
+        // Update Firestore
         await firestore.collection('subscriptions').doc(subscriptionId).update({
             cancelAtPeriodEnd: true,
             cancelReason: reason || null,
@@ -239,8 +295,23 @@ exports.reactivateSubscription = (0, https_1.onCall)({
         if (subscriptionData?.userId !== userId) {
             throw new Error('Nincs jogosultságod ehhez az előfizetéshez');
         }
-        // Reactivate subscription
-        // TODO: Call Stripe API to reactivate
+        // Reactivate subscription in Stripe
+        const stripeSubscriptionId = subscriptionData.stripeSubscriptionId;
+        if (stripeSubscriptionId) {
+            try {
+                // Remove cancel_at_period_end in Stripe
+                const stripeInstance = getStripeInstance();
+                await stripeInstance.subscriptions.update(stripeSubscriptionId, {
+                    cancel_at_period_end: false
+                });
+                v2_1.logger.info(`Stripe subscription ${stripeSubscriptionId} reactivated`);
+            }
+            catch (stripeError) {
+                v2_1.logger.error('Error reactivating Stripe subscription:', stripeError);
+                throw new Error('Stripe előfizetés újraaktiválása sikertelen');
+            }
+        }
+        // Update Firestore
         await firestore.collection('subscriptions').doc(subscriptionId).update({
             cancelAtPeriodEnd: false,
             reactivatedAt: new Date().toISOString(),

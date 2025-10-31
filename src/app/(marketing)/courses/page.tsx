@@ -6,8 +6,8 @@ import { BookOpen } from 'lucide-react'
 import { db } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { PremiumHeader } from '@/components/PremiumHeader'
-import { PremiumFooter } from '@/components/PremiumFooter'
+import Header from '@/components/landing-home/ui/header'
+import Footer from '@/components/landing-home/ui/footer'
 import { CoursesHeroSection } from '@/components/courses/CoursesHeroSection'
 import { CourseStatsBar } from '@/components/courses/CourseStatsBar'
 import { CourseFilterPanel } from '@/components/courses/CourseFilterPanel'
@@ -126,43 +126,38 @@ export default function CourseListPage() {
   if (loading) {
     return (
       <AuthProvider>
-        <PremiumHeader />
-        <div
-          className="min-h-screen flex items-center justify-center"
-          style={{ background: 'linear-gradient(to bottom, #16222F 0%, #466C95 100%)' }}
-        >
+        <Header />
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <div
-              className="animate-spin rounded-full h-16 w-16 mx-auto mb-6"
-              style={{
-                border: '3px solid rgba(255, 255, 255, 0.2)',
-                borderTopColor: 'white'
-              }}
-            />
-            <p className="text-lg text-white/80">Kurzusok betöltése...</p>
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
+            <p className="text-lg text-gray-600">Kurzusok betöltése...</p>
           </div>
         </div>
-        <PremiumFooter />
+        <Footer border={true} />
       </AuthProvider>
     )
   }
 
   return (
     <AuthProvider>
-      <PremiumHeader />
+      <Header />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
+        {/* Background blur shapes */}
+        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
         {/* Hero Section */}
         <CoursesHeroSection
           searchInput={searchInput}
           onSearchChange={setSearchInput}
           totalCourses={courses.length}
+          courses={courses}
         />
 
         {/* Stats Bar */}
         <CourseStatsBar
           totalCourses={courses.length}
-          freeCourses={courses.filter(c => c.price === 0).length}
+          categoriesCount={categories.filter(c => c !== 'all').length}
           filteredCount={filteredCourses.length}
         />
 
@@ -187,29 +182,23 @@ export default function CourseListPage() {
             <div className="lg:col-span-3">
               {filteredCourses.length === 0 ? (
                 <motion.div
-                  className="flex flex-col items-center justify-center py-20 px-6"
+                  className="flex flex-col items-center justify-center py-20 px-6 bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div
-                    className="p-6 rounded-full mb-6"
-                    style={{
-                      background: 'linear-gradient(135deg, rgba(70, 108, 149, 0.1) 0%, rgba(70, 108, 149, 0.05) 100%)',
-                      border: '2px dashed rgba(70, 108, 149, 0.3)'
-                    }}
-                  >
-                    <BookOpen className="w-12 h-12 text-[#466C95] opacity-40" />
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg">
+                    <BookOpen className="w-10 h-10 text-white" />
                   </div>
-                  <h3 className="text-2xl font-semibold text-gray-900 mb-3">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
                     Nincs találat
                   </h3>
-                  <p className="text-gray-600 text-center max-w-md">
+                  <p className="text-gray-600 text-center max-w-md mb-6">
                     Próbálj más szűrőket vagy keresési kifejezést használni
                   </p>
                   <button
                     onClick={handleResetFilters}
-                    className="mt-6 px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-full font-medium transition-colors duration-200"
+                    className="btn bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
                   >
                     Szűrők törlése
                   </button>
@@ -230,7 +219,7 @@ export default function CourseListPage() {
         </div>
       </div>
 
-      <PremiumFooter />
+      <Footer border={true} />
     </AuthProvider>
   )
 }

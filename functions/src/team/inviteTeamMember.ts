@@ -299,7 +299,7 @@ async function createEmailTransporter() {
   const brevoKey = process.env.BREVO_SMTP_KEY;
 
   if (brevoUser && brevoKey) {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       host: 'smtp-relay.brevo.com',
       port: 587,
       secure: false,
@@ -314,7 +314,7 @@ async function createEmailTransporter() {
   const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
   if (gmailUser && gmailAppPassword) {
-    return nodemailer.createTransporter({
+    return nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: gmailUser,

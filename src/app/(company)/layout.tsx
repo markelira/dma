@@ -27,9 +27,9 @@ export default function CompanyLayout({
 
   if (!authReady || isLoading || !user || user.role !== 'COMPANY_ADMIN') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
         <div className="text-center">
-          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-teal-600" />
+          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-blue-600" />
           <p className="text-gray-600">
             {!authReady ? 'Hitelesítés inicializálása...' :
              isLoading ? 'Betöltés...' :
@@ -41,5 +41,13 @@ export default function CompanyLayout({
     )
   }
 
-  return <>{children}</>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
+      {/* Background blur shapes */}
+      <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
+      <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+
+      {children}
+    </div>
+  )
 }

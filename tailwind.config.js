@@ -221,6 +221,52 @@ module.exports = {
           '0%': { transform: 'translateX(0)' },
           '100%': { transform: 'translateX(-50%)' },
         },
+        'code-1': {
+          '0%': { opacity: '0' },
+          '2.5%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'code-2': {
+          '16.2%': { opacity: '0' },
+          '18.75%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'code-3': {
+          '32.5%': { opacity: '0' },
+          '35%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'code-4': {
+          '48.75%': { opacity: '0' },
+          '51.25%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'code-5': {
+          '65%': { opacity: '0' },
+          '72.5%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'code-6': {
+          '81.25%': { opacity: '0' },
+          '83.75%': { opacity: '1' },
+          '97.5%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        'breath': {
+          '0%, 100%': { transform: 'scale(0.95)' },
+          '50%': { transform: 'scale(1.1)' },
+        },
+        'line': {
+          '0%, 100%': { left: '0', opacity: '0' },
+          '50%': { left: '100%', transform: 'translateX(-100%)' },
+          '10%, 40%, 60%, 90%': { opacity: '0' },
+          '25%, 75%': { opacity: '1' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",

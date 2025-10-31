@@ -6,7 +6,7 @@ import { onRequest, onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import * as nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
-// import * as sgMail from '@sendgrid/mail';
+import sgMail from '@sendgrid/mail';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -16,15 +16,26 @@ if (!admin.apps.length) {
 const auth = admin.auth();
 const firestore = admin.firestore();
 
-// Email configuration
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@dma.hu';
+// Email configuration - lazy initialization
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@academion.hu';
+let sendGridInitialized = false;
 
-// Initialize SendGrid if API key is available
-// if (SENDGRID_API_KEY) {
-//   sgMail.setApiKey(SENDGRID_API_KEY);
-//   console.log('SendGrid initialized for email sending');
-// }
+/**
+ * Initialize SendGrid (lazy initialization)
+ */
+function initializeSendGrid(): boolean {
+  if (!sendGridInitialized) {
+    const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
+    if (SENDGRID_API_KEY) {
+      sgMail.setApiKey(SENDGRID_API_KEY);
+      sendGridInitialized = true;
+      console.log('SendGrid initialized for email sending');
+      return true;
+    }
+    return false;
+  }
+  return true;
+}
 
 // Email transporter configuration
 const createTransporter = async () => {
@@ -179,10 +190,32 @@ export const requestPasswordReset = onCall({
 }, async (request) => {
   try {
     const { email } = request.data;
-    
+
     if (!email) {
       throw new Error('Email cím kötelező.');
     }
+
+    // Rate limiting: Check password reset attempts in the last hour
+    const oneHourAgo = new Date();
+    oneHourAgo.setHours(oneHourAgo.getHours() - 1);
+
+    const recentAttempts = await firestore
+      .collection('passwordResetAttempts')
+      .where('email', '==', email.toLowerCase())
+      .where('attemptedAt', '>=', oneHourAgo.toISOString())
+      .get();
+
+    if (recentAttempts.size >= 3) {
+      logger.warn(`Rate limit exceeded for email: ${email}`);
+      throw new Error('Túl sok jelszó visszaállítási kérés. Kérjük, próbálja újra 1 óra múlva.');
+    }
+
+    // Log this attempt
+    await firestore.collection('passwordResetAttempts').add({
+      email: email.toLowerCase(),
+      attemptedAt: new Date().toISOString(),
+      ipAddress: request.rawRequest?.ip || 'unknown'
+    });
 
     // Check if user exists
     let userRecord;
@@ -211,72 +244,156 @@ export const requestPasswordReset = onCall({
     });
 
     // Prepare reset link
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+    const baseUrl = process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000';
+    const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
 
-    // HTML email template
+    // World-class HTML email template matching DMA brand
     const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-            .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Jelszó visszaállítás</h1>
-            </div>
-            <div class="content">
-              <p>Kedves Felhasználó!</p>
-              <p>Jelszó visszaállítási kérelmet kaptunk az Ön DMA fiókjához.</p>
-              <p>A jelszó visszaállításához kattintson az alábbi gombra:</p>
-              <div style="text-align: center;">
-                <a href="${resetLink}" class="button">Új jelszó beállítása</a>
-              </div>
-              <p><small>Vagy másold be ezt a linket a böngészőbe:</small></p>
-              <p style="word-break: break-all; background: #fff; padding: 10px; border-radius: 5px;">
-                <small>${resetLink}</small>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Jelszó visszaállítás - DMA Platform</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td {font-family: Arial, sans-serif !important;}
+  </style>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #F9FAFB; font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+  <!-- Email wrapper -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <!-- Main container -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 2px 16px 0 rgba(16, 23, 42, 0.08); max-width: 600px; width: 100%;">
+
+          <!-- Header with DMA Navy brand color -->
+          <tr>
+            <td style="background-color: #2C3E54; padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                DMA Platform
+              </h1>
+              <p style="margin: 8px 0 0 0; color: #ffffff; opacity: 0.9; font-size: 14px;">
+                Jelszó visszaállítás
               </p>
-              <p><strong>Ez a link 1 óráig érvényes.</strong></p>
-              <p>Ha nem Ön kérte a jelszó visszaállítást, hagyja figyelmen kívül ezt az emailt.</p>
-              <p>Üdvözlettel,<br>Az DMA csapata</p>
-            </div>
-            <div class="footer">
-              <p>Ez egy automatikus üzenet, kérjük ne válaszoljon rá.</p>
-            </div>
-          </div>
-        </body>
-        </html>
+            </td>
+          </tr>
+
+          <!-- Main content -->
+          <tr>
+            <td style="padding: 40px 32px;">
+
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px; font-weight: 600; line-height: 1.3;">
+                Kedves Felhasználó!
+              </h2>
+
+              <!-- Message -->
+              <p style="margin: 0 0 16px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                Jelszó visszaállítási kérelmet kaptunk az Ön <strong>DMA Platform</strong> fiókjához.
+              </p>
+
+              <p style="margin: 0 0 32px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                A jelszó visszaállításához kattintson az alábbi gombra:
+              </p>
+
+              <!-- CTA Button with blue gradient -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="center" style="padding: 0 0 32px 0;">
+                    <a href="${resetLink}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(to top, #2563eb, #3b82f6); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); letter-spacing: 0.3px;">
+                      Új jelszó beállítása
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Alternative link -->
+              <div style="background-color: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
+                <p style="margin: 0 0 8px 0; color: #1E40AF; font-size: 14px; font-weight: 600;">
+                  Vagy másold be ezt a linket a böngészőbe:
+                </p>
+                <p style="margin: 0; color: #1E40AF; font-size: 13px; word-break: break-all; line-height: 1.5;">
+                  ${resetLink}
+                </p>
+              </div>
+
+              <!-- Security info -->
+              <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #78350F; font-size: 14px; line-height: 1.5;">
+                  <strong>⏱️ Fontos:</strong> Ez a link <strong>1 óráig</strong> érvényes biztonsági okokból.
+                </p>
+              </div>
+
+              <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px; line-height: 1.6;">
+                Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.
+              </p>
+
+              <!-- Signature -->
+              <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                Üdvözlettel,<br>
+                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F9FAFB; padding: 32px; text-align: center; border-radius: 0 0 16px 16px; border-top: 1px solid #E5E7EB;">
+              <p style="margin: 0 0 8px 0; color: #6B7280; font-size: 13px; line-height: 1.5;">
+                Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
+              </p>
+              <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                © 2025 DMA Platform. Minden jog fenntartva.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Spacer for email clients -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%;">
+          <tr>
+            <td style="padding: 20px 32px; text-align: center;">
+              <p style="margin: 0; color: #9CA3AF; font-size: 12px; line-height: 1.5;">
+                Ha problémád van a gombbal, másold be a fenti linket a böngésződbe.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
       `;
 
     // Try SendGrid first if available
-    // if (SENDGRID_API_KEY) {
-    //   try {
-    //     const msg = {
-    //       to: email,
-    //       from: FROM_EMAIL,
-    //       subject: 'Jelszó visszaállítás - DMA',
-    //       html: htmlContent,
-    //     };
-    //
-    //     await sgMail.send(msg);
-    //     logger.info('Email sent via SendGrid to:', email);
-    //
-    //     return {
-    //       success: true,
-    //       message: 'Ha a megadott email cím regisztrálva van, küldtünk egy jelszó visszaállítási linket.'
-    //     };
-    //   } catch (error: any) {
-    //     logger.error('SendGrid error, falling back to SMTP:', error);
-    //   }
-    // }
+    if (initializeSendGrid()) {
+      try {
+        const msg = {
+          to: email,
+          from: FROM_EMAIL,
+          subject: 'Jelszó visszaállítás - DMA Platform',
+          html: htmlContent,
+        };
+
+        await sgMail.send(msg);
+        logger.info('Email sent via SendGrid to:', email);
+
+        return {
+          success: true,
+          message: 'Ha a megadott email cím regisztrálva van, küldtünk egy jelszó visszaállítási linket.'
+        };
+      } catch (error: any) {
+        logger.error('SendGrid error, falling back to SMTP:', error);
+      }
+    }
 
     // Use nodemailer (Brevo, Gmail, or Ethereal)
     const transporter = await createTransporter();
@@ -285,7 +402,7 @@ export const requestPasswordReset = onCall({
     const mailOptions = {
       from: `"DMA Platform" <${fromEmail}>`,
       to: email,
-      subject: 'Jelszó visszaállítás - DMA',
+      subject: 'Jelszó visszaállítás - DMA Platform',
       html: htmlContent
     };
 
@@ -474,72 +591,156 @@ export const sendEmailVerification = onCall({
     });
 
     // Prepare verification link
-    const verificationLink = `http://localhost:3000/verify-email?token=${verificationToken}`;
+    const baseUrl = process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000';
+    const verificationLink = `${baseUrl}/verify-email?token=${verificationToken}`;
 
-    // HTML email template
+    // World-class HTML email template matching DMA brand
     const htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-            .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 10px 10px; }
-            .button { display: inline-block; padding: 15px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-            .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Email cím megerősítése</h1>
-            </div>
-            <div class="content">
-              <p>Kedves Felhasználó!</p>
-              <p>Köszönjük, hogy regisztrált az DMA platformon!</p>
-              <p>Kérjük, erősítse meg az email címét az alábbi gombra kattintva:</p>
-              <div style="text-align: center;">
-                <a href="${verificationLink}" class="button">Email cím megerősítése</a>
-              </div>
-              <p><small>Vagy másold be ezt a linket a böngészőbe:</small></p>
-              <p style="word-break: break-all; background: #fff; padding: 10px; border-radius: 5px;">
-                <small>${verificationLink}</small>
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Email cím megerősítése - DMA Platform</title>
+  <!--[if mso]>
+  <style type="text/css">
+    body, table, td {font-family: Arial, sans-serif !important;}
+  </style>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; background-color: #F9FAFB; font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
+  <!-- Email wrapper -->
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <!-- Main container -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 2px 16px 0 rgba(16, 23, 42, 0.08); max-width: 600px; width: 100%;">
+
+          <!-- Header with DMA Navy brand color -->
+          <tr>
+            <td style="background-color: #2C3E54; padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
+                DMA Platform
+              </h1>
+              <p style="margin: 8px 0 0 0; color: #ffffff; opacity: 0.9; font-size: 14px;">
+                Email cím megerősítése
               </p>
-              <p><strong>Ez a link 24 óráig érvényes.</strong></p>
-              <p>Ha nem Ön regisztrált az DMA platformon, hagyja figyelmen kívül ezt az emailt.</p>
-              <p>Üdvözlettel,<br>Az DMA csapata</p>
-            </div>
-            <div class="footer">
-              <p>Ez egy automatikus üzenet, kérjük ne válaszoljon rá.</p>
-            </div>
-          </div>
-        </body>
-        </html>
+            </td>
+          </tr>
+
+          <!-- Main content -->
+          <tr>
+            <td style="padding: 40px 32px;">
+
+              <!-- Greeting -->
+              <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px; font-weight: 600; line-height: 1.3;">
+                Üdvözöljük a DMA Platformon!
+              </h2>
+
+              <!-- Message -->
+              <p style="margin: 0 0 16px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                Köszönjük, hogy csatlakozott hozzánk! Már csak egy lépés van hátra.
+              </p>
+
+              <p style="margin: 0 0 32px 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                Kérjük, erősítse meg az email címét az alábbi gombra kattintva:
+              </p>
+
+              <!-- CTA Button with blue gradient -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td align="center" style="padding: 0 0 32px 0;">
+                    <a href="${verificationLink}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(to top, #2563eb, #3b82f6); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); letter-spacing: 0.3px;">
+                      Email cím megerősítése
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Alternative link -->
+              <div style="background-color: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
+                <p style="margin: 0 0 8px 0; color: #1E40AF; font-size: 14px; font-weight: 600;">
+                  Vagy másold be ezt a linket a böngészőbe:
+                </p>
+                <p style="margin: 0; color: #1E40AF; font-size: 13px; word-break: break-all; line-height: 1.5;">
+                  ${verificationLink}
+                </p>
+              </div>
+
+              <!-- Expiry info -->
+              <div style="background-color: #F0F9FF; border-left: 4px solid #0EA5E9; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #0C4A6E; font-size: 14px; line-height: 1.5;">
+                  <strong>✨ Info:</strong> Ez a megerősítő link <strong>24 óráig</strong> érvényes.
+                </p>
+              </div>
+
+              <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px; line-height: 1.6;">
+                Ha nem Ön regisztrált a DMA platformon, kérjük hagyja figyelmen kívül ezt az emailt.
+              </p>
+
+              <!-- Signature -->
+              <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
+                Üdvözlettel,<br>
+                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F9FAFB; padding: 32px; text-align: center; border-radius: 0 0 16px 16px; border-top: 1px solid #E5E7EB;">
+              <p style="margin: 0 0 8px 0; color: #6B7280; font-size: 13px; line-height: 1.5;">
+                Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
+              </p>
+              <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
+                © 2025 DMA Platform. Minden jog fenntartva.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+        <!-- Spacer for email clients -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%;">
+          <tr>
+            <td style="padding: 20px 32px; text-align: center;">
+              <p style="margin: 0; color: #9CA3AF; font-size: 12px; line-height: 1.5;">
+                Ha problémád van a gombbal, másold be a fenti linket a böngésződbe.
+              </p>
+            </td>
+          </tr>
+        </table>
+
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
       `;
 
     // Try SendGrid first if available
-    // if (SENDGRID_API_KEY) {
-    //   try {
-    //     const msg = {
-    //       to: email,
-    //       from: FROM_EMAIL,
-    //       subject: 'Email cím megerősítése - DMA',
-    //       html: htmlContent,
-    //     };
-    //
-    //     await sgMail.send(msg);
-    //     logger.info('Verification email sent via SendGrid to:', email);
-    //
-    //     return {
-    //       success: true,
-    //       message: 'Megerősítő email elküldve.'
-    //     };
-    //   } catch (error: any) {
-    //     logger.error('SendGrid error, falling back to SMTP:', error);
-    //   }
-    // }
+    if (initializeSendGrid()) {
+      try {
+        const msg = {
+          to: email,
+          from: FROM_EMAIL,
+          subject: 'Email cím megerősítése - Academion',
+          html: htmlContent,
+        };
+
+        await sgMail.send(msg);
+        logger.info('Verification email sent via SendGrid to:', email);
+
+        return {
+          success: true,
+          message: 'Megerősítő email elküldve.'
+        };
+      } catch (error: any) {
+        logger.error('SendGrid error, falling back to SMTP:', error);
+      }
+    }
 
     // Use nodemailer (Brevo, Gmail, or Ethereal)
     const transporter = await createTransporter();
@@ -1420,8 +1621,32 @@ export {
 } from './promoCode';
 
 // ============================================
+// PAYMENT FUNCTIONS
+// ============================================
+
+// Export payment Cloud Functions
+export {
+  createCheckoutSession,
+} from './payment/createCheckoutSession';
+
+export {
+  createCustomer,
+} from './payment/createCustomer';
+
+// ============================================
 // STRIPE WEBHOOK
 // ============================================
 
-// Export Stripe webhook handler (placeholder for now)
-// export { stripeWebhook } from './stripe';
+// Export Stripe webhook handler
+export { stripeWebhook } from './stripe/webhook';
+
+// ============================================
+// EMAIL VERIFICATION
+// ============================================
+
+// Export email verification functions
+export {
+  sendEmailVerificationCode,
+  verifyEmailCode,
+  resendVerificationCode,
+} from './emailVerification';

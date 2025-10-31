@@ -185,15 +185,15 @@ export default function CompanyDashboardPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-900"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-blue-600"></div>
       </div>
     );
   }
 
   if (error || !company || !admin) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
           <h2 className="text-2xl font-semibold text-gray-900 mb-2">
@@ -204,7 +204,7 @@ export default function CompanyDashboardPage() {
           </p>
           <Link
             href="/auth"
-            className="inline-flex items-center justify-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-black transition-colors"
+            className="btn inline-flex items-center justify-center bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
           >
             Vállalat regisztrálása
           </Link>
@@ -216,9 +216,9 @@ export default function CompanyDashboardPage() {
   const daysRemaining = getDaysRemaining();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Top Navigation */}
-      <nav className="bg-white border-b border-gray-200">
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo & Company Name */}
@@ -230,30 +230,32 @@ export default function CompanyDashboardPage() {
                   className="h-8"
                 />
               </Link>
-              <div className="hidden md:block h-6 w-px bg-gray-300"></div>
+              <div className="hidden md:block h-6 w-px bg-gray-300/50"></div>
               <div className="hidden md:flex items-center space-x-2">
-                <Building2 className="w-5 h-5 text-gray-600" />
-                <span className="font-medium text-gray-900">{company.name}</span>
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <span className="font-semibold text-gray-900">{company.name}</span>
               </div>
             </div>
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              <Link href="/company/dashboard" className="text-sm text-gray-900 font-medium">
+              <Link href="/company/dashboard" className="text-sm text-blue-600 font-medium">
                 Áttekintés
               </Link>
-              <Link href="/company/dashboard/employees" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/company/dashboard/employees" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
                 Alkalmazottak
               </Link>
-              <Link href="/company/dashboard/masterclasses" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/company/dashboard/masterclasses" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
                 Masterclassok
               </Link>
-              <Link href="/company/dashboard/progress" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+              <Link href="/company/dashboard/progress" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
                 Haladás
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-sm text-gray-600 hover:text-gray-900 transition-colors flex items-center space-x-1"
+                className="text-sm text-gray-600 hover:text-blue-600 transition-colors flex items-center space-x-1"
               >
                 <LogOut className="w-4 h-4" />
                 <span>Kijelentkezés</span>
@@ -263,7 +265,7 @@ export default function CompanyDashboardPage() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+              className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100/50"
             >
               {mobileMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -281,28 +283,30 @@ export default function CompanyDashboardPage() {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden border-t border-gray-200 bg-white"
+              className="md:hidden border-t border-white/20 bg-white/80 backdrop-blur-xl"
             >
               <div className="px-4 py-4 space-y-3">
-                <div className="flex items-center space-x-2 pb-3 border-b border-gray-200">
-                  <Building2 className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium text-gray-900">{company.name}</span>
+                <div className="flex items-center space-x-2 pb-3 border-b border-gray-200/50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <span className="font-semibold text-gray-900">{company.name}</span>
                 </div>
-                <Link href="/company/dashboard" className="block w-full text-left px-3 py-2 text-sm text-gray-900 font-medium bg-gray-50 rounded-lg">
+                <Link href="/company/dashboard" className="block w-full text-left px-3 py-2 text-sm text-blue-600 font-medium bg-blue-50/50 rounded-lg">
                   Áttekintés
                 </Link>
-                <Link href="/company/dashboard/employees" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                <Link href="/company/dashboard/employees" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
                   Alkalmazottak
                 </Link>
-                <Link href="/company/dashboard/masterclasses" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                <Link href="/company/dashboard/masterclasses" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
                   Masterclassok
                 </Link>
-                <Link href="/company/dashboard/progress" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg">
+                <Link href="/company/dashboard/progress" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
                   Haladás
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg flex items-center space-x-2"
+                  className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg flex items-center space-x-2"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Kijelentkezés</span>
@@ -327,7 +331,7 @@ export default function CompanyDashboardPage() {
 
         {/* Trial Banner */}
         {company.plan === 'trial' && daysRemaining > 0 && (
-          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="mb-8 bg-amber-50/80 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center space-x-3">
               <Clock className="w-5 h-5 text-amber-600" />
               <div>
@@ -337,7 +341,7 @@ export default function CompanyDashboardPage() {
             </div>
             <Link
               href="/company/dashboard/billing"
-              className="px-4 py-2 bg-amber-600 text-white rounded-lg font-medium hover:bg-amber-700 transition-colors text-sm"
+              className="btn-sm bg-gradient-to-t from-amber-600 to-amber-500 text-white shadow-sm hover:shadow-md transition-all"
             >
               Frissítés
             </Link>
@@ -351,15 +355,15 @@ export default function CompanyDashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className={cardStyles.flat + " p-6"}
+            className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Összes alkalmazott</p>
-                <p className="text-3xl font-semibold text-gray-900">{stats.totalEmployees}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.totalEmployees}</p>
               </div>
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.primary + '20' }}>
-                <Users className="w-6 h-6" style={{ color: colors.primary }} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                <Users className="w-6 h-6 text-white" />
               </div>
             </div>
           </motion.div>
@@ -369,15 +373,15 @@ export default function CompanyDashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className={cardStyles.flat + " p-6"}
+            className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Aktív</p>
-                <p className="text-3xl font-semibold" style={{ color: colors.success }}>{stats.activeEmployees}</p>
+                <p className="text-3xl font-bold text-green-600">{stats.activeEmployees}</p>
               </div>
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.success + '20' }}>
-                <TrendingUp className="w-6 h-6" style={{ color: colors.success }} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                <TrendingUp className="w-6 h-6 text-white" />
               </div>
             </div>
           </motion.div>
@@ -387,15 +391,15 @@ export default function CompanyDashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className={cardStyles.flat + " p-6"}
+            className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Meghívott</p>
-                <p className="text-3xl font-semibold text-amber-600">{stats.invitedEmployees}</p>
+                <p className="text-3xl font-bold text-amber-600">{stats.invitedEmployees}</p>
               </div>
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
-                <Clock className="w-6 h-6 text-amber-600" />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg">
+                <Clock className="w-6 h-6 text-white" />
               </div>
             </div>
           </motion.div>
@@ -405,29 +409,29 @@ export default function CompanyDashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
-            className={cardStyles.flat + " p-6"}
+            className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Masterclassok</p>
-                <p className="text-3xl font-semibold" style={{ color: colors.accent }}>{stats.totalMasterclasses}</p>
+                <p className="text-3xl font-bold text-purple-600">{stats.totalMasterclasses}</p>
               </div>
-              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: colors.accent + '20' }}>
-                <GraduationCap className="w-6 h-6" style={{ color: colors.accent }} />
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+                <GraduationCap className="w-6 h-6 text-white" />
               </div>
             </div>
           </motion.div>
         </div>
 
         {/* Quick Actions */}
-        <div className={cardStyles.flat + " p-6 mb-8"}>
+        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Gyors műveletek
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link href="/company/dashboard/employees" className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-md transition-all text-left">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-blue-600" />
+            <Link href="/company/dashboard/employees" className="group flex items-center space-x-3 p-4 bg-white/50 border border-gray-200/50 rounded-lg hover:bg-white/80 hover:border-blue-300 hover:shadow-md transition-all text-left">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                <Users className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-medium text-gray-900">Alkalmazott hozzáadása</p>
@@ -435,9 +439,9 @@ export default function CompanyDashboardPage() {
               </div>
             </Link>
 
-            <Link href="/company/dashboard/masterclasses" className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-md transition-all text-left">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-5 h-5 text-purple-600" />
+            <Link href="/company/dashboard/masterclasses" className="group flex items-center space-x-3 p-4 bg-white/50 border border-gray-200/50 rounded-lg hover:bg-white/80 hover:border-purple-300 hover:shadow-md transition-all text-left">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                <GraduationCap className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-medium text-gray-900">Masterclass kezelése</p>
@@ -445,9 +449,9 @@ export default function CompanyDashboardPage() {
               </div>
             </Link>
 
-            <Link href="/company/dashboard/progress" className="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:border-gray-900 hover:shadow-md transition-all text-left">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+            <Link href="/company/dashboard/progress" className="group flex items-center space-x-3 p-4 bg-white/50 border border-gray-200/50 rounded-lg hover:bg-white/80 hover:border-green-300 hover:shadow-md transition-all text-left">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                <TrendingUp className="w-5 h-5 text-white" />
               </div>
               <div>
                 <p className="font-medium text-gray-900">Riportok megtekintése</p>

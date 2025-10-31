@@ -199,17 +199,31 @@ export interface RemoveTeamMemberResponse {
   error?: string;
 }
 
+export interface TeamDashboardData {
+  team: Team;
+  members: TeamMember[];
+  owner: {
+    id: string;
+    email: string;
+    name: string;
+  };
+  stats: {
+    totalMembers: number;
+    activeMembers: number;
+    invitedMembers: number;
+  };
+  subscription: {
+    status: SubscriptionStatus;
+    plan: SubscriptionPlan;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+  };
+}
+
 export interface GetTeamDashboardResponse {
   success: boolean;
-  data?: {
-    team: Team;
-    members: TeamMember[];
-    stats: {
-      totalMembers: number;
-      activeMembers: number;
-      invitedMembers: number;
-    };
-  };
+  data?: TeamDashboardData;
   error?: string;
 }
 

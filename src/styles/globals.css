@@ -5,6 +5,57 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Landing page buttons */
+  .btn,
+  .btn-sm {
+    @apply text-sm font-medium inline-flex items-center justify-center rounded-lg whitespace-nowrap transition-all;
+  }
+
+  .btn {
+    @apply px-4 py-[11px] shadow-lg;
+  }
+
+  .btn-sm {
+    @apply px-3 py-[5px] shadow-sm;
+  }
+
+  /* Landing page forms */
+  .form-input,
+  .form-textarea,
+  .form-multiselect,
+  .form-select,
+  .form-checkbox,
+  .form-radio {
+    @apply border border-gray-200 shadow-sm rounded-lg focus:ring-0 focus:ring-offset-0;
+  }
+
+  .form-input,
+  .form-textarea,
+  .form-multiselect,
+  .form-select {
+    @apply bg-white text-sm py-2.5 px-4 focus:border-blue-300;
+  }
+
+  .form-input,
+  .form-textarea {
+    @apply placeholder-gray-400;
+  }
+
+  .form-select {
+    @apply pr-10;
+  }
+
+  .form-checkbox,
+  .form-radio {
+    @apply text-gray-800 checked:bg-blue-500 checked:border-transparent;
+  }
+
+  .form-checkbox {
+    @apply rounded-sm;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
