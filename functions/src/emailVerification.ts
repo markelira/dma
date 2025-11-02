@@ -374,7 +374,13 @@ export const verifyEmailCode = onCall({
       throw new Error('A kód lejárt. Kérj új kódot.');
     }
 
-    // Code is valid! Update user document
+    // Code is valid! Update Firebase Auth user emailVerified flag
+    await admin.auth().updateUser(userId, {
+      emailVerified: true
+    });
+    logger.info(`Firebase Auth emailVerified flag updated for user ${userId}`);
+
+    // Update user document in Firestore
     await firestore.collection('users').doc(userId).update({
       emailVerified: true,
       emailVerifiedAt: new Date().toISOString(),

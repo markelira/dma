@@ -172,6 +172,7 @@ function createVerificationEmailTemplate(code, email) {
 exports.sendEmailVerificationCode = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {
         // Authentication check
@@ -179,18 +180,27 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
             throw new Error('Hitelesítés szükséges');
         }
         const userId = request.auth.uid;
-        // Get user document
-        const userDoc = await firestore.collection('users').doc(userId).get();
-        if (!userDoc.exists) {
-            throw new Error('Felhasználó nem található');
+        // Get email directly from auth token (works even if Firestore document doesn't exist yet)
+        const email = request.auth.token.email;
+        if (!email) {
+            throw new Error('Email cím nem található az auth tokenben');
         }
-        const userData = userDoc.data();
-        if (!userData) {
-            throw new Error('Felhasználói adatok nem találhatók');
+        // Check if already verified (optional check, don't fail if document doesn't exist yet)
+        let alreadyVerified = false;
+        try {
+            const userDoc = await firestore.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                if (userData?.emailVerified === true) {
+                    alreadyVerified = true;
+                }
+            }
         }
-        const email = userData.email;
-        // Check if already verified
-        if (userData.emailVerified === true) {
+        catch (error) {
+            // Document doesn't exist yet (user just registered), continue with verification
+            v2_1.logger.info(`User document not yet available for ${userId}, proceeding with verification`);
+        }
+        if (alreadyVerified) {
             return {
                 success: true,
                 alreadyVerified: true,
@@ -308,6 +318,7 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
 exports.verifyEmailCode = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {
         // Authentication check
@@ -364,7 +375,12 @@ exports.verifyEmailCode = (0, https_1.onCall)({
                 .update({ used: true, expiredAt: new Date().toISOString() });
             throw new Error('A kód lejárt. Kérj új kódot.');
         }
-        // Code is valid! Update user document
+        // Code is valid! Update Firebase Auth user emailVerified flag
+        await admin.auth().updateUser(userId, {
+            emailVerified: true
+        });
+        v2_1.logger.info(`Firebase Auth emailVerified flag updated for user ${userId}`);
+        // Update user document in Firestore
         await firestore.collection('users').doc(userId).update({
             emailVerified: true,
             emailVerifiedAt: new Date().toISOString(),
@@ -403,6 +419,7 @@ exports.verifyEmailCode = (0, https_1.onCall)({
 exports.resendVerificationCode = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {
         // Authentication check
