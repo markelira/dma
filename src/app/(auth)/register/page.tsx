@@ -158,8 +158,24 @@ function RegisterPageContent() {
   }
 
   // If user is authenticated, show nothing (will redirect)
-  if (user) {
+  // EXCEPT when we're showing the verification modal
+  if (user && !showVerificationModal) {
     return null;
+  }
+
+  // If showing verification modal, only render the modal
+  if (showVerificationModal && registeredUserId) {
+    return (
+      <EmailVerificationModal
+        email={formData.email}
+        userId={registeredUserId}
+        onVerified={() => {
+          console.log('[Register Page] Email verified, redirecting to:', redirectTo);
+          setShowVerificationModal(false);
+          router.push(redirectTo);
+        }}
+      />
+    );
   }
 
   // Show account type selector if no type selected
@@ -336,19 +352,6 @@ function RegisterPageContent() {
           Bejelentkezés
         </Link>
       </div>
-
-      {/* Email Verification Modal */}
-      {showVerificationModal && registeredUserId && (
-        <EmailVerificationModal
-          email={formData.email}
-          userId={registeredUserId}
-          onVerified={() => {
-            console.log('[Register Page] Email verified, redirecting to:', redirectTo);
-            setShowVerificationModal(false);
-            router.push(redirectTo);
-          }}
-        />
-      )}
     </>
   );
 }
