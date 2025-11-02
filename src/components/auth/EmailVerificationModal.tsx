@@ -19,11 +19,6 @@ export function EmailVerificationModal({
   onVerified,
   userId
 }: EmailVerificationModalProps) {
-  // Force client-side only rendering
-  if (typeof window === 'undefined') {
-    return null
-  }
-
   const [code, setCode] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState('')
