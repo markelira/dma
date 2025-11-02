@@ -2,18 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth, functions } from '@/lib/firebase';
+import { functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
-import { useAuth, AuthProvider } from '@/contexts/AuthContext';
+import { useLogin } from '@/hooks/useAuthQueries';
+import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, CheckCircle, AlertCircle, X } from 'lucide-react';
 
-function LoginPageContent() {
+export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user, isLoading } = useAuthStore();
+  const loginMutation = useLogin();
 
   // Check for email verification success
   const verifiedParam = searchParams?.get('verified');
@@ -22,8 +23,6 @@ function LoginPageContent() {
 
   const [email, setEmail] = useState(emailParam || '');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showVerificationSuccess, setShowVerificationSuccess] = useState(isVerified);
 
   // Forgot password states
@@ -38,34 +37,24 @@ function LoginPageContent() {
 
   useEffect(() => {
     // If user is already authenticated, redirect
-    if (user && !authLoading) {
+    if (user && !isLoading) {
       console.log('[Login Page] User authenticated, redirecting to:', redirectTo);
       router.push(redirectTo);
     }
-  }, [user, authLoading, redirectTo, router]);
+  }, [user, isLoading, redirectTo, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log('[Login Page] Auth success, redirecting to:', redirectTo);
-      router.push(redirectTo);
-    } catch (err: any) {
-      console.error('Login error:', err);
-
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setError('Hibás email cím vagy jelszó');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Túl sok sikertelen próbálkozás. Kérjük, próbálja újra később.');
-      } else {
-        setError('Bejelentkezési hiba történt. Kérjük, próbálja újra.');
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          console.log('[Login Page] Auth success, redirecting to:', redirectTo);
+          router.push(redirectTo);
+        }
       }
-    } finally {
-      setLoading(false);
-    }
+    );
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -113,8 +102,8 @@ function LoginPageContent() {
     }
   };
 
-  if (authLoading) {
-    return null; // Auth layout will handle the loading state
+  if (isLoading) {
+    return null; // Show nothing while loading, auth will initialize
   }
 
   // If user is authenticated, show nothing (will redirect)
@@ -163,9 +152,9 @@ function LoginPageContent() {
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
-        {error && (
+        {loginMutation.error && (
           <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">
-            {error}
+            {loginMutation.error.message}
           </div>
         )}
 
@@ -185,7 +174,7 @@ function LoginPageContent() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              disabled={loading}
+              disabled={loginMutation.isPending}
             />
           </div>
           <div>
@@ -204,7 +193,7 @@ function LoginPageContent() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              disabled={loading}
+              disabled={loginMutation.isPending}
             />
           </div>
         </div>
@@ -212,9 +201,9 @@ function LoginPageContent() {
           <button
             type="submit"
             className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
-            disabled={loading}
+            disabled={loginMutation.isPending}
           >
-            {loading ? 'Bejelentkezés...' : 'Bejelentkezés'}
+            {loginMutation.isPending ? 'Bejelentkezés...' : 'Bejelentkezés'}
           </button>
         </div>
       </form>
@@ -330,13 +319,5 @@ function LoginPageContent() {
         </Link>
       </div>
     </>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <AuthProvider>
-      <LoginPageContent />
-    </AuthProvider>
   );
 }
