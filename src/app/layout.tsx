@@ -44,7 +44,7 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config','${process.env.NEXT_PUBLIC_GA_ID}', { page_path: window.location.pathname });`}
       </Script>
-      <body className={`${inter.variable} bg-gray-50 font-inter tracking-tight text-gray-900 antialiased min-h-screen`}>
+      <body className={`${inter.variable} bg-gray-50 font-sans tracking-tight text-gray-900 antialiased min-h-screen`}>
         <ErrorBoundary>
           <ReactQueryProvider>
             <AuthProvider>

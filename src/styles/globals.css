@@ -1,5 +1,4 @@
-/* DMA.hu Brand Typography - Titillium Web */
-@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap');
+/* DMA.hu Brand Typography - Inter (loaded via Next.js font optimization) */
 
 @tailwind base;
 @tailwind components;
@@ -536,23 +535,23 @@
 
 html {
   font-size: var(--font-size);
-  font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* ============================================
    DMA.hu Brand-Specific Styles
    ============================================ */
 
-/* Typography - Titillium Web */
+/* Typography - Inter */
 body {
-  font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 14px;
   line-height: 1.8;
   letter-spacing: 0.6px;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
   line-height: 1.4;
 }

@@ -16,12 +16,12 @@ module.exports = {
     },
     extend: {
       fontFamily: {
-        sans: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'Inter', 'ui-sans-serif', 'system-ui'],
-        display: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
-        heading: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
-        serif: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
-        inter: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'Inter', 'ui-sans-serif', 'system-ui'],
-        academic: ['Titillium Web', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+        sans: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'ui-sans-serif', 'system-ui'],
+        display: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+        heading: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+        serif: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
+        inter: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'ui-sans-serif', 'system-ui'],
+        academic: ['var(--font-inter)', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui'],
       },
       colors: {
         border: "hsl(var(--border))",
