@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navbar } from '@/components/navigation/navbar';
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import { Footer } from '@/components/navigation/footer';
 
 interface MainLayoutProps {
@@ -9,7 +9,7 @@ interface MainLayoutProps {
 export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar />
+      <FramerNavbarWrapper />
       <div className="flex-1">{children}</div>
       <Footer />
     </div>

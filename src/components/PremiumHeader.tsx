@@ -1,11 +1,11 @@
 'use client'
 
-import { Navbar } from '@/components/navigation/navbar'
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 
 /**
  * PremiumHeader component
- * Wrapper around the existing Navbar component for marketing pages
+ * Wrapper around the Framer-style navbar with scroll behavior for marketing pages
  */
 export function PremiumHeader() {
-  return <Navbar />
+  return <FramerNavbarWrapper />
 }
