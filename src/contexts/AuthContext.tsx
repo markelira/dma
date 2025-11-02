@@ -178,12 +178,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       // Call Cloud Function to create user document
+      console.log('[AUTH] 🚀 About to call createUserProfile:', {
+        uid: result.user.uid,
+        email: email,
+        timestamp: new Date().toISOString()
+      });
+
       const createUser = httpsCallable(functions, 'createUserProfile');
-      await createUser({
+
+      console.log('[AUTH] 📞 httpsCallable created, making request...');
+
+      const profileResult = await createUser({
         uid: result.user.uid,
         email,
         ...userData
       });
+
+      console.log('[AUTH] ✅ createUserProfile success:', profileResult.data);
 
       const enrichedUser = await fetchUserData(result.user);
       setUser(enrichedUser);

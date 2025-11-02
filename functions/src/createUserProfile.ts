@@ -27,6 +27,13 @@ export const createUserProfile = onCall({
   cors: true,
   region: 'us-central1',
 }, async (request) => {
+  logger.info('🔵 [createUserProfile] Function invoked', {
+    hasAuth: !!request.auth,
+    origin: request.rawRequest?.headers?.origin,
+    method: request.rawRequest?.method,
+    timestamp: new Date().toISOString()
+  });
+
   try {
     // Input validation
     const validatedData = CreateUserProfileSchema.parse(request.data);

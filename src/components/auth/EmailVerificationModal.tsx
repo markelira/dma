@@ -19,18 +19,23 @@ export function EmailVerificationModal({
   onVerified,
   userId
 }: EmailVerificationModalProps) {
+  // Force client-side only rendering
+  if (typeof window === 'undefined') {
+    return null
+  }
+
   const [code, setCode] = useState('')
   const [isVerifying, setIsVerifying] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [resending, setResending] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
 
-  // Handle mounting for portal (SSR safety)
+  // Set up portal container on mount (client-side only)
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
+    setPortalContainer(document.body)
+    return () => setPortalContainer(null)
   }, [])
 
   // Mask email for display (e.g., j***@example.com)
@@ -154,8 +159,8 @@ export function EmailVerificationModal({
       </div>
     )
 
-    if (!mounted) return null
-    return createPortal(successModal, document.body)
+    if (!portalContainer) return null
+    return createPortal(successModal, portalContainer)
   }
 
   // Main verification modal
@@ -277,6 +282,6 @@ export function EmailVerificationModal({
     </div>
   )
 
-  if (!mounted) return null
-  return createPortal(mainModal, document.body)
+  if (!portalContainer) return null
+  return createPortal(mainModal, portalContainer)
 }

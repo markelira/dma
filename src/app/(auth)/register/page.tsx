@@ -103,14 +103,19 @@ function RegisterPageContent() {
       });
 
       console.log('[Register Page] Auth success, sending verification code');
+      console.log('[Register Page] User ID:', userCredential.user.uid);
+      console.log('[Register Page] Email:', formData.email);
 
       // Store user ID for verification modal
       setRegisteredUserId(userCredential.user.uid);
 
       // Send verification code
       try {
+        console.log('[Register Page] Calling sendEmailVerificationCode function...');
         const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
         const result = await sendEmailVerificationCode({}) as any;
+
+        console.log('[Register Page] Function call completed:', result.data);
 
         if (result.data.success) {
           console.log('[Register Page] Verification code sent successfully');
@@ -121,14 +126,22 @@ function RegisterPageContent() {
           }
 
           // Show verification modal (hard block)
+          console.log('[Register Page] Setting showVerificationModal to true');
           setShowVerificationModal(true);
         } else {
           console.error('[Register Page] Failed to send verification code:', result.data.error);
+          console.log('[Register Page] Still showing modal - user can try resend');
           // Still show modal - user can try resend
           setShowVerificationModal(true);
         }
-      } catch (emailError) {
+      } catch (emailError: any) {
         console.error('[Register Page] Error sending verification code:', emailError);
+        console.error('[Register Page] Error details:', {
+          message: emailError.message,
+          code: emailError.code,
+          details: emailError.details
+        });
+        console.log('[Register Page] Still showing modal - user can try resend');
         // Still show modal - user can try resend
         setShowVerificationModal(true);
       }
@@ -165,6 +178,10 @@ function RegisterPageContent() {
 
   // If showing verification modal, only render the modal
   if (showVerificationModal && registeredUserId) {
+    console.log('[Register Page] Rendering EmailVerificationModal component');
+    console.log('[Register Page] Modal state - showVerificationModal:', showVerificationModal);
+    console.log('[Register Page] Modal state - registeredUserId:', registeredUserId);
+    console.log('[Register Page] Modal state - email:', formData.email);
     return (
       <EmailVerificationModal
         email={formData.email}
