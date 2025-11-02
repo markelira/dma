@@ -1,38 +1,16 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { FramerNavbarInitial } from './framer-navbar-initial'
-import { FramerNavbarScroll } from './framer-navbar-scroll'
+import { FramerNavbarUnified } from './framer-navbar-unified'
 import { useAuthStore } from '@/stores/authStore'
 import { useLogout } from '@/hooks/useLogout'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
-const SCROLL_THRESHOLD = 100 // pixels
-
 export function FramerNavbarWrapper() {
-  const [scrolled, setScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { isAuthenticated, user } = useAuthStore()
   const logout = useLogout()
-
-  // Handle scroll detection
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY
-      setScrolled(scrollPosition > SCROLL_THRESHOLD)
-    }
-
-    // Set initial state
-    handleScroll()
-
-    // Add scroll listener
-    window.addEventListener('scroll', handleScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -57,29 +35,8 @@ export function FramerNavbarWrapper() {
 
   return (
     <>
-      {/* Initial Navbar - Hidden when scrolled */}
-      <div
-        className="transition-all duration-300"
-        style={{
-          opacity: scrolled ? 0 : 1,
-          pointerEvents: scrolled ? 'none' : 'auto',
-          transform: scrolled ? 'translateY(-20px)' : 'translateY(0)',
-        }}
-      >
-        <FramerNavbarInitial onMobileMenuToggle={toggleMobileMenu} />
-      </div>
-
-      {/* Scroll Navbar - Shown when scrolled */}
-      <div
-        className="transition-all duration-300"
-        style={{
-          opacity: scrolled ? 1 : 0,
-          pointerEvents: scrolled ? 'auto' : 'none',
-          transform: scrolled ? 'translateY(0)' : 'translateY(-20px)',
-        }}
-      >
-        <FramerNavbarScroll onMobileMenuToggle={toggleMobileMenu} />
-      </div>
+      {/* Unified morphing navbar */}
+      <FramerNavbarUnified onMobileMenuToggle={toggleMobileMenu} />
 
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (

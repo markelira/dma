@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import "@/styles/framer.css";
 
-import Hero from "@/components/landing-home/HeroHome";
+import CustomHero from "@/components/landing-home/CustomHero";
+import CompanyLogos from "@/components/landing-home/CompanyLogos";
 import BusinessCategories from "@/components/landing-home/BusinessCategories";
 import FeaturesPlanet from "@/components/landing-home/FeaturesPlanet";
 import LargeTestimonial from "@/components/landing-home/LargeTestimonial";
@@ -26,7 +28,8 @@ export default function Home() {
     <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
       <FramerNavbarWrapper />
       <main className="grow">
-        <Hero />
+        <CustomHero />
+        <CompanyLogos />
         <BusinessCategories />
         <FeaturesPlanet />
         <LargeTestimonial />

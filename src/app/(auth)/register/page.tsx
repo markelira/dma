@@ -25,6 +25,7 @@ function RegisterPageContent() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isCompanyRegistering, setIsCompanyRegistering] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
 
@@ -40,9 +41,10 @@ function RegisterPageContent() {
 
   useEffect(() => {
     // If user is already authenticated, redirect based on role
-    // BUT: Don't redirect if we're in the middle of company registration
+    // BUT: Don't redirect if we're in the middle of company registration OR email verification
     // (CompanyRegisterForm handles its own redirect after claims propagate)
-    if (user && !authLoading && !isCompanyRegistering) {
+    // (EmailVerificationModal handles redirect after verification)
+    if (user && !authLoading && !isCompanyRegistering && !isVerifying) {
       if (user.role === 'company_admin' || user.role === 'COMPANY_ADMIN') {
         console.log('[Register Page] COMPANY_ADMIN user authenticated, redirecting to /company/dashboard');
         router.push('/company/dashboard');
@@ -54,7 +56,7 @@ function RegisterPageContent() {
         router.push(redirectTo);
       }
     }
-  }, [user, authLoading, redirectTo, router, isCompanyRegistering]);
+  }, [user, authLoading, redirectTo, router, isCompanyRegistering, isVerifying]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -92,6 +94,9 @@ function RegisterPageContent() {
     }
 
     try {
+      // Set verifying flag to prevent auto-redirect
+      setIsVerifying(true);
+
       const userCredential = await registerUser(formData.email, formData.password, {
         firstName: formData.firstName,
         lastName: formData.lastName
@@ -129,6 +134,9 @@ function RegisterPageContent() {
       }
     } catch (err: any) {
       console.error('Registration error:', err);
+
+      // Reset verification flag on error
+      setIsVerifying(false);
 
       if (err.code === 'auth/email-already-in-use') {
         setError('Ez az email cím már használatban van');

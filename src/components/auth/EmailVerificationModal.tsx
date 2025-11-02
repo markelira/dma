@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import { CheckCircle, Loader2, AlertCircle, Mail } from 'lucide-react'
 import { OTPInput } from './OTPInput'
@@ -24,6 +25,13 @@ export function EmailVerificationModal({
   const [success, setSuccess] = useState(false)
   const [resendCooldown, setResendCooldown] = useState(0)
   const [resending, setResending] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Handle mounting for portal (SSR safety)
+  useEffect(() => {
+    setMounted(true)
+    return () => setMounted(false)
+  }, [])
 
   // Mask email for display (e.g., j***@example.com)
   const maskEmail = (email: string): string => {
@@ -109,8 +117,8 @@ export function EmailVerificationModal({
 
   // Success state
   if (success) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+    const successModal = (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -145,11 +153,14 @@ export function EmailVerificationModal({
         </motion.div>
       </div>
     )
+
+    if (!mounted) return null
+    return createPortal(successModal, document.body)
   }
 
   // Main verification modal
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+  const mainModal = (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -265,4 +276,7 @@ export function EmailVerificationModal({
       </motion.div>
     </div>
   )
+
+  if (!mounted) return null
+  return createPortal(mainModal, document.body)
 }

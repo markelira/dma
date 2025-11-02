@@ -13,14 +13,15 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
   const { isAuthenticated, user, isLoading } = useAuthStore()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 w-full">
-      <nav className="w-full py-4 px-6 lg:px-12">
-        <div className="container mx-auto">
-          {/* Content wrapper with glassmorphism effect */}
+    <header className="w-full">
+      <nav className="w-full py-4 px-6">
+        {/* Centered container with narrower max-width */}
+        <div className="mx-auto max-w-4xl">
+          {/* Rounded pill with glassmorphism - taller height */}
           <div
-            className="flex items-center justify-between h-14 px-6 rounded-[40px] transition-all duration-300"
+            className="flex items-center justify-between h-16 px-8 rounded-[40px] transition-all duration-300 shadow-sm"
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.25)',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
               border: '1px solid rgba(117, 115, 114, 0.15)',
@@ -42,19 +43,19 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
             <div className="hidden md:flex items-center gap-6">
               <Link
                 href="/courses"
-                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20 hover:border hover:border-gray-300/15"
+                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 hover:border hover:border-gray-300/20"
               >
                 Kurzusok
               </Link>
               <Link
                 href="/pricing"
-                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20 hover:border hover:border-gray-300/15"
+                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 hover:border hover:border-gray-300/20"
               >
                 Árazás
               </Link>
               <Link
                 href="/blog"
-                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20 hover:border hover:border-gray-300/15"
+                className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 hover:border hover:border-gray-300/20"
               >
                 Blog
               </Link>
@@ -66,7 +67,7 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
                 <Link href={user.role === 'INSTRUCTOR' ? '/instructor/dashboard' : user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}>
                   <Button
                     size="sm"
-                    className="bg-primary hover:bg-primary-hover text-white px-5 py-2 text-sm rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 text-sm rounded-full font-medium transition-all duration-200"
                   >
                     Irányítópult
                   </Button>
@@ -75,7 +76,7 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
                 <Link href="/login">
                   <Button
                     size="sm"
-                    className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 text-sm rounded-full font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                    className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 text-sm rounded-full font-medium transition-all duration-200"
                   >
                     Bejelentkezés
                   </Button>
