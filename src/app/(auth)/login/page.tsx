@@ -46,15 +46,9 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    loginMutation.mutate(
-      { email, password },
-      {
-        onSuccess: () => {
-          console.log('[Login Page] Auth success, redirecting to:', redirectTo);
-          router.push(redirectTo);
-        }
-      }
-    );
+    // Remove onSuccess callback - let useEffect handle redirect
+    // This prevents duplicate redirects racing each other
+    loginMutation.mutate({ email, password });
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {

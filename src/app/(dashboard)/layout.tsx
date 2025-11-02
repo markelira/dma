@@ -18,7 +18,10 @@ export default function DashboardRouteGroupLayout({
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [DashboardLayout] No user found, redirecting to login')
-        router.replace('/login?redirect_to=/dashboard')
+        // Only redirect if we're not already on the login page to prevent loops
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+          router.replace('/login?redirect_to=/dashboard')
+        }
       } else if (user.role === 'COMPANY_ADMIN') {
         console.log('🏢 [DashboardLayout] COMPANY_ADMIN user, redirecting to company dashboard')
         router.replace('/company/dashboard')
