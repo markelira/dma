@@ -59,6 +59,7 @@ const CreateUserProfileSchema = z.object({
 exports.createUserProfile = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     v2_1.logger.info('🔵 [createUserProfile] Function invoked', {
         hasAuth: !!request.auth,

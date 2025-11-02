@@ -17,15 +17,16 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         try {
-          // Force token refresh to ensure fresh token and get custom claims
-          const idToken = await fbUser.getIdToken(true)
-          const tokenResult = await fbUser.getIdTokenResult(true)
+          // Get token WITHOUT forcing refresh (only refresh when needed)
+          const idToken = await fbUser.getIdToken(false)
+          const tokenResult = await fbUser.getIdTokenResult(false)
           const customClaims = tokenResult.claims
 
           console.log('[AuthProvider] Custom claims:', customClaims)
 
-          // If we already have this token stored, skip refresh
-          if (accessToken === idToken && user) {
+          // If we already have this user stored, skip re-fetching
+          if (user && user.uid === fbUser.uid && accessToken === idToken) {
+            console.log('[AuthProvider] User already in store, skipping update')
             setAuthReady(true)
             return
           }
