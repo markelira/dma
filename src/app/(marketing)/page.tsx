@@ -9,7 +9,7 @@ import BusinessCategories from "@/components/landing-home/BusinessCategories";
 import FeaturesPlanet from "@/components/landing-home/FeaturesPlanet";
 import LargeTestimonial from "@/components/landing-home/LargeTestimonial";
 import Cta from "@/components/landing-home/Cta";
-import Header from "@/components/landing-home/ui/header";
+import { FramerNavbarWrapper } from "@/components/navigation/framer-navbar-wrapper";
 import Footer from "@/components/landing-home/ui/footer";
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
-      <Header />
+      <FramerNavbarWrapper />
       <main className="grow">
         <Hero />
         <BusinessCategories />

@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import React, { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
-import Header from '@/components/landing-home/ui/header';
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import Footer from '@/components/landing-home/ui/footer';
 import { CourseDetailHero } from '@/components/course/CourseDetailHero';
 import { CourseDetailStatsBar } from '@/components/course/CourseDetailStatsBar';
@@ -48,7 +48,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   if (isLoading) {
     return (
       <AuthProvider>
-        <Header />
+        <FramerNavbarWrapper />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
@@ -64,7 +64,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   if (error || !course) {
     return (
       <AuthProvider>
-        <Header />
+        <FramerNavbarWrapper />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Kurzus nem található</h1>
