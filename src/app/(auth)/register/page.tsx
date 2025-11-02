@@ -13,7 +13,7 @@ import Link from 'next/link';
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading, register: registerUser, refreshUser } = useAuth();
+  const { user, loading: authLoading, register: registerUser, logout } = useAuth();
 
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [formData, setFormData] = useState({
@@ -187,15 +187,16 @@ function RegisterPageContent() {
         email={formData.email}
         userId={registeredUserId}
         onVerified={async () => {
-          console.log('[Register Page] Email verified, refreshing user data...');
+          console.log('[Register Page] Email verified successfully');
           setIsVerifying(false);
           setShowVerificationModal(false);
 
-          // Refresh user data to get updated emailVerified status from Firestore
-          await refreshUser();
+          // Sign out the user (they registered but haven't logged in to AuthStore)
+          await logout();
 
-          console.log('[Register Page] User data refreshed, redirecting to:', redirectTo);
-          router.push(redirectTo);
+          // Redirect to login page with verification success message
+          console.log('[Register Page] Redirecting to login with verification success');
+          router.push('/login?verified=true&email=' + encodeURIComponent(formData.email));
         }}
       />
     );

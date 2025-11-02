@@ -15,10 +15,16 @@ function LoginPageContent() {
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
 
-  const [email, setEmail] = useState('');
+  // Check for email verification success
+  const verifiedParam = searchParams?.get('verified');
+  const emailParam = searchParams?.get('email');
+  const isVerified = verifiedParam === 'true';
+
+  const [email, setEmail] = useState(emailParam || '');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showVerificationSuccess, setShowVerificationSuccess] = useState(isVerified);
 
   // Forgot password states
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -121,6 +127,39 @@ function LoginPageContent() {
       <div className="mb-10">
         <h1 className="text-4xl font-bold">Jelentkezz be a fiókodba</h1>
       </div>
+
+      {/* Email Verification Success Message */}
+      <AnimatePresence>
+        {showVerificationSuccess && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6"
+          >
+            <div className="rounded-lg bg-green-50 p-4 border border-green-200">
+              <div className="flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-green-900 mb-1">
+                    Email megerősítve!
+                  </p>
+                  <p className="text-sm text-green-800">
+                    Az email címed sikeresen megerősítettük. Most már bejelentkezhetsz a fiókodba.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowVerificationSuccess(false)}
+                  className="text-green-600 hover:text-green-700 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Form */}
       <form onSubmit={handleSubmit}>
