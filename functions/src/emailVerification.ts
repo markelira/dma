@@ -137,13 +137,9 @@ function createVerificationEmailTemplate(code: string, email: string): string {
  * Code expires in 15 minutes
  */
 export const sendEmailVerificationCode = onCall({
-  cors: [
-    'https://www.academion.hu',
-    'https://academion.hu',
-    'https://dma-nine-delta.vercel.app',
-    'http://localhost:3000'
-  ],
+  cors: true,
   region: 'us-central1',
+  invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {
     // Authentication check
@@ -153,21 +149,28 @@ export const sendEmailVerificationCode = onCall({
 
     const userId = request.auth.uid;
 
-    // Get user document
-    const userDoc = await firestore.collection('users').doc(userId).get();
-    if (!userDoc.exists) {
-      throw new Error('Felhasználó nem található');
+    // Get email directly from auth token (works even if Firestore document doesn't exist yet)
+    const email = request.auth.token.email as string;
+    if (!email) {
+      throw new Error('Email cím nem található az auth tokenben');
     }
 
-    const userData = userDoc.data();
-    if (!userData) {
-      throw new Error('Felhasználói adatok nem találhatók');
+    // Check if already verified (optional check, don't fail if document doesn't exist yet)
+    let alreadyVerified = false;
+    try {
+      const userDoc = await firestore.collection('users').doc(userId).get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (userData?.emailVerified === true) {
+          alreadyVerified = true;
+        }
+      }
+    } catch (error) {
+      // Document doesn't exist yet (user just registered), continue with verification
+      logger.info(`User document not yet available for ${userId}, proceeding with verification`);
     }
 
-    const email = userData.email;
-
-    // Check if already verified
-    if (userData.emailVerified === true) {
+    if (alreadyVerified) {
       return {
         success: true,
         alreadyVerified: true,
@@ -299,13 +302,9 @@ export const sendEmailVerificationCode = onCall({
  * Max 3 attempts per code, then locked
  */
 export const verifyEmailCode = onCall({
-  cors: [
-    'https://www.academion.hu',
-    'https://academion.hu',
-    'https://dma-nine-delta.vercel.app',
-    'http://localhost:3000'
-  ],
+  cors: true,
   region: 'us-central1',
+  invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {
     // Authentication check
@@ -417,13 +416,9 @@ export const verifyEmailCode = onCall({
  * Cooldown: 60 seconds between requests
  */
 export const resendVerificationCode = onCall({
-  cors: [
-    'https://www.academion.hu',
-    'https://academion.hu',
-    'https://dma-nine-delta.vercel.app',
-    'http://localhost:3000'
-  ],
+  cors: true,
   region: 'us-central1',
+  invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {
     // Authentication check

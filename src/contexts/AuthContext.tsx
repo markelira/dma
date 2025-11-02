@@ -90,13 +90,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const idTokenResult = await firebaseUser.getIdTokenResult(true);
       const customClaims = idTokenResult.claims;
 
-      // Fetch user document from Firestore
-      const userDocRef = doc(db, 'users', firebaseUser.uid);
-      const userDocSnap = await getDoc(userDocRef);
+      // Try to fetch user document from Firestore, but don't fail if it doesn't exist yet
+      let userData: any = null;
+      try {
+        const userDocRef = doc(db, 'users', firebaseUser.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        if (userDocSnap.exists()) {
+          userData = userDocSnap.data();
+        }
+      } catch (docError) {
+        // Document doesn't exist yet or permission denied (new registration)
+        // Fall back to custom claims
+        console.warn('User document not yet available, using custom claims:', docError);
+      }
 
-      if (userDocSnap.exists()) {
-        const userData = userDocSnap.data();
-
+      if (userData) {
         return {
           ...firebaseUser,
           role: userData.role || customClaims.role,

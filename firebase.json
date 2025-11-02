@@ -25,6 +25,14 @@
     },
     "rewrites": [
       {
+        "source": "/__/functions/**",
+        "function": {
+          "functionId": "**",
+          "region": "us-central1",
+          "pinTag": false
+        }
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

@@ -24,13 +24,9 @@ const CreateUserProfileSchema = z.object({
  * Create user profile in Firestore
  */
 export const createUserProfile = onCall({
-  cors: [
-    'https://www.academion.hu',
-    'https://academion.hu',
-    'https://dma-nine-delta.vercel.app',
-    'http://localhost:3000'
-  ],
+  cors: true,
   region: 'us-central1',
+  invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   logger.info('🔵 [createUserProfile] Function invoked', {
     hasAuth: !!request.auth,

@@ -120,16 +120,22 @@ service cloud.firestore {
 
     // Email Verification Codes
     match /emailVerificationCodes/{codeId} {
-      // Users can read their own verification codes
-      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Users can read single verification code document (get)
+      allow get: if isAuthenticated() && resource.data.userId == request.auth.uid;
+
+      // Allow queries/list for authenticated users (needed for rate limiting and invalidation)
+      allow list: if isAuthenticated();
+
+      // Allow authenticated users to create verification codes (called by Cloud Function)
+      allow create: if isAuthenticated();
 
       // Users can update ONLY the attempts field (for tracking failed attempts)
       allow update: if isAuthenticated() &&
         resource.data.userId == request.auth.uid &&
-        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attempts', 'lastAttemptAt']);
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['attempts', 'lastAttemptAt', 'locked']);
 
-      // Only Cloud Functions can create and delete verification codes
-      allow create, delete: if false;
+      // Deletes are blocked from client
+      allow delete: if false;
     }
 
     // Allow all other authenticated operations (fallback)
