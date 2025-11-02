@@ -84,10 +84,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   // Fetch additional user data from Firestore and custom claims
-  const fetchUserData = async (firebaseUser: User): Promise<AuthUser> => {
+  const fetchUserData = async (firebaseUser: User, forceRefresh: boolean = false): Promise<AuthUser> => {
     try {
-      // Force token refresh to get latest custom claims (including company data)
-      const idTokenResult = await firebaseUser.getIdTokenResult(true);
+      // Get token result (only force refresh when explicitly needed)
+      const idTokenResult = await firebaseUser.getIdTokenResult(forceRefresh);
       const customClaims = idTokenResult.claims;
 
       // Try to fetch user document from Firestore, but don't fail if it doesn't exist yet
@@ -286,7 +286,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async () => {
     if (user) {
-      const enrichedUser = await fetchUserData(user);
+      const enrichedUser = await fetchUserData(user, true); // Force token refresh
       setUser(enrichedUser);
     }
   };

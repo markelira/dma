@@ -13,7 +13,7 @@ import Link from 'next/link';
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading, register: registerUser } = useAuth();
+  const { user, loading: authLoading, register: registerUser, refreshUser } = useAuth();
 
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [formData, setFormData] = useState({
@@ -186,9 +186,15 @@ function RegisterPageContent() {
       <EmailVerificationModal
         email={formData.email}
         userId={registeredUserId}
-        onVerified={() => {
-          console.log('[Register Page] Email verified, redirecting to:', redirectTo);
+        onVerified={async () => {
+          console.log('[Register Page] Email verified, refreshing user data...');
+          setIsVerifying(false);
           setShowVerificationModal(false);
+
+          // Refresh user data to get updated emailVerified status from Firestore
+          await refreshUser();
+
+          console.log('[Register Page] User data refreshed, redirecting to:', redirectTo);
           router.push(redirectTo);
         }}
       />
