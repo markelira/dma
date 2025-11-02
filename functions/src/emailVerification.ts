@@ -137,7 +137,12 @@ function createVerificationEmailTemplate(code: string, email: string): string {
  * Code expires in 15 minutes
  */
 export const sendEmailVerificationCode = onCall({
-  cors: true,
+  cors: [
+    'https://www.academion.hu',
+    'https://academion.hu',
+    'https://dma-nine-delta.vercel.app',
+    'http://localhost:3000'
+  ],
   region: 'us-central1',
 }, async (request) => {
   try {
@@ -294,7 +299,12 @@ export const sendEmailVerificationCode = onCall({
  * Max 3 attempts per code, then locked
  */
 export const verifyEmailCode = onCall({
-  cors: true,
+  cors: [
+    'https://www.academion.hu',
+    'https://academion.hu',
+    'https://dma-nine-delta.vercel.app',
+    'http://localhost:3000'
+  ],
   region: 'us-central1',
 }, async (request) => {
   try {
@@ -407,7 +417,12 @@ export const verifyEmailCode = onCall({
  * Cooldown: 60 seconds between requests
  */
 export const resendVerificationCode = onCall({
-  cors: true,
+  cors: [
+    'https://www.academion.hu',
+    'https://academion.hu',
+    'https://dma-nine-delta.vercel.app',
+    'http://localhost:3000'
+  ],
   region: 'us-central1',
 }, async (request) => {
   try {
