@@ -101,14 +101,14 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
 
   return (
     <div className="fixed inset-0 bg-gray-50 flex">
-      {/* Hamburger Menu Sidebar - Always hidden by default */}
+      {/* Sidebar - Always visible on desktop, collapsible on mobile */}
       <div className={`${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } fixed inset-y-0 left-0 z-50 w-96 bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-xl transform transition-transform duration-300 ease-in-out`}>
+      } fixed lg:relative inset-y-0 left-0 z-50 w-80 lg:w-96 bg-gradient-to-b from-blue-600 to-blue-700 text-white shadow-xl transform lg:transform-none transition-transform duration-300 ease-in-out lg:translate-x-0`}>
         <div className="flex flex-col h-full">
           {/* Course Header Section */}
           <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 lg:hidden">
               <Button
                 variant="ghost"
                 size="sm"
@@ -202,10 +202,10 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
         </div>
       </div>
 
-      {/* Sidebar Overlay */}
+      {/* Sidebar Overlay - Mobile only */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -221,7 +221,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => setSidebarOpen(true)}
-                  className="text-gray-600 hover:bg-gray-100 flex-shrink-0"
+                  className="text-gray-600 hover:bg-gray-100 flex-shrink-0 lg:hidden"
                   title="Kurzus tartalom (M)"
                 >
                   <Menu className="w-5 h-5" />
