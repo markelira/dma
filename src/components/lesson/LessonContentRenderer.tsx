@@ -1,9 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { VideoPlayer } from './VideoPlayer'
-import { FirebaseVideoPlayer } from './FirebaseVideoPlayer'
-import { EnhancedVideoPlayer } from './EnhancedVideoPlayer'
 import { LessonVideoPlayer } from './LessonVideoPlayer'
 import { QuizModal } from './QuizModal'
 import { InteractiveQuizEngine } from './InteractiveQuizEngine'
@@ -243,77 +240,29 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
         {/* VIDEO Content - handle both uppercase and lowercase */}
         {(lesson.type === 'VIDEO' || lesson.type === 'video') && (
           <div className="bg-black rounded-lg overflow-hidden">
-            {/* Priority 1: Use LessonVideoPlayer if muxPlaybackId is available */}
-            {lesson.muxPlaybackId ? (
-              <LessonVideoPlayer
-                playbackId={lesson.muxPlaybackId}
-                videoUrl={lesson.videoUrl}
-                onProgress={(currentTime, duration) => {
-                  const percentage = (currentTime / duration) * 100
-                  handleProgressUpdate(percentage, currentTime, {
-                    videoPosition: currentTime,
-                    videoDuration: duration
-                  })
-                }}
-                onComplete={() => {
-                  console.log('✅ [LessonContentRenderer] Video completed via LessonVideoPlayer')
-                  handleProgressUpdate(100, progress.timeSpent)
-                  onCompleted()
-                }}
-                autoPlay={false}
-                className="w-full"
-              />
-            ) : lesson.videoUrl?.includes('firebasestorage.googleapis.com') ? (
-              /* Priority 2: Use Firebase player for Firebase Storage URLs */
-              <FirebaseVideoPlayer
-                src={lesson.videoUrl}
-                lessonTitle={lesson.title}
-                lessonId={lesson.id}
-                courseId={courseId}
-                poster={lesson.thumbnailUrl}
-                onProgress={(percentage, timeSpent) => {
-                  handleProgressUpdate(percentage, timeSpent, {
-                    videoPosition: timeSpent
-                  })
-                }}
-                onEnded={() => {
-                  handleProgressUpdate(100, progress.timeSpent)
-                  onCompleted()
-                }}
-                chapters={playerData?.chapters || []}
-                startTime={resumeManager.getVideoResumeContext()?.startTime}
-              />
-            ) : (
-              /* Priority 3: Fallback to enhanced player */
-              <EnhancedVideoPlayer
-                src={playerData?.signedPlaybackUrl || lesson.videoUrl || ''}
-                playbackId={lesson.muxPlaybackId}
-                lessonTitle={lesson.title}
-                courseTitle={playerData?.course?.title}
-                lessonId={lesson.id}
-                courseId={courseId}
-                userId={userId}
-                poster={lesson.muxThumbnailUrl || lesson.thumbnailUrl}
-                onProgress={(percentage, timeSpent, analytics) => {
-                  handleProgressUpdate(percentage, timeSpent, {
-                    videoPosition: timeSpent,
-                    ...analytics
-                  })
-                }}
-                onCompleted={() => {
-                  handleProgressUpdate(100, progress.timeSpent)
-                }}
-                enableAnalytics={true}
-                chapters={playerData?.chapters || []}
-                initialNotes={playerData?.notes || []}
-                initialBookmarks={playerData?.bookmarks || []}
-                onNotesUpdate={(notes, bookmarks) => {
-                  console.log('📝 Notes updated:', notes.length, 'bookmarks:', bookmarks.length)
-                  // Here you could save notes/bookmarks to the backend
-                }}
-                resumeContext={resumeManager.getVideoResumeContext()}
-              />
-            )}
+            <LessonVideoPlayer
+              muxPlaybackId={lesson.muxPlaybackId}
+              videoUrl={playerData?.signedPlaybackUrl || lesson.videoUrl}
+              poster={lesson.muxThumbnailUrl || lesson.thumbnailUrl}
+              lessonTitle={lesson.title}
+              lessonId={lesson.id}
+              courseId={courseId}
+              userId={userId}
+              autoPlay={false}
+              startTime={resumeManager.getVideoResumeContext()?.startTime}
+              className="w-full"
+              onProgress={(percentage, timeSpent, analytics) => {
+                handleProgressUpdate(percentage, timeSpent, {
+                  videoPosition: timeSpent,
+                  ...analytics
+                })
+              }}
+              onEnded={() => {
+                console.log('✅ [LessonContentRenderer] Video completed')
+                handleProgressUpdate(100, progress.timeSpent)
+                onCompleted()
+              }}
+            />
           </div>
         )}
 

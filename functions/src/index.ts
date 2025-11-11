@@ -7,6 +7,7 @@ import { logger } from 'firebase-functions/v2';
 import * as nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import sgMail from '@sendgrid/mail';
+import { z } from 'zod';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -1101,7 +1102,6 @@ export const getCourse = onCall({
  * Get all courses with optional filters
  */
 export const getCoursesCallable = onCall({
-  cors: true,
   region: 'us-central1',
 }, async (request) => {
   try {
@@ -1350,7 +1350,7 @@ export { generateCSVReport } from './company/generateCSVReport';
 export { sendEmployeeReminder } from './company/sendReminder';
 
 // Export Mux video functions
-export { getMuxUploadUrl, getMuxAssetStatus, testVideoUpload } from './muxActions';
+export { getMuxUploadUrl, getMuxAssetStatus, testVideoUpload, migrateVideoToMux } from './muxActions';
 export { muxWebhook } from './muxWebhook';
 
 // Export course management functions
@@ -1364,7 +1364,6 @@ export { getSignedUploadUrl } from './fileActions';
  * Auto-creates default categories if none exist
  */
 export const getCategories = onCall({
-  cors: true,
   region: 'us-central1',
 }, async (request) => {
   try {
@@ -1459,10 +1458,10 @@ export const getInstructors = onCall({
       throw new Error('Nincs jogosultságod az oktatók listázásához');
     }
 
-    // Get all users with INSTRUCTOR or ADMIN role
+    // Get all users with INSTRUCTOR role
     const snapshot = await firestore
       .collection('users')
-      .where('role', 'in', ['INSTRUCTOR', 'ADMIN'])
+      .where('role', '==', 'INSTRUCTOR')
       .get();
 
     const instructors: any[] = [];
@@ -1578,6 +1577,280 @@ export const seedCategories = onCall({
   }
 });
 
+/**
+ * Create a new category (ADMIN only)
+ */
+export const createCategory = onCall({
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    logger.info('[createCategory] Called');
+
+    // Check authentication
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    // Check if user is ADMIN (check custom claims first, then Firestore)
+    const userRole = request.auth.token.role;
+
+    if (userRole !== 'ADMIN') {
+      // Fallback: check Firestore document
+      const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+      const userData = userDoc.data();
+
+      if (!userData || userData.role !== 'ADMIN') {
+        throw new Error('Csak ADMIN hozhat létre kategóriát');
+      }
+    }
+
+    // Validate input
+    const createCategorySchema = z.object({
+      name: z.string().min(1, 'A név kötelező.'),
+      slug: z.string().optional(),
+      description: z.string().optional(),
+      icon: z.string().optional(),
+      order: z.number().optional(),
+    });
+
+    const data = createCategorySchema.parse(request.data);
+
+    // Check if category with same name already exists
+    const existingCategoryQuery = await firestore
+      .collection('categories')
+      .where('name', '==', data.name)
+      .limit(1)
+      .get();
+
+    if (!existingCategoryQuery.empty) {
+      throw new Error('Már létezik kategória ezzel a névvel.');
+    }
+
+    // Generate slug if not provided
+    let slug = data.slug;
+    if (!slug) {
+      slug = data.name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+        .replace(/\s+/g, '-') // Replace spaces with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single
+        .trim();
+    }
+
+    // Check if slug already exists
+    const existingSlugQuery = await firestore
+      .collection('categories')
+      .where('slug', '==', slug)
+      .limit(1)
+      .get();
+
+    if (!existingSlugQuery.empty) {
+      // Append timestamp to make unique
+      slug = `${slug}-${Date.now()}`;
+    }
+
+    const categoryData = {
+      name: data.name,
+      slug: slug,
+      description: data.description || null,
+      icon: data.icon || null,
+      order: data.order || 999,
+      active: true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    const categoryRef = await firestore.collection('categories').add(categoryData);
+
+    logger.info(`[createCategory] Category created: ${categoryRef.id}`);
+
+    return {
+      success: true,
+      message: 'Kategória sikeresen létrehozva.',
+      category: { id: categoryRef.id, ...categoryData }
+    };
+  } catch (error: any) {
+    logger.error('[createCategory] Error:', error);
+    if (error instanceof z.ZodError) {
+      return { success: false, error: 'Validációs hiba', details: error.errors };
+    }
+    return { success: false, error: error.message || 'Kategória létrehozása sikertelen' };
+  }
+});
+
+/**
+ * Update an existing category (ADMIN only)
+ */
+export const updateCategory = onCall({
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    logger.info('[updateCategory] Called');
+
+    // Check authentication
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    // Check if user is ADMIN (check custom claims first, then Firestore)
+    const userRole = request.auth.token.role;
+
+    if (userRole !== 'ADMIN') {
+      // Fallback: check Firestore document
+      const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+      const userData = userDoc.data();
+
+      if (!userData || userData.role !== 'ADMIN') {
+        throw new Error('Csak ADMIN módosíthat kategóriát');
+      }
+    }
+
+    // Validate input
+    const updateCategorySchema = z.object({
+      id: z.string().min(1, 'A kategória ID kötelező'),
+      name: z.string().min(1, 'A név kötelező'),
+      slug: z.string().optional(),
+      description: z.string().optional(),
+      icon: z.string().optional(),
+      order: z.number().optional(),
+      active: z.boolean().optional(),
+    });
+
+    const data = updateCategorySchema.parse(request.data);
+
+    // Check if category exists
+    const categoryRef = firestore.collection('categories').doc(data.id);
+    const categoryDoc = await categoryRef.get();
+
+    if (!categoryDoc.exists) {
+      throw new Error('Kategória nem található');
+    }
+
+    // Check if another category with the same name exists (excluding current)
+    const existingCategoryQuery = await firestore
+      .collection('categories')
+      .where('name', '==', data.name)
+      .get();
+
+    const duplicateExists = existingCategoryQuery.docs.some(doc => doc.id !== data.id);
+    if (duplicateExists) {
+      throw new Error('Már létezik másik kategória ezzel a névvel.');
+    }
+
+    // Prepare update data
+    const updateData: any = {
+      name: data.name,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (data.slug !== undefined) updateData.slug = data.slug;
+    if (data.description !== undefined) updateData.description = data.description || null;
+    if (data.icon !== undefined) updateData.icon = data.icon || null;
+    if (data.order !== undefined) updateData.order = data.order;
+    if (data.active !== undefined) updateData.active = data.active;
+
+    await categoryRef.update(updateData);
+
+    const updated = (await categoryRef.get()).data();
+
+    logger.info(`[updateCategory] Category updated: ${data.id}`);
+
+    return {
+      success: true,
+      message: 'Kategória sikeresen frissítve.',
+      category: { id: data.id, ...updated }
+    };
+  } catch (error: any) {
+    logger.error('[updateCategory] Error:', error);
+    if (error instanceof z.ZodError) {
+      return { success: false, error: 'Validációs hiba', details: error.errors };
+    }
+    return { success: false, error: error.message || 'Kategória frissítése sikertelen' };
+  }
+});
+
+/**
+ * Delete a category (ADMIN only)
+ * Includes safety check to prevent deleting categories with associated courses
+ */
+export const deleteCategory = onCall({
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    logger.info('[deleteCategory] Called');
+
+    // Check authentication
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    // Check if user is ADMIN (check custom claims first, then Firestore)
+    const userRole = request.auth.token.role;
+
+    if (userRole !== 'ADMIN') {
+      // Fallback: check Firestore document
+      const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+      const userData = userDoc.data();
+
+      if (!userData || userData.role !== 'ADMIN') {
+        throw new Error('Csak ADMIN törölhet kategóriát');
+      }
+    }
+
+    // Validate input
+    const deleteCategorySchema = z.object({
+      id: z.string().min(1, 'A kategória ID kötelező')
+    });
+
+    const data = deleteCategorySchema.parse(request.data);
+
+    // Check if category exists
+    const categoryRef = firestore.collection('categories').doc(data.id);
+    const categoryDoc = await categoryRef.get();
+
+    if (!categoryDoc.exists) {
+      throw new Error('Kategória nem található');
+    }
+
+    // SAFETY CHECK: Verify no courses are using this category
+    const coursesWithCategory = await firestore
+      .collection('courses')
+      .where('categoryId', '==', data.id)
+      .limit(1)
+      .get();
+
+    if (!coursesWithCategory.empty) {
+      const courseCount = (await firestore
+        .collection('courses')
+        .where('categoryId', '==', data.id)
+        .get()).size;
+
+      throw new Error(
+        `Nem törölhető kategória, mert ${courseCount} kurzus használja. ` +
+        'Először távolítsa el a kategóriát az összes kurzusból.'
+      );
+    }
+
+    // Delete the category
+    await categoryRef.delete();
+
+    logger.info(`[deleteCategory] Category deleted: ${data.id}`);
+
+    return {
+      success: true,
+      message: 'Kategória sikeresen törölve.'
+    };
+  } catch (error: any) {
+    logger.error('[deleteCategory] Error:', error);
+    if (error instanceof z.ZodError) {
+      return { success: false, error: 'Validációs hiba', details: error.errors };
+    }
+    return { success: false, error: error.message || 'Kategória törlése sikertelen' };
+  }
+});
+
 // ============================================
 // TEAM MANAGEMENT FUNCTIONS
 // ============================================
@@ -1641,6 +1914,13 @@ export {
 export { stripeWebhook } from './stripe/webhook';
 
 // ============================================
+// STRIPE INVOICES
+// ============================================
+
+// Export Stripe invoices function
+export { getStripeInvoices } from './stripe/getInvoices';
+
+// ============================================
 // EMAIL VERIFICATION
 // ============================================
 
@@ -1657,3 +1937,20 @@ export {
 
 // Export user profile management
 export { createUserProfile } from './createUserProfile';
+
+// ============================================
+// DASHBOARD ANALYTICS
+// ============================================
+
+// Export dashboard analytics functions
+export { getDashboardStats } from './dashboard';
+
+// ============================================
+// LESSON PROGRESS
+// ============================================
+
+// Export lesson progress functions
+export {
+  getSyncedLessonProgress,
+  syncProgressOnDeviceSwitch,
+} from './lessonProgress';

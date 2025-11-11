@@ -1,93 +1,87 @@
 "use client"
 
 import React from 'react'
-import { VideoPlayer } from './VideoPlayer'
-import { EnhancedVideoPlayer } from './EnhancedVideoPlayer'
-import { FirebaseVideoPlayer } from './FirebaseVideoPlayer'
+import { MuxVideoPlayer } from './MuxVideoPlayer'
 
 interface LessonVideoPlayerProps {
-  src: string
-  videoType?: 'standard' | 'enhanced' | 'firebase' | 'mux'
-  onProgress?: (percentage: number, timeSpent: number, analytics?: any) => void
-  onEnded?: () => void
-  onError?: (error: any) => void
+  // Video source props
+  videoUrl?: string
+  src?: string // Backward compatibility
+  muxPlaybackId?: string
+  playbackId?: string // Backward compatibility
+  muxData?: any
+
+  // Common props
   poster?: string
   lessonTitle?: string
   lessonId?: string
   courseId?: string
   userId?: string
+  className?: string
+
+  // Callbacks
+  onProgress?: (percentage: number, timeSpent: number, analytics?: any) => void
+  onTimeUpdate?: (currentTime: number) => void
+  onEnded?: () => void
+  onError?: (error: any) => void
+
+  // Playback options
+  autoPlay?: boolean
+  startTime?: number
+
+  // Deprecated props (ignored)
+  videoType?: 'standard' | 'enhanced' | 'firebase' | 'mux'
   enableAnalytics?: boolean
   chapters?: any[]
   resumeContext?: any
   bookmarks?: any[]
-  playbackId?: string
-  muxData?: any
   [key: string]: any
 }
 
 /**
  * LessonVideoPlayer component
- * Smart video player wrapper that selects the appropriate player based on video type
+ * Universal video player wrapper using Mux Player for all video types
  */
 export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
+  videoUrl,
   src,
-  videoType = 'standard',
+  muxPlaybackId,
   playbackId,
   muxData,
+  poster,
+  lessonTitle,
+  onProgress,
+  onTimeUpdate,
+  onEnded,
+  onError,
+  autoPlay,
+  startTime,
+  className,
   ...props
 }) => {
-  // Determine which player to use
-  const getPlayerComponent = () => {
-    // If Mux playback ID is provided, use EnhancedVideoPlayer
-    if (playbackId || muxData) {
-      return (
-        <EnhancedVideoPlayer
-          playbackId={playbackId || muxData?.playbackId}
-          {...props}
-        />
-      )
-    }
+  console.log('📺 [LessonVideoPlayer] Called with:', { videoUrl, src, muxPlaybackId, playbackId, muxData })
 
-    // If src is from Firebase Storage, use FirebaseVideoPlayer
-    if (src && (src.includes('firebasestorage') || src.includes('storage.googleapis.com'))) {
-      return (
-        <FirebaseVideoPlayer
-          src={src}
-          {...props}
-        />
-      )
-    }
+  // Determine playback ID (priority order)
+  const finalPlaybackId = muxPlaybackId || playbackId || muxData?.playbackId
 
-    // Check explicit videoType
-    switch (videoType) {
-      case 'enhanced':
-        return (
-          <EnhancedVideoPlayer
-            playbackId={playbackId || src}
-            {...props}
-          />
-        )
-      case 'firebase':
-        return (
-          <FirebaseVideoPlayer
-            src={src}
-            {...props}
-          />
-        )
-      case 'standard':
-      default:
-        return (
-          <VideoPlayer
-            src={src}
-            {...props}
-          />
-        )
-    }
-  }
+  // Determine video URL (priority order)
+  const finalVideoUrl = videoUrl || src
+
+  console.log('📺 [LessonVideoPlayer] Passing to MuxVideoPlayer:', { finalPlaybackId, finalVideoUrl })
 
   return (
-    <div className="lesson-video-player-wrapper">
-      {getPlayerComponent()}
-    </div>
+    <MuxVideoPlayer
+      muxPlaybackId={finalPlaybackId}
+      videoUrl={finalVideoUrl}
+      poster={poster}
+      lessonTitle={lessonTitle}
+      onProgress={onProgress}
+      onTimeUpdate={onTimeUpdate}
+      onEnded={onEnded}
+      onError={onError}
+      autoPlay={autoPlay}
+      startTime={startTime}
+      className={className}
+    />
   )
 }
