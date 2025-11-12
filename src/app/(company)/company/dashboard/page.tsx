@@ -31,7 +31,17 @@ import { Company, CompanyAdmin, DashboardStats } from '@/types/company';
 
 export default function CompanyDashboardPage() {
   const router = useRouter();
-  const { user, isLoading: authLoading, logout } = useAuthStore();
+  const { user, isLoading: authLoading, authReady, logout } = useAuthStore();
+
+  console.log('🔍 [RESEARCH] Company Dashboard mounted:', {
+    authReady,
+    authLoading,
+    hasUser: !!user,
+    userRole: user?.role,
+    companyId: user?.companyId,
+    companyRole: user?.companyRole,
+    userObject: user
+  });
   const [company, setCompany] = useState<Company | null>(null);
   const [admin, setAdmin] = useState<CompanyAdmin | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +62,7 @@ export default function CompanyDashboardPage() {
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (!user) {
-        router.push('/auth?redirect=/company/dashboard');
+        router.push('/login?redirect_to=/company/dashboard');
         return;
       }
 
@@ -61,9 +71,18 @@ export default function CompanyDashboardPage() {
 
         // Get companyId from user custom claims
         const companyId = user.companyId;
+        console.log('🔍 [RESEARCH] Company Dashboard user data:', {
+          companyId: companyId,
+          hasCompanyId: !!companyId,
+          userRole: user.role,
+          companyRole: user.companyRole,
+          fullUser: user
+        });
 
         if (!companyId) {
+          console.error('❌ [RESEARCH] No companyId found! User object:', user);
           setError('Nem található vállalati fiók');
+          setLoading(false);
           return;
         }
 
@@ -72,9 +91,13 @@ export default function CompanyDashboardPage() {
         const companySnap = await getDoc(companyRef);
 
         if (!companySnap.exists()) {
+          console.error('[Company Dashboard] Company document not found:', companyId);
           setError('Nem található vállalati fiók');
+          setLoading(false);
           return;
         }
+
+        console.log('[Company Dashboard] Company document loaded');
 
         const userCompany: Company = {
           id: companySnap.id,
@@ -86,9 +109,13 @@ export default function CompanyDashboardPage() {
         const adminSnap = await getDoc(adminRef);
 
         if (!adminSnap.exists()) {
+          console.error('[Company Dashboard] Admin document not found for user:', user.uid);
           setError('Nincs admin jogosultságod');
+          setLoading(false);
           return;
         }
+
+        console.log('[Company Dashboard] Admin document loaded');
 
         const userAdmin = adminSnap.data() as CompanyAdmin;
 
@@ -96,20 +123,26 @@ export default function CompanyDashboardPage() {
         setAdmin(userAdmin);
 
         // Fetch basic stats
+        console.log('[Company Dashboard] Fetching employees...');
         const employeesRef = collection(db, 'companies', userCompany.id, 'employees');
         const employeesSnapshot = await getDocs(employeesRef);
+        console.log('[Company Dashboard] Employees loaded:', employeesSnapshot.size);
 
         const activeCount = employeesSnapshot.docs.filter(doc => doc.data().status === 'active').length;
         const invitedCount = employeesSnapshot.docs.filter(doc => doc.data().status === 'invited').length;
 
+        console.log('[Company Dashboard] Fetching masterclasses...');
         const masterclassesRef = collection(db, 'companies', userCompany.id, 'masterclasses');
         const masterclassesSnapshot = await getDocs(masterclassesRef);
+        console.log('[Company Dashboard] Masterclasses loaded:', masterclassesSnapshot.size);
 
         // Fetch progress analytics from Cloud Function
         try {
+          console.log('[Company Dashboard] Calling getCompanyDashboard Cloud Function...');
           const getDashboard = httpsCallable(functions, 'getCompanyDashboard');
           const result = await getDashboard({ companyId: userCompany.id });
           const dashboardData = result.data as any;
+          console.log('[Company Dashboard] Cloud Function response received');
 
           setStats({
             totalEmployees: employeesSnapshot.size,
@@ -121,7 +154,7 @@ export default function CompanyDashboardPage() {
             averageProgress: Math.round(dashboardData.stats?.averageProgress || 0),
           });
         } catch (err) {
-          console.error('Error fetching dashboard analytics:', err);
+          console.error('[Company Dashboard] Error fetching dashboard analytics:', err);
           // Fallback to basic stats if analytics fail
           setStats({
             totalEmployees: employeesSnapshot.size,
@@ -136,22 +169,25 @@ export default function CompanyDashboardPage() {
 
         // Fetch available courses for purchase
         try {
+          console.log('[Company Dashboard] Fetching available courses...');
           setCoursesLoading(true);
-          const coursesSnapshot = await getDocs(collection(db, 'course-content'));
+          const coursesSnapshot = await getDocs(collection(db, 'courses'));
           const courses = coursesSnapshot.docs
             .map(doc => ({
               id: doc.id,
               ...doc.data()
             }))
-            .filter((course: any) => course.isPublished !== false);
+            .filter((course: any) => course.published === true);
 
-          console.log(`Loaded ${courses.length} available courses for company dashboard`);
+          console.log(`[Company Dashboard] Loaded ${courses.length} available courses`);
           setAvailableCourses(courses);
         } catch (err) {
-          console.error('Error fetching courses:', err);
+          console.error('[Company Dashboard] Error fetching courses:', err);
         } finally {
           setCoursesLoading(false);
         }
+
+        console.log('[Company Dashboard] All data loaded successfully');
 
       } catch (err: any) {
         console.error('Error fetching company data:', err);
@@ -161,10 +197,17 @@ export default function CompanyDashboardPage() {
       }
     };
 
-    if (!authLoading) {
-      fetchCompanyData();
+    // Wait for auth to be ready and user to have companyId
+    if (authReady && !authLoading) {
+      if (user?.companyId) {
+        console.log('[Company Dashboard] Conditions met, fetching data...');
+        fetchCompanyData();
+      } else {
+        console.log('[Company Dashboard] Auth ready but no companyId, stopping loading');
+        setLoading(false);
+      }
     }
-  }, [user, authLoading, router]);
+  }, [user, authLoading, authReady, router]);
 
   const getDaysRemaining = () => {
     if (!company || !company.trialEndsAt) return 0;
@@ -203,7 +246,7 @@ export default function CompanyDashboardPage() {
             Úgy tűnik, még nincs vállalati fiókod, vagy nem vagy admin.
           </p>
           <Link
-            href="/auth"
+            href="/register"
             className="btn inline-flex items-center justify-center bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
           >
             Vállalat regisztrálása

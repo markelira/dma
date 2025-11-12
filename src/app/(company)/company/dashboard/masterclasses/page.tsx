@@ -21,7 +21,7 @@ export default function MasterclassesPage() {
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/auth?redirect=/company/dashboard/masterclasses');
+      router.push('/login?redirect_to=/company/dashboard/masterclasses');
     }
   }, [user, authLoading, router]);
 

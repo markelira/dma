@@ -5,18 +5,45 @@ import { SubscriptionPlans } from "@/components/payment/SubscriptionPlans";
 import { PremiumFooter } from "@/components/PremiumFooter";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, AlertCircle } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 /**
  * Pricing Page - Full subscription plans with detailed features
  * Uses the complete SubscriptionPlans component with all DMA.hu pricing
  */
 export default function PricingPage() {
+  const searchParams = useSearchParams();
+  const reason = searchParams.get('reason');
+  const returnTo = searchParams.get('returnTo');
+
   return (
     <AuthProvider>
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
         <PremiumHeader />
         <main className="py-16">
+          {/* Subscription Required Alert */}
+          {reason === 'subscription_required' && (
+            <motion.div
+              className="container mx-auto px-6 mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-blue-900 font-medium">
+                    Előfizetés szükséges
+                  </p>
+                  <p className="text-blue-800 text-sm mt-1">
+                    A kurzusokhoz való hozzáféréshez aktív előfizetés szükséges. Válasszon egy csomagot az alábbiak közül.
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
           {/* Page Header */}
           <motion.div
             className="container mx-auto px-6 text-center mb-16"

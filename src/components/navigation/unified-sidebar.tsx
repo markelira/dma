@@ -30,7 +30,8 @@ import {
   FileSearch,
   AlertTriangle,
   Calendar,
-  DollarSign
+  DollarSign,
+  FolderTree
 } from 'lucide-react'
 
 interface NavItem {
@@ -182,6 +183,12 @@ const allNavItems: NavItem[] = [
     title: 'Kurzus kezelés',
     href: '/admin/courses',
     icon: BookOpen,
+    roles: ['ADMIN'] // CSAK admin
+  },
+  {
+    title: 'Kategóriák',
+    href: '/admin/categories',
+    icon: FolderTree,
     roles: ['ADMIN'] // CSAK admin
   },
   {

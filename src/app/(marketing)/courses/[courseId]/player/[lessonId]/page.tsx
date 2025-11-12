@@ -55,6 +55,20 @@ export default function PlayerPage() {
     return null
   }
 
+  // Hard block: Check subscription status
+  if (subStatus && !hasSub) {
+    const returnUrl = `/courses/${courseId}/player/${lessonId}`;
+    router.push(`/pricing?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
+    return (
+      <div className="fixed inset-0 bg-black flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Átirányítás az előfizetés oldalra...</p>
+        </div>
+      </div>
+    );
+  }
+
   // Auto-redirect if course/lesson not found
   // Only redirect after both queries have finished loading
   useEffect(() => {

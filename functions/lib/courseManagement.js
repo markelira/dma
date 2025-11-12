@@ -49,8 +49,8 @@ const CourseSchema = z.object({
     description: z.string().min(10, "Description must be at least 10 characters"),
     categoryId: z.string().min(1, "Category is required"),
     instructorId: z.string().min(1, "Instructor is required"),
-    language: z.string().min(1, "Language is required"),
-    difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
+    language: z.string().nullish().default('hu'),
+    difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).nullish().default('BEGINNER'),
     certificateEnabled: z.boolean().nullish().default(false),
     thumbnailUrl: z.string().nullish().default(''),
     learningObjectives: z.string().min(10, "Learning objectives must be at least 10 characters"),
@@ -108,6 +108,13 @@ exports.createCourse = (0, https_1.onCall)({
             // Add timestamp to make it unique
             finalSlug = `${slug}-${Date.now()}`;
         }
+        // Check if thumbnailUrl is a base64 data URL (too large for Firestore)
+        let thumbnailUrl = validatedData.thumbnailUrl || '';
+        if (thumbnailUrl.startsWith('data:')) {
+            // Base64 data URLs are too large for Firestore, skip them
+            v2_1.logger.warn('Base64 data URL detected in thumbnailUrl, skipping...');
+            thumbnailUrl = '';
+        }
         // Prepare course data
         const courseData = {
             // Basic info
@@ -115,10 +122,10 @@ exports.createCourse = (0, https_1.onCall)({
             description: validatedData.description,
             categoryId: validatedData.categoryId,
             instructorId: validatedData.instructorId,
-            language: validatedData.language,
-            difficulty: validatedData.difficulty,
-            certificateEnabled: validatedData.certificateEnabled,
-            thumbnailUrl: validatedData.thumbnailUrl || '',
+            language: validatedData.language || 'hu',
+            difficulty: validatedData.difficulty || 'BEGINNER',
+            certificateEnabled: validatedData.certificateEnabled || false,
+            thumbnailUrl: thumbnailUrl,
             learningObjectives: validatedData.learningObjectives,
             // Marketing fields
             shortDescription: validatedData.shortDescription || '',
@@ -170,10 +177,21 @@ exports.updateCourse = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
 }, async (request) => {
+    // Diagnostic logging for CORS debugging
+    v2_1.logger.info('🔍 updateCourse called', {
+        hasAuth: !!request.auth,
+        hasData: !!request.data,
+        rawRequest: request.rawRequest ? {
+            method: request.rawRequest.method,
+            origin: request.rawRequest.headers.origin,
+            headers: Object.keys(request.rawRequest.headers)
+        } : 'no rawRequest'
+    });
     try {
         const { courseId, ...updateData } = request.data || {};
         // Check authentication
         if (!request.auth) {
+            v2_1.logger.warn('❌ updateCourse: No authentication');
             throw new Error('Hitelesítés szükséges');
         }
         if (!courseId) {
@@ -214,8 +232,15 @@ exports.updateCourse = (0, https_1.onCall)({
             updates.difficulty = updateData.difficulty;
         if (updateData.certificateEnabled !== undefined)
             updates.certificateEnabled = updateData.certificateEnabled;
-        if (updateData.thumbnailUrl !== undefined)
-            updates.thumbnailUrl = updateData.thumbnailUrl;
+        if (updateData.thumbnailUrl !== undefined) {
+            // Skip base64 data URLs (too large for Firestore)
+            if (updateData.thumbnailUrl.startsWith('data:')) {
+                v2_1.logger.warn('Base64 data URL detected in thumbnailUrl update, skipping...');
+            }
+            else {
+                updates.thumbnailUrl = updateData.thumbnailUrl;
+            }
+        }
         if (updateData.learningObjectives !== undefined)
             updates.learningObjectives = updateData.learningObjectives;
         // Marketing fields

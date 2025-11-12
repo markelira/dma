@@ -10,6 +10,7 @@ import { useAuthStore } from '@/stores/authStore';
 import React, { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
+import Header from '@/components/landing-home/ui/header';
 import Footer from '@/components/landing-home/ui/footer';
 import { CourseDetailHero } from '@/components/course/CourseDetailHero';
 import { CourseDetailStatsBar } from '@/components/course/CourseDetailStatsBar';
@@ -17,7 +18,7 @@ import { CourseCurriculumSection } from '@/components/course/CourseCurriculumSec
 import { CourseInstructorCard } from '@/components/course/CourseInstructorCard';
 import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
 import { CourseGuaranteeSection } from '@/components/course/CourseGuaranteeSection';
-import { CheckoutForm } from '@/components/payment/CheckoutForm';
+import { SubscriptionRequiredModal } from '@/components/payment/SubscriptionRequiredModal';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight, Shield } from 'lucide-react';
 
@@ -26,7 +27,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const { user, isAuthenticated, authReady } = useAuthStore();
   const { data: course, isLoading, error } = useCourse(id);
   const enrollMutation = useEnrollInCourse();
-  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
@@ -119,8 +120,8 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }))
   }));
 
-  // Enrollment handlers
-  const handleFreeEnrollment = async () => {
+  // Enrollment handler
+  const handleEnroll = async () => {
     if (!isAuthenticated) {
       router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}`);
       return;
@@ -131,28 +132,18 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
       if (result.alreadyEnrolled) {
         toast.info('Már beiratkozott erre a kurzusra!');
       } else {
-        toast.success('Sikeres ingyenes beiratkozás!');
+        toast.success('Sikeres beiratkozás!');
       }
-      router.push('/dashboard/my-learning');
+      router.push('/dashboard/courses');
     } catch (error: any) {
-      console.error('Free enrollment failed:', error);
-      toast.error('Hiba történt a beiratkozáskor. Próbálja újra.');
-    }
-  };
+      console.error('Enrollment failed:', error);
 
-  const handlePaidEnrollment = () => {
-    if (!isAuthenticated) {
-      router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}`);
-      return;
-    }
-    setShowPaymentForm(true);
-  };
-
-  const handleEnroll = () => {
-    if (isFreeCourse) {
-      handleFreeEnrollment();
-    } else {
-      handlePaidEnrollment();
+      // Check if error is subscription required
+      if (error.code === 'SUBSCRIPTION_REQUIRED' || error.message.includes('SUBSCRIPTION_REQUIRED')) {
+        setShowSubscriptionModal(true);
+      } else {
+        toast.error(error.message || 'Hiba történt a beiratkozáskor. Próbálja újra.');
+      }
     }
   };
 
@@ -352,69 +343,29 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
             {/* Right Column - Enrollment Card */}
             <div className="lg:col-span-1">
-              {!showPaymentForm ? (
-                <CourseEnrollmentCard
-                  price={coursePrice}
-                  duration={stats.duration}
-                  lessons={stats.lessons}
-                  rating={stats.rating}
-                  students={stats.students}
-                  certificateIncluded={true}
-                  lifetimeAccess={true}
-                  onEnroll={handleEnroll}
-                  onPreview={() => console.log('Preview')}
-                  isEnrolled={false}
-                />
-              ) : (
-                /* Payment Form Card */
-                <div className="sticky top-24">
-                  <motion.div
-                    className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <div className="p-6 border-b border-gray-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-semibold text-gray-900">
-                          Biztonságos fizetés
-                        </h3>
-                        <button
-                          onClick={() => setShowPaymentForm(false)}
-                          className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
-                      </div>
-                      <p className="text-sm text-gray-600">
-                        Stripe segítségével
-                      </p>
-                    </div>
-                    <div className="p-6">
-                      <CheckoutForm
-                        courseId={c.id}
-                        amount={coursePrice}
-                        currency="HUF"
-                        description={c.title}
-                        mode="payment"
-                        features={courseFeatures}
-                        onSuccess={() => {
-                          router.push(`/courses/${id}/learn?success=true`);
-                        }}
-                        onError={(error) => {
-                          console.error('Payment error:', error);
-                          toast.error('Hiba történt a fizetés során. Próbálja újra.');
-                        }}
-                      />
-                    </div>
-                  </motion.div>
-                </div>
-              )}
+              <CourseEnrollmentCard
+                price={coursePrice}
+                duration={stats.duration}
+                lessons={stats.lessons}
+                rating={stats.rating}
+                students={stats.students}
+                certificateIncluded={true}
+                lifetimeAccess={true}
+                onEnroll={handleEnroll}
+                onPreview={() => console.log('Preview')}
+                isEnrolled={false}
+              />
             </div>
           </div>
         </div>
+
+        {/* Subscription Required Modal */}
+        <SubscriptionRequiredModal
+          open={showSubscriptionModal}
+          onOpenChange={setShowSubscriptionModal}
+          courseName={c.title}
+          returnTo={`/courses/${id}`}
+        />
 
         {/* Guarantee Section */}
         {c.guaranteeEnabled && c.guaranteeText && (

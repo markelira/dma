@@ -51,7 +51,61 @@ export const getSubscriptionStatus = onCall({
 
     const userData = userDoc.data();
 
-    // Check for direct subscription
+    // PRIORITY 1: Check user's subscriptionStatus field (set by webhook when team is created)
+    if (userData?.subscriptionStatus === 'active' || userData?.subscriptionStatus === 'trialing') {
+      const status = userData.subscriptionStatus;
+      const isTrialing = status === 'trialing';
+
+      // If user has teamId, get team subscription details
+      if (userData.teamId) {
+        const teamDoc = await firestore.collection('teams').doc(userData.teamId).get();
+        if (teamDoc.exists) {
+          const teamData = teamDoc.data();
+
+          return {
+            success: true,
+            hasSubscription: true,
+            isActive: true,
+            hasActiveSubscription: true,
+            viaTeam: true,
+            subscription: {
+              id: userData.stripeSubscriptionId || teamData?.stripeSubscriptionId || userData.teamId,
+              subscriptionId: teamData?.stripeSubscriptionId || userData.stripeSubscriptionId,
+              status: status,
+              planName: teamData?.subscriptionPlan || 'DMA Előfizetés',
+              currentPeriodStart: teamData?.subscriptionStartDate?.toDate?.() || null,
+              currentPeriodEnd: teamData?.subscriptionEndDate?.toDate?.() || null,
+              cancelAtPeriodEnd: false,
+              createdAt: teamData?.createdAt?.toDate?.() || null,
+              trialEnd: teamData?.trialEndDate?.toDate?.() || null,
+              isTrialing: isTrialing,
+            }
+          };
+        }
+      }
+
+      // User has subscriptionStatus but no team (shouldn't happen, but handle it)
+      return {
+        success: true,
+        hasSubscription: true,
+        isActive: true,
+        hasActiveSubscription: true,
+        subscription: {
+          id: userData.stripeSubscriptionId || 'direct',
+          subscriptionId: userData.stripeSubscriptionId,
+          status: status,
+          planName: 'DMA Előfizetés',
+          currentPeriodStart: null,
+          currentPeriodEnd: null,
+          cancelAtPeriodEnd: false,
+          createdAt: null,
+          trialEnd: null,
+          isTrialing: isTrialing,
+        }
+      };
+    }
+
+    // PRIORITY 2: Check for direct subscription in subscriptions collection (fallback)
     const subscriptionsSnapshot = await firestore
       .collection('subscriptions')
       .where('userId', '==', userId)
@@ -83,47 +137,34 @@ export const getSubscriptionStatus = onCall({
       };
     }
 
-    // Check for team/company subscription inheritance
+    // PRIORITY 3: Check team subscription status directly (not through subscriptions collection)
     const teamId = userData?.teamId;
     if (teamId) {
       const teamDoc = await firestore.collection('teams').doc(teamId).get();
       if (teamDoc.exists) {
         const teamData = teamDoc.data();
-        const teamOwnerId = teamData?.ownerId;
 
-        if (teamOwnerId) {
-          // Check team owner's subscription
-          const ownerSubscriptionSnapshot = await firestore
-            .collection('subscriptions')
-            .where('userId', '==', teamOwnerId)
-            .where('status', 'in', ['active', 'trialing'])
-            .limit(1)
-            .get();
-
-          if (!ownerSubscriptionSnapshot.empty) {
-            const subscriptionDoc = ownerSubscriptionSnapshot.docs[0];
-            const subscriptionData = subscriptionDoc.data();
-
-            return {
-              success: true,
-              hasSubscription: true,
-              isActive: true,
-              hasActiveSubscription: true,
-              inheritedFromTeam: true,
-              subscription: {
-                id: subscriptionDoc.id,
-                subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
-                status: subscriptionData.status,
-                planName: subscriptionData.planName || 'DMA Csapat Előfizetés',
-                currentPeriodStart: subscriptionData.currentPeriodStart,
-                currentPeriodEnd: subscriptionData.currentPeriodEnd,
-                cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd || false,
-                createdAt: subscriptionData.createdAt,
-                trialEnd: subscriptionData.trialEnd || null,
-                isTrialing: subscriptionData.status === 'trialing',
-              }
-            };
-          }
+        // Check team's subscription status directly
+        if (teamData?.subscriptionStatus === 'active' || teamData?.subscriptionStatus === 'trialing') {
+          return {
+            success: true,
+            hasSubscription: true,
+            isActive: true,
+            hasActiveSubscription: true,
+            inheritedFromTeam: true,
+            subscription: {
+              id: teamData.stripeSubscriptionId || teamId,
+              subscriptionId: teamData.stripeSubscriptionId,
+              status: teamData.subscriptionStatus,
+              planName: teamData.subscriptionPlan || 'DMA Csapat Előfizetés',
+              currentPeriodStart: teamData.subscriptionStartDate?.toDate?.() || null,
+              currentPeriodEnd: teamData.subscriptionEndDate?.toDate?.() || null,
+              cancelAtPeriodEnd: false,
+              createdAt: teamData.createdAt?.toDate?.() || null,
+              trialEnd: teamData.trialEndDate?.toDate?.() || null,
+              isTrialing: teamData.subscriptionStatus === 'trialing',
+            }
+          };
         }
       }
     }

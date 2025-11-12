@@ -31,7 +31,12 @@ export const completeCompanyOnboarding = https.onCall(
   {
     region: 'us-central1',
     memory: '512MiB',
-    cors: true
+    cors: [
+      'https://www.academion.hu',
+      'https://academion.hu',
+      'https://dmaapp-477d4.web.app',
+      'https://dmaapp-477d4.firebaseapp.com'
+    ]
   },
   async (request: CallableRequest<OnboardingInput>): Promise<OnboardingResponse> => {
     const db = admin.firestore();
@@ -140,9 +145,10 @@ export const completeCompanyOnboarding = https.onCall(
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      await db.collection('users').doc(userId).set({
+      const userDocData = {
         id: userId,
         email: userEmail,
+        emailVerified: false, // Will be updated after email verification
         firstName: firstName,
         lastName: lastName,
         role: 'COMPANY_ADMIN',
@@ -156,14 +162,35 @@ export const completeCompanyOnboarding = https.onCall(
         specialties: [],
         createdAt: FieldValue.serverTimestamp(),
         updatedAt: FieldValue.serverTimestamp(),
+      };
+
+      console.log('🔍 [RESEARCH] Writing user document to Firestore:', {
+        path: `users/${userId}`,
+        companyId: companyId,
+        role: 'COMPANY_ADMIN',
+        companyRole: 'owner'
       });
 
+      await db.collection('users').doc(userId).set(userDocData);
+
+      console.log('✅ [RESEARCH] User document written successfully');
+
       // Step 4: Set custom claims for the owner
-      await auth.setCustomUserClaims(userId, {
+      const customClaims = {
         role: 'COMPANY_ADMIN',
         companyId: companyId,
         companyRole: 'owner',
-      });
+      };
+
+      console.log('🔍 [RESEARCH] Setting custom claims:', customClaims);
+
+      await auth.setCustomUserClaims(userId, customClaims);
+
+      console.log('✅ [RESEARCH] Custom claims set successfully');
+
+      // Verify claims were set by reading them back
+      const userRecordVerify = await auth.getUser(userId);
+      console.log('🔍 [RESEARCH] Verified custom claims from Firebase Auth:', userRecordVerify.customClaims);
 
       // Step 5: Invite employees (if any)
       let employeesInvited = 0;

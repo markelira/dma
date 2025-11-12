@@ -36,9 +36,22 @@ export default function LoginPage() {
   const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
 
   useEffect(() => {
+    console.log('🚀 [DIAGNOSTIC] Login page redirect check', {
+      hasUser: !!user,
+      isLoading,
+      userId: user?.id,
+      willRedirect: user && !isLoading,
+      redirectTo,
+      timestamp: Date.now()
+    })
+
     // If user is already authenticated, redirect
     if (user && !isLoading) {
-      console.log('[Login Page] User authenticated, redirecting to:', redirectTo);
+      console.log('🚀 [DIAGNOSTIC] Login page: User authenticated, REDIRECTING to:', {
+        redirectTo,
+        userId: user.id,
+        timestamp: Date.now()
+      });
       router.push(redirectTo);
     }
   }, [user, isLoading, redirectTo, router]);

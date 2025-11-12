@@ -193,7 +193,9 @@ async function handleCheckoutSessionCompleted(session, stripe) {
     }
 }
 /**
- * Handle subscription checkout - creates team
+ * Handle subscription checkout
+ * Creates team for company subscriptions OR
+ * Creates subscription document for individual subscriptions
  */
 async function handleSubscriptionCheckout(session, stripe) {
     try {
@@ -203,6 +205,7 @@ async function handleSubscriptionCheckout(session, stripe) {
         // Get metadata from session
         const userId = session.metadata?.userId;
         const priceId = session.metadata?.priceId;
+        const subscriptionType = session.metadata?.subscriptionType || 'company'; // Default to company for backwards compatibility
         if (!userId) {
             throw new Error('User ID not found in session metadata');
         }
@@ -225,39 +228,104 @@ async function handleSubscriptionCheckout(session, stripe) {
         const endDate = (0, team_1.calculateSubscriptionEndDate)(startDate, subscriptionPlan);
         // Get trial end date from subscription if available
         let trialEndDate = (0, team_1.calculateTrialEndDate)(startDate);
+        let subscriptionStatus = 'active';
         if (subscriptionId) {
             try {
                 const subscription = await stripe.subscriptions.retrieve(subscriptionId);
                 if (subscription.trial_end) {
                     trialEndDate = new Date(subscription.trial_end * 1000);
                 }
+                subscriptionStatus = subscription.status === 'trialing' ? 'trialing' : 'active';
             }
             catch (error) {
                 v2_1.logger.warn('Could not retrieve trial_end from subscription, using default');
             }
         }
-        // Create team
-        await (0, createTeam_1.createTeam)({
-            name: `${userName} csapata`,
-            ownerId: userId,
-            ownerEmail: userData.email || userEmail || '',
-            ownerName: userName,
-            subscriptionPlan,
-            subscriptionStartDate: startDate,
-            subscriptionEndDate: endDate,
-            trialEndDate,
-            stripeSubscriptionId: subscriptionId,
-            stripeCustomerId: customerId,
-            stripePriceId: priceId,
-        });
-        v2_1.logger.info('[handleSubscriptionCheckout] Team created successfully', {
-            userId,
-            customerId,
-            subscriptionId,
-        });
+        // Handle based on subscription type
+        if (subscriptionType === 'individual') {
+            // Individual subscription - create subscription document
+            await handleIndividualSubscription({
+                userId,
+                customerId,
+                subscriptionId,
+                subscriptionStatus,
+                priceId,
+                subscriptionPlan,
+                startDate,
+                endDate,
+                trialEndDate,
+            });
+            v2_1.logger.info('[handleSubscriptionCheckout] Individual subscription created successfully', {
+                userId,
+                customerId,
+                subscriptionId,
+            });
+        }
+        else {
+            // Company subscription - create team
+            await (0, createTeam_1.createTeam)({
+                name: `${userName} csapata`,
+                ownerId: userId,
+                ownerEmail: userData.email || userEmail || '',
+                ownerName: userName,
+                subscriptionPlan,
+                subscriptionStartDate: startDate,
+                subscriptionEndDate: endDate,
+                trialEndDate,
+                stripeSubscriptionId: subscriptionId,
+                stripeCustomerId: customerId,
+                stripePriceId: priceId,
+            });
+            v2_1.logger.info('[handleSubscriptionCheckout] Team created successfully', {
+                userId,
+                customerId,
+                subscriptionId,
+            });
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleSubscriptionCheckout] Error:', error);
+        throw error;
+    }
+}
+/**
+ * Handle individual subscription
+ * Creates subscription document and updates user without creating a team
+ */
+async function handleIndividualSubscription(params) {
+    const { userId, customerId, subscriptionId, subscriptionStatus, priceId, subscriptionPlan, startDate, endDate, trialEndDate, } = params;
+    try {
+        // Create subscription document
+        await firestore.collection('subscriptions').add({
+            userId,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            stripePriceId: priceId,
+            status: subscriptionStatus,
+            planName: `DMA ${subscriptionPlan} Subscription`,
+            subscriptionPlan,
+            currentPeriodStart: startDate.toISOString(),
+            currentPeriodEnd: endDate.toISOString(),
+            trialEnd: trialEndDate.toISOString(),
+            cancelAtPeriodEnd: false,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        });
+        // Update user document with subscription status
+        await firestore.collection('users').doc(userId).update({
+            subscriptionStatus,
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscriptionId,
+            updatedAt: new Date().toISOString(),
+        });
+        v2_1.logger.info('[handleIndividualSubscription] Individual subscription created', {
+            userId,
+            subscriptionId,
+            status: subscriptionStatus,
+        });
+    }
+    catch (error) {
+        v2_1.logger.error('[handleIndividualSubscription] Error:', error);
         throw error;
     }
 }

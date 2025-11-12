@@ -35,11 +35,18 @@ import { brandGradient } from '@/lib/design-tokens'
 const navigationSections = {
   STUDENT: [
     {
-      title: 'Tanulás',
+      title: 'Fő navigáció',
       items: [
         { title: 'Kezdőlap', href: '/dashboard', icon: Home },
-        { title: 'Masterclass', href: '/dashboard/learning', icon: BookOpen },
-        { title: '1:1 Meetingek', href: '/dashboard/meetings', icon: Users },
+        { title: 'Kurzusaim', href: '/dashboard/courses', icon: BookOpen },
+        { title: 'Böngészés', href: '/courses', icon: GraduationCap },
+      ]
+    },
+    {
+      title: 'Eszközök',
+      items: [
+        { title: 'Fizetések', href: '/dashboard/invoices', icon: FolderOpen },
+        { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
       ]
     }
   ],
@@ -55,11 +62,15 @@ const navigationSections = {
       ]
     },
     {
+      title: 'Eszközök',
+      items: [
+        { title: 'Beállítások', href: '/instructor/settings', icon: Settings },
+      ]
+    },
+    {
       title: 'Diák Nézet',
       items: [
         { title: 'Diák Dashboard', href: '/dashboard', icon: GraduationCap },
-        { title: 'Masterclass', href: '/dashboard/learning', icon: BookOpen },
-        { title: '1:1 Meetingek', href: '/dashboard/meetings', icon: Users },
       ]
     }
   ],
@@ -75,17 +86,10 @@ const navigationSections = {
       ]
     },
     {
-      title: 'Oktató Nézet',
+      title: 'Egyéb Nézetek',
       items: [
         { title: 'Oktató Dashboard', href: '/instructor/dashboard', icon: Building2 },
-      ]
-    },
-    {
-      title: 'Diák Nézet',
-      items: [
         { title: 'Diák Dashboard', href: '/dashboard', icon: GraduationCap },
-        { title: 'Masterclass', href: '/dashboard/learning', icon: BookOpen },
-        { title: '1:1 Meetingek', href: '/dashboard/meetings', icon: Users },
       ]
     }
   ]
@@ -148,7 +152,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
   const handleLogout = async () => {
     try {
       await logout()
-      router.push('/auth')
+      router.push('/login')
     } catch (error) {
       console.error('Logout error:', error)
     }
@@ -246,7 +250,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
         <div className="space-y-1">
           <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
             <Link
-              href="/dashboard/profile"
+              href="/dashboard/settings"
               onClick={onNavigate}
               className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
             >

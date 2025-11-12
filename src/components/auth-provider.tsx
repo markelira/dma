@@ -13,8 +13,15 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   const { setAuth, clearAuth, user, accessToken, setAuthReady } = useAuthStore()
 
   useEffect(() => {
+    console.log('🔧 [DIAGNOSTIC] AuthProvider useEffect mounting')
     // Listen to Firebase auth state changes
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+      console.log('🔥 [DIAGNOSTIC] onAuthStateChanged fired', {
+        hasUser: !!fbUser,
+        uid: fbUser?.uid,
+        email: fbUser?.email,
+        timestamp: Date.now()
+      })
       if (fbUser) {
         try {
           // Get token WITHOUT forcing refresh (only refresh when needed)
@@ -22,14 +29,12 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
           const tokenResult = await fbUser.getIdTokenResult(false)
           const customClaims = tokenResult.claims
 
-          console.log('[AuthProvider] Custom claims:', customClaims)
-
-          // If we already have this user stored, skip re-fetching
-          if (user && user.uid === fbUser.uid && accessToken === idToken) {
-            console.log('[AuthProvider] User already in store, skipping update')
-            setAuthReady(true)
-            return
-          }
+          console.log('🔍 [RESEARCH] AuthProvider custom claims:', {
+            role: customClaims.role,
+            companyId: customClaims.companyId,
+            companyRole: customClaims.companyRole,
+            allClaims: Object.keys(customClaims)
+          })
 
           // Get user data from Firestore directly
           try {
@@ -40,22 +45,41 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
 
             if (userDoc.exists()) {
               const firestoreData = userDoc.data()
+
+              console.log('🔍 [RESEARCH] AuthProvider Firestore data:', {
+                role: firestoreData.role,
+                companyId: firestoreData.companyId,
+                companyRole: firestoreData.companyRole,
+                allFields: Object.keys(firestoreData)
+              });
+
               const userData: User = {
                 id: fbUser.uid,
                 uid: fbUser.uid,
                 email: firestoreData.email || fbUser.email || '',
                 firstName: firestoreData.firstName || '',
                 lastName: firestoreData.lastName || '',
-                // IMPORTANT: Prioritize custom claims over Firestore for role
-                // Custom claims are more authoritative (set by Cloud Functions)
-                role: (customClaims.role as string) || firestoreData.role || 'STUDENT',
+                // IMPORTANT: Prioritize Firestore for company roles (COMPANY_ADMIN, COMPANY_EMPLOYEE)
+                // Company roles in Firestore are set by completeCompanyOnboarding after custom claims
+                // For other roles, prioritize custom claims
+                role: firestoreData.role === 'COMPANY_ADMIN' || firestoreData.role === 'COMPANY_EMPLOYEE'
+                  ? firestoreData.role
+                  : ((customClaims.role as string) || firestoreData.role || 'STUDENT'),
                 profilePictureUrl: firestoreData.profilePictureUrl || fbUser.photoURL || undefined,
                 companyId: (customClaims.companyId as string) || firestoreData.companyId,
                 companyRole: (customClaims.companyRole as string) || firestoreData.companyRole,
                 universityId: firestoreData.universityId,
               }
+
+              console.log('🔍 [RESEARCH] AuthProvider constructed user:', {
+                role: userData.role,
+                companyId: userData.companyId,
+                companyRole: userData.companyRole,
+                hasCompanyId: !!userData.companyId
+              });
+
               setAuth(userData, idToken)
-              console.log('✅ Auth set from Firestore + Custom Claims:', userData)
+              console.log('✅ [RESEARCH] Auth set in store')
             } else {
               // No Firestore doc - use custom claims if available, otherwise default to STUDENT
               const userData: User = {
@@ -94,10 +118,16 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
           clearAuth()
         }
       } else {
+        console.log('🔥 [DIAGNOSTIC] onAuthStateChanged: No user, clearing auth')
         clearAuth()
       }
-      
+
       // Mark auth ready after processing
+      console.log('✅ [DIAGNOSTIC] AuthProvider setting authReady=TRUE', {
+        hasUser: !!fbUser,
+        uid: fbUser?.uid,
+        timestamp: Date.now()
+      })
       setAuthReady(true)
     })
     return () => unsubscribe()

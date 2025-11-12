@@ -133,11 +133,11 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     console.log('[PurchaseButton - Handler] Purchase initiated for course:', currentCourseId);
     console.log('[PurchaseButton - Handler] User:', !!user, 'Loading:', isLoading, 'Disabled:', disabled);
 
-    // If not logged in, redirect to auth page with purchase intent
+    // If not logged in, redirect to login page with purchase intent
     // After auth, user will be redirected back and purchase will be triggered
     if (!user) {
       const currentUrl = window.location.pathname + window.location.search;
-      const authUrl = `/auth?redirect=${encodeURIComponent(currentUrl)}&courseId=${currentCourseId}&purchaseIntent=true`;
+      const authUrl = `/login?redirect_to=${encodeURIComponent(currentUrl)}&courseId=${currentCourseId}&purchaseIntent=true`;
       console.log('[PurchaseButton - Handler] User not authenticated, redirecting to:', authUrl);
       router.push(authUrl);
       return;

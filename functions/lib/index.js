@@ -36,8 +36,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.seedCategories = exports.getInstructors = exports.getCategories = exports.getSignedUploadUrl = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = void 0;
+exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getInstructors = exports.getCategories = exports.getSignedUploadUrl = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
+exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -47,6 +47,7 @@ const v2_1 = require("firebase-functions/v2");
 const nodemailer = __importStar(require("nodemailer"));
 const uuid_1 = require("uuid");
 const mail_1 = __importDefault(require("@sendgrid/mail"));
+const zod_1 = require("zod");
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -1031,7 +1032,6 @@ exports.getCourse = (0, https_1.onCall)({
  * Get all courses with optional filters
  */
 exports.getCoursesCallable = (0, https_1.onCall)({
-    cors: true,
     region: 'us-central1',
 }, async (request) => {
     try {
@@ -1254,6 +1254,7 @@ var muxActions_1 = require("./muxActions");
 Object.defineProperty(exports, "getMuxUploadUrl", { enumerable: true, get: function () { return muxActions_1.getMuxUploadUrl; } });
 Object.defineProperty(exports, "getMuxAssetStatus", { enumerable: true, get: function () { return muxActions_1.getMuxAssetStatus; } });
 Object.defineProperty(exports, "testVideoUpload", { enumerable: true, get: function () { return muxActions_1.testVideoUpload; } });
+Object.defineProperty(exports, "migrateVideoToMux", { enumerable: true, get: function () { return muxActions_1.migrateVideoToMux; } });
 var muxWebhook_1 = require("./muxWebhook");
 Object.defineProperty(exports, "muxWebhook", { enumerable: true, get: function () { return muxWebhook_1.muxWebhook; } });
 // Export course management functions
@@ -1270,7 +1271,6 @@ Object.defineProperty(exports, "getSignedUploadUrl", { enumerable: true, get: fu
  * Auto-creates default categories if none exist
  */
 exports.getCategories = (0, https_1.onCall)({
-    cors: true,
     region: 'us-central1',
 }, async (request) => {
     try {
@@ -1348,10 +1348,10 @@ exports.getInstructors = (0, https_1.onCall)({
         if (!userData || !['ADMIN', 'INSTRUCTOR'].includes(userData.role)) {
             throw new Error('Nincs jogosultságod az oktatók listázásához');
         }
-        // Get all users with INSTRUCTOR or ADMIN role
+        // Get all users with INSTRUCTOR role
         const snapshot = await firestore
             .collection('users')
-            .where('role', 'in', ['INSTRUCTOR', 'ADMIN'])
+            .where('role', '==', 'INSTRUCTOR')
             .get();
         const instructors = [];
         snapshot.forEach(doc => {
@@ -1450,6 +1450,238 @@ exports.seedCategories = (0, https_1.onCall)({
         };
     }
 });
+/**
+ * Create a new category (ADMIN only)
+ */
+exports.createCategory = (0, https_1.onCall)({
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[createCategory] Called');
+        // Check authentication
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        // Check if user is ADMIN (check custom claims first, then Firestore)
+        const userRole = request.auth.token.role;
+        if (userRole !== 'ADMIN') {
+            // Fallback: check Firestore document
+            const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+            const userData = userDoc.data();
+            if (!userData || userData.role !== 'ADMIN') {
+                throw new Error('Csak ADMIN hozhat létre kategóriát');
+            }
+        }
+        // Validate input
+        const createCategorySchema = zod_1.z.object({
+            name: zod_1.z.string().min(1, 'A név kötelező.'),
+            slug: zod_1.z.string().optional(),
+            description: zod_1.z.string().optional(),
+            icon: zod_1.z.string().optional(),
+            order: zod_1.z.number().optional(),
+        });
+        const data = createCategorySchema.parse(request.data);
+        // Check if category with same name already exists
+        const existingCategoryQuery = await firestore
+            .collection('categories')
+            .where('name', '==', data.name)
+            .limit(1)
+            .get();
+        if (!existingCategoryQuery.empty) {
+            throw new Error('Már létezik kategória ezzel a névvel.');
+        }
+        // Generate slug if not provided
+        let slug = data.slug;
+        if (!slug) {
+            slug = data.name
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '') // Remove accents
+                .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+                .replace(/\s+/g, '-') // Replace spaces with hyphens
+                .replace(/-+/g, '-') // Replace multiple hyphens with single
+                .trim();
+        }
+        // Check if slug already exists
+        const existingSlugQuery = await firestore
+            .collection('categories')
+            .where('slug', '==', slug)
+            .limit(1)
+            .get();
+        if (!existingSlugQuery.empty) {
+            // Append timestamp to make unique
+            slug = `${slug}-${Date.now()}`;
+        }
+        const categoryData = {
+            name: data.name,
+            slug: slug,
+            description: data.description || null,
+            icon: data.icon || null,
+            order: data.order || 999,
+            active: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        const categoryRef = await firestore.collection('categories').add(categoryData);
+        v2_1.logger.info(`[createCategory] Category created: ${categoryRef.id}`);
+        return {
+            success: true,
+            message: 'Kategória sikeresen létrehozva.',
+            category: { id: categoryRef.id, ...categoryData }
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[createCategory] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return { success: false, error: 'Validációs hiba', details: error.errors };
+        }
+        return { success: false, error: error.message || 'Kategória létrehozása sikertelen' };
+    }
+});
+/**
+ * Update an existing category (ADMIN only)
+ */
+exports.updateCategory = (0, https_1.onCall)({
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[updateCategory] Called');
+        // Check authentication
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        // Check if user is ADMIN (check custom claims first, then Firestore)
+        const userRole = request.auth.token.role;
+        if (userRole !== 'ADMIN') {
+            // Fallback: check Firestore document
+            const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+            const userData = userDoc.data();
+            if (!userData || userData.role !== 'ADMIN') {
+                throw new Error('Csak ADMIN módosíthat kategóriát');
+            }
+        }
+        // Validate input
+        const updateCategorySchema = zod_1.z.object({
+            id: zod_1.z.string().min(1, 'A kategória ID kötelező'),
+            name: zod_1.z.string().min(1, 'A név kötelező'),
+            slug: zod_1.z.string().optional(),
+            description: zod_1.z.string().optional(),
+            icon: zod_1.z.string().optional(),
+            order: zod_1.z.number().optional(),
+            active: zod_1.z.boolean().optional(),
+        });
+        const data = updateCategorySchema.parse(request.data);
+        // Check if category exists
+        const categoryRef = firestore.collection('categories').doc(data.id);
+        const categoryDoc = await categoryRef.get();
+        if (!categoryDoc.exists) {
+            throw new Error('Kategória nem található');
+        }
+        // Check if another category with the same name exists (excluding current)
+        const existingCategoryQuery = await firestore
+            .collection('categories')
+            .where('name', '==', data.name)
+            .get();
+        const duplicateExists = existingCategoryQuery.docs.some(doc => doc.id !== data.id);
+        if (duplicateExists) {
+            throw new Error('Már létezik másik kategória ezzel a névvel.');
+        }
+        // Prepare update data
+        const updateData = {
+            name: data.name,
+            updatedAt: new Date().toISOString(),
+        };
+        if (data.slug !== undefined)
+            updateData.slug = data.slug;
+        if (data.description !== undefined)
+            updateData.description = data.description || null;
+        if (data.icon !== undefined)
+            updateData.icon = data.icon || null;
+        if (data.order !== undefined)
+            updateData.order = data.order;
+        if (data.active !== undefined)
+            updateData.active = data.active;
+        await categoryRef.update(updateData);
+        const updated = (await categoryRef.get()).data();
+        v2_1.logger.info(`[updateCategory] Category updated: ${data.id}`);
+        return {
+            success: true,
+            message: 'Kategória sikeresen frissítve.',
+            category: { id: data.id, ...updated }
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[updateCategory] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return { success: false, error: 'Validációs hiba', details: error.errors };
+        }
+        return { success: false, error: error.message || 'Kategória frissítése sikertelen' };
+    }
+});
+/**
+ * Delete a category (ADMIN only)
+ * Includes safety check to prevent deleting categories with associated courses
+ */
+exports.deleteCategory = (0, https_1.onCall)({
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[deleteCategory] Called');
+        // Check authentication
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        // Check if user is ADMIN (check custom claims first, then Firestore)
+        const userRole = request.auth.token.role;
+        if (userRole !== 'ADMIN') {
+            // Fallback: check Firestore document
+            const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+            const userData = userDoc.data();
+            if (!userData || userData.role !== 'ADMIN') {
+                throw new Error('Csak ADMIN törölhet kategóriát');
+            }
+        }
+        // Validate input
+        const deleteCategorySchema = zod_1.z.object({
+            id: zod_1.z.string().min(1, 'A kategória ID kötelező')
+        });
+        const data = deleteCategorySchema.parse(request.data);
+        // Check if category exists
+        const categoryRef = firestore.collection('categories').doc(data.id);
+        const categoryDoc = await categoryRef.get();
+        if (!categoryDoc.exists) {
+            throw new Error('Kategória nem található');
+        }
+        // SAFETY CHECK: Verify no courses are using this category
+        const coursesWithCategory = await firestore
+            .collection('courses')
+            .where('categoryId', '==', data.id)
+            .limit(1)
+            .get();
+        if (!coursesWithCategory.empty) {
+            const courseCount = (await firestore
+                .collection('courses')
+                .where('categoryId', '==', data.id)
+                .get()).size;
+            throw new Error(`Nem törölhető kategória, mert ${courseCount} kurzus használja. ` +
+                'Először távolítsa el a kategóriát az összes kurzusból.');
+        }
+        // Delete the category
+        await categoryRef.delete();
+        v2_1.logger.info(`[deleteCategory] Category deleted: ${data.id}`);
+        return {
+            success: true,
+            message: 'Kategória sikeresen törölve.'
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[deleteCategory] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return { success: false, error: 'Validációs hiba', details: error.errors };
+        }
+        return { success: false, error: error.message || 'Kategória törlése sikertelen' };
+    }
+});
 // ============================================
 // TEAM MANAGEMENT FUNCTIONS
 // ============================================
@@ -1498,6 +1730,12 @@ Object.defineProperty(exports, "createCustomer", { enumerable: true, get: functi
 var webhook_1 = require("./stripe/webhook");
 Object.defineProperty(exports, "stripeWebhook", { enumerable: true, get: function () { return webhook_1.stripeWebhook; } });
 // ============================================
+// STRIPE INVOICES
+// ============================================
+// Export Stripe invoices function
+var getInvoices_1 = require("./stripe/getInvoices");
+Object.defineProperty(exports, "getStripeInvoices", { enumerable: true, get: function () { return getInvoices_1.getStripeInvoices; } });
+// ============================================
 // EMAIL VERIFICATION
 // ============================================
 // Export email verification functions
@@ -1511,4 +1749,17 @@ Object.defineProperty(exports, "resendVerificationCode", { enumerable: true, get
 // Export user profile management
 var createUserProfile_1 = require("./createUserProfile");
 Object.defineProperty(exports, "createUserProfile", { enumerable: true, get: function () { return createUserProfile_1.createUserProfile; } });
+// ============================================
+// DASHBOARD ANALYTICS
+// ============================================
+// Export dashboard analytics functions
+var dashboard_1 = require("./dashboard");
+Object.defineProperty(exports, "getDashboardStats", { enumerable: true, get: function () { return dashboard_1.getDashboardStats; } });
+// ============================================
+// LESSON PROGRESS
+// ============================================
+// Export lesson progress functions
+var lessonProgress_1 = require("./lessonProgress");
+Object.defineProperty(exports, "getSyncedLessonProgress", { enumerable: true, get: function () { return lessonProgress_1.getSyncedLessonProgress; } });
+Object.defineProperty(exports, "syncProgressOnDeviceSwitch", { enumerable: true, get: function () { return lessonProgress_1.syncProgressOnDeviceSwitch; } });
 //# sourceMappingURL=index.js.map

@@ -59,7 +59,7 @@ interface User {
   email: string
   firstName: string
   lastName: string
-  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN'
+  role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN' | 'COMPANY_ADMIN'
   createdAt: string
   lastLoginAt?: string
   isActive: boolean
@@ -143,6 +143,9 @@ export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [roleDialogOpen, setRoleDialogOpen] = useState(false)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedRole, setSelectedRole] = useState<string>('')
   const queryClient = useQueryClient()
 
   const { data: users, isLoading: usersLoading, error: usersError } = useQuery<User[]>({
@@ -160,8 +163,23 @@ export default function AdminUsersPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminUsers'] })
       queryClient.invalidateQueries({ queryKey: ['adminUserStats'] })
+      setRoleDialogOpen(false)
+      setSelectedUser(null)
+      setSelectedRole('')
     },
   })
+
+  const handleOpenRoleDialog = (user: User) => {
+    setSelectedUser(user)
+    setSelectedRole(user.role)
+    setRoleDialogOpen(true)
+  }
+
+  const handleUpdateRole = () => {
+    if (selectedUser && selectedRole) {
+      updateRoleMutation.mutate({ userId: selectedUser.id, role: selectedRole })
+    }
+  }
 
   const deleteUserMutation = useMutation({
     mutationFn: deleteUser,
@@ -197,6 +215,8 @@ export default function AdminUsersPage() {
     switch (role) {
       case 'ADMIN':
         return 'bg-red-100 text-red-700 border-red-200'
+      case 'COMPANY_ADMIN':
+        return 'bg-purple-100 text-purple-700 border-purple-200'
       case 'INSTRUCTOR':
         return 'bg-blue-100 text-blue-700 border-blue-200'
       case 'STUDENT':
@@ -210,6 +230,8 @@ export default function AdminUsersPage() {
     switch (role) {
       case 'ADMIN':
         return 'Adminisztrátor'
+      case 'COMPANY_ADMIN':
+        return 'Cég Adminisztrátor'
       case 'INSTRUCTOR':
         return 'Oktató'
       case 'STUDENT':
@@ -387,6 +409,7 @@ export default function AdminUsersPage() {
               <option value="STUDENT">Hallgató</option>
               <option value="INSTRUCTOR">Oktató</option>
               <option value="ADMIN">Adminisztrátor</option>
+              <option value="COMPANY_ADMIN">Cég Adminisztrátor</option>
             </select>
 
             <select
@@ -542,12 +565,9 @@ export default function AdminUsersPage() {
                           <Edit className="h-4 w-4" />
                           Szerkesztés
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           className="flex items-center gap-2"
-                          onClick={() => updateRoleMutation.mutate({ 
-                            userId: user.id, 
-                            role: user.role === 'STUDENT' ? 'INSTRUCTOR' : 'STUDENT' 
-                          })}
+                          onClick={() => handleOpenRoleDialog(user)}
                         >
                           <UserCheck className="h-4 w-4" />
                           Szerepkör Módosítása
@@ -601,6 +621,67 @@ export default function AdminUsersPage() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Role Change Dialog */}
+      <AlertDialog open={roleDialogOpen} onOpenChange={setRoleDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Felhasználói Szerepkör Módosítása</AlertDialogTitle>
+            <AlertDialogDescription>
+              {selectedUser && (
+                <span>
+                  Változtasd meg <strong>{selectedUser.firstName} {selectedUser.lastName}</strong> szerepkörét.
+                  Ez azonnal érvénybe lép.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="py-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Új Szerepkör
+            </label>
+            <select
+              value={selectedRole}
+              onChange={(e) => setSelectedRole(e.target.value)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="STUDENT">Hallgató</option>
+              <option value="INSTRUCTOR">Oktató</option>
+              <option value="ADMIN">Adminisztrátor</option>
+              <option value="COMPANY_ADMIN">Cég Adminisztrátor</option>
+            </select>
+
+            {selectedUser && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">Jelenlegi szerepkör:</span>
+                  <Badge variant="outline" className={getRoleBadgeColor(selectedUser.role)}>
+                    {getRoleLabel(selectedUser.role)}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between text-sm mt-2">
+                  <span className="text-gray-600">Új szerepkör:</span>
+                  <Badge variant="outline" className={getRoleBadgeColor(selectedRole)}>
+                    {getRoleLabel(selectedRole)}
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Mégse</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleUpdateRole}
+              disabled={updateRoleMutation.isPending || !selectedRole || selectedRole === selectedUser?.role}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {updateRoleMutation.isPending ? 'Mentés...' : 'Szerepkör Módosítása'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 } 

@@ -85,42 +85,58 @@ export function EnhancedCheckoutButton({
     : 0;
 
   const handleCheckout = async () => {
+    console.log('🔵 [CHECKOUT] Button clicked!', { priceId, mode, courseId });
+
     if (!user) {
+      console.log('❌ [CHECKOUT] No user, redirecting to login');
       window.location.href = '/login';
       return;
     }
 
+    console.log('✅ [CHECKOUT] User authenticated:', user.uid);
     setError(null);
 
     try {
       const currentUrl = window.location.origin;
-      const defaultSuccessUrl = courseId 
+      const defaultSuccessUrl = courseId
         ? `${currentUrl}/courses/${courseId}/learn?success=true`
         : `${currentUrl}/dashboard?success=true`;
-      const defaultCancelUrl = courseId 
+      const defaultCancelUrl = courseId
         ? `${currentUrl}/courses/${courseId}?cancelled=true`
         : `${currentUrl}?cancelled=true`;
 
-      await createCheckoutSession.mutateAsync({
-        courseId,
+      const checkoutData: any = {
         priceId,
         mode,
         successUrl: successUrl || defaultSuccessUrl,
         cancelUrl: cancelUrl || defaultCancelUrl,
         metadata: {
-          ...metadata,
+          ...(metadata || {}),
           source: 'enhanced_checkout_button',
-          variant,
-          hasDiscount: hasDiscount.toString()
+          variant: variant || 'default',
+          hasDiscount: String(hasDiscount || false)
         }
-      });
+      };
+
+      // Only include courseId if it's defined (Zod .optional() requires field omission, not undefined)
+      if (courseId) {
+        checkoutData.courseId = courseId;
+      }
+
+      console.log('🚀 [CHECKOUT] Calling createCheckoutSession with:', checkoutData);
+
+      const result = await createCheckoutSession.mutateAsync(checkoutData);
+
+      console.log('✅ [CHECKOUT] Mutation completed, result:', result);
 
       onSuccess?.();
+      console.log('✅ [CHECKOUT] onSuccess callback executed');
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Hiba történt a fizetés során';
+      console.error('❌ [CHECKOUT] Error caught:', err);
+      console.error('❌ [CHECKOUT] Error message:', errorMessage);
       setError(errorMessage);
       onError?.(errorMessage);
-      console.error('Checkout error:', err);
     }
   };
 

@@ -84,13 +84,19 @@ exports.createCheckoutSession = (0, https_1.onCall)({
     region: 'us-central1',
 }, async (request) => {
     try {
+        v2_1.logger.info('🔵 [CF] createCheckoutSession called');
+        v2_1.logger.info('🔵 [CF] request.data:', request.data);
         // Authentication check
         if (!request.auth) {
+            v2_1.logger.error('❌ [CF] No authentication');
             throw new Error('Hitelesítés szükséges');
         }
         const userId = request.auth.uid;
+        v2_1.logger.info(`✅ [CF] User authenticated: ${userId}`);
         // Input validation
+        v2_1.logger.info('🔵 [CF] Validating input data...');
         const validatedData = CreateCheckoutSessionSchema.parse(request.data);
+        v2_1.logger.info('✅ [CF] Input validation passed:', validatedData);
         v2_1.logger.info(`Creating checkout session for user: ${userId}`);
         // Get user document
         const userDoc = await firestore.collection('users').doc(userId).get();
@@ -120,6 +126,11 @@ exports.createCheckoutSession = (0, https_1.onCall)({
                 updatedAt: new Date().toISOString()
             });
         }
+        // Determine subscription type based on user's account
+        // Individual: user has NO teamId
+        // Company: user has teamId or isTeamOwner
+        const subscriptionType = (userData.teamId || userData.isTeamOwner) ? 'company' : 'individual';
+        v2_1.logger.info(`Subscription type determined: ${subscriptionType} (teamId: ${userData.teamId}, isTeamOwner: ${userData.isTeamOwner})`);
         // Prepare session parameters
         const sessionParams = {
             customer: stripeCustomerId,
@@ -128,13 +139,39 @@ exports.createCheckoutSession = (0, https_1.onCall)({
             success_url: validatedData.successUrl,
             cancel_url: validatedData.cancelUrl,
             locale: 'hu',
-            billing_address_collection: 'auto',
+            // Collect billing addresses (required)
+            billing_address_collection: 'required',
+            // Collect customers' names and addresses
             customer_update: {
                 address: 'auto',
                 name: 'auto'
             },
+            // Require phone number
+            phone_number_collection: {
+                enabled: true
+            },
+            // Allow promotion codes
+            allow_promotion_codes: true,
+            // Allow business tax IDs
+            tax_id_collection: {
+                enabled: true
+            },
+            // Collect business name (optional)
+            custom_fields: [
+                {
+                    key: 'business_name',
+                    label: {
+                        type: 'custom',
+                        custom: 'Cégnév (opcionális)'
+                    },
+                    type: 'text',
+                    optional: true
+                }
+            ],
             metadata: {
                 userId,
+                priceId: validatedData.priceId,
+                subscriptionType,
                 ...validatedData.metadata
             }
         };
@@ -204,11 +241,23 @@ exports.createCheckoutSession = (0, https_1.onCall)({
             createdAt: new Date().toISOString()
         });
         v2_1.logger.info(`Checkout session created: ${session.id}`);
-        return {
+        const response = {
             success: true,
-            sessionId: session.id,
-            url: session.url
+            data: {
+                sessionId: session.id,
+                url: session.url
+            }
         };
+        v2_1.logger.info('✅ [CF] Returning response:', response);
+        v2_1.logger.info('✅ [CF] Response structure check:', {
+            hasSuccess: 'success' in response,
+            successValue: response.success,
+            hasData: 'data' in response,
+            dataValue: response.data,
+            hasUrl: response.data && 'url' in response.data,
+            urlValue: response.data?.url
+        });
+        return response;
     }
     catch (error) {
         v2_1.logger.error('Create checkout session error:', error);

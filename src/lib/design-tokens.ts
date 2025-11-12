@@ -14,10 +14,10 @@ export const cardStyles = {
 }
 
 export const buttonStyles = {
-  primary: 'px-6 py-3 bg-gray-900 hover:bg-black text-white font-medium rounded-full transition-colors duration-200',
-  secondary: 'px-6 py-3 bg-transparent hover:bg-gray-100 text-gray-900 font-medium rounded-full border border-gray-300 transition-colors duration-200',
-  outline: 'px-6 py-3 bg-transparent hover:bg-gray-50 text-gray-700 font-medium rounded-full border border-gray-300 transition-colors duration-200',
-  ghost: 'px-6 py-3 bg-transparent hover:bg-gray-100 text-gray-700 font-medium rounded-full transition-colors duration-200',
+  primary: 'px-6 py-3 bg-gray-900 hover:bg-black text-white font-medium rounded-lg transition-colors duration-200',
+  secondary: 'px-6 py-3 bg-transparent hover:bg-gray-100 text-gray-900 font-medium rounded-lg border border-gray-300 transition-colors duration-200',
+  outline: 'px-6 py-3 bg-transparent hover:bg-gray-50 text-gray-700 font-medium rounded-lg border border-gray-300 transition-colors duration-200',
+  ghost: 'px-6 py-3 bg-transparent hover:bg-gray-100 text-gray-700 font-medium rounded-lg transition-colors duration-200',
   link: 'text-blue-600 hover:text-blue-700 font-medium underline-offset-4 hover:underline',
 }
 

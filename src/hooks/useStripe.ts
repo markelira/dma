@@ -74,17 +74,43 @@ export function useStripe() {
   // Create checkout session mutation
   const createCheckoutSession = useMutation({
     mutationFn: async (data: CheckoutSessionData) => {
+      console.log('🟢 [useStripe] mutationFn called with data:', data);
+
       const result = await createCheckoutSessionFn(data);
-      return result.data as { success: boolean; data?: { sessionId: string; url: string }; error?: string };
+
+      console.log('🟢 [useStripe] Cloud Function raw result:', result);
+      console.log('🟢 [useStripe] result.data:', result.data);
+
+      const typedResult = result.data as { success: boolean; data?: { sessionId: string; url: string }; error?: string };
+
+      console.log('🟢 [useStripe] Typed result:', typedResult);
+      console.log('🟢 [useStripe] typedResult.success:', typedResult.success);
+      console.log('🟢 [useStripe] typedResult.data:', typedResult.data);
+      console.log('🟢 [useStripe] typedResult.data?.url:', typedResult.data?.url);
+
+      return typedResult;
     },
     onSuccess: (result) => {
+      console.log('🟢 [useStripe] onSuccess called with result:', result);
+      console.log('🟢 [useStripe] Checking redirect condition:', {
+        success: result.success,
+        hasData: !!result.data,
+        hasUrl: !!result.data?.url,
+        url: result.data?.url
+      });
+
       if (result.success && result.data?.url) {
-        // Redirect to Stripe Checkout
+        console.log('🟢 [useStripe] Redirecting to:', result.data.url);
         window.location.href = result.data.url;
+      } else {
+        console.warn('⚠️ [useStripe] Redirect condition not met!', {
+          success: result.success,
+          data: result.data
+        });
       }
     },
     onError: (error) => {
-      console.error('Error creating checkout session:', error);
+      console.error('❌ [useStripe] onError called:', error);
     }
   });
 
@@ -166,7 +192,7 @@ export function useStripe() {
       
       return data.data?.paymentMethods || [];
     },
-    enabled: !!user,
+    enabled: false, // Disabled - Cloud Function not implemented
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -180,19 +206,19 @@ export function useStripe() {
     queryKey: ['subscriptions', user?.uid],
     queryFn: async () => {
       const result = await getUserSubscriptionsFn();
-      const data = result.data as { 
-        success: boolean; 
-        data?: { subscriptions: Subscription[] }; 
-        error?: string 
+      const data = result.data as {
+        success: boolean;
+        data?: { subscriptions: Subscription[] };
+        error?: string
       };
-      
+
       if (!data.success) {
         throw new Error(data.error || 'Failed to fetch subscriptions');
       }
-      
+
       return data.data?.subscriptions || [];
     },
-    enabled: !!user,
+    enabled: false, // Disabled - Cloud Function not implemented
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 

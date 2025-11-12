@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-// import { slugify } from "@/lib/utils"; // Not needed
+import { slugify } from "@/lib/utils";
 import { Sparkles } from "lucide-react";
 import { useCategories } from "@/hooks/useCategoryQueries";
 import { useQuery } from "@tanstack/react-query";

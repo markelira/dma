@@ -109,11 +109,11 @@ async function createEnrollment(userId: string, courseId: string): Promise<void>
     await firestore.collection('enrollments').doc(enrollmentId).set({
       userId,
       courseId,
-      enrolledAt: new Date().toISOString(),
+      enrolledAt: admin.firestore.FieldValue.serverTimestamp(),
       status: 'active',
       progress: 0,
       completedLessons: [],
-      lastAccessedAt: new Date().toISOString(),
+      lastAccessedAt: admin.firestore.FieldValue.serverTimestamp(),
       completedAt: null
     });
 

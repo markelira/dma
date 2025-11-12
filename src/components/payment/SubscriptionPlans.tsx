@@ -350,7 +350,7 @@ export function SubscriptionPlans({
                   metadata={{
                     planId: plan.id,
                     planName: plan.name,
-                    interval: isYearly ? 'year' : 'month'
+                    interval: plan.interval
                   }}
                   className="w-full"
                 />

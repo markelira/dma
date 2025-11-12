@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = void 0;
+exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const auth_1 = require("firebase-admin/auth");
@@ -50,6 +50,12 @@ const getMuxUploadUrlSchema = zod_1.z.object({
 // Zod schema for Mux asset status
 const getMuxAssetStatusSchema = zod_1.z.object({
     assetId: zod_1.z.string().min(1, 'Asset ID szükséges')
+});
+// Zod schema for video migration
+const migrateVideoToMuxSchema = zod_1.z.object({
+    courseId: zod_1.z.string().min(1, 'Course ID szükséges'),
+    moduleId: zod_1.z.string().optional(),
+    lessonId: zod_1.z.string().min(1, 'Lesson ID szükséges')
 });
 /**
  * Update lesson document with mock playback ID (development mode only)
@@ -110,29 +116,23 @@ exports.getMuxUploadUrl = (0, https_1.onCall)({
         }
         const userId = request.auth.uid;
         console.log('👤 User ID:', userId);
-        // For development/emulator, skip user role check to allow testing
-        const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.NODE_ENV === 'development';
-        if (!isEmulator) {
-            // Get user data to check role (only in production)
-            const userDoc = await firestore.collection('users').doc(userId).get();
-            if (!userDoc.exists) {
-                throw new Error('Felhasználó nem található.');
-            }
-            const userData = userDoc.data();
-            const userRole = userData?.role;
-            // Check if user has appropriate permissions (INSTRUCTOR or ADMIN)
-            if (userRole !== 'INSTRUCTOR' && userRole !== 'ADMIN') {
-                throw new Error('Nincs jogosultság videó feltöltéshez. Csak oktatók és adminisztrátorok tölthetnek fel videókat.');
-            }
+        // Get user data to check role
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('Felhasználó nem található.');
         }
-        else {
-            console.log('🧪 Running in emulator mode, skipping role check');
+        const userData = userDoc.data();
+        const userRole = userData?.role;
+        // Check if user has appropriate permissions (INSTRUCTOR or ADMIN)
+        if (userRole !== 'INSTRUCTOR' && userRole !== 'ADMIN') {
+            throw new Error('Nincs jogosultság videó feltöltéshez. Csak oktatók és adminisztrátorok tölthetnek fel videókat.');
         }
         // Validate input data (no parameters needed)
         getMuxUploadUrlSchema.parse(request.data || {});
-        // For development, return a working test URL that can actually be used
-        if (isEmulator || !getMuxVideo()) {
-            console.log('🔧 Development mode: returning test upload URL');
+        // Check if Mux is available
+        const muxVideo = getMuxVideo();
+        if (!muxVideo) {
+            console.log('⚠️ Mux client not available, returning test upload URL');
             // Generate a unique test asset ID
             const testAssetId = `test_asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
             return {
@@ -144,10 +144,6 @@ exports.getMuxUploadUrl = (0, https_1.onCall)({
         }
         // Create Mux upload URL (production)
         console.log('🎬 Creating real Mux upload URL');
-        const muxVideo = getMuxVideo();
-        if (!muxVideo) {
-            throw new Error('Mux client not initialized. Please configure Mux credentials.');
-        }
         const upload = await muxVideo.uploads.create({
             new_asset_settings: {
                 playback_policy: ['public'],
@@ -198,14 +194,13 @@ exports.getMuxAssetStatus = (0, https_1.onCall)({
         // Validate input
         const { assetId } = getMuxAssetStatusSchema.parse(request.data);
         console.log('🎬 Checking asset:', assetId);
-        const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.NODE_ENV === 'development';
-        // For development/test assets, return mock ready status
-        if (isEmulator || assetId.startsWith('test_asset_') || !getMuxVideo()) {
-            console.log('🧪 Development mode: returning test asset status');
+        // For test assets, return mock ready status
+        if (assetId.startsWith('test_asset_')) {
+            console.log('🧪 Test asset detected: returning mock status');
             const mockPlaybackId = `test_playback_${assetId.replace('test_asset_', '')}`;
-            // In development mode, also update the lesson document with mock playback ID
+            // Update the lesson document with mock playback ID for test assets
             try {
-                console.log('🔄 [getMuxAssetStatus] Updating lesson with mock playbackId in development mode');
+                console.log('🔄 [getMuxAssetStatus] Updating lesson with mock playbackId for test asset');
                 await updateLessonWithMockPlaybackId(assetId, mockPlaybackId);
             }
             catch (error) {
@@ -226,7 +221,32 @@ exports.getMuxAssetStatus = (0, https_1.onCall)({
         if (!muxVideo) {
             throw new Error('Mux client not initialized. Please configure Mux credentials.');
         }
-        const asset = await muxVideo.assets.retrieve(assetId);
+        // The assetId parameter might actually be an Upload ID
+        // Try to retrieve as upload first to get the actual Asset ID
+        let actualAssetId = assetId;
+        try {
+            console.log('🔍 Attempting to retrieve as Upload ID first:', assetId);
+            const upload = await muxVideo.uploads.retrieve(assetId);
+            if (upload.asset_id) {
+                console.log('✅ Found Asset ID from Upload:', upload.asset_id);
+                actualAssetId = upload.asset_id;
+            }
+            else {
+                console.log('⏳ Upload exists but Asset ID not yet available (still processing)');
+                return {
+                    success: true,
+                    status: 'preparing',
+                    message: 'Video is being processed by Mux'
+                };
+            }
+        }
+        catch (uploadError) {
+            // If retrieving as upload fails, assume it's already an Asset ID
+            console.log('ℹ️ Not an Upload ID, treating as Asset ID:', assetId);
+        }
+        // Now retrieve the actual asset
+        console.log('🎬 Retrieving asset:', actualAssetId);
+        const asset = await muxVideo.assets.retrieve(actualAssetId);
         return {
             success: true,
             status: asset.status,
@@ -262,11 +282,7 @@ exports.testVideoUpload = (0, https_1.onCall)({
 }, async (request) => {
     try {
         console.log('🧪 Test video upload called');
-        const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true' || process.env.NODE_ENV === 'development';
-        if (!isEmulator) {
-            throw new Error('Test upload only available in development mode');
-        }
-        // Simulate successful upload
+        // This is a test endpoint - always simulate successful upload
         await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate processing time
         return {
             success: true,
@@ -278,6 +294,125 @@ exports.testVideoUpload = (0, https_1.onCall)({
         return {
             success: false,
             error: error.message || 'Test upload failed'
+        };
+    }
+});
+/**
+ * Migrate existing Firebase Storage video to Mux (Callable Cloud Function)
+ * This function creates a Mux asset from an existing video URL
+ */
+exports.migrateVideoToMux = (0, https_1.onCall)({
+    region: 'us-central1',
+    memory: '1GiB',
+    timeoutSeconds: 540, // 9 minutes (max for callable functions)
+    maxInstances: 5,
+    secrets: ['MUX_TOKEN_ID_V2', 'MUX_TOKEN_SECRET_V2']
+}, async (request) => {
+    try {
+        console.log('🔄 migrateVideoToMux called');
+        // Verify authentication
+        if (!request.auth) {
+            throw new Error('Bejelentkezés szükséges.');
+        }
+        const userId = request.auth.uid;
+        // Get user data to check role
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('Felhasználó nem található.');
+        }
+        const userData = userDoc.data();
+        const userRole = userData?.role;
+        // Only ADMIN can migrate videos
+        if (userRole !== 'ADMIN') {
+            throw new Error('Nincs jogosultság videó migráláshoz. Csak adminisztrátorok migrálhatnak videókat.');
+        }
+        // Validate input
+        const { courseId, moduleId, lessonId } = migrateVideoToMuxSchema.parse(request.data);
+        console.log(`📹 Migrating video for lesson ${lessonId} in course ${courseId}`);
+        // Get lesson document
+        let lessonRef;
+        let lessonDoc;
+        if (moduleId) {
+            lessonRef = firestore
+                .collection('courses')
+                .doc(courseId)
+                .collection('modules')
+                .doc(moduleId)
+                .collection('lessons')
+                .doc(lessonId);
+        }
+        else {
+            lessonRef = firestore
+                .collection('courses')
+                .doc(courseId)
+                .collection('lessons')
+                .doc(lessonId);
+        }
+        lessonDoc = await lessonRef.get();
+        if (!lessonDoc.exists) {
+            throw new Error('Lecke nem található.');
+        }
+        const lessonData = lessonDoc.data();
+        // Check if lesson has a video URL
+        if (!lessonData?.videoUrl) {
+            throw new Error('A leckéhez nincs videó URL hozzárendelve.');
+        }
+        // Check if already migrated
+        if (lessonData.muxPlaybackId) {
+            console.log('⚠️ Video already migrated to Mux');
+            return {
+                success: true,
+                message: 'A videó már migrálva van Mux-ra',
+                playbackId: lessonData.muxPlaybackId,
+                alreadyMigrated: true
+            };
+        }
+        // Initialize Mux client
+        const muxVideo = getMuxVideo();
+        if (!muxVideo) {
+            throw new Error('Mux client nincs inicializálva. Konfigurálja a Mux hitelesítő adatokat.');
+        }
+        console.log(`📤 Creating Mux asset from URL: ${lessonData.videoUrl.substring(0, 50)}...`);
+        // Create Mux asset from URL
+        const asset = await muxVideo.assets.create({
+            input: [{
+                    url: lessonData.videoUrl
+                }],
+            playback_policy: ['public'],
+            encoding_tier: 'baseline',
+            mp4_support: 'standard'
+        });
+        console.log(`✅ Mux asset created: ${asset.id}`);
+        // Update lesson with Mux asset ID and status
+        await lessonRef.update({
+            muxAssetId: asset.id,
+            muxStatus: 'processing',
+            muxMigrationStarted: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+        console.log('⏳ Asset is processing. Playback ID will be available when ready.');
+        // Return asset info (playback ID will be available after processing)
+        return {
+            success: true,
+            message: 'Videó migráció elindítva. A feldolgozás néhány percet vehet igénybe.',
+            assetId: asset.id,
+            status: asset.status,
+            playbackId: asset.playback_ids?.[0]?.id || null,
+            processing: true
+        };
+    }
+    catch (error) {
+        console.error('❌ migrateVideoToMux error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return {
+                success: false,
+                error: 'Validációs hiba',
+                details: error.errors
+            };
+        }
+        return {
+            success: false,
+            error: error.message || 'Ismeretlen hiba történt a migrálás során'
         };
     }
 });

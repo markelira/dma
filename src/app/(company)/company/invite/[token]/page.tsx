@@ -75,8 +75,8 @@ export default function InviteAcceptancePage() {
 
   const handleAcceptInvite = async () => {
     if (!user) {
-      // Redirect to auth with return URL
-      router.push(`/auth?redirect=/company/invite/${token}`);
+      // Redirect to login with return URL
+      router.push(`/login?redirect_to=/company/invite/${token}`);
       return;
     }
 
@@ -103,7 +103,7 @@ export default function InviteAcceptancePage() {
       console.error('Error accepting invite:', err);
 
       if (err.code === 'unauthenticated') {
-        router.push(`/auth?redirect=/company/invite/${token}`);
+        router.push(`/login?redirect_to=/company/invite/${token}`);
       } else if (err.code === 'failed-precondition') {
         setError('Ez a meghívó már fel lett használva');
       } else if (err.code === 'not-found') {

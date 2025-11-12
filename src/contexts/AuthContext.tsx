@@ -285,8 +285,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const refreshUser = async () => {
-    if (user) {
-      const enrichedUser = await fetchUserData(user, true); // Force token refresh
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      const enrichedUser = await fetchUserData(currentUser, true); // Force token refresh
       setUser(enrichedUser);
     }
   };

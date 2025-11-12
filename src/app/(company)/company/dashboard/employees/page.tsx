@@ -54,7 +54,7 @@ export default function EmployeesPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) {
-        router.push('/auth?redirect=/company/dashboard/employees');
+        router.push('/login?redirect_to=/company/dashboard/employees');
         return;
       }
 

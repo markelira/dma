@@ -182,6 +182,8 @@ function RegisterPageContent() {
     console.log('[Register Page] Modal state - showVerificationModal:', showVerificationModal);
     console.log('[Register Page] Modal state - registeredUserId:', registeredUserId);
     console.log('[Register Page] Modal state - email:', formData.email);
+    console.log('[Register Page] Modal state - accountType:', accountType);
+
     return (
       <EmailVerificationModal
         email={formData.email}
@@ -191,11 +193,10 @@ function RegisterPageContent() {
           setIsVerifying(false);
           setShowVerificationModal(false);
 
-          // Sign out the user (they registered but haven't logged in to AuthStore)
+          // Sign out and redirect to login for fresh authentication
+          // This ensures custom claims are properly loaded on next login
           await logout();
-
-          // Redirect to login page with verification success message
-          console.log('[Register Page] Redirecting to login with verification success');
+          console.log('[Register Page] Email verified, redirecting to login');
           router.push('/login?verified=true&email=' + encodeURIComponent(formData.email));
         }}
       />
@@ -216,6 +217,23 @@ function RegisterPageContent() {
   if (accountType === 'company') {
     return (
       <CompanyRegisterForm
+        onVerificationStart={() => {
+          console.log('[Register Page] Company verification starting');
+          // Set isVerifying flag to prevent any redirects during verification
+          setIsVerifying(true);
+        }}
+        onRegistrationComplete={(userId: string, email: string) => {
+          console.log('[Register Page] Company registration complete, showing verification modal');
+          console.log('[Register Page] User ID:', userId);
+          console.log('[Register Page] Email:', email);
+
+          // Store the userId and email for modal
+          setRegisteredUserId(userId);
+          setFormData(prev => ({ ...prev, email }));
+
+          // Show verification modal
+          setShowVerificationModal(true);
+        }}
         onSuccess={() => {
           console.log('[Register Page] Company registration success');
           // CompanyRegisterForm handles its own redirect to /company/dashboard

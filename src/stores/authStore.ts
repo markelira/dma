@@ -88,9 +88,22 @@ export const useAuthStore = create<AuthState>()(
         isAuthenticated: state.isAuthenticated
       }),
       onRehydrateStorage: () => (state) => {
+        console.log('🔄 [DIAGNOSTIC] Zustand rehydration START', {
+          hasUser: !!state?.user,
+          userId: state?.user?.id,
+          userEmail: state?.user?.email,
+          authReady: state?.authReady,
+          timestamp: Date.now()
+        })
         if (state) {
           state.isLoading = false
           state.authReady = true  // Set authReady after rehydration completes
+          console.log('🔄 [DIAGNOSTIC] Zustand rehydration COMPLETE - authReady set to TRUE', {
+            hasUser: !!state.user,
+            userId: state.user?.id,
+            authReady: state.authReady,
+            timestamp: Date.now()
+          })
         }
       },
     }

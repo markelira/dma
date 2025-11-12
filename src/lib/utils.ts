@@ -47,7 +47,7 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean = false;
-  
+
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
@@ -57,4 +57,26 @@ export function throttle<T extends (...args: any[]) => any>(
       }, limit);
     }
   };
+}
+
+/**
+ * Generate URL-friendly slugs from text
+ */
+export function slugify(text: string): string {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    // Remove accents/diacritics
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    // Replace spaces and underscores with hyphens
+    .replace(/[\s_]+/g, '-')
+    // Remove all non-word chars except hyphens
+    .replace(/[^\w\-]+/g, '')
+    // Replace multiple hyphens with single hyphen
+    .replace(/\-\-+/g, '-')
+    // Remove leading/trailing hyphens
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
 }

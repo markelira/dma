@@ -18,28 +18,28 @@ async function createTestUsers() {
       email: 'admin@dma.hu',
       password: 'admin123',
       displayName: 'Admin User',
-      customClaims: { role: 'admin' }
+      customClaims: { role: 'ADMIN' }
     },
     {
       uid: 'jjCWRvVCERVBO4YWBlhxu3ynnyGx',
       email: 'instructor@dma.hu',
       password: 'instructor123',
       displayName: 'Nagy Péter',
-      customClaims: { role: 'instructor' }
+      customClaims: { role: 'INSTRUCTOR' }
     },
     {
       uid: 'rvrvcbhX8NqV7bghm4umhfGuGuyo',
       email: 'student1@dma.hu',
       password: 'student123',
       displayName: 'Kovács János',
-      customClaims: { role: 'student' }
+      customClaims: { role: 'STUDENT' }
     },
     {
       uid: '8P3Kanza5Cak6esWIaehrCMigEJ1',
       email: 'student2@dma.hu',
       password: 'student123',
       displayName: 'Szabó Anna',
-      customClaims: { role: 'student' }
+      customClaims: { role: 'STUDENT' }
     }
   ];
 

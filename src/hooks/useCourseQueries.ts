@@ -76,29 +76,41 @@ export const useCourse = (identifier: string) => {
       
       // Fetch lessons - try multiple locations
       let lessons = [];
-      
-      // First try modules/default-module/lessons (new structure)
+
+      // First try fetching all modules and their lessons (new structure)
       try {
-        const moduleLessonsRef = collection(db, 'courses', courseData.id, 'modules', 'default-module', 'lessons');
-        const moduleLessonsSnapshot = await getDocs(moduleLessonsRef);
-        
-        if (!moduleLessonsSnapshot.empty) {
-          lessons = moduleLessonsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          }));
-          console.log(`Found ${lessons.length} lessons in modules/default-module/lessons`);
+        const modulesRef = collection(db, 'courses', courseData.id, 'modules');
+        const modulesSnapshot = await getDocs(modulesRef);
+
+        if (!modulesSnapshot.empty) {
+          console.log(`Found ${modulesSnapshot.size} modules`);
+
+          // Fetch lessons from each module
+          for (const moduleDoc of modulesSnapshot.docs) {
+            const moduleLessonsRef = collection(db, 'courses', courseData.id, 'modules', moduleDoc.id, 'lessons');
+            const moduleLessonsSnapshot = await getDocs(moduleLessonsRef);
+
+            if (!moduleLessonsSnapshot.empty) {
+              const moduleLessons = moduleLessonsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                moduleId: moduleDoc.id // Ensure moduleId is set
+              }));
+              lessons.push(...moduleLessons);
+              console.log(`Found ${moduleLessons.length} lessons in module ${moduleDoc.id}`);
+            }
+          }
         }
       } catch (error) {
-        console.log('No lessons in modules subcollection');
+        console.log('No lessons in modules subcollection:', error);
       }
-      
+
       // If no lessons found, try direct lessons subcollection (old structure)
       if (lessons.length === 0) {
         try {
           const lessonsRef = collection(db, 'courses', courseData.id, 'lessons');
           const lessonsSnapshot = await getDocs(lessonsRef);
-          
+
           lessons = lessonsSnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -168,9 +180,35 @@ export const useEnrollInCourse = () => {
       
       console.log('🔧 Creating enrollment for courseId:', courseId);
       console.log('🔧 User data:', { id: user.id, email: user.email });
-      
+
+      // Check subscription status
+      const { functions } = await import('@/lib/firebase');
+      const { httpsCallable } = await import('firebase/functions');
+
+      let hasActiveSubscription = false;
+      try {
+        const getSubscriptionStatusFn = httpsCallable(functions, 'getSubscriptionStatus');
+        const subResult: any = await getSubscriptionStatusFn({});
+
+        console.log('🔧 Subscription status:', subResult.data);
+        hasActiveSubscription = subResult.data?.hasActiveSubscription || false;
+
+        // Log subscription status but don't block enrollment
+        // Active subscription = universal access to all courses
+        // No subscription = user might have individually purchased this course or it's free
+        if (hasActiveSubscription) {
+          console.log('✅ User has active subscription - auto-enrolling');
+        } else {
+          console.log('⚠️ No active subscription - checking course-specific access');
+        }
+      } catch (error: any) {
+        // If subscription check fails, log it but continue
+        // This ensures enrollment still works even if subscription service is down
+        console.warn('⚠️ Failed to check subscription status, proceeding with enrollment:', error);
+      }
+
       // Save to Firebase directly
-      const { doc, setDoc, getDoc, addDoc, collection } = await import('firebase/firestore');
+      const { doc, setDoc, getDoc, addDoc, collection, Timestamp } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase');
       
       // Check if already enrolled
@@ -191,16 +229,17 @@ export const useEnrollInCourse = () => {
       }
       
       // Create new enrollment
+      const now = Timestamp.now();
       await setDoc(enrollmentRef, {
         userId: user.id,
         courseId,
-        enrolledAt: new Date().toISOString(),
-        lastAccessedAt: new Date().toISOString(),
+        enrolledAt: now,
+        lastAccessedAt: now,
         completedLessons: 0,
         progress: 0,
         status: 'ACTIVE',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: now,
+        updatedAt: now
       });
       
       // Get course details for audit log

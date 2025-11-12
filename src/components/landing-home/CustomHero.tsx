@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 
 export default function CustomHero() {
   const dashboardRef = useRef<HTMLDivElement>(null);
@@ -76,7 +75,7 @@ export default function CustomHero() {
             }}
           >
             <img
-              src="https://framerusercontent.com/images/JeI7uULY0av9DxD7q7NVLTuoNc.png?width=2880&height=2000"
+              src="/dashboard-preview.png"
               alt="Dashboard preview"
               className="h-full w-full object-cover object-top"
               style={{ objectFit: "cover", objectPosition: "top" }}

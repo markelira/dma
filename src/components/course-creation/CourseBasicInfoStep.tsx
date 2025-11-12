@@ -26,21 +26,16 @@ export interface BasicInfoData {
   description: string;
   categoryId: string;
   instructorId: string;
-  language: string;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  certificateEnabled: boolean;
   thumbnailUrl?: string;
   learningObjectives: string;
 
   // Marketing fields
   shortDescription?: string;
   whatYouWillLearn?: string[];
-  requirements?: string[];
   targetAudience?: string[];
   guaranteeEnabled?: boolean;
   guaranteeText?: string;
   guaranteeDays?: number;
-  faq?: Array<{ question: string; answer: string }>;
 }
 
 interface Props {
@@ -53,24 +48,16 @@ const schema = z.object({
   description: z.string().min(10, "A leírás legalább 10 karakter legyen"),
   categoryId: z.string().min(1, "Válassz kategóriát"),
   instructorId: z.string().min(1, "Válassz oktatót"),
-  language: z.string().min(1, "Válassz nyelvet"),
-  difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']),
-  certificateEnabled: z.boolean(),
   thumbnailUrl: z.string().optional(),
   learningObjectives: z.string().min(10, "A tanulási célok legalább 10 karakter legyen"),
 
   // Marketing fields (all optional)
   shortDescription: z.string().max(160, "Maximum 160 karakter").optional(),
   whatYouWillLearn: z.array(z.string()).optional(),
-  requirements: z.array(z.string()).optional(),
   targetAudience: z.array(z.string()).optional(),
   guaranteeEnabled: z.boolean().optional(),
   guaranteeText: z.string().optional(),
   guaranteeDays: z.number().optional(),
-  faq: z.array(z.object({
-    question: z.string(),
-    answer: z.string()
-  })).optional(),
 });
 
 export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
@@ -84,9 +71,7 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
 
   // Marketing fields state
   const [whatYouWillLearn, setWhatYouWillLearn] = useState<string[]>(initial?.whatYouWillLearn || []);
-  const [requirements, setRequirements] = useState<string[]>(initial?.requirements || []);
   const [targetAudience, setTargetAudience] = useState<string[]>(initial?.targetAudience || []);
-  const [faq, setFaq] = useState<Array<{ question: string; answer: string }>>(initial?.faq || []);
 
   const {
     control,
@@ -104,9 +89,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
       description: "",
       categoryId: "",
       instructorId: "",
-      language: "hu",
-      difficulty: "BEGINNER",
-      certificateEnabled: false,
       thumbnailUrl: "",
       learningObjectives: "",
     },
@@ -125,16 +107,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
     setWhatYouWillLearn(whatYouWillLearn.filter((_, i) => i !== index));
   };
 
-  const addRequirement = () => setRequirements([...requirements, ""]);
-  const updateRequirement = (index: number, value: string) => {
-    const updated = [...requirements];
-    updated[index] = value;
-    setRequirements(updated);
-  };
-  const removeRequirement = (index: number) => {
-    setRequirements(requirements.filter((_, i) => i !== index));
-  };
-
   const addTargetAudience = () => setTargetAudience([...targetAudience, ""]);
   const updateTargetAudience = (index: number, value: string) => {
     const updated = [...targetAudience];
@@ -145,15 +117,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
     setTargetAudience(targetAudience.filter((_, i) => i !== index));
   };
 
-  const addFaqItem = () => setFaq([...faq, { question: "", answer: "" }]);
-  const updateFaqItem = (index: number, field: 'question' | 'answer', value: string) => {
-    const updated = [...faq];
-    updated[index][field] = value;
-    setFaq(updated);
-  };
-  const removeFaqItem = (index: number) => {
-    setFaq(faq.filter((_, i) => i !== index));
-  };
 
   // Load categories and instructors
   useEffect(() => {
@@ -257,9 +220,7 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
       const completeData: BasicInfoData = {
         ...data,
         whatYouWillLearn: whatYouWillLearn.filter(item => item.trim() !== ""),
-        requirements: requirements.filter(item => item.trim() !== ""),
         targetAudience: targetAudience.filter(item => item.trim() !== ""),
-        faq: faq.filter(item => item.question.trim() !== "" && item.answer.trim() !== ""),
       };
       await onSubmit(completeData);
     } catch (error) {
@@ -358,68 +319,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
           {errors.instructorId && (
             <p className="text-sm text-red-600">{errors.instructorId.message}</p>
           )}
-        </div>
-
-        {/* Language */}
-        <div className="space-y-2">
-          <Label htmlFor="language" required>Nyelv</Label>
-          <Controller
-            name="language"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="language">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hu">Magyar</SelectItem>
-                  <SelectItem value="en">Angol</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        {/* Difficulty */}
-        <div className="space-y-2">
-          <Label htmlFor="difficulty" required>Nehézségi szint</Label>
-          <Controller
-            name="difficulty"
-            control={control}
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger id="difficulty">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BEGINNER">Kezdő</SelectItem>
-                  <SelectItem value="INTERMEDIATE">Középhaladó</SelectItem>
-                  <SelectItem value="ADVANCED">Haladó</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          />
-        </div>
-
-        {/* Certificate */}
-        <div className="space-y-2">
-          <Label htmlFor="certificate">Tanúsítvány</Label>
-          <div className="flex items-center space-x-2">
-            <Controller
-              name="certificateEnabled"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  id="certificate"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-            <Label htmlFor="certificate" className="font-normal cursor-pointer">
-              Tanúsítvány engedélyezése
-            </Label>
-          </div>
         </div>
       </div>
 
@@ -564,40 +463,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
           </div>
         </div>
 
-        {/* Requirements */}
-        <div className="space-y-2 mb-6">
-          <Label>Előfeltételek</Label>
-          <div className="space-y-2">
-            {requirements.map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) => updateRequirement(index, e.target.value)}
-                  placeholder="pl. Alapvető HTML/CSS ismeretek"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeRequirement(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addRequirement}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Új előfeltétel hozzáadása
-            </Button>
-          </div>
-        </div>
-
         {/* Target Audience */}
         <div className="space-y-2 mb-6">
           <Label>Célközönség</Label>
@@ -683,49 +548,6 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
               </div>
             </>
           )}
-        </div>
-
-        {/* FAQ Section */}
-        <div className="space-y-2 mb-6">
-          <Label>Gyakran Ismételt Kérdések (GYIK)</Label>
-          <div className="space-y-4">
-            {faq.map((item, index) => (
-              <div key={index} className="p-4 border rounded-lg space-y-2">
-                <div className="flex justify-between items-start gap-2">
-                  <Input
-                    value={item.question}
-                    onChange={(e) => updateFaqItem(index, 'question', e.target.value)}
-                    placeholder="Kérdés"
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    onClick={() => removeFaqItem(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <Textarea
-                  value={item.answer}
-                  onChange={(e) => updateFaqItem(index, 'answer', e.target.value)}
-                  placeholder="Válasz"
-                  rows={2}
-                />
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addFaqItem}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Új GYIK elem hozzáadása
-            </Button>
-          </div>
         </div>
       </div>
 

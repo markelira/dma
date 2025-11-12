@@ -12,18 +12,36 @@ import { Table, TableHead, TableHeader, TableRow, TableCell, TableBody } from "@
 import { toast } from "sonner";
 import { auth } from '@/lib/firebase';
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
+import { useAuthStore } from '@/stores/authStore';
 
 interface Category { id: string; name: string; description?: string }
 
+interface GetCategoriesResponse {
+  success: boolean;
+  categories: Category[];
+  error?: string;
+}
+
 export default function CategoriesPage() {
   const qc = useQueryClient();
+  const { authReady, user } = useAuthStore();
+
   const { data, isLoading } = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => {
-      const fn = httpsCallable(fbFunctions, "getCategories");
-      const res: any = await fn();
-      return res.data?.categories || [];
+      const fn = httpsCallable<{}, GetCategoriesResponse>(fbFunctions, "getCategories");
+      const res = await fn({});
+
+      if (!res.data.success) {
+        throw new Error(res.data.error || 'Kategóriák betöltése sikertelen');
+      }
+
+      return res.data.categories;
     },
+    // Wait for auth to be ready before calling function
+    enabled: authReady && !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    retry: 1,
   });
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -31,15 +49,25 @@ export default function CategoriesPage() {
   const [form, setForm] = useState({ name: "", description: "" });
 
   const saveMutation = useMutation({
-    mutationFn: async (payload: any) => {
+    mutationFn: async (payload: { name: string; description: string }) => {
+      if (!user) {
+        throw new Error('Hitelesítés szükséges');
+      }
+
       if (editCat) {
-        const fn = httpsCallable(fbFunctions, "updateCategory");
-        const res: any = await fn({ id: editCat.id, ...payload });
-        if (!res.data?.success) throw new Error(res.data?.error || "Frissítés hiba");
+        const fn = httpsCallable<{ id: string; name: string; description: string }, { success: boolean; error?: string }>(
+          fbFunctions,
+          "updateCategory"
+        );
+        const res = await fn({ id: editCat.id, ...payload });
+        if (!res.data.success) throw new Error(res.data.error || "Frissítés hiba");
       } else {
-        const fn = httpsCallable(fbFunctions, "createCategory");
-        const res: any = await fn(payload);
-        if (!res.data?.success) throw new Error(res.data?.error || "Létrehozás hiba");
+        const fn = httpsCallable<{ name: string; description: string }, { success: boolean; error?: string }>(
+          fbFunctions,
+          "createCategory"
+        );
+        const res = await fn(payload);
+        if (!res.data.success) throw new Error(res.data.error || "Létrehozás hiba");
       }
     },
     onSuccess: () => {
@@ -49,20 +77,27 @@ export default function CategoriesPage() {
       setForm({ name: "", description: "" });
       setEditCat(null);
     },
-    onError: (e: any) => toast.error(e.response?.data?.message || e.message),
+    onError: (e: Error) => toast.error(e.message || "Hiba történt"),
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const fn = httpsCallable(fbFunctions, "deleteCategory");
-      const res: any = await fn({ id });
-      if (!res.data?.success) throw new Error(res.data?.error || "Törlés hiba");
+      if (!user) {
+        throw new Error('Hitelesítés szükséges');
+      }
+
+      const fn = httpsCallable<{ id: string }, { success: boolean; error?: string }>(
+        fbFunctions,
+        "deleteCategory"
+      );
+      const res = await fn({ id });
+      if (!res.data.success) throw new Error(res.data.error || "Törlés hiba");
     },
     onSuccess: () => {
       toast.success("Kategória törölve");
       qc.invalidateQueries({ queryKey: ["categories"] });
     },
-    onError: (e: any) => toast.error(e.response?.data?.message || e.message),
+    onError: (e: Error) => toast.error(e.message || "Hiba történt"),
   });
 
   const openForEdit = (c: Category) => {

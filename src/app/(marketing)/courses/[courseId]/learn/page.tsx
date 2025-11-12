@@ -12,14 +12,27 @@ export default function CourseLearnPage() {
   const { data: course, isLoading } = useCourse(courseId)
 
   useEffect(() => {
-    if (!isLoading && course && course.modules?.length) {
-      // Find the first available lesson and redirect to it
-      const firstModule = course.modules[0]
-      const firstLesson = firstModule?.lessons?.[0]
-      
+    if (!isLoading && course) {
+      // Find the first available lesson
+      // Try modules structure first
+      let firstLesson = null
+
+      if (course.modules?.length) {
+        const firstModule = course.modules[0]
+        firstLesson = firstModule?.lessons?.[0]
+      }
+
+      // Fallback to direct lessons array
+      if (!firstLesson && course.lessons?.length) {
+        firstLesson = course.lessons[0]
+      }
+
       if (firstLesson) {
         // Redirect to the specific lesson page using the player route
         router.replace(`/courses/${courseId}/player/${firstLesson.id}`)
+      } else {
+        // No lessons found, redirect to course detail page
+        router.replace(`/courses/${courseId}`)
       }
     }
   }, [course, isLoading, courseId, router])

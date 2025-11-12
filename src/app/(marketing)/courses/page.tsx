@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import { motion } from "motion/react"
 import { BookOpen } from 'lucide-react'
-import { db } from '@/lib/firebase'
+import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
@@ -41,6 +42,28 @@ export default function CourseListPage() {
   const [selectedPrice, setSelectedPrice] = useState('all')
   const [categories, setCategories] = useState<string[]>(['all'])
 
+  // Fetch categories from Cloud Function
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const getCategories = httpsCallable(fbFunctions, 'getCategories')
+        const result: any = await getCategories()
+
+        if (result.data?.success && result.data?.categories) {
+          // Map category objects to just names and add 'all' option
+          const categoryNames = ['all', ...result.data.categories.map((cat: any) => cat.name)]
+          setCategories(categoryNames)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+        // Fallback to just 'all' if fetch fails
+        setCategories(['all'])
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
   // Fetch all courses from Firestore
   useEffect(() => {
     const coursesQuery = query(
@@ -56,19 +79,6 @@ export default function CourseListPage() {
 
       setCourses(coursesData)
       setFilteredCourses(coursesData)
-
-      // Extract unique categories
-      const uniqueCategories = new Set<string>(['all'])
-      coursesData.forEach(course => {
-        if (course.category) {
-          const categoryName = typeof course.category === 'string' ? course.category : (course.category as any)?.name
-          if (categoryName) {
-            uniqueCategories.add(categoryName)
-          }
-        }
-      })
-      setCategories(Array.from(uniqueCategories))
-
       setLoading(false)
     }, (error) => {
       console.error('Error fetching courses:', error)

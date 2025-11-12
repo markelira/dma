@@ -15,23 +15,47 @@ export function useLogin() {
         const userCredential = await signInWithEmailAndPassword(auth, email, password)
         console.log('✅ Firebase Auth sikeres:', userCredential.user.uid)
         
-        // 2) Get Firebase ID token
+        // 2) Get Firebase ID token with custom claims
         const idToken = await userCredential.user.getIdToken(true)
-        console.log('✅ ID token megszerzve')
+        const tokenResult = await userCredential.user.getIdTokenResult(true)
+        console.log('🔍 [RESEARCH] ID token custom claims:', {
+          role: tokenResult.claims.role,
+          companyId: tokenResult.claims.companyId,
+          companyRole: tokenResult.claims.companyRole,
+          allClaims: Object.keys(tokenResult.claims)
+        })
         
         // 3) Get user data from Firestore
+        console.log('📄 [DIAGNOSTIC] Checking Firestore user document', {
+          uid: userCredential.user.uid,
+          email: userCredential.user.email,
+          timestamp: Date.now()
+        })
+
         const { doc, getDoc } = await import('firebase/firestore')
         const { db } = await import('@/lib/firebase')
-        
+
         const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid))
-        
+
+        console.log('📄 [DIAGNOSTIC] Firestore document result', {
+          exists: userDoc.exists(),
+          hasData: userDoc.exists() && !!userDoc.data(),
+          timestamp: Date.now()
+        })
+
         if (!userDoc.exists()) {
-          console.error('❌ User document not found in Firestore')
+          console.error('❌ [DIAGNOSTIC] User document NOT FOUND in Firestore for uid:', userCredential.user.uid)
           throw new Error('Felhasználói adatok nem találhatók')
         }
-        
+
         const userData = userDoc.data()
-        console.log('✅ User data from Firestore:', userData)
+        console.log('🔍 [RESEARCH] Raw Firestore user data:', {
+          role: userData.role,
+          companyId: userData.companyId,
+          companyRole: userData.companyRole,
+          email: userData.email,
+          allFields: Object.keys(userData)
+        })
         
         // Check if email is verified
         if (userData.emailVerified === false) {
@@ -40,22 +64,33 @@ export function useLogin() {
           throw new Error('Kérjük, először erősítse meg email címét a bejelentkezéshez.')
         }
         
+        const userObject = {
+          id: userCredential.user.uid,
+          uid: userCredential.user.uid,
+          email: userData.email || userCredential.user.email || '',
+          firstName: userData.firstName || '',
+          lastName: userData.lastName || '',
+          role: userData.role || 'STUDENT',
+          profilePictureUrl: userData.profilePictureUrl || null,
+          bio: userData.bio || null,
+          title: userData.title || null,
+          institution: userData.institution || null,
+          createdAt: userData.createdAt || new Date().toISOString(),
+          updatedAt: userData.updatedAt || new Date().toISOString(),
+          companyId: userData.companyId,
+          companyRole: userData.companyRole,
+        };
+
+        console.log('🔍 [RESEARCH] User object constructed in useLogin:', {
+          role: userObject.role,
+          companyId: userObject.companyId,
+          companyRole: userObject.companyRole,
+          hasCompanyId: !!userObject.companyId
+        });
+
         return {
           success: true,
-          user: {
-            id: userCredential.user.uid,
-            uid: userCredential.user.uid,
-            email: userData.email || userCredential.user.email || '',
-            firstName: userData.firstName || '',
-            lastName: userData.lastName || '',
-            role: userData.role || 'STUDENT',
-            profilePictureUrl: userData.profilePictureUrl || null,
-            bio: userData.bio || null,
-            title: userData.title || null,
-            institution: userData.institution || null,
-            createdAt: userData.createdAt || new Date().toISOString(),
-            updatedAt: userData.updatedAt || new Date().toISOString(),
-          },
+          user: userObject,
           accessToken: idToken,
         } as AuthResponse
         

@@ -21,7 +21,7 @@ import {
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
-import { EmailVerificationModal } from './EmailVerificationModal';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CompanyOnboardingData {
   // Step 1: Account owner
@@ -49,6 +49,8 @@ interface CompanyOnboardingData {
 interface CompanyRegisterFormProps {
   onSuccess?: () => void;
   onBack?: () => void;
+  onVerificationStart?: () => void;
+  onRegistrationComplete?: (userId: string, email: string) => void;
 }
 
 interface CompleteOnboardingInput {
@@ -89,14 +91,13 @@ const companySizes = [
   '500+ fő'
 ];
 
-export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSuccess, onBack }) => {
+export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSuccess, onBack, onVerificationStart, onRegistrationComplete }) => {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState<CompanyOnboardingData>({
     ownerFirstName: '',
@@ -110,6 +111,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     companySize: '',
     employees: []
   });
+
 
   const updateField = (field: keyof CompanyOnboardingData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -285,78 +287,55 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
       console.log('[Company Registration] ✅ Cloud Function returned:', result);
 
       if (result.data.success) {
-        console.log('[Company Registration] Cloud Function succeeded, companyId:', result.data.companyId);
-        setSuccess(true);
+        console.log('[Company Registration] ✅ Cloud Function succeeded, companyId:', result.data.companyId);
 
-        // CRITICAL: Wait for custom claims to propagate and verify them
-        let claimsVerified = false;
-        let attempts = 0;
-        const maxAttempts = 10;
-
-        while (!claimsVerified && attempts < maxAttempts) {
-          attempts++;
-          console.log(`[Company Registration] Attempt ${attempts}/${maxAttempts} - Checking custom claims...`);
-
-          // Force token refresh
-          await userCredential.user.getIdToken(true);
-
-          // Get fresh token with claims
-          const tokenResult = await userCredential.user.getIdTokenResult(true);
-          console.log('[Company Registration] Custom claims:', {
-            role: tokenResult.claims.role,
-            companyId: tokenResult.claims.companyId,
-            companyRole: tokenResult.claims.companyRole
-          });
-
-          if (tokenResult.claims.companyId && tokenResult.claims.role === 'COMPANY_ADMIN') {
-            console.log('✅ [Company Registration] Custom claims verified!');
-            claimsVerified = true;
-          } else {
-            console.log(`⏳ [Company Registration] Claims not ready yet, waiting 500ms...`);
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-        }
-
-        if (!claimsVerified) {
-          console.warn('⚠️ [Company Registration] Custom claims not verified after max attempts, but proceeding');
-        }
-
-        // Reload user to trigger auth state update with new claims
+        // CRITICAL: Force token refresh to pick up new custom claims
+        console.log('[Company Registration] Forcing token refresh to get custom claims...');
+        await userCredential.user.getIdToken(true);
         await userCredential.user.reload();
+        console.log('[Company Registration] ✅ Token refreshed');
 
-        // Small delay to ensure auth state propagates
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Store user ID for verification modal FIRST (before any async operations)
+        const userId = userCredential.user.uid;
+        console.log('[Company Registration] Stored userId for modal:', userId);
 
-        console.log('[Company Registration] Claims verified, now sending verification code');
+        // Notify parent that verification is starting (BEFORE refreshUser to prevent redirect)
+        if (onVerificationStart) {
+          onVerificationStart();
+        }
 
-        // Store user ID for verification modal
-        setRegisteredUserId(userCredential.user.uid);
-
-        // Send verification code
+        // Send verification code immediately
         try {
+          console.log('[Company Registration] Sending email verification code...');
           const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
           const verificationResult = await sendEmailVerificationCode({}) as any;
 
           if (verificationResult.data.success) {
-            console.log('[Company Registration] Verification code sent successfully');
+            console.log('[Company Registration] ✅ Verification code sent successfully');
 
             // In emulator mode, log the code for testing
             if (verificationResult.data.code) {
               console.log('🔐 VERIFICATION CODE (emulator):', verificationResult.data.code);
             }
-
-            // Show verification modal (hard block)
-            setShowVerificationModal(true);
           } else {
             console.error('[Company Registration] Failed to send verification code:', verificationResult.data.error);
-            // Still show modal - user can try resend
-            setShowVerificationModal(true);
           }
         } catch (emailError) {
           console.error('[Company Registration] Error sending verification code:', emailError);
-          // Still show modal - user can try resend
-          setShowVerificationModal(true);
         }
+
+        // Notify parent to show the verification modal
+        console.log('[Company Registration] Notifying parent to show verification modal...');
+        setLoading(false);
+
+        if (onRegistrationComplete) {
+          console.log('[Company Registration] Calling onRegistrationComplete callback');
+          onRegistrationComplete(userId, formData.ownerEmail);
+        }
+        console.log('[Company Registration] 📧 Parent should now render EmailVerificationModal');
+
+        // NOTE: refreshUser() is intentionally NOT called here to prevent redirect race condition
+        // It will be called in the onVerified callback AFTER email verification completes
       } else {
         setError('Hiba történt a regisztráció során');
         setLoading(false);
@@ -390,6 +369,8 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
   };
 
   const inputClass = "w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all";
+
+  // Parent will render the EmailVerificationModal when onRegistrationComplete is called
 
   return (
     <div className="space-y-6">
@@ -819,19 +800,6 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             </button>
           )}
         </div>
-      )}
-
-      {/* Email Verification Modal */}
-      {showVerificationModal && registeredUserId && (
-        <EmailVerificationModal
-          email={formData.ownerEmail}
-          userId={registeredUserId}
-          onVerified={() => {
-            console.log('[Company Registration] Email verified, redirecting to /company/dashboard');
-            setShowVerificationModal(false);
-            router.push('/company/dashboard');
-          }}
-        />
       )}
     </div>
   );
