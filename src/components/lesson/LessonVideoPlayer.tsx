@@ -103,6 +103,30 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
     )
   }
 
+  // For MVP: Add sample chapters to demonstrate the feature
+  const sampleChapters: VideoChapter[] = chapters.length > 0 ? chapters : [
+    {
+      id: 'intro',
+      title: 'Bevezetés',
+      startTime: 0,
+      endTime: 60,
+      description: 'A lecke áttekintése és célkitűzések'
+    },
+    {
+      id: 'main-content',
+      title: 'Főbb pontok',
+      startTime: 60,
+      endTime: 180,
+      description: 'A legfontosabb koncepciók részletes tárgyalása'
+    },
+    {
+      id: 'summary',
+      title: 'Összefoglalás',
+      startTime: 180,
+      description: 'A lecke kulcspontjainak áttekintése'
+    }
+  ]
+
   return (
     <VideoPlayer
       src={videoSource || `https://stream.mux.com/${finalPlaybackId}.m3u8`}
@@ -117,7 +141,7 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
       autoPlay={autoPlay}
       className={className}
       enableAnalytics={enableAnalytics}
-      chapters={chapters}
+      chapters={sampleChapters}
       bookmarks={bookmarks}
     />
   )
