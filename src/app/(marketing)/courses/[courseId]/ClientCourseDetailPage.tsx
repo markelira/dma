@@ -34,6 +34,44 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   // Fetch instructors to get full instructor data
   const { data: instructors = [] } = useInstructors();
 
+  // Fetch instructor data from instructors collection (moved before early returns)
+  const instructor = useMemo(() => {
+    if (!course) return null;
+
+    const c = course;
+
+    // First try to find instructor by instructorId in course
+    if (c.instructorId && instructors.length > 0) {
+      const found = instructors.find(inst => inst.id === c.instructorId);
+      if (found) return found;
+    }
+
+    // Fallback to legacy instructor data if available
+    const legacyInstructor = c.instructor || {};
+    if (legacyInstructor.firstName || legacyInstructor.lastName) {
+      return {
+        id: c.instructorId || 'legacy',
+        name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
+        title: legacyInstructor.title,
+        bio: legacyInstructor.bio,
+        profilePictureUrl: legacyInstructor.profilePictureUrl,
+        createdAt: '',
+        updatedAt: ''
+      };
+    }
+
+    // Default fallback
+    return {
+      id: 'default',
+      name: c.instructorName || 'DMA Oktató',
+      title: c.instructorTitle,
+      bio: c.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
+      profilePictureUrl: c.instructorImageUrl,
+      createdAt: '',
+      updatedAt: ''
+    };
+  }, [course, instructors]);
+
   // Handle payment success/cancel
   React.useEffect(() => {
     const success = searchParams.get('success');
@@ -149,40 +187,6 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
       }
     }
   };
-
-  // Fetch instructor data from instructors collection
-  const instructor = useMemo(() => {
-    // First try to find instructor by instructorId in course
-    if (c.instructorId && instructors.length > 0) {
-      const found = instructors.find(inst => inst.id === c.instructorId);
-      if (found) return found;
-    }
-
-    // Fallback to legacy instructor data if available
-    const legacyInstructor = c.instructor || {};
-    if (legacyInstructor.firstName || legacyInstructor.lastName) {
-      return {
-        id: c.instructorId || 'legacy',
-        name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
-        title: legacyInstructor.title,
-        bio: legacyInstructor.bio,
-        profilePictureUrl: legacyInstructor.profilePictureUrl,
-        createdAt: '',
-        updatedAt: ''
-      };
-    }
-
-    // Default fallback
-    return {
-      id: 'default',
-      name: c.instructorName || 'DMA Oktató',
-      title: c.instructorTitle,
-      bio: c.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
-      profilePictureUrl: c.instructorImageUrl,
-      createdAt: '',
-      updatedAt: ''
-    };
-  }, [c, instructors]);
 
   const courseFeatures = [
     `${stats.lessons} lecke`,
@@ -307,19 +311,21 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               )}
 
               {/* Instructor Card */}
-              <CourseInstructorCard
-                name={instructor.name}
-                title={instructor.title}
-                bio={instructor.bio || 'Tapasztalt oktató az ELIRA platformon.'}
-                imageUrl={instructor.profilePictureUrl}
-                stats={{
-                  students: stats.students,
-                  courses: 5,
-                  rating: stats.rating,
-                  reviews: Math.floor(stats.students * 0.3)
-                }}
-                expertise={c.tags || ['Üzleti fejlődés', 'Soft skills', 'Szakmai képzés']}
-              />
+              {instructor && (
+                <CourseInstructorCard
+                  name={instructor.name}
+                  title={instructor.title}
+                  bio={instructor.bio || 'Tapasztalt oktató az ELIRA platformon.'}
+                  imageUrl={instructor.profilePictureUrl}
+                  stats={{
+                    students: stats.students,
+                    courses: 5,
+                    rating: stats.rating,
+                    reviews: Math.floor(stats.students * 0.3)
+                  }}
+                  expertise={c.tags || ['Üzleti fejlődés', 'Soft skills', 'Szakmai képzés']}
+                />
+              )}
 
               {/* FAQ Section */}
               {c.faq && c.faq.length > 0 && (
