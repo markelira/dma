@@ -27,6 +27,17 @@ service firebase.storage {
                       request.resource.size < 500 * 1024 * 1024;
     }
 
+    // Instructor profile pictures
+    match /instructors/profile-pictures/{fileName} {
+      // Anyone can read instructor profile pictures
+      allow read: if true;
+
+      // Only admins can upload/update instructor profile pictures
+      allow write: if isAdmin() &&
+                      request.resource.size < 5 * 1024 * 1024 && // 5MB limit
+                      request.resource.contentType.matches('image/.*');
+    }
+
     // User profile pictures
     match /users/{userId}/profile/{fileName} {
       // Anyone can read profile pictures
