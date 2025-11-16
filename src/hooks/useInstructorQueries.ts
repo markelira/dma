@@ -2,7 +2,7 @@
  * React Query hooks for instructor CRUD operations
  * Instructors are managed like categories - separate entities, not users
  */
-import { useQuery, useMutation, useQueryClient } from '@tantml:react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Instructor } from '@/types';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
@@ -111,19 +111,16 @@ export const useCreateInstructor = () => {
           throw new Error(result.data.error || 'Oktató létrehozása sikertelen');
         }
 
+        // Invalidate instructors cache to refetch the list
+        queryClient.invalidateQueries({ queryKey: ['instructors'] });
+        toast.success(result.data.message || 'Oktató sikeresen létrehozva');
+
         return result.data;
       } catch (error: any) {
         console.error('[useCreateInstructor] Error creating instructor:', error);
+        toast.error(error.message || 'Hiba történt az oktató létrehozásakor');
         throw error;
       }
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || 'Oktató sikeresen létrehozva');
-      // Invalidate instructors cache to refetch the list
-      queryClient.invalidateQueries({ queryKey: ['instructors'] });
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Hiba történt az oktató létrehozásakor');
     },
   });
 };
@@ -148,19 +145,16 @@ export const useUpdateInstructor = () => {
           throw new Error(result.data.error || 'Oktató frissítése sikertelen');
         }
 
+        // Invalidate instructors cache to refetch the list
+        queryClient.invalidateQueries({ queryKey: ['instructors'] });
+        toast.success(result.data.message || 'Oktató sikeresen frissítve');
+
         return result.data;
       } catch (error: any) {
         console.error('[useUpdateInstructor] Error updating instructor:', error);
+        toast.error(error.message || 'Hiba történt az oktató frissítésekor');
         throw error;
       }
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || 'Oktató sikeresen frissítve');
-      // Invalidate instructors cache to refetch the list
-      queryClient.invalidateQueries({ queryKey: ['instructors'] });
-    },
-    onError: (error: Error) {
-      toast.error(error.message || 'Hiba történt az oktató frissítésekor');
     },
   });
 };
@@ -185,19 +179,16 @@ export const useDeleteInstructor = () => {
           throw new Error(result.data.error || 'Oktató törlése sikertelen');
         }
 
+        // Invalidate instructors cache to refetch the list
+        queryClient.invalidateQueries({ queryKey: ['instructors'] });
+        toast.success(result.data.message || 'Oktató sikeresen törölve');
+
         return result.data;
       } catch (error: any) {
         console.error('[useDeleteInstructor] Error deleting instructor:', error);
+        toast.error(error.message || 'Hiba történt az oktató törlésekor');
         throw error;
       }
-    },
-    onSuccess: (data) => {
-      toast.success(data.message || 'Oktató sikeresen törölve');
-      // Invalidate instructors cache to refetch the list
-      queryClient.invalidateQueries({ queryKey: ['instructors'] });
-    },
-    onError: (error: Error) {
-      toast.error(error.message || 'Hiba történt az oktató törlésekor');
     },
   });
 };
