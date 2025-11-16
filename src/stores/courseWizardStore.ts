@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Module, Lesson } from '@/types';
+import { Module, Lesson, CourseType } from '@/types';
 
 export interface WizardBasicInfo {
   title: string;
@@ -12,6 +12,12 @@ export interface WizardBasicInfo {
   certificateEnabled: boolean;
   thumbnailUrl?: string;
   learningObjectives: string;
+
+  // NEW: Webinar-specific fields
+  webinarDate?: string;
+  webinarDuration?: number;
+  liveStreamUrl?: string;
+  recordingAvailable?: boolean;
 }
 
 interface WizardModule extends Omit<Module, 'lessons'> {
@@ -30,9 +36,10 @@ interface CourseWizardState {
   // Step tracking
   currentStep: number;
   completedSteps: number[];
-  
+
   // Course data
   courseId: string | null;
+  courseType: CourseType | null; // NEW: Selected course type
   basicInfo: WizardBasicInfo | null;
   modules: WizardModule[];
   
@@ -50,6 +57,7 @@ interface CourseWizardState {
   setCurrentStep: (step: number) => void;
   markStepCompleted: (step: number) => void;
   setCourseId: (id: string) => void;
+  setCourseType: (type: CourseType) => void; // NEW: Set course type
   setBasicInfo: (info: WizardBasicInfo) => void;
   
   // Module actions
@@ -76,9 +84,10 @@ interface CourseWizardState {
 }
 
 const initialState = {
-  currentStep: 1,
+  currentStep: 0, // Start at Step 0 (type selection)
   completedSteps: [],
   courseId: null,
+  courseType: null, // NEW: Initialize course type as null
   basicInfo: null,
   modules: [],
   uploads: {},
@@ -95,9 +104,10 @@ export const useCourseWizardStore = create<CourseWizardState>()(
       markStepCompleted: (step) => set((state) => ({
         completedSteps: [...new Set([...state.completedSteps, step])].sort()
       })),
-      
+
       // Course data
       setCourseId: (id) => set({ courseId: id }),
+      setCourseType: (type) => set({ courseType: type }), // NEW: Set course type
       setBasicInfo: (info) => set({ basicInfo: info }),
       
       // Module actions
@@ -226,6 +236,7 @@ export const useCourseWizardStore = create<CourseWizardState>()(
         currentStep: state.currentStep,
         completedSteps: state.completedSteps,
         courseId: state.courseId,
+        courseType: state.courseType, // NEW: Persist course type
         basicInfo: state.basicInfo,
         modules: state.modules,
         uploads: state.uploads,

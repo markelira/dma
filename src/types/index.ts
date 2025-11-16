@@ -113,14 +113,53 @@ export interface Lesson {
   description?: string;
 }
 
+/**
+ * Course Type enum
+ * Defines the 3 types of courses in the platform:
+ * - ACADEMIA: Long, multi-module video course
+ * - WEBINAR: Single-lesson webinar with optional resources
+ * - MASTERCLASS: Comprehensive multi-module master course
+ */
+export type CourseType = 'ACADEMIA' | 'WEBINAR' | 'MASTERCLASS';
+
+/**
+ * Course Type labels in Hungarian for UI display
+ */
+export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
+  ACADEMIA: 'Akadémia',
+  WEBINAR: 'Webinár',
+  MASTERCLASS: 'Masterclass',
+};
+
+/**
+ * Course Type descriptions in Hungarian
+ */
+export const COURSE_TYPE_DESCRIPTIONS: Record<CourseType, string> = {
+  ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
+  WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
+  MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+};
+
 export interface Course {
   id: string;
   title: string;
   description: string;
   status: 'DRAFT' | 'PUBLISHED' | 'SOON' | 'ARCHIVED' | 'FREE' | 'PAID';
+
+  // NEW: Course type field (required)
+  courseType: CourseType;
+
   instructor: User;
   category: Category;
-  modules: Module[];
+
+  // UPDATED: modules is now optional (Webinars don't have modules)
+  modules?: Module[];
+
+  // NEW: Webinar-specific fields (only used when courseType === 'WEBINAR')
+  webinarDate?: string; // ISO timestamp for scheduled webinar
+  webinarDuration?: number; // Duration in minutes
+  liveStreamUrl?: string; // URL for live webinar session
+  recordingAvailable?: boolean; // Whether recording is available post-webinar
   averageRating?: number;
   reviewCount: number;
   enrollmentCount: number;

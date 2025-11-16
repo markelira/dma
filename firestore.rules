@@ -138,6 +138,31 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Support Tickets: User issue reporting and admin management
+    match /supportTickets/{ticketId} {
+      // Users can create their own tickets
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid;
+
+      // Users can read their own tickets, admins can read all
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Only admins can update/delete tickets
+      allow update, delete: if isAdmin();
+    }
+
+    // Lesson Progress: Track user progress through lessons
+    match /lessonProgress/{progressId} {
+      // Users can read/write their own progress
+      // Progress ID format: {userId}_{lessonId}
+      allow read, write: if isAuthenticated() &&
+        progressId.matches('^' + request.auth.uid + '_.*$');
+
+      // Admins can read any progress
+      allow read: if isAdmin();
+    }
+
     // Allow all other authenticated operations (fallback)
     match /{document=**} {
       allow read, write: if request.auth != null;

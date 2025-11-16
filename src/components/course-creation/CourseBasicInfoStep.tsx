@@ -13,13 +13,16 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import Image from "next/image";
 import { httpsCallable } from 'firebase/functions';
-import { functions as fbFunctions } from '@/lib/firebase';
+import { functions as fbFunctions, storage } from '@/lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Upload, X, Loader2, Plus } from "lucide-react";
 import { useCourseWizardStore } from "@/stores/courseWizardStore";
 import { useAuthStore } from "@/stores/authStore";
 
 interface Category { id: string; name: string }
 interface Instructor { id: string; firstName: string; lastName: string }
+
+import { CourseType } from '@/types';
 
 export interface BasicInfoData {
   title: string;
@@ -36,10 +39,17 @@ export interface BasicInfoData {
   guaranteeEnabled?: boolean;
   guaranteeText?: string;
   guaranteeDays?: number;
+
+  // Webinar-specific fields
+  webinarDate?: string;
+  webinarDuration?: number;
+  liveStreamUrl?: string;
+  recordingAvailable?: boolean;
 }
 
 interface Props {
   initial?: BasicInfoData;
+  courseType?: CourseType;
   onSubmit: (data: BasicInfoData) => Promise<void>;
 }
 
@@ -58,14 +68,21 @@ const schema = z.object({
   guaranteeEnabled: z.boolean().optional(),
   guaranteeText: z.string().optional(),
   guaranteeDays: z.number().optional(),
+
+  // Webinar-specific fields (all optional)
+  webinarDate: z.string().optional(),
+  webinarDuration: z.number().positive().optional(),
+  liveStreamUrl: z.string().url("Érvényes URL-t adj meg").optional().or(z.literal('')),
+  recordingAvailable: z.boolean().optional(),
 });
 
-export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
+export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: Props) {
   const { setValidationErrors, clearValidationErrors } = useCourseWizardStore();
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -181,7 +198,7 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
 
   const handleThumbnailUpload = async (file: File) => {
     if (!file) return;
-    
+
     // Validate file
     const maxSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxSize) {
@@ -196,20 +213,52 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
     }
 
     setThumbnailUploading(true);
+    setUploadProgress(0);
+
     try {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64 = reader.result as string;
-        setValue('thumbnailUrl', base64);
-        setThumbnailFile(file);
-        toast.success('Thumbnail feltöltve');
-      };
-      reader.readAsDataURL(file);
+      // Create a reference to Firebase Storage
+      const storageRef = ref(storage, `courses/thumbnails/${Date.now()}_${file.name}`);
+
+      // Upload file with progress tracking
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      // Monitor upload progress
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Calculate and update progress percentage
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setUploadProgress(progress);
+        },
+        (error) => {
+          // Handle upload errors
+          console.error('Thumbnail feltöltési hiba:', error);
+          toast.error('Thumbnail feltöltési hiba');
+          setThumbnailUploading(false);
+          setUploadProgress(0);
+        },
+        async () => {
+          // Upload completed successfully, get download URL
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setValue('thumbnailUrl', downloadURL);
+            setThumbnailFile(file);
+            toast.success('Thumbnail sikeresen feltöltve');
+            setThumbnailUploading(false);
+            setUploadProgress(0);
+          } catch (err: any) {
+            console.error('Download URL lekérési hiba:', err);
+            toast.error('Hiba a kép URL lekérésekor');
+            setThumbnailUploading(false);
+            setUploadProgress(0);
+          }
+        }
+      );
     } catch (err: any) {
       console.error('Thumbnail feltöltési hiba:', err);
       toast.error('Thumbnail feltöltési hiba');
-    } finally {
       setThumbnailUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -352,6 +401,85 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
         )}
       </div>
 
+      {/* Webinar-specific fields (only shown for WEBINAR type) */}
+      {courseType === 'WEBINAR' && (
+        <div className="space-y-4 p-4 border-2 border-purple-200 rounded-lg bg-purple-50/30">
+          <h3 className="font-semibold text-purple-900 flex items-center gap-2">
+            <span className="text-purple-600">🎥</span>
+            Webinár beállítások
+          </h3>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Webinar Date */}
+            <div className="space-y-2">
+              <Label htmlFor="webinarDate">Webinár időpontja</Label>
+              <Input
+                id="webinarDate"
+                type="datetime-local"
+                {...register("webinarDate")}
+                className={errors.webinarDate ? "border-red-500" : ""}
+              />
+              {errors.webinarDate && (
+                <p className="text-sm text-red-600">{errors.webinarDate.message}</p>
+              )}
+            </div>
+
+            {/* Webinar Duration */}
+            <div className="space-y-2">
+              <Label htmlFor="webinarDuration">Időtartam (perc)</Label>
+              <Input
+                id="webinarDuration"
+                type="number"
+                min="15"
+                step="15"
+                placeholder="pl. 60"
+                {...register("webinarDuration", { valueAsNumber: true })}
+                className={errors.webinarDuration ? "border-red-500" : ""}
+              />
+              {errors.webinarDuration && (
+                <p className="text-sm text-red-600">{errors.webinarDuration.message}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Live Stream URL */}
+          <div className="space-y-2">
+            <Label htmlFor="liveStreamUrl">Élő közvetítés URL (opcionális)</Label>
+            <Input
+              id="liveStreamUrl"
+              type="url"
+              placeholder="https://zoom.us/j/... vagy YouTube link"
+              {...register("liveStreamUrl")}
+              className={errors.liveStreamUrl ? "border-red-500" : ""}
+            />
+            {errors.liveStreamUrl && (
+              <p className="text-sm text-red-600">{errors.liveStreamUrl.message}</p>
+            )}
+            <p className="text-xs text-muted-foreground">
+              A résztvevők ezen a linken keresztül csatlakozhatnak az élő webinárhoz
+            </p>
+          </div>
+
+          {/* Recording Available */}
+          <div className="flex items-center space-x-2">
+            <Controller
+              name="recordingAvailable"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="recordingAvailable"
+                  checked={field.value || false}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+            <Label htmlFor="recordingAvailable" className="cursor-pointer">
+              Felvétel elérhető lesz a webinár után
+            </Label>
+          </div>
+        </div>
+      )}
+
       {/* Thumbnail Upload */}
       <div className="space-y-2">
         <Label>Kurzus borítókép</Label>
@@ -373,7 +501,18 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
               className="flex flex-col items-center cursor-pointer"
             >
               {thumbnailUploading ? (
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                <div className="w-full space-y-3">
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto" />
+                  <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-primary h-full transition-all duration-300 ease-out"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Feltöltés... {uploadProgress}%
+                  </p>
+                </div>
               ) : (
                 <>
                   <Upload className="h-8 w-8 text-muted-foreground mb-2" />
@@ -403,6 +542,7 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
                 setThumbnailFile(null);
               }}
               className="absolute -top-2 -right-2 bg-red-600 hover:bg-red-700 text-white rounded-full h-6 w-6 flex items-center justify-center transition-colors"
+              disabled={thumbnailUploading}
             >
               <X className="h-4 w-4" />
             </button>
@@ -555,13 +695,18 @@ export default function CourseBasicInfoStep({ initial, onSubmit }: Props) {
       <div className="flex justify-end pt-4">
         <Button
           type="submit"
-          disabled={!isValid || isSubmitting}
+          disabled={!isValid || isSubmitting || thumbnailUploading}
           size="lg"
         >
           {isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Mentés...
+            </>
+          ) : thumbnailUploading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Kép feltöltése...
             </>
           ) : (
             'Mentés és tovább'

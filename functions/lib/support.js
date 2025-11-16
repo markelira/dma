@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.respondToSupportTicket = exports.createSupportTicket = void 0;
+exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const admin_1 = require("./admin");
 const z = __importStar(require("zod"));
@@ -135,6 +135,106 @@ exports.respondToSupportTicket = (0, https_1.onCall)(async (request) => {
     }
     catch (error) {
         console.error('[respondToSupportTicket] Error:', error);
+        throw error;
+    }
+});
+// Report lesson-specific issue
+const ReportLessonIssueSchema = z.object({
+    lessonId: z.string(),
+    courseId: z.string(),
+    issueType: z.enum(['technical', 'content', 'video', 'audio', 'other']),
+    subject: z.string().min(3).max(200),
+    description: z.string().min(10).max(2000),
+    browser: z.string().optional(),
+    platform: z.string().optional(),
+    url: z.string().optional(),
+});
+exports.reportLessonIssue = (0, https_1.onCall)(async (request) => {
+    if (!request.auth) {
+        throw new Error('Authentication required');
+    }
+    const validatedData = ReportLessonIssueSchema.parse(request.data);
+    try {
+        // Get user info
+        const userDoc = await admin_1.firestore.collection('users').doc(request.auth.uid).get();
+        const userData = userDoc.data();
+        // Get lesson and course info for context
+        const lessonDoc = await admin_1.firestore
+            .collection('courses')
+            .doc(validatedData.courseId)
+            .collection('lessons')
+            .doc(validatedData.lessonId)
+            .get();
+        const courseDoc = await admin_1.firestore
+            .collection('courses')
+            .doc(validatedData.courseId)
+            .get();
+        const lessonTitle = lessonDoc.exists ? lessonDoc.data()?.title : 'Unknown Lesson';
+        const courseTitle = courseDoc.exists ? courseDoc.data()?.title : 'Unknown Course';
+        // Priority mapping based on issue type
+        const priorityMap = {
+            'technical': 'high',
+            'video': 'high',
+            'audio': 'medium',
+            'content': 'medium',
+            'other': 'low'
+        };
+        const ticketData = {
+            userId: request.auth.uid,
+            userEmail: request.auth?.token?.email || '',
+            userName: `${userData?.firstName || ''} ${userData?.lastName || ''}`.trim() || 'Unknown User',
+            // Issue context
+            lessonId: validatedData.lessonId,
+            courseId: validatedData.courseId,
+            lessonTitle,
+            courseTitle,
+            issueType: validatedData.issueType,
+            // Issue details
+            subject: validatedData.subject,
+            description: validatedData.description,
+            priority: priorityMap[validatedData.issueType] || 'low',
+            status: 'open',
+            // Technical metadata
+            browser: validatedData.browser,
+            platform: validatedData.platform,
+            url: validatedData.url,
+            // Timestamps
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        };
+        const ticketRef = await admin_1.firestore.collection('supportTickets').add(ticketData);
+        // Create audit log entry
+        await (0, auditLog_1.createAuditLogEntry)(request.auth.uid, request.auth?.token?.email || '', ticketData.userName, 'REPORT_LESSON_ISSUE', 'SupportTicket', ticketRef.id, {
+            lessonTitle,
+            courseTitle,
+            issueType: validatedData.issueType,
+            subject: validatedData.subject,
+        }, ticketData.priority === 'high' ? 'HIGH' : 'MEDIUM');
+        console.log(`[Support] Lesson issue reported: ${ticketRef.id} by ${ticketData.userName}`, {
+            lessonId: validatedData.lessonId,
+            courseId: validatedData.courseId,
+            issueType: validatedData.issueType
+        });
+        return {
+            success: true,
+            ticketId: ticketRef.id,
+            message: 'Probléma sikeresen jelentve. Hamarosan válaszolunk!',
+            data: {
+                ticketId: ticketRef.id,
+                status: 'open',
+                priority: ticketData.priority
+            }
+        };
+    }
+    catch (error) {
+        console.error('[reportLessonIssue] Error:', error);
+        if (error instanceof z.ZodError) {
+            return {
+                success: false,
+                error: 'Validációs hiba',
+                details: error.errors
+            };
+        }
         throw error;
     }
 });

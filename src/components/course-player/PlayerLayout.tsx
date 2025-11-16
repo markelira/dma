@@ -1,13 +1,20 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { httpsCallable } from 'firebase/functions'
+import { functions } from '@/lib/firebase'
 import { LessonContentRenderer } from '@/components/lesson/LessonContentRenderer'
-import { LessonResourcesList } from '@/components/lesson/LessonResourcesList'
-import { LessonOverviewTab } from './LessonOverviewTab'
-import { ChevronLeft, ChevronRight, Menu, X, BookOpen, Play, CheckCircle, FileDown } from 'lucide-react'
+import { CourseNavigationSidebar } from './CourseNavigationSidebar'
+import { LessonTabs } from './LessonTabs'
+import { LearningCompanionPanel } from './LearningCompanionPanel'
+import { PlayerHeader } from './PlayerHeader'
+import { ReportIssueDialog } from './ReportIssueDialog'
+import { Button } from '@/components/ui/button'
+import { playerComponents } from '@/lib/course-player-design-system'
+import { useTranslation } from '@/hooks/useTranslation'
+import { useToast } from '@/hooks/use-toast'
 
 interface PlayerLayoutProps {
   course: any
@@ -33,346 +40,371 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
   hasSubscription
 }) => {
   const router = useRouter()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [isFullscreen, setIsFullscreen] = useState(false)
-  const [activeTab, setActiveTab] = useState('overview')
-  const [currentVideoTime, setCurrentVideoTime] = useState(0)
+  const { t } = useTranslation()
+  const { toast } = useToast()
+  const [showLeftSidebar, setShowLeftSidebar] = useState(true)
+  const [showRightPanel, setShowRightPanel] = useState(true)
+  const [showReportIssueDialog, setShowReportIssueDialog] = useState(false)
+  const [isMarkingComplete, setIsMarkingComplete] = useState(false)
+  const [isDownloadingResources, setIsDownloadingResources] = useState(false)
 
   // Calculate navigation
-  const flatLessons = modules.flatMap((m: any) =>
-    (m.lessons as any[]).sort((a: any, b: any) => a.order - b.order).map((l: any) => ({
-      ...l,
-      moduleId: m.id,
-      moduleOrder: m.order,
-      moduleTitle: m.title
-    }))
-  )
+  const flatLessons = useMemo(() => {
+    return modules.flatMap((m: any) =>
+      (m.lessons as any[])
+        .sort((a: any, b: any) => a.order - b.order)
+        .map((l: any) => ({
+          ...l,
+          moduleId: m.id,
+          moduleOrder: m.order,
+          moduleTitle: m.title
+        }))
+    )
+  }, [modules])
+
   const currentIndex = flatLessons.findIndex((l: any) => l.id === currentLessonId)
-  const prevLesson = currentIndex > 0 ? flatLessons[currentIndex-1] : null
-  const nextLesson = currentIndex < flatLessons.length-1 ? flatLessons[currentIndex+1] : null
+  const prevLesson = currentIndex > 0 ? flatLessons[currentIndex - 1] : null
+  const nextLesson =
+    currentIndex < flatLessons.length - 1 ? flatLessons[currentIndex + 1] : null
 
-  // Fullscreen detection
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement)
-    }
+  // Calculate course progress
+  const courseStats = useMemo(() => {
+    const totalLessons = flatLessons.length
+    const completedLessons = flatLessons.filter(
+      (l: any) =>
+        l.progress?.completed || (l.progress?.watchPercentage ?? 0) >= 90
+    ).length
+    const overallProgress =
+      totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0
 
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
-  }, [])
+    return { totalLessons, completedLessons, overallProgress }
+  }, [flatLessons])
 
-  // Keyboard shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+  // Find current module
+  const currentModule = modules.find((m: any) =>
+    m.lessons.some((l: any) => l.id === currentLessonId)
+  )
 
-      switch (e.key) {
-        case 'Escape':
-          if (sidebarOpen) setSidebarOpen(false)
-          break
-        case 'm':
-        case 'M':
-          setSidebarOpen(!sidebarOpen)
-          break
-        case 'ArrowLeft':
-          if (e.shiftKey && prevLesson) {
-            router.push(`/courses/${course.id}/player/${prevLesson.id}`)
-          }
-          break
-        case 'ArrowRight':
-          if (e.shiftKey && nextLesson) {
-            router.push(`/courses/${course.id}/player/${nextLesson.id}`)
-          }
-          break
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [sidebarOpen, prevLesson, nextLesson, course.id, router])
+  // Learning outcomes - use from lesson data or fallback to placeholders
+  const learningOutcomes = lesson?.learningOutcomes || [
+    t('placeholders.learningOutcome1'),
+    t('placeholders.learningOutcome2'),
+    t('placeholders.learningOutcome3')
+  ]
 
   const locked = !hasSubscription && lesson?.subscriptionTier === 'PREMIUM'
 
-  // Calculate progress percentage
-  const completedLessons = flatLessons.filter((l: any) => l.completed).length
-  const progressPercentage = flatLessons.length > 0
-    ? Math.round((completedLessons / flatLessons.length) * 100)
-    : 0
+  const handleLessonClick = (lessonId: string) => {
+    router.push(`/courses/${course.id}/player/${lessonId}`)
+  }
+
+  const handleMarkComplete = async () => {
+    if (isMarkingComplete) return
+
+    setIsMarkingComplete(true)
+    try {
+      const markLessonComplete = httpsCallable(functions, 'markLessonComplete')
+      const result = await markLessonComplete({
+        lessonId: currentLessonId,
+        courseId: course.id,
+        timeSpent: lesson.duration || 0,
+        analytics: {
+          sessionId: `session_${Date.now()}`,
+        }
+      })
+
+      const data = result.data as any
+
+      if (data.success) {
+        // Update local progress
+        onProgress(100, lesson.duration || 0)
+
+        // Show success message
+        toast({
+          title: data.data?.courseCompleted ? 'Gratulálunk!' : 'Lecke befejezve!',
+          description: data.message,
+          variant: 'default',
+        })
+
+        // If course completed, you might want to redirect or show celebration
+        if (data.data?.courseCompleted) {
+          setTimeout(() => {
+            router.push(`/courses/${course.id}`)
+          }, 3000)
+        }
+      }
+    } catch (error) {
+      console.error('Error marking lesson complete:', error)
+      toast({
+        title: 'Hiba történt',
+        description: 'Nem sikerült befejezettnek jelölni a leckét. Próbáld újra!',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsMarkingComplete(false)
+    }
+  }
+
+  const handleDownloadResources = async () => {
+    if (isDownloadingResources) return
+
+    setIsDownloadingResources(true)
+    try {
+      const getResourceDownloadUrls = httpsCallable(functions, 'getResourceDownloadUrls')
+      const result = await getResourceDownloadUrls({
+        lessonId: currentLessonId,
+        courseId: course.id,
+      })
+
+      const data = result.data as any
+
+      if (data.success && data.resources) {
+        const availableResources = data.resources.filter((r: any) => r.available)
+
+        if (availableResources.length === 0) {
+          toast({
+            title: 'Nincs elérhető forrás',
+            description: 'Ehhez a leckéhez jelenleg nincsenek letölthető források.',
+            variant: 'default',
+          })
+          return
+        }
+
+        // Download all resources
+        availableResources.forEach((resource: any, index: number) => {
+          setTimeout(() => {
+            const link = document.createElement('a')
+            link.href = resource.downloadUrl
+            link.download = resource.title || `resource_${index + 1}`
+            link.target = '_blank'
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+          }, index * 500) // Stagger downloads by 500ms
+        })
+
+        toast({
+          title: 'Források letöltése',
+          description: `${availableResources.length} forrás letöltése elindult...`,
+          variant: 'default',
+        })
+      }
+    } catch (error) {
+      console.error('Error downloading resources:', error)
+      toast({
+        title: 'Hiba történt',
+        description: 'Nem sikerült letölteni a forrásokat. Próbáld újra!',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsDownloadingResources(false)
+    }
+  }
+
+  const handleReportIssue = () => {
+    setShowReportIssueDialog(true)
+  }
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex">
-      {/* Sidebar - Always visible on desktop, collapsible on mobile */}
-      <div className={`${
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      } fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-lg lg:shadow-none transform lg:transform-none transition-transform duration-300 ease-in-out lg:translate-x-0`}>
-        <div className="flex flex-col h-full">
-          {/* Course Header Section */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4 lg:hidden">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSidebarOpen(false)}
-                className="text-gray-600 hover:bg-gray-100 ml-auto"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+    <div className="h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <PlayerHeader
+        courseTitle={course?.title || 'Course'}
+        courseId={course?.id}
+        moduleTitle={currentModule?.title}
+        lessonTitle={lesson?.title || 'Lesson'}
+        overallProgress={courseStats.overallProgress}
+      />
 
-            <h1 className="text-lg font-semibold text-gray-900 mb-2 leading-tight">
-              {course.title || 'Kurzus címe'}
-            </h1>
+      {/* Main Content Area - 3 Column Layout */}
+      <div className="flex-1 flex min-h-0">
+        {/* Left Sidebar - Course Navigation */}
+        {showLeftSidebar && (
+          <CourseNavigationSidebar
+            course={course}
+            currentLessonId={currentLessonId}
+            onLessonClick={handleLessonClick}
+            onClose={() => setShowLeftSidebar(false)}
+            className="hidden lg:block"
+          />
+        )}
 
-            {/* Progress indicator */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
-                <span>Haladás</span>
-                <span className="font-semibold text-gray-900">{progressPercentage}%</span>
+        {/* Main Content Column */}
+        <main className="flex-1 overflow-y-auto" role="main">
+          <div className="max-w-5xl mx-auto p-6 space-y-6">
+            {/* Video Player / Content Area */}
+            {!locked && lesson && (
+              <div className={playerComponents.card}>
+                <div className="bg-black rounded-t-lg overflow-hidden">
+                  <LessonContentRenderer
+                    lesson={lesson}
+                    playerData={playerData}
+                    courseId={course.id}
+                    userId={userId}
+                    onProgress={onProgress}
+                    onCompleted={onEnded}
+                    hasAccess={hasSubscription}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-600 rounded-full h-2 transition-all duration-300"
-                  style={{ width: `${progressPercentage}%` }}
-                />
+            )}
+
+            {locked && (
+              <div className={`${playerComponents.card} p-12 text-center`}>
+                <div className="max-w-md mx-auto">
+                  <div
+                    className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4"
+                  >
+                    <svg
+                      className="w-8 h-8 text-gray-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    {t('subscription.required')}
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    {t('subscription.message')}
+                  </p>
+                  <Button onClick={() => router.push(`/courses/${course.id}`)}>
+                    {t('subscription.viewPlans')}
+                  </Button>
+                </div>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {completedLessons} / {flatLessons.length} lecke befejezve
-              </div>
-            </div>
-          </div>
+            )}
 
-          {/* Modules Section - Dynamic from props */}
-          <div className="flex-1 overflow-y-auto px-4">
-            {modules && modules.length > 0 && (
-              <div className="mb-4 space-y-6">
-                {modules.map((module: any) => (
-                  <div key={module.id}>
-                    <div className="flex items-center gap-2 mb-3 px-2">
-                      <BookOpen className="w-4 h-4 text-gray-400" />
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{module.title}</h3>
-                    </div>
+            {/* Lesson Tabs */}
+            {!locked && (
+              <LessonTabs lesson={lesson} learningOutcomes={learningOutcomes} />
+            )}
 
-                    <div className="space-y-1">
-                      {module.lessons && module.lessons.map((lessonItem: any) => {
-                        const isActive = lessonItem.id === currentLessonId
-                        const isCompleted = lessonItem.completed
+            {/* Bottom Navigation */}
+            {!locked && (
+              <div className={`${playerComponents.card} p-4`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    {prevLesson && (
+                      <Button
+                        variant="outline"
+                        onClick={() => handleLessonClick(prevLesson.id)}
+                        className="gap-2"
+                      >
+                        <ChevronLeft size={16} />
+                        <div className="text-left hidden sm:block">
+                          <div className="text-xs text-gray-500">{t('navigation.previous')}</div>
+                          <div className="text-sm font-medium truncate max-w-[200px]">
+                            {prevLesson.title}
+                          </div>
+                        </div>
+                        <span className="sm:hidden">{t('navigation.previous')}</span>
+                      </Button>
+                    )}
+                  </div>
 
-                        return (
-                          <button
-                            key={lessonItem.id}
-                            onClick={() => router.push(`/courses/${course.id}/player/${lessonItem.id}`)}
-                            className={`w-full text-left rounded-lg p-3 transition-colors duration-200 ${
-                              isActive
-                                ? 'bg-[#466C95]/10 text-[#466C95] border-l-4 border-[#466C95] shadow-sm'
-                                : 'text-gray-700 hover:bg-gray-50'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              {isCompleted ? (
-                                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                              ) : isActive ? (
-                                <Play className="w-4 h-4 text-[#466C95] flex-shrink-0" />
-                              ) : (
-                                <div className="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
-                              )}
-                              <span className="text-sm font-medium">{lessonItem.title}</span>
-                            </div>
-                          </button>
-                        )
-                      })}
+                  <div className="flex-1 text-center px-4">
+                    <div className="text-sm text-gray-600">
+                      {t('navigation.lessonCounter', { current: currentIndex + 1, total: flatLessons.length })}
                     </div>
                   </div>
-                ))}
+
+                  <div>
+                    {nextLesson && (
+                      <Button
+                        onClick={() => handleLessonClick(nextLesson.id)}
+                        className="gap-2"
+                      >
+                        <div className="text-right hidden sm:block">
+                          <div className="text-xs opacity-90">{t('navigation.next')}</div>
+                          <div className="text-sm font-medium truncate max-w-[200px]">
+                            {nextLesson.title}
+                          </div>
+                        </div>
+                        <span className="sm:hidden">{t('navigation.next')}</span>
+                        <ChevronRight size={16} />
+                      </Button>
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </div>
+        </main>
 
-          {/* Sidebar Footer */}
-          <div className="p-4 border-t border-gray-200">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => router.push(`/courses/${course.id}`)}
-              className="w-full justify-start font-medium"
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Vissza a kurzushoz
-            </Button>
-          </div>
-        </div>
+        {/* Right Panel - Learning Companion */}
+        {showRightPanel && !locked && (
+          <LearningCompanionPanel
+            lesson={lesson}
+            courseProgress={courseStats.overallProgress}
+            totalLessons={courseStats.totalLessons}
+            completedLessons={courseStats.completedLessons}
+            learningOutcomes={learningOutcomes}
+            onMarkComplete={handleMarkComplete}
+            onDownloadResources={handleDownloadResources}
+            onReportIssue={handleReportIssue}
+            className="hidden xl:block"
+          />
+        )}
       </div>
 
-      {/* Sidebar Overlay - Mobile only */}
-      {sidebarOpen && (
+      {/* Report Issue Dialog */}
+      <ReportIssueDialog
+        open={showReportIssueDialog}
+        onOpenChange={setShowReportIssueDialog}
+        lessonId={currentLessonId}
+        courseId={course.id}
+        lessonTitle={lesson?.title}
+        courseTitle={course?.title}
+      />
+
+      {/* Mobile Sidebar Overlay */}
+      {showLeftSidebar && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
+          onClick={() => setShowLeftSidebar(false)}
+        >
+          <div className="h-full" onClick={(e) => e.stopPropagation()}>
+            <CourseNavigationSidebar
+              course={course}
+              currentLessonId={currentLessonId}
+              onLessonClick={(lessonId) => {
+                handleLessonClick(lessonId)
+                setShowLeftSidebar(false)
+              }}
+              onClose={() => setShowLeftSidebar(false)}
+            />
+          </div>
+        </div>
       )}
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        {!isFullscreen && (
-          <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-3">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-3 min-w-0">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSidebarOpen(true)}
-                  className="text-gray-600 hover:bg-gray-100 flex-shrink-0 lg:hidden"
-                  title="Kurzus tartalom (M)"
-                >
-                  <Menu className="w-5 h-5" />
-                </Button>
-                <div className="min-w-0">
-                  <div className="text-sm text-gray-500 truncate">
-                    {course.title || 'Kurzus'}
-                  </div>
-                  <div className="text-base md:text-lg font-semibold text-gray-900 truncate">
-                    {lesson?.title || 'Lecke'}
-                  </div>
-                </div>
-              </div>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push(`/courses/${course.id}`)}
-                className="flex-shrink-0 hidden md:flex"
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" />
-                Kurzus
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto">
-          {locked ? (
-            <div className="flex items-center justify-center min-h-full text-center p-8">
-              <div>
-                <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <h3 className="text-xl font-semibold mb-2">Előfizetés szükséges</h3>
-                <p className="text-gray-600 mb-4">Ez a lecke csak előfizetőknek érhető el.</p>
-                <Button onClick={() => router.push(`/courses/${course.id}`)}>
-                  Előfizetés indítása
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <>
-              {/* Video Player */}
-              <div className="bg-black">
-                <LessonContentRenderer
-                  lesson={lesson}
-                  playerData={playerData}
-                  courseId={course.id}
-                  userId={userId}
-                  onProgress={(percentage, time, analytics) => {
-                    setCurrentVideoTime(time)
-                    onProgress(percentage, time, analytics)
-                  }}
-                  onCompleted={onEnded}
-                  hasAccess={hasSubscription}
-                />
-              </div>
-
-              {/* Progress Bar with Navigation */}
-              {!isFullscreen && (
-                <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-3">
-                  <div className="flex items-center justify-between gap-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={!prevLesson}
-                      onClick={() => prevLesson && router.push(`/courses/${course.id}/player/${prevLesson.id}`)}
-                      className="flex items-center gap-2"
-                      title="Shift + ←"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                      <span className="hidden sm:inline">Előző</span>
-                    </Button>
-
-                    <div className="text-center flex-1">
-                      <div className="text-sm font-medium text-gray-900">
-                        Lecke {currentIndex + 1} / {flatLessons.length}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {progressPercentage}% befejezve
-                      </div>
-                    </div>
-
-                    <Button
-                      variant="default"
-                      size="sm"
-                      disabled={!nextLesson}
-                      onClick={() => nextLesson && router.push(`/courses/${course.id}/player/${nextLesson.id}`)}
-                      className="flex items-center gap-2"
-                      title="Shift + →"
-                    >
-                      <span className="hidden sm:inline">Következő</span>
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Tabs Section */}
-              {!isFullscreen && (
-                <div className="bg-white">
-                  <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <div className="border-b border-gray-200 px-4 md:px-6">
-                      <TabsList className="bg-transparent h-auto p-0 space-x-6">
-                        <TabsTrigger
-                          value="overview"
-                          className="bg-transparent border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 rounded-none px-0 py-3"
-                        >
-                          <BookOpen className="w-4 h-4 mr-2" />
-                          Áttekintés
-                        </TabsTrigger>
-                        <TabsTrigger
-                          value="resources"
-                          className="bg-transparent border-b-2 border-transparent data-[state=active]:border-blue-600 data-[state=active]:text-blue-600 rounded-none px-0 py-3"
-                        >
-                          <FileDown className="w-4 h-4 mr-2" />
-                          Anyagok
-                        </TabsTrigger>
-                      </TabsList>
-                    </div>
-
-                    <div className="px-4 md:px-6">
-                      <TabsContent value="overview" className="mt-0">
-                        <LessonOverviewTab lesson={lesson} course={course} />
-                      </TabsContent>
-
-                      <TabsContent value="resources" className="mt-0 py-6">
-                        {lesson?.resources && lesson.resources.length > 0 ? (
-                          <div className="max-w-4xl mx-auto">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                              Letölthető anyagok
-                            </h3>
-                            <LessonResourcesList resources={lesson.resources} />
-                          </div>
-                        ) : (
-                          <div className="max-w-4xl mx-auto py-12 text-center">
-                            <FileDown className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                            <p className="text-gray-500">
-                              Nincsenek letölthető anyagok ehhez a leckéhez
-                            </p>
-                          </div>
-                        )}
-                      </TabsContent>
-                    </div>
-                  </Tabs>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
+      {/* Mobile Menu Toggle (Bottom Right FAB) */}
+      <button
+        onClick={() => setShowLeftSidebar(true)}
+        className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-[#0066CC] text-white rounded-full shadow-lg flex items-center justify-center z-30 hover:bg-[#0052A3] transition-colors"
+        aria-label={t('navigation.openCourseMenu')}
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+      </button>
     </div>
   )
 }

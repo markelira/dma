@@ -1321,7 +1321,11 @@ export const verifyEmail = onCall({
 export { getAuditLogs, getAuditLogStats } from './auditLog';
 
 // Export support functions
-export { createSupportTicket, respondToSupportTicket } from './support';
+export {
+  createSupportTicket,
+  respondToSupportTicket,
+  reportLessonIssue,
+} from './support';
 
 // Export Company Admin Dashboard functions
 export { createCompany } from './company/createCompany';
@@ -1355,6 +1359,9 @@ export { muxWebhook } from './muxWebhook';
 
 // Export course management functions
 export { createCourse, updateCourse, publishCourse, deleteCourse } from './courseManagement';
+
+// Export data cleanup functions (Admin only)
+export { deleteAllCourses } from './dataCleanup';
 
 // Export file actions
 export { getSignedUploadUrl } from './fileActions';
@@ -1953,4 +1960,14 @@ export { getDashboardStats } from './dashboard';
 export {
   getSyncedLessonProgress,
   syncProgressOnDeviceSwitch,
+  markLessonComplete,
 } from './lessonProgress';
+
+// ============================================
+// COURSE RESOURCES
+// ============================================
+
+// Export course resources functions
+export {
+  getResourceDownloadUrls,
+} from './courseResources';

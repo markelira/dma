@@ -49,11 +49,21 @@ const CourseSchema = z.object({
     description: z.string().min(10, "Description must be at least 10 characters"),
     categoryId: z.string().min(1, "Category is required"),
     instructorId: z.string().min(1, "Instructor is required"),
+    // NEW: Course type field (REQUIRED)
+    courseType: z.enum(['ACADEMIA', 'WEBINAR', 'MASTERCLASS'], {
+        required_error: "Course type is required",
+        invalid_type_error: "Course type must be ACADEMIA, WEBINAR, or MASTERCLASS"
+    }),
     language: z.string().nullish().default('hu'),
     difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).nullish().default('BEGINNER'),
     certificateEnabled: z.boolean().nullish().default(false),
     thumbnailUrl: z.string().nullish().default(''),
     learningObjectives: z.string().min(10, "Learning objectives must be at least 10 characters"),
+    // NEW: Webinar-specific fields (optional, used when courseType === 'WEBINAR')
+    webinarDate: z.string().nullish(),
+    webinarDuration: z.number().positive().nullish(),
+    liveStreamUrl: z.string().url().nullish().or(z.literal('')),
+    recordingAvailable: z.boolean().nullish().default(false),
     // Marketing fields - all optional with defaults (nullish handles both null and undefined)
     shortDescription: z.string().max(160).nullish().default(''),
     whatYouWillLearn: z.array(z.string()).nullish().default([]),
@@ -122,11 +132,19 @@ exports.createCourse = (0, https_1.onCall)({
             description: validatedData.description,
             categoryId: validatedData.categoryId,
             instructorId: validatedData.instructorId,
+            courseType: validatedData.courseType, // NEW: Course type
             language: validatedData.language || 'hu',
             difficulty: validatedData.difficulty || 'BEGINNER',
             certificateEnabled: validatedData.certificateEnabled || false,
             thumbnailUrl: thumbnailUrl,
             learningObjectives: validatedData.learningObjectives,
+            // Webinar-specific fields (only populated for WEBINAR type)
+            ...(validatedData.courseType === 'WEBINAR' && {
+                webinarDate: validatedData.webinarDate || null,
+                webinarDuration: validatedData.webinarDuration || null,
+                liveStreamUrl: validatedData.liveStreamUrl || '',
+                recordingAvailable: validatedData.recordingAvailable || false,
+            }),
             // Marketing fields
             shortDescription: validatedData.shortDescription || '',
             whatYouWillLearn: validatedData.whatYouWillLearn || [],
@@ -150,10 +168,45 @@ exports.createCourse = (0, https_1.onCall)({
         };
         // Create course document
         const courseRef = await firestore.collection('courses').add(courseData);
-        v2_1.logger.info(`Course created: ${courseRef.id} by user ${userId}`);
+        const courseId = courseRef.id;
+        v2_1.logger.info(`Course created: ${courseId} by user ${userId} with type ${validatedData.courseType}`);
+        // Auto-create default module and lesson for WEBINAR type
+        if (validatedData.courseType === 'WEBINAR') {
+            v2_1.logger.info(`Creating default module and lesson for webinar ${courseId}`);
+            // Create default module
+            const moduleRef = await firestore
+                .collection('courses')
+                .doc(courseId)
+                .collection('modules')
+                .add({
+                title: 'Webinár',
+                description: 'Webinár felvétel',
+                order: 0,
+                status: 'DRAFT',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            });
+            // Create default lesson
+            await firestore
+                .collection('courses')
+                .doc(courseId)
+                .collection('modules')
+                .doc(moduleRef.id)
+                .collection('lessons')
+                .add({
+                title: 'Webinár felvétel',
+                content: 'Töltsd fel a webinár videót',
+                type: 'VIDEO',
+                order: 0,
+                status: 'DRAFT',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            });
+            v2_1.logger.info(`Default module and lesson created for webinar ${courseId}`);
+        }
         return {
             success: true,
-            courseId: courseRef.id,
+            courseId,
             slug: finalSlug,
             message: 'Kurzus sikeresen létrehozva'
         };

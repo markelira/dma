@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ArrowLeft, ArrowRight, Check, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import CourseTypeSelection from './CourseTypeSelection';
 import CourseBasicInfoStep, { BasicInfoData } from './CourseBasicInfoStep';
 import CurriculumStructureStep from './CurriculumStructureStep';
 import CoursePublishStep from './CoursePublishStep';
@@ -15,6 +16,7 @@ import { collection, doc, getDocs, query, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourseWizardStore } from '@/stores/courseWizardStore';
 import { Progress } from '@/components/ui/progress';
+import { CourseType } from '@/types';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,21 +29,27 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const steps = [
-  { 
-    id: 1, 
-    title: 'Alapadatok', 
+  {
+    id: 0,
+    title: 'Típus',
+    description: 'Válassz kurzus típust',
+    validation: ['courseType']
+  },
+  {
+    id: 1,
+    title: 'Alapadatok',
     description: 'Kurzus alapinformációk megadása',
     validation: ['title', 'description', 'categoryId', 'instructorId', 'learningObjectives']
   },
-  { 
-    id: 2, 
-    title: 'Tanterv', 
+  {
+    id: 2,
+    title: 'Tanterv',
     description: 'Modulok és leckék létrehozása',
     validation: ['modules']
   },
-  { 
-    id: 3, 
-    title: 'Publikálás', 
+  {
+    id: 3,
+    title: 'Publikálás',
     description: 'Áttekintés és közzététel',
     validation: []
   },
@@ -60,12 +68,14 @@ export default function CourseCreationWizard() {
     currentStep,
     completedSteps,
     courseId,
+    courseType,
     basicInfo,
     modules,
     validationErrors,
     setCurrentStep,
     markStepCompleted,
     setCourseId,
+    setCourseType,
     setBasicInfo,
     resetWizard,
   } = useCourseWizardStore();
@@ -182,8 +192,17 @@ export default function CourseCreationWizard() {
     return errors.length === 0;
   };
 
+  // Handle course type selection
+  const handleTypeSelection = (type: CourseType) => {
+    setCourseType(type);
+    markStepCompleted(0);
+    setCurrentStep(1); // Move to basic info step
+    toast.success(`${type === 'ACADEMIA' ? 'Akadémia' : type === 'WEBINAR' ? 'Webinár' : 'Masterclass'} típus kiválasztva`);
+  };
+
   // Check if can proceed to next step
   const canProceed = (stepId: number) => {
+    if (stepId === 0) return !!courseType;
     if (stepId === 1) return !!courseId;
     if (stepId === 2) {
       // Check Firestore directly since CurriculumStructureStep works with Firestore
@@ -210,10 +229,20 @@ export default function CourseCreationWizard() {
   const handleBasicInfoSubmit = async (formData: BasicInfoData) => {
     setIsSaving(true);
     try {
+      if (!courseType) {
+        toast.error('Válassz kurzus típust először');
+        setCurrentStep(0);
+        setIsSaving(false);
+        return;
+      }
+
       if (!courseId) {
-        // Create new course
+        // Create new course with course type
         const createCourseFn = httpsCallable(fbFunctions, 'createCourse');
-        const res: any = await createCourseFn(formData);
+        const res: any = await createCourseFn({
+          ...formData,
+          courseType, // Include course type
+        });
 
         console.log('🔍 createCourse response:', res.data);
 
@@ -289,9 +318,17 @@ export default function CourseCreationWizard() {
           setTimeout(resolve, 0);
         })
       ]);
-      
-      // Navigate to next step after all state updates complete
-      setCurrentStep(2);
+
+      // Navigate to next step - skip curriculum for webinars
+      if (courseType === 'WEBINAR') {
+        // For webinars, skip curriculum step and go directly to publish
+        markStepCompleted(2); // Mark curriculum as complete
+        setCurrentStep(3); // Go to publish
+        toast.info('Webinár típusnál nincs tanterv lépés - egy videó leckét fog tartalmazni');
+      } else {
+        // For Academia and Masterclass, go to curriculum step
+        setCurrentStep(2);
+      }
     } catch (err: any) {
       console.error('Error saving basic info:', err);
       toast.error(err.message || 'Hiba történt a mentés során');
@@ -497,6 +534,15 @@ export default function CourseCreationWizard() {
 
         {/* Step content */}
         <CardContent className="pt-6">
+          {currentStep === 0 && (
+            <div>
+              <CourseTypeSelection
+                onSelect={handleTypeSelection}
+                initialSelection={courseType || undefined}
+              />
+            </div>
+          )}
+
           {currentStep === 1 && (
             <div>
               <CardHeader className="px-0 pt-0">
@@ -507,6 +553,7 @@ export default function CourseCreationWizard() {
               </CardHeader>
               <CourseBasicInfoStep
                 initial={basicInfo || undefined}
+                courseType={courseType || undefined}
                 onSubmit={handleBasicInfoSubmit}
               />
             </div>

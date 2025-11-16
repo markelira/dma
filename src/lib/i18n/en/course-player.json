@@ -1,0 +1,86 @@
+{
+  "navigation": {
+    "backToCourse": "Back to Course",
+    "previous": "Previous",
+    "next": "Next",
+    "lessonCounter": "Lesson {current} of {total}",
+    "openCourseMenu": "Open course menu",
+    "closeSidebar": "Close sidebar"
+  },
+  "subscription": {
+    "required": "Subscription Required",
+    "message": "This lesson is only available to subscribers.",
+    "viewPlans": "View Subscription Plans"
+  },
+  "header": {
+    "settings": "Settings",
+    "closePlayer": "Close player",
+    "overallProgress": "Overall course progress",
+    "complete": "{progress}% Complete"
+  },
+  "sidebar": {
+    "courseNavigation": "Course navigation",
+    "course": "Course",
+    "by": "by",
+    "overallProgress": "Overall Progress",
+    "lessonsCompleted": "{completed} / {total} lessons",
+    "courseContent": "Course Content"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "resources": "Resources",
+    "transcript": "Transcript",
+    "aboutLesson": "About This Lesson",
+    "whatYouWillLearn": "What You'll Learn",
+    "keyConcepts": "Key Concepts Covered",
+    "downloadableResources": "Downloadable Resources",
+    "resource": "Resource {index}",
+    "download": "Download",
+    "noResources": "No resources available for this lesson",
+    "transcriptComingSoon": "Transcript Coming Soon",
+    "transcriptMessage": "Video transcripts will be available in a future update",
+    "contentType": "{type} Content"
+  },
+  "companion": {
+    "aria": "Learning companion",
+    "lessonProgress": "Lesson Progress",
+    "timeWatched": "Time Watched",
+    "status": "Status",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "remaining": "{duration} remaining",
+    "learningOutcomes": "Learning Outcomes",
+    "quickActions": "Quick Actions",
+    "markComplete": "Mark as Complete",
+    "downloadResources": "Download Resources",
+    "reportIssue": "Report Issue",
+    "courseProgress": "Course Progress",
+    "completedLessons": "Completed Lessons",
+    "remainingLessons": "{count} lessons",
+    "courseComplete": "Course Complete!"
+  },
+  "lessonTypes": {
+    "VIDEO": "Video",
+    "QUIZ": "Quiz",
+    "TEXT": "Text",
+    "READING": "Reading",
+    "PDF": "PDF",
+    "AUDIO": "Audio",
+    "ASSIGNMENT": "Assignment"
+  },
+  "progress": {
+    "lessonCount": "{completed}/{total} lessons"
+  },
+  "duration": {
+    "lessThanMinute": "< 1m",
+    "minutes": "{minutes}m",
+    "hours": "{hours}h",
+    "hoursMinutes": "{hours}h {minutes}m"
+  },
+  "placeholders": {
+    "learningOutcome1": "Understand the core concepts covered in this lesson",
+    "learningOutcome2": "Apply the knowledge to real-world scenarios",
+    "learningOutcome3": "Complete the lesson exercises successfully"
+  }
+}

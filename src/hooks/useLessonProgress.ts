@@ -42,29 +42,87 @@ const getSessionId = (): string => {
 
 export const useLessonProgress = () => {
   const qc = useQueryClient()
-  
+  const { user } = useAuthStore()
+
   return useMutation({
-    mutationFn: async ({ lessonId, ...body }: ProgressPayload) => {
+    mutationFn: async ({ lessonId, courseId, ...body }: ProgressPayload) => {
+      if (!user) {
+        throw new Error('User must be authenticated to save progress')
+      }
+
       const deviceId = getDeviceId()
       const sessionId = getSessionId()
-      
-      // For now, just log the progress update
-      // In production, this would update Firestore
-      console.log('📊 Progress Update:', {
+
+      console.log('📊 Saving Progress to Firestore:', {
         lessonId,
+        courseId,
         deviceId,
         sessionId,
         ...body
       })
-      
-      // Return mock success response
+
+      // Import Firestore functions
+      const { doc, setDoc, serverTimestamp } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+
+      // Create progress document ID: {userId}_{lessonId}
+      const progressId = `${user.uid}_${lessonId}`
+      const progressRef = doc(db, 'lessonProgress', progressId)
+
+      // Prepare progress data
+      const progressData: any = {
+        userId: user.uid,
+        lessonId,
+        deviceId,
+        sessionId,
+        lastWatchedAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      }
+
+      // Add courseId if provided
+      if (courseId) {
+        progressData.courseId = courseId
+      }
+
+      // Add watchPercentage if provided
+      if (body.watchPercentage !== undefined) {
+        progressData.watchPercentage = body.watchPercentage
+
+        // Mark as completed if >= 90%
+        if (body.watchPercentage >= 90) {
+          progressData.completed = true
+          progressData.completedAt = serverTimestamp()
+        }
+      }
+
+      // Add timeSpent if provided
+      if (body.timeSpent !== undefined) {
+        progressData.timeSpent = body.timeSpent
+      }
+
+      // Add resumePosition if provided
+      if (body.resumePosition !== undefined) {
+        progressData.resumePosition = body.resumePosition
+      }
+
+      // Add quizScore if provided
+      if (body.quizScore !== undefined) {
+        progressData.quizScore = body.quizScore
+      }
+
+      // Save to Firestore (merge to preserve existing data)
+      await setDoc(progressRef, progressData, { merge: true })
+
+      console.log('✅ Progress saved to Firestore:', progressId)
+
       return {
         success: true,
+        progressId,
         lessonId,
         deviceId,
         sessionId,
         syncVersion: Date.now(),
-        ...body
+        ...progressData
       }
     },
     onMutate: async ({ lessonId }) => {

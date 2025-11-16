@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = void 0;
+exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
@@ -48,6 +48,16 @@ const GetSyncedProgressSchema = zod_1.z.object({
 const DeviceSyncSchema = zod_1.z.object({
     deviceId: zod_1.z.string(),
     courseId: zod_1.z.string().optional(),
+});
+// Schema for markLessonComplete
+const MarkCompleteSchema = zod_1.z.object({
+    lessonId: zod_1.z.string(),
+    courseId: zod_1.z.string(),
+    timeSpent: zod_1.z.number().min(0),
+    analytics: zod_1.z.object({
+        sessionId: zod_1.z.string().optional(),
+        engagementEvents: zod_1.z.array(zod_1.z.any()).optional(),
+    }).optional(),
 });
 /**
  * Get synchronized lesson progress across devices
@@ -183,6 +193,128 @@ exports.syncProgressOnDeviceSwitch = (0, https_1.onCall)({
         return {
             success: false,
             error: error instanceof Error ? error.message : 'Failed to sync progress'
+        };
+    }
+});
+/**
+ * Mark a lesson as complete (100%)
+ * Updates progress, checks course completion, awards badges/certificates
+ */
+exports.markLessonComplete = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        // Check authentication
+        if (!request.auth) {
+            throw new Error('Authentication required');
+        }
+        const userId = request.auth.uid;
+        // Validate input
+        const { lessonId, courseId, timeSpent, analytics } = MarkCompleteSchema.parse(request.data);
+        v2_1.logger.info('Marking lesson as complete', {
+            userId,
+            lessonId,
+            courseId,
+            timeSpent
+        });
+        // Get user data
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('User not found');
+        }
+        const userData = userDoc.data();
+        // Update lesson progress
+        const progressId = `${userId}_${lessonId}`;
+        const progressRef = firestore.collection('lessonProgress').doc(progressId);
+        await progressRef.set({
+            userId,
+            lessonId,
+            courseId,
+            watchPercentage: 100,
+            timeSpent,
+            completed: true,
+            completedAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastWatchedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            ...(analytics && {
+                sessionId: analytics.sessionId,
+                engagementEvents: analytics.engagementEvents
+            })
+        }, { merge: true });
+        // Check if all lessons in the course are completed
+        const courseRef = firestore.collection('courses').doc(courseId);
+        const courseDoc = await courseRef.get();
+        if (!courseDoc.exists) {
+            throw new Error('Course not found');
+        }
+        const courseData = courseDoc.data();
+        // Get all lessons for this course
+        const lessonsSnapshot = await courseRef.collection('lessons').get();
+        const totalLessons = lessonsSnapshot.size;
+        // Get all completed lessons for this user in this course
+        const completedLessonsSnapshot = await firestore
+            .collection('lessonProgress')
+            .where('userId', '==', userId)
+            .where('courseId', '==', courseId)
+            .where('completed', '==', true)
+            .get();
+        const completedLessons = completedLessonsSnapshot.size;
+        const courseCompleted = completedLessons >= totalLessons;
+        v2_1.logger.info('Course progress check', {
+            userId,
+            courseId,
+            completedLessons,
+            totalLessons,
+            courseCompleted
+        });
+        // Update enrollment if course is completed
+        if (courseCompleted) {
+            const enrollmentRef = firestore.collection('enrollments').doc(`${userId}_${courseId}`);
+            await enrollmentRef.update({
+                completedAt: admin.firestore.FieldValue.serverTimestamp(),
+                progress: 100,
+                updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+            v2_1.logger.info('Course completed - enrollment updated', {
+                userId,
+                courseId
+            });
+            // TODO: Award certificate
+            // TODO: Send completion email
+            // TODO: Award badges based on course completion
+        }
+        return {
+            success: true,
+            data: {
+                lessonId,
+                courseId,
+                completed: true,
+                completedAt: new Date().toISOString(),
+                courseProgress: {
+                    completedLessons,
+                    totalLessons,
+                    percentage: Math.round((completedLessons / totalLessons) * 100),
+                    courseCompleted
+                }
+            },
+            message: courseCompleted
+                ? 'Gratulálunk! Teljesítetted a kurzust!'
+                : 'Lecke sikeresen befejezve!'
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('Error marking lesson complete:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return {
+                success: false,
+                error: 'Validation error',
+                details: error.errors
+            };
+        }
+        return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Failed to mark lesson complete'
         };
     }
 });

@@ -1,0 +1,115 @@
+{
+  "navigation": {
+    "backToCourse": "Vissza a kurzushoz",
+    "previous": "Előző",
+    "next": "Következő",
+    "lessonCounter": "{current}. lecke / {total}",
+    "openCourseMenu": "Kurzus menü megnyitása",
+    "closeSidebar": "Oldalsáv bezárása"
+  },
+  "subscription": {
+    "required": "Előfizetés szükséges",
+    "message": "Ez a lecke csak előfizetők számára elérhető.",
+    "viewPlans": "Előfizetési csomagok megtekintése"
+  },
+  "header": {
+    "settings": "Beállítások",
+    "closePlayer": "Lejátszó bezárása",
+    "overallProgress": "Teljes kurzus előrehaladás",
+    "complete": "{progress}% teljesítve"
+  },
+  "sidebar": {
+    "courseNavigation": "Kurzus navigáció",
+    "course": "Kurzus",
+    "by": "Oktató:",
+    "overallProgress": "Teljes előrehaladás",
+    "lessonsCompleted": "{completed} / {total} lecke",
+    "courseContent": "Kurzus tartalma"
+  },
+  "tabs": {
+    "overview": "Áttekintés",
+    "resources": "Források",
+    "transcript": "Átirat",
+    "aboutLesson": "A leckéről",
+    "whatYouWillLearn": "Mit fogsz megtanulni",
+    "keyConcepts": "Kulcsfogalmak",
+    "downloadableResources": "Letölthető források",
+    "resource": "{index}. forrás",
+    "download": "Letöltés",
+    "noResources": "Ehhez a leckéhez nem tartoznak források",
+    "transcriptComingSoon": "Az átirat hamarosan elérhető",
+    "transcriptMessage": "A videó átirat egy jövőbeli frissítésben lesz elérhető",
+    "contentType": "{type} tartalom"
+  },
+  "companion": {
+    "aria": "Tanulási asszisztens",
+    "lessonProgress": "Lecke előrehaladása",
+    "timeWatched": "Megtekintett idő",
+    "status": "Státusz",
+    "completed": "Befejezve",
+    "inProgress": "Folyamatban",
+    "notStarted": "Még nem kezdted el",
+    "remaining": "{duration} van hátra",
+    "learningOutcomes": "Tanulási célok",
+    "quickActions": "Gyors műveletek",
+    "markComplete": "Megjelölés befejezettként",
+    "downloadResources": "Források letöltése",
+    "reportIssue": "Probléma jelentése",
+    "courseProgress": "Kurzus előrehaladása",
+    "completedLessons": "Befejezett leckék",
+    "remainingLessons": "{count} lecke van hátra",
+    "courseComplete": "Kurzus teljesítve!"
+  },
+  "lessonTypes": {
+    "VIDEO": "Videó",
+    "QUIZ": "Kvíz",
+    "TEXT": "Szöveg",
+    "READING": "Olvasmány",
+    "PDF": "PDF",
+    "AUDIO": "Audió",
+    "ASSIGNMENT": "Feladat"
+  },
+  "progress": {
+    "lessonCount": "{completed}/{total} lecke"
+  },
+  "duration": {
+    "lessThanMinute": "< 1 perc",
+    "minutes": "{minutes} perc",
+    "hours": "{hours} óra",
+    "hoursMinutes": "{hours} óra {minutes} perc"
+  },
+  "placeholders": {
+    "learningOutcome1": "A lecke alapvető fogalmainak megértése",
+    "learningOutcome2": "A tudás alkalmazása valós helyzetekben",
+    "learningOutcome3": "A lecke gyakorlatainak sikeres elvégzése"
+  },
+  "reportIssue": {
+    "title": "Probléma jelentése",
+    "description": "Segíts nekünk javítani a tananyagot! Írd le a problémát, amit tapasztaltál.",
+    "issueType": "Probléma típusa",
+    "issueTypePlaceholder": "Válassz egy kategóriát",
+    "issueTypes": {
+      "technical": "Technikai probléma",
+      "content": "Tartalmi hiba",
+      "video": "Videó probléma",
+      "audio": "Hang probléma",
+      "other": "Egyéb"
+    },
+    "subject": "Rövid összefoglaló",
+    "subjectPlaceholder": "Pl.: A videó nem játszik le 5:30-nál",
+    "description": "Részletes leírás",
+    "descriptionPlaceholder": "Írd le részletesen, hogy mi a probléma és mikor történt...",
+    "cancel": "Mégse",
+    "submit": "Jelentés küldése",
+    "submitting": "Küldés...",
+    "success": "Köszönjük a jelentést! Hamarosan válaszolunk.",
+    "error": "Hiba történt a jelentés küldése során. Próbáld újra!",
+    "validation": {
+      "issueTypeRequired": "Kérjük válassz egy probléma típust",
+      "subjectTooShort": "A címnek legalább 3 karakter hosszúnak kell lennie",
+      "subjectTooLong": "A cím maximum 200 karakter lehet",
+      "descriptionTooShort": "A leírásnak legalább 10 karakter hosszúnak kell lennie",
+      "descriptionTooLong": "A leírás maximum 2000 karakter lehet"
+    }
+  }
+}
