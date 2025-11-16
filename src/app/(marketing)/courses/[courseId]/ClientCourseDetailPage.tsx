@@ -10,7 +10,6 @@ import { useAuthStore } from '@/stores/authStore';
 import React, { useState } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
-import Header from '@/components/landing-home/ui/header';
 import Footer from '@/components/landing-home/ui/footer';
 import { CourseDetailHero } from '@/components/course/CourseDetailHero';
 import { CourseDetailStatsBar } from '@/components/course/CourseDetailStatsBar';
@@ -166,7 +165,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
   return (
     <AuthProvider>
-      <Header />
+      <FramerNavbarWrapper />
 
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
         {/* Background blur shapes */}
