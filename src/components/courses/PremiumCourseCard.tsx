@@ -18,7 +18,7 @@ interface Course {
   students?: number;
   enrollmentCount?: number;
   price: number;
-  imageUrl?: string;
+  thumbnailUrl?: string;
   lessons?: number;
 }
 
@@ -81,9 +81,9 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
       >
         {/* Course Image */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden">
-          {course.imageUrl ? (
+          {course.thumbnailUrl ? (
             <Image
-              src={course.imageUrl}
+              src={course.thumbnailUrl}
               alt={course.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"

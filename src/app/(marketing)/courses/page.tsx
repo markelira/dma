@@ -26,7 +26,7 @@ interface Course {
   students?: number
   enrollmentCount?: number
   price: number
-  imageUrl?: string
+  thumbnailUrl?: string
   lessons?: number
   createdAt?: any
   tags?: string[]
