@@ -4,27 +4,20 @@ import { Filter, X } from 'lucide-react'
 
 interface CourseFilterPanelProps {
   selectedCategory: string
-  selectedLevel: string
-  selectedPrice: string
   categories: string[]
   onCategoryChange: (category: string) => void
-  onLevelChange: (level: string) => void
-  onPriceChange: (price: string) => void
   onResetFilters: () => void
 }
 
 /**
  * CourseFilterPanel component
- * Sidebar panel for filtering courses
+ * Sidebar panel for filtering courses by category only
+ * (Level and price filters removed for type-specific course pages)
  */
 export function CourseFilterPanel({
   selectedCategory,
-  selectedLevel,
-  selectedPrice,
   categories,
   onCategoryChange,
-  onLevelChange,
-  onPriceChange,
   onResetFilters
 }: CourseFilterPanelProps) {
   return (

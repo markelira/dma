@@ -13,6 +13,7 @@ const SCROLL_THRESHOLD = 100
 
 export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedProps) {
   const [scrolled, setScrolled] = useState(false)
+  const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false)
   const { isAuthenticated, user, isLoading } = useAuthStore()
 
   useEffect(() => {
@@ -77,15 +78,62 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                 transform: scrolled ? 'none' : 'translateX(-50%)',
               }}
             >
-              <Link
-                href="/courses"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
-                style={{
-                  fontSize: scrolled ? '14px' : '16px',
-                }}
+              {/* Kurzusok Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => setCoursesDropdownOpen(true)}
+                onMouseLeave={() => setCoursesDropdownOpen(false)}
               >
-                Kurzusok
-              </Link>
+                <button
+                  className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20 flex items-center gap-1"
+                  style={{
+                    fontSize: scrolled ? '14px' : '16px',
+                  }}
+                >
+                  Kurzusok
+                  <svg
+                    className={`w-4 h-4 transition-transform duration-200 ${coursesDropdownOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {coursesDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
+                    <Link
+                      href="/webinar"
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-purple-600">🎥</span>
+                        <span>Webinárok</span>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/akadémia"
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-blue-600">📚</span>
+                        <span>Akadémia</span>
+                      </div>
+                    </Link>
+                    <Link
+                      href="/masterclass"
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-amber-600">🎓</span>
+                        <span>Masterclass</span>
+                      </div>
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link
                 href="/pricing"
                 className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"

@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react'
 import { motion } from "motion/react"
 import { BookOpen } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
-import { CoursesHeroSection } from '@/components/courses/CoursesHeroSection'
 import { CourseStatsBar } from '@/components/courses/CourseStatsBar'
 import { CourseFilterPanel } from '@/components/courses/CourseFilterPanel'
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
+import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
 
 interface Course {
   id: string
@@ -30,16 +30,15 @@ interface Course {
   lessons?: number
   createdAt?: any
   tags?: string[]
+  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
 }
 
-export default function CourseListPage() {
+export default function AkadémiaPage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedLevel, setSelectedLevel] = useState('all')
-  const [selectedPrice, setSelectedPrice] = useState('all')
   const [categories, setCategories] = useState<string[]>(['all'])
 
   // Fetch categories from Cloud Function
@@ -50,13 +49,11 @@ export default function CourseListPage() {
         const result: any = await getCategories()
 
         if (result.data?.success && result.data?.categories) {
-          // Map category objects to just names and add 'all' option
           const categoryNames = ['all', ...result.data.categories.map((cat: any) => cat.name)]
           setCategories(categoryNames)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
-        // Fallback to just 'all' if fetch fails
         setCategories(['all'])
       }
     }
@@ -64,10 +61,11 @@ export default function CourseListPage() {
     fetchCategories()
   }, [])
 
-  // Fetch all courses from Firestore
+  // Fetch ACADEMIA courses only from Firestore
   useEffect(() => {
     const coursesQuery = query(
       collection(db, 'courses'),
+      where('courseType', '==', 'ACADEMIA'),
       orderBy('createdAt', 'desc')
     )
 
@@ -81,7 +79,7 @@ export default function CourseListPage() {
       setFilteredCourses(coursesData)
       setLoading(false)
     }, (error) => {
-      console.error('Error fetching courses:', error)
+      console.error('Error fetching academia courses:', error)
       setLoading(false)
     })
 
@@ -109,27 +107,11 @@ export default function CourseListPage() {
       })
     }
 
-    // Level filter
-    if (selectedLevel !== 'all') {
-      filtered = filtered.filter(course =>
-        course.level?.toLowerCase() === selectedLevel.toLowerCase()
-      )
-    }
-
-    // Price filter
-    if (selectedPrice === 'free') {
-      filtered = filtered.filter(course => course.price === 0)
-    } else if (selectedPrice === 'paid') {
-      filtered = filtered.filter(course => course.price > 0)
-    }
-
     setFilteredCourses(filtered)
-  }, [searchInput, selectedCategory, selectedLevel, selectedPrice, courses])
+  }, [searchInput, selectedCategory, courses])
 
   const handleResetFilters = () => {
     setSelectedCategory('all')
-    setSelectedLevel('all')
-    setSelectedPrice('all')
     setSearchInput('')
   }
 
@@ -137,10 +119,10 @@ export default function CourseListPage() {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
-            <p className="text-lg text-gray-600">Kurzusok betöltése...</p>
+            <p className="text-lg text-gray-600">Akadémia kurzusok betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -152,24 +134,61 @@ export default function CourseListPage() {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50/30 to-gray-50 relative overflow-hidden">
         {/* Background blur shapes */}
         <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-cyan-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+
         {/* Hero Section */}
-        <CoursesHeroSection
-          searchInput={searchInput}
-          onSearchChange={setSearchInput}
-          totalCourses={courses.length}
-          courses={courses}
-        />
+        <div className="relative pt-20 pb-16 px-6 lg:px-12">
+          <div className="container mx-auto max-w-6xl text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-6"
+            >
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-6 shadow-lg">
+                <BookOpen className="w-10 h-10 text-white" />
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Akadémia
+              </h1>
+              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
+                Hosszú, több leckéből álló képzések videókkal. Átfogó tudás strukturált tananyaggal, amely végigvezet a témakörön.
+              </p>
+            </motion.div>
+
+            {/* Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Keress akadémia kurzusok között..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500"
+                />
+              </div>
+            </motion.div>
+          </div>
+        </div>
 
         {/* Stats Bar */}
         <CourseStatsBar
           totalCourses={courses.length}
           categoriesCount={categories.filter(c => c !== 'all').length}
           filteredCount={filteredCourses.length}
+          courseType="ACADEMIA"
         />
+
+        {/* Cross-Type Navigation */}
+        <CrossTypeNavigation currentType="ACADEMIA" />
 
         {/* Main Content */}
         <div className="container mx-auto px-6 lg:px-12 py-12 lg:py-16">
@@ -178,12 +197,8 @@ export default function CourseListPage() {
             <div className="lg:col-span-1">
               <CourseFilterPanel
                 selectedCategory={selectedCategory}
-                selectedLevel={selectedLevel}
-                selectedPrice={selectedPrice}
                 categories={categories}
                 onCategoryChange={setSelectedCategory}
-                onLevelChange={setSelectedLevel}
-                onPriceChange={setSelectedPrice}
                 onResetFilters={handleResetFilters}
               />
             </div>

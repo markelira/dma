@@ -7,17 +7,27 @@ interface CourseStatsBarProps {
   totalCourses: number
   categoriesCount: number
   filteredCount: number
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
 }
+
+const courseTypeLabels = {
+  WEBINAR: 'Webinárok',
+  ACADEMIA: 'Akadémia kurzusok',
+  MASTERCLASS: 'Masterclass kurzusok'
+};
 
 /**
  * CourseStatsBar component
  * Displays statistics about available courses
+ * Shows type-specific label if courseType is provided
  */
 export function CourseStatsBar({
   totalCourses,
   categoriesCount,
-  filteredCount
+  filteredCount,
+  courseType
 }: CourseStatsBarProps) {
+  const courseLabel = courseType ? courseTypeLabels[courseType] : 'Összes kurzus';
   return (
     <div className="relative py-6 border-b border-gray-200/50">
       <div className="container mx-auto px-6 lg:px-12">
@@ -34,7 +44,7 @@ export function CourseStatsBar({
                 <BookOpen className="w-5 h-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs text-gray-500">Összes kurzus</p>
+                <p className="text-xs text-gray-500">{courseLabel}</p>
                 <p className="text-2xl font-semibold text-gray-900">{totalCourses}</p>
               </div>
             </motion.div>
