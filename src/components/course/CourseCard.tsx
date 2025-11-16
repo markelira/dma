@@ -1,10 +1,11 @@
 "use client"
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Course } from '@/types'
 import { UniversalCourseCard } from '@/components/ui/UniversalCourseCard'
 import { useAuthStore } from '@/stores/authStore'
 import { useEnrollInCourse } from '@/hooks/useCourseQueries'
 import { useEnrollmentStatus } from '@/hooks/useEnrollmentStatus'
+import { useInstructors } from '@/hooks/useInstructorQueries'
 import { toast } from 'sonner'
 
 interface Props {
@@ -15,9 +16,9 @@ interface Props {
   context?: 'dashboard' | 'university' | 'search' | 'recommendations' | 'home'
 }
 
-export const CourseCard: React.FC<Props> = ({ 
-  course, 
-  trialMode, 
+export const CourseCard: React.FC<Props> = ({
+  course,
+  trialMode,
   showPreview = true,
   variant = 'default',
   context = 'home'
@@ -25,6 +26,33 @@ export const CourseCard: React.FC<Props> = ({
   const { isAuthenticated, authReady } = useAuthStore()
   const enrollmentMutation = useEnrollInCourse()
   const { data: enrollmentData } = useEnrollmentStatus(course.id)
+  const { data: instructors = [] } = useInstructors()
+
+  // Find instructor by ID from instructors collection
+  const instructor = useMemo(() => {
+    if (!course) return null
+
+    // Try to find instructor by instructorId from instructors collection
+    if (course.instructorId && instructors.length > 0) {
+      const found = instructors.find(inst => inst.id === course.instructorId)
+      if (found) return found
+    }
+
+    // Fallback to legacy instructor object if present
+    if (course.instructor) {
+      return {
+        id: course.instructorId || 'legacy',
+        name: `${course.instructor.firstName || ''} ${course.instructor.lastName || ''}`.trim() || 'Ismeretlen Oktató',
+        title: course.instructor.title || null,
+        bio: course.instructor.bio || null,
+        profilePictureUrl: course.instructor.profilePictureUrl || null,
+        createdAt: '',
+        updatedAt: ''
+      }
+    }
+
+    return null
+  }, [course, instructors])
 
   const handleCourseAction = async (action: string, courseData: any) => {
     switch (action) {
@@ -86,14 +114,15 @@ export const CourseCard: React.FC<Props> = ({
     slug: course.slug,
     thumbnail: course.thumbnailUrl,
     description: course.description,
-    instructor: course.instructor ? {
-      firstName: course.instructor.firstName,
-      lastName: course.instructor.lastName,
-      title: course.instructor.title,
-      imageUrl: course.instructor.profilePictureUrl
+    instructor: instructor ? {
+      // Split name for legacy compatibility with UniversalCourseCard
+      firstName: instructor.name.split(' ')[0] || 'Ismeretlen',
+      lastName: instructor.name.split(' ').slice(1).join(' ') || 'Oktató',
+      title: instructor.title || null,
+      imageUrl: instructor.profilePictureUrl || null
     } : undefined,
     rating: 0, // Remove rating display
-    ratingCount: 0, // Remove review count display  
+    ratingCount: 0, // Remove review count display
     enrollmentCount: 0, // Remove student count display
     duration: 8, // MVP: Default duration in hours
     difficulty: '', // Remove difficulty level display

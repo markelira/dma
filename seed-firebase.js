@@ -71,6 +71,49 @@ const testUniversities = [
   },
 ];
 
+const testInstructors = [
+  {
+    name: 'Dr. Nagy Péter',
+    title: 'Senior Software Engineer',
+    bio: 'Több mint 10 éves tapasztalattal rendelkező szoftverfejlesztő és oktató. Specializációja a modern webes technológiák és a felhő alapú architektúrák.',
+    profilePictureUrl: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    name: 'Dr. Kovács Anna',
+    title: 'Data Science Expert',
+    bio: 'Adattudományi szakértő, aki szenvedéllyel tanítja a Python adatelemzést és a gépi tanulás alapjait. PhD fokozattal rendelkezik adattudományból.',
+    profilePictureUrl: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    name: 'Tóth Márk',
+    title: 'Vezető Marketing Oktató',
+    bio: 'Digitális marketing területén 8 éves tapasztalattal rendelkező szakember. Segített számos startupnak elindítani sikeres online marketingkampányokat.',
+    profilePictureUrl: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    name: 'Dr. Szabó Gábor',
+    title: 'AI Research Scientist',
+    bio: 'Mesterséges intelligencia kutató és oktató. Nemzetközi konferenciákon publikált és több ML projektet vezetett nagyvállalatoknál.',
+    profilePictureUrl: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+  {
+    name: 'Kiss Katalin',
+    title: 'iOS Development Lead',
+    bio: 'Tapasztalt iOS fejlesztő, aki több mint 20 alkalmazást készített az App Store-ba. Szereti megosztani tudását a következő generáció fejlesztőivel.',
+    profilePictureUrl: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+];
+
 const testCourses = [
   {
     title: 'React.js Alapok',
@@ -82,7 +125,6 @@ const testCourses = [
     status: 'PUBLISHED',
     isPlus: false,
     certificateEnabled: true,
-    instructorId: 'dev-admin-user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     averageRating: 4.5,
@@ -120,7 +162,6 @@ const testCourses = [
     status: 'PUBLISHED',
     isPlus: true,
     certificateEnabled: true,
-    instructorId: 'dev-admin-user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     averageRating: 4.2,
@@ -158,7 +199,6 @@ const testCourses = [
     status: 'PUBLISHED',
     isPlus: false,
     certificateEnabled: true,
-    instructorId: 'dev-admin-user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     averageRating: 4.7,
@@ -196,7 +236,6 @@ const testCourses = [
     status: 'PUBLISHED',
     isPlus: true,
     certificateEnabled: true,
-    instructorId: 'dev-admin-user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     averageRating: 4.8,
@@ -234,7 +273,6 @@ const testCourses = [
     status: 'PUBLISHED',
     isPlus: true,
     certificateEnabled: true,
-    instructorId: 'dev-admin-user',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     averageRating: 4.6,
@@ -368,7 +406,12 @@ async function seedDatabase() {
     });
     await courseBatch.commit();
 
-
+    const instructorsSnapshot = await db.collection('instructors').get();
+    const instructorBatch = db.batch();
+    instructorsSnapshot.docs.forEach(doc => {
+      instructorBatch.delete(doc.ref);
+    });
+    await instructorBatch.commit();
 
     console.log('✅ Existing data cleared');
 
@@ -427,21 +470,34 @@ async function seedDatabase() {
     }
     console.log(`✅ Created ${testUniversities.length} universities`);
 
+    // Create instructors
+    console.log('👨‍🏫 Creating instructors...');
+    const instructorRefs = [];
+    for (const instructor of testInstructors) {
+      const docRef = db.collection('instructors').doc();
+      instructorRefs.push(docRef);
+      await docRef.set(instructor);
+    }
+    console.log(`✅ Created ${testInstructors.length} instructors`);
+
     // Create courses with proper references
     console.log('📖 Creating courses...');
     const courseRefs = [];
     for (let i = 0; i < testCourses.length; i++) {
       const course = { ...testCourses[i] };
-      
+
       // Extract modules from course data before saving
       const modules = course.modules || [];
       delete course.modules;
-      
+
       // Assign category (cycle through categories)
       course.categoryId = categoryRefs[i % categoryRefs.length].id;
-      
+
       // Assign university (cycle through universities)
       course.universityId = universityRefs[i % universityRefs.length].id;
+
+      // Assign instructor (cycle through instructors)
+      course.instructorId = instructorRefs[i % instructorRefs.length].id;
       
       const courseRef = await db.collection('courses').add(course);
       courseRefs.push(courseRef);

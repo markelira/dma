@@ -27,70 +27,33 @@ interface Instructor {
 
 async function fetchInstructors(): Promise<Instructor[]> {
   try {
-    // Development mode: return mock data
-    if (process.env.NODE_ENV === 'development') {
-      console.log('🔧 Development mode: using mock instructors')
-      return [
-        {
-          id: 'instructor-1',
-          name: 'Dr. Nagy Anna',
-          title: 'Senior Frontend Fejlesztő',
-          bio: 'Több mint 10 éves tapasztalattal rendelkezem a webes technológiákban. React és Vue.js szakértő, több multinacionális cégnél dolgoztam.',
-          avatar: null,
-          linkedinUrl: 'https://linkedin.com/in/nagyanna',
-          websiteUrl: 'https://nagyanna.dev',
-          averageRating: 4.8,
-          reviewCount: 156,
-          studentCount: 2500,
-          courseCount: 8,
-          expertise: ['React', 'Vue.js', 'TypeScript'],
-          company: 'Google',
-          isVerified: true
-        },
-        {
-          id: 'instructor-2',
-          name: 'Kovács Péter',
-          title: 'Full-Stack Developer',
-          bio: 'Backend és frontend fejlesztésben egyaránt jártas. Node.js és Python szakértő, startup környezetben szerzett értékes tapasztalatok.',
-          avatar: null,
-          linkedinUrl: 'https://linkedin.com/in/kovacspeter',
-          websiteUrl: null,
-          averageRating: 4.6,
-          reviewCount: 89,
-          studentCount: 1800,
-          courseCount: 5,
-          expertise: ['Node.js', 'Python', 'MongoDB'],
-          company: 'Microsoft',
-          isVerified: true
-        },
-        {
-          id: 'instructor-3',
-          name: 'Szabó Mária',
-          title: 'UI/UX Designer',
-          bio: 'Kreatív designeremként felhasználóbarát interfészeket tervezek. Figma és Adobe Creative Suite szakértő, több díjnyertes projektben vettem részt.',
-          avatar: null,
-          linkedinUrl: 'https://linkedin.com/in/szabomaria',
-          websiteUrl: 'https://szabomaria.design',
-          averageRating: 4.9,
-          reviewCount: 203,
-          studentCount: 3200,
-          courseCount: 12,
-          expertise: ['Figma', 'User Research', 'Prototyping'],
-          company: 'Adobe',
-          isVerified: true
-        }
-      ]
-    }
-    
-    // Production mode: call Cloud Function
-    const getInstructorsPublicFn = httpsCallable(functions, 'getInstructorsPublic')
-    const result: any = await getInstructorsPublicFn({ limit: 6, verified: true })
-    
+    // Call getInstructors Cloud Function
+    const getInstructorsFn = httpsCallable(functions, 'getInstructors')
+    const result: any = await getInstructorsFn({})
+
     if (!result.data.success) {
       throw new Error(result.data.error || 'Hiba az oktatók betöltésekor')
     }
-    
-    return result.data.instructors || []
+
+    // Transform instructors to match expected interface with default values for missing fields
+    const instructors = (result.data.instructors || []).map((inst: any) => ({
+      id: inst.id,
+      name: inst.name,
+      title: inst.title || 'Oktató',
+      bio: inst.bio || '',
+      avatar: inst.profilePictureUrl || null,
+      linkedinUrl: null,
+      websiteUrl: null,
+      averageRating: 5.0, // Default rating
+      reviewCount: 0,
+      studentCount: 0,
+      courseCount: 0,
+      expertise: [],
+      company: null,
+      isVerified: true
+    }))
+
+    return instructors
   } catch (error) {
     console.error('Error fetching instructors:', error)
     throw new Error('Hiba az oktatók betöltésekor')

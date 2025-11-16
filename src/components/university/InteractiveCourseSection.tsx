@@ -12,8 +12,9 @@ interface PublicCourse {
   thumbnailUrl?: string | null
   description?: string
   instructor?: {
-    firstName: string
-    lastName: string
+    name?: string // New format: single name field
+    firstName?: string // Legacy format
+    lastName?: string // Legacy format
     title?: string
   }
   rating?: number
@@ -60,7 +61,7 @@ function CourseCardSmall({ course }: { course: PublicCourse }) {
         
         {course.instructor && (
           <p className="text-xs text-gray-600 mb-2">
-            {course.instructor.firstName} {course.instructor.lastName}
+            {course.instructor.name || `${course.instructor.firstName || ''} ${course.instructor.lastName || ''}`.trim()}
             {course.instructor.title && ` - ${course.instructor.title}`}
           </p>
         )}

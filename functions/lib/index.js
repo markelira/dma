@@ -946,13 +946,12 @@ exports.getCourse = (0, https_1.onCall)({
         // Get instructor data
         let instructor = null;
         if (courseData?.instructorId) {
-            const instructorDoc = await firestore.collection('users').doc(courseData.instructorId).get();
+            const instructorDoc = await firestore.collection('instructors').doc(courseData.instructorId).get();
             if (instructorDoc.exists) {
                 const instructorData = instructorDoc.data();
                 instructor = {
                     id: instructorDoc.id,
-                    firstName: instructorData?.firstName || 'Ismeretlen',
-                    lastName: instructorData?.lastName || 'Oktató',
+                    name: instructorData?.name || 'Ismeretlen Oktató',
                     title: instructorData?.title || null,
                     bio: instructorData?.bio || null,
                     profilePictureUrl: instructorData?.profilePictureUrl || null,
@@ -1044,13 +1043,13 @@ exports.getCoursesCallable = (0, https_1.onCall)({
             // Get instructor data
             let instructor = null;
             if (courseData?.instructorId) {
-                const instructorDoc = await firestore.collection('users').doc(courseData.instructorId).get();
+                const instructorDoc = await firestore.collection('instructors').doc(courseData.instructorId).get();
                 if (instructorDoc.exists) {
                     const instructorData = instructorDoc.data();
                     instructor = {
                         id: instructorDoc.id,
-                        firstName: instructorData?.firstName || 'Ismeretlen',
-                        lastName: instructorData?.lastName || 'Oktató',
+                        name: instructorData?.name || 'Ismeretlen Oktató',
+                        title: instructorData?.title || null,
                         profilePictureUrl: instructorData?.profilePictureUrl || null,
                     };
                 }

@@ -163,7 +163,18 @@ export interface Course {
   // NEW: Course type field (required)
   courseType: CourseType;
 
-  instructor: User;
+  /**
+   * PREFERRED: Reference to instructor in instructors collection
+   * Use this field for all new code. Fetch instructor details from instructors collection using this ID.
+   */
+  instructorId?: string;
+
+  /**
+   * @deprecated Use instructorId instead and fetch from instructors collection
+   * Legacy: Instructor as nested User object
+   */
+  instructor?: User;
+
   category: Category;
 
   // UPDATED: modules is now optional (Webinars don't have modules)
@@ -198,10 +209,22 @@ export interface Course {
   // Payment-related fields
   price: number;
   originalPrice?: number;
-  // Convenience fields for display (alternative to nested instructor object)
+  /**
+   * @deprecated Use instructorId and fetch instructor from instructors collection
+   * Legacy: Convenience fields for display (alternative to nested instructor object)
+   */
   instructorName?: string;
+  /**
+   * @deprecated Use instructorId and fetch instructor from instructors collection
+   */
   instructorImage?: string;
+  /**
+   * @deprecated Use instructorId and fetch instructor from instructors collection
+   */
   instructorTitle?: string;
+  /**
+   * @deprecated Use instructorId and fetch instructor from instructors collection
+   */
   instructorBio?: string;
   // Course metadata
   duration?: string;

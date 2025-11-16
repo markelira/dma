@@ -33,7 +33,9 @@ interface Course {
   id: string
   title: string
   instructor?: {
-    name?: string
+    name?: string // New format: single name field
+    firstName?: string // Legacy format
+    lastName?: string // Legacy format
   }
   thumbnailUrl?: string
   modules: Module[]
@@ -105,9 +107,9 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
             <h2 className={`${playerTypography.h3} text-gray-900 leading-tight`}>
               {course.title}
             </h2>
-            {course.instructor?.name && (
+            {course.instructor && (
               <p className={`${playerTypography.caption} mt-1`}>
-                {t('sidebar.by')} {course.instructor.name}
+                {t('sidebar.by')} {course.instructor.name || `${course.instructor.firstName || ''} ${course.instructor.lastName || ''}`.trim() || 'Ismeretlen Oktató'}
               </p>
             )}
           </div>
