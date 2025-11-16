@@ -18,9 +18,10 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { Upload, X, Loader2, Plus } from "lucide-react";
 import { useCourseWizardStore } from "@/stores/courseWizardStore";
 import { useAuthStore } from "@/stores/authStore";
+import { useInstructors } from "@/hooks/useInstructorQueries";
+import { Instructor } from "@/types";
 
 interface Category { id: string; name: string }
-interface Instructor { id: string; firstName: string; lastName: string }
 
 import { CourseType } from '@/types';
 
@@ -79,12 +80,14 @@ const schema = z.object({
 export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: Props) {
   const { setValidationErrors, clearValidationErrors } = useCourseWizardStore();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailUploading, setThumbnailUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Use instructor query hook
+  const { data: instructors = [], isLoading: instructorsLoading } = useInstructors();
 
   // Marketing fields state
   const [whatYouWillLearn, setWhatYouWillLearn] = useState<string[]>(initial?.whatYouWillLearn || []);
@@ -135,7 +138,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
   };
 
 
-  // Load categories and instructors
+  // Load categories
   useEffect(() => {
     const loadData = async () => {
       // Wait for auth to be ready
@@ -144,7 +147,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       }
 
       setIsLoading(true);
-      
+
       try {
         // Load categories
         const getCategoriesFn = httpsCallable(fbFunctions, 'getCategories');
@@ -157,30 +160,9 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       } catch (error) {
         console.error('Failed to load categories:', error);
         toast.error("Kategóriák betöltése sikertelen");
+      } finally {
+        setIsLoading(false);
       }
-
-      // Only load instructors if authenticated
-      if (isAuthenticated && user) {
-        try {
-          // Load instructors
-          const getInstructorsFn = httpsCallable(fbFunctions, "getInstructors");
-          const userRes: any = await getInstructorsFn();
-          if (userRes.data?.success) {
-            setInstructors(userRes.data.instructors || []);
-            console.log('✅ Instructors loaded:', userRes.data.instructors);
-          } else {
-            console.warn('Instructors load failed:', userRes.data?.error);
-            toast.error(userRes.data?.error || "Oktatók betöltése sikertelen");
-          }
-        } catch (error) {
-          console.error('Failed to load instructors:', error);
-          toast.error("Oktatók betöltése sikertelen - ellenőrizze a bejelentkezést");
-        }
-      } else {
-        console.warn('Not authenticated, skipping instructors load');
-      }
-      
-      setIsLoading(false);
     };
 
     loadData();
@@ -358,7 +340,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
                 <SelectContent>
                   {instructors.map((instructor) => (
                     <SelectItem key={instructor.id} value={instructor.id}>
-                      {instructor.firstName} {instructor.lastName}
+                      {instructor.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

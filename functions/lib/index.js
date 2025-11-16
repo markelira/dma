@@ -36,8 +36,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createCategory = exports.seedCategories = exports.getInstructors = exports.getCategories = exports.getSignedUploadUrl = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = void 0;
+exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
+exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -1333,58 +1333,6 @@ exports.getCategories = (0, https_1.onCall)({
     }
 });
 /**
- * Get all instructors (ADMIN/INSTRUCTOR only)
- */
-exports.getInstructors = (0, https_1.onCall)({
-    cors: true,
-    region: 'us-central1',
-}, async (request) => {
-    try {
-        v2_1.logger.info('[getInstructors] Called');
-        // Check authentication
-        if (!request.auth) {
-            throw new Error('Hitelesítés szükséges');
-        }
-        const userId = request.auth.uid;
-        // Check if user has permission (ADMIN or INSTRUCTOR)
-        const userDoc = await firestore.collection('users').doc(userId).get();
-        const userData = userDoc.data();
-        if (!userData || !['ADMIN', 'INSTRUCTOR'].includes(userData.role)) {
-            throw new Error('Nincs jogosultságod az oktatók listázásához');
-        }
-        // Get all users with INSTRUCTOR role
-        const snapshot = await firestore
-            .collection('users')
-            .where('role', '==', 'INSTRUCTOR')
-            .get();
-        const instructors = [];
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            instructors.push({
-                id: doc.id,
-                firstName: data.firstName || '',
-                lastName: data.lastName || '',
-                email: data.email || '',
-                profilePictureUrl: data.profilePictureUrl || null,
-                title: data.title || null,
-                bio: data.bio || null,
-            });
-        });
-        v2_1.logger.info(`[getInstructors] Found ${instructors.length} instructors`);
-        return {
-            success: true,
-            instructors
-        };
-    }
-    catch (error) {
-        v2_1.logger.error('[getInstructors] Error:', error);
-        return {
-            success: false,
-            error: error.message || 'Oktatók betöltése sikertelen'
-        };
-    }
-});
-/**
  * Seed default categories (ADMIN only)
  */
 exports.seedCategories = (0, https_1.onCall)({
@@ -1773,4 +1721,14 @@ Object.defineProperty(exports, "markLessonComplete", { enumerable: true, get: fu
 // Export course resources functions
 var courseResources_1 = require("./courseResources");
 Object.defineProperty(exports, "getResourceDownloadUrls", { enumerable: true, get: function () { return courseResources_1.getResourceDownloadUrls; } });
+// ============================================
+// INSTRUCTOR MANAGEMENT
+// ============================================
+// Export instructor CRUD functions
+// Instructors are separate entities (not users), managed through admin dashboard
+var instructorActions_1 = require("./instructorActions");
+Object.defineProperty(exports, "getInstructors", { enumerable: true, get: function () { return instructorActions_1.getInstructors; } });
+Object.defineProperty(exports, "createInstructor", { enumerable: true, get: function () { return instructorActions_1.createInstructor; } });
+Object.defineProperty(exports, "updateInstructor", { enumerable: true, get: function () { return instructorActions_1.updateInstructor; } });
+Object.defineProperty(exports, "deleteInstructor", { enumerable: true, get: function () { return instructorActions_1.deleteInstructor; } });
 //# sourceMappingURL=index.js.map

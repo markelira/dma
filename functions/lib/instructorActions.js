@@ -1,0 +1,299 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = void 0;
+/**
+ * Instructor CRUD Operations
+ * Instructors are separate entities (not users), managed through admin dashboard
+ */
+const admin = __importStar(require("firebase-admin"));
+const https_1 = require("firebase-functions/v2/https");
+const v2_1 = require("firebase-functions/v2");
+const zod_1 = require("zod");
+const firestore = admin.firestore();
+// Zod schema for instructor creation
+const createInstructorSchema = zod_1.z.object({
+    name: zod_1.z.string().min(1, 'A név kötelező.'),
+    title: zod_1.z.string().optional(),
+    bio: zod_1.z.string().optional(),
+    profilePictureUrl: zod_1.z.string().url('Érvényes URL szükséges.').optional().or(zod_1.z.literal('')),
+});
+// Zod schema for instructor update
+const updateInstructorSchema = zod_1.z.object({
+    id: zod_1.z.string().min(1, 'Az oktató azonosító kötelező.'),
+    name: zod_1.z.string().min(1, 'A név kötelező.'),
+    title: zod_1.z.string().optional(),
+    bio: zod_1.z.string().optional(),
+    profilePictureUrl: zod_1.z.string().url('Érvényes URL szükséges.').optional().or(zod_1.z.literal('')),
+});
+// Zod schema for instructor deletion
+const deleteInstructorSchema = zod_1.z.object({
+    id: zod_1.z.string().min(1, 'Az oktató azonosító kötelező.'),
+});
+/**
+ * Get all instructors (Public - no authentication required)
+ */
+exports.getInstructors = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[getInstructors] Called');
+        // Get all instructors ordered by creation date (newest first)
+        const snapshot = await firestore
+            .collection('instructors')
+            .orderBy('createdAt', 'desc')
+            .get();
+        const instructors = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        v2_1.logger.info(`[getInstructors] Found ${instructors.length} instructors`);
+        return {
+            success: true,
+            instructors,
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[getInstructors] Error:', error);
+        throw new Error(error.message || 'Ismeretlen hiba történt az oktatók lekérésekor.');
+    }
+});
+/**
+ * Create a new instructor (Admin only)
+ */
+exports.createInstructor = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[createInstructor] Called');
+        // Verify authentication
+        if (!request.auth) {
+            throw new Error('Bejelentkezés szükséges oktató létrehozásához.');
+        }
+        const userId = request.auth.uid;
+        // Get user data to check role
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('Felhasználó nem található.');
+        }
+        const userData = userDoc.data();
+        if (userData?.role !== 'ADMIN') {
+            throw new Error('Nincs jogosultságod oktató létrehozásához. Csak adminisztrátorok hozhatnak létre oktatókat.');
+        }
+        // Validate input data
+        const data = createInstructorSchema.parse(request.data);
+        // Check if instructor with same name already exists
+        const existingInstructorQuery = await firestore
+            .collection('instructors')
+            .where('name', '==', data.name)
+            .limit(1)
+            .get();
+        if (!existingInstructorQuery.empty) {
+            throw new Error('Már létezik oktató ezzel a névvel.');
+        }
+        // Create instructor
+        const instructorData = {
+            name: data.name,
+            title: data.title || null,
+            bio: data.bio || null,
+            profilePictureUrl: data.profilePictureUrl || null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        };
+        const instructorRef = await firestore.collection('instructors').add(instructorData);
+        v2_1.logger.info(`[createInstructor] Created instructor: ${instructorRef.id}`);
+        return {
+            success: true,
+            message: 'Oktató sikeresen létrehozva.',
+            instructor: { id: instructorRef.id, ...instructorData }
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[createInstructor] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return {
+                success: false,
+                error: 'Validációs hiba',
+                details: error.errors
+            };
+        }
+        return {
+            success: false,
+            error: error.message || 'Ismeretlen hiba történt az oktató létrehozásakor.'
+        };
+    }
+});
+/**
+ * Update an existing instructor (Admin only)
+ */
+exports.updateInstructor = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[updateInstructor] Called');
+        // Verify authentication
+        if (!request.auth) {
+            throw new Error('Bejelentkezés szükséges oktató frissítéséhez.');
+        }
+        const userId = request.auth.uid;
+        // Get user data to check role
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('Felhasználó nem található.');
+        }
+        const userData = userDoc.data();
+        if (userData?.role !== 'ADMIN') {
+            throw new Error('Nincs jogosultságod oktató frissítéséhez.');
+        }
+        // Validate input data
+        const data = updateInstructorSchema.parse(request.data);
+        // Check if instructor exists
+        const instructorRef = firestore.collection('instructors').doc(data.id);
+        const instructorDoc = await instructorRef.get();
+        if (!instructorDoc.exists) {
+            throw new Error('Az oktató nem található.');
+        }
+        // Check if another instructor with same name exists (excluding current one)
+        const existingInstructorQuery = await firestore
+            .collection('instructors')
+            .where('name', '==', data.name)
+            .limit(2)
+            .get();
+        const duplicates = existingInstructorQuery.docs.filter(doc => doc.id !== data.id);
+        if (duplicates.length > 0) {
+            throw new Error('Már létezik másik oktató ezzel a névvel.');
+        }
+        // Update instructor
+        const updateData = {
+            name: data.name,
+            title: data.title || null,
+            bio: data.bio || null,
+            profilePictureUrl: data.profilePictureUrl || null,
+            updatedAt: new Date().toISOString(),
+        };
+        await instructorRef.update(updateData);
+        const updatedDoc = await instructorRef.get();
+        v2_1.logger.info(`[updateInstructor] Updated instructor: ${data.id}`);
+        return {
+            success: true,
+            message: 'Oktató sikeresen frissítve.',
+            instructor: { id: data.id, ...updatedDoc.data() }
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[updateInstructor] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return {
+                success: false,
+                error: 'Validációs hiba',
+                details: error.errors
+            };
+        }
+        return {
+            success: false,
+            error: error.message || 'Ismeretlen hiba történt az oktató frissítésekor.'
+        };
+    }
+});
+/**
+ * Delete an instructor (Admin only)
+ * Prevents deletion if instructor is assigned to any courses
+ */
+exports.deleteInstructor = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        v2_1.logger.info('[deleteInstructor] Called');
+        // Verify authentication
+        if (!request.auth) {
+            throw new Error('Bejelentkezés szükséges oktató törléséhez.');
+        }
+        const userId = request.auth.uid;
+        // Get user data to check role
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (!userDoc.exists) {
+            throw new Error('Felhasználó nem található.');
+        }
+        const userData = userDoc.data();
+        if (userData?.role !== 'ADMIN') {
+            throw new Error('Nincs jogosultságod oktató törléséhez.');
+        }
+        // Validate input data
+        const data = deleteInstructorSchema.parse(request.data);
+        // Check if instructor exists
+        const instructorRef = firestore.collection('instructors').doc(data.id);
+        const instructorDoc = await instructorRef.get();
+        if (!instructorDoc.exists) {
+            throw new Error('Az oktató nem található.');
+        }
+        // Check if instructor is assigned to any courses
+        const coursesSnapshot = await firestore
+            .collection('courses')
+            .where('instructorId', '==', data.id)
+            .limit(1)
+            .get();
+        if (!coursesSnapshot.empty) {
+            const courseCount = coursesSnapshot.size;
+            throw new Error(`Ez az oktató ${courseCount} kurzushoz van hozzárendelve. ` +
+                'Először rendelje át vagy törölje ezeket a kurzusokat.');
+        }
+        // Delete instructor
+        await instructorRef.delete();
+        v2_1.logger.info(`[deleteInstructor] Deleted instructor: ${data.id}`);
+        return {
+            success: true,
+            message: 'Oktató sikeresen törölve.'
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[deleteInstructor] Error:', error);
+        if (error instanceof zod_1.z.ZodError) {
+            return {
+                success: false,
+                error: 'Validációs hiba',
+                details: error.errors
+            };
+        }
+        return {
+            success: false,
+            error: error.message || 'Ismeretlen hiba történt az oktató törlésekor.'
+        };
+    }
+});
+//# sourceMappingURL=instructorActions.js.map

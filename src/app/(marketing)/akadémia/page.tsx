@@ -13,6 +13,7 @@ import { CourseStatsBar } from '@/components/courses/CourseStatsBar'
 import { CourseFilterPanel } from '@/components/courses/CourseFilterPanel'
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
 import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
+import { useInstructors } from '@/hooks/useInstructorQueries'
 
 interface Course {
   id: string
@@ -40,6 +41,10 @@ export default function AkadémiaPage() {
   const [searchInput, setSearchInput] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [categories, setCategories] = useState<string[]>(['all'])
+  const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
+
+  // Fetch instructors using React Query
+  const { data: instructors = [] } = useInstructors()
 
   // Fetch categories from Cloud Function
   useEffect(() => {
@@ -51,10 +56,12 @@ export default function AkadémiaPage() {
         if (result.data?.success && result.data?.categories) {
           const categoryNames = ['all', ...result.data.categories.map((cat: any) => cat.name)]
           setCategories(categoryNames)
+          setCategoryObjects(result.data.categories)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
         setCategories(['all'])
+        setCategoryObjects([])
       }
     }
 
@@ -235,6 +242,8 @@ export default function AkadémiaPage() {
                       key={course.id}
                       course={course}
                       index={index}
+                      categories={categoryObjects}
+                      instructors={instructors}
                     />
                   ))}
                 </div>

@@ -10,25 +10,67 @@ interface Course {
   id: string;
   title: string;
   description: string;
-  instructorName?: string;
-  category: string;
+  instructorId?: string; // Reference to instructor
+  instructorName?: string; // Legacy field
+  category?: string; // Category name (optional, might be categoryId)
+  categoryId?: string; // Category ID from Firestore
   level: string;
   duration: string;
   rating?: number;
   students?: number;
   enrollmentCount?: number;
-  price: number;
+  price?: number;
   thumbnailUrl?: string;
   lessons?: number;
+}
+
+interface Instructor {
+  id: string;
+  name: string;
+  title?: string;
+  bio?: string;
+  profilePictureUrl?: string;
 }
 
 interface PremiumCourseCardProps {
   course: Course;
   index: number;
+  categories?: Array<{ id: string; name: string }>;
+  instructors?: Instructor[]; // Optional instructors array
 }
 
-export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
+export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
+
+  // Get category display name
+  // Courses store categoryId in Firestore, so we need to map it to the category name
+  const getCategoryName = () => {
+    // First check if category name is directly available
+    if (course.category && typeof course.category === 'string') {
+      return course.category;
+    }
+    // Otherwise, look up the category name from categoryId
+    if (course.categoryId && categories) {
+      const category = categories.find(cat => cat.id === course.categoryId);
+      return category?.name || null;
+    }
+    return null;
+  };
+
+  // Get instructor name
+  // Courses store instructorId in Firestore, so we need to map it to the instructor name
+  const getInstructorName = () => {
+    // First check if instructor name is directly available (legacy field)
+    if (course.instructorName) {
+      return course.instructorName;
+    }
+    // Otherwise, look up the instructor name from instructorId
+    if (course.instructorId && instructors) {
+      const instructor = instructors.find(inst => inst.id === course.instructorId);
+      return instructor?.name || null;
+    }
+    return null;
+  };
 
   const getLevelColor = (level: string) => {
     switch (level?.toLowerCase()) {
@@ -105,9 +147,11 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
         <div className="flex-1 flex flex-col p-5">
           {/* Category and Level Badges */}
           <div className="flex items-center justify-between mb-3">
-            <div className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
-              {typeof course.category === 'string' ? course.category : (course.category as any)?.name || 'N/A'}
-            </div>
+            {getCategoryName() && (
+              <div className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
+                {getCategoryName()}
+              </div>
+            )}
             {course.level && (
               <div
                 className="px-2.5 py-1 rounded-md text-xs font-medium"
@@ -133,9 +177,9 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
           </p>
 
           {/* Instructor */}
-          {course.instructorName && (
+          {getInstructorName() && (
             <p className="text-xs text-gray-500 mb-3">
-              Oktató: <span className="font-medium">{course.instructorName}</span>
+              Oktató: <span className="font-medium">{getInstructorName()}</span>
             </p>
           )}
 
@@ -147,13 +191,13 @@ export function PremiumCourseCard({ course, index }: PremiumCourseCardProps) {
                 <span>{course.duration}</span>
               </div>
             )}
-            {course.lessons && (
+            {(course.lessons ?? 0) > 0 && (
               <div className="flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5" />
                 <span>{course.lessons} lecke</span>
               </div>
             )}
-            {course.rating && (
+            {(course.rating ?? 0) > 0 && (
               <div className="flex items-center gap-1.5">
                 <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
                 <span>{course.rating}</span>

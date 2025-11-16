@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import Footer from '@/components/landing-home/ui/footer';
@@ -20,6 +20,7 @@ import { CourseGuaranteeSection } from '@/components/course/CourseGuaranteeSecti
 import { SubscriptionRequiredModal } from '@/components/payment/SubscriptionRequiredModal';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight, Shield } from 'lucide-react';
+import { useInstructors } from '@/hooks/useInstructorQueries';
 
 export default function ClientCourseDetailPage({ id }: { id: string }) {
   const router = useRouter();
@@ -29,6 +30,9 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+
+  // Fetch instructors to get full instructor data
+  const { data: instructors = [] } = useInstructors();
 
   // Handle payment success/cancel
   React.useEffect(() => {
@@ -146,12 +150,39 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }
   };
 
-  // Instructor data
-  const instructorData = c.instructor || {};
-  const instructorName = c.instructorName ||
-    (instructorData.firstName && instructorData.lastName
-      ? `${instructorData.firstName} ${instructorData.lastName}`
-      : 'DMA Oktató');
+  // Fetch instructor data from instructors collection
+  const instructor = useMemo(() => {
+    // First try to find instructor by instructorId in course
+    if (c.instructorId && instructors.length > 0) {
+      const found = instructors.find(inst => inst.id === c.instructorId);
+      if (found) return found;
+    }
+
+    // Fallback to legacy instructor data if available
+    const legacyInstructor = c.instructor || {};
+    if (legacyInstructor.firstName || legacyInstructor.lastName) {
+      return {
+        id: c.instructorId || 'legacy',
+        name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
+        title: legacyInstructor.title,
+        bio: legacyInstructor.bio,
+        profilePictureUrl: legacyInstructor.profilePictureUrl,
+        createdAt: '',
+        updatedAt: ''
+      };
+    }
+
+    // Default fallback
+    return {
+      id: 'default',
+      name: c.instructorName || 'DMA Oktató',
+      title: c.instructorTitle,
+      bio: c.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
+      profilePictureUrl: c.instructorImageUrl,
+      createdAt: '',
+      updatedAt: ''
+    };
+  }, [c, instructors]);
 
   const courseFeatures = [
     `${stats.lessons} lecke`,
@@ -277,10 +308,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
               {/* Instructor Card */}
               <CourseInstructorCard
-                name={instructorName}
-                title={c.instructorTitle || instructorData.title}
-                bio={c.instructorBio || instructorData.bio || 'Tapasztalt oktató az ELIRA platformon.'}
-                imageUrl={c.instructorImageUrl || instructorData.profilePictureUrl}
+                name={instructor.name}
+                title={instructor.title}
+                bio={instructor.bio || 'Tapasztalt oktató az ELIRA platformon.'}
+                imageUrl={instructor.profilePictureUrl}
                 stats={{
                   students: stats.students,
                   courses: 5,

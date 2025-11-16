@@ -1441,68 +1441,6 @@ export const getCategories = onCall({
 });
 
 /**
- * Get all instructors (ADMIN/INSTRUCTOR only)
- */
-export const getInstructors = onCall({
-  cors: true,
-  region: 'us-central1',
-}, async (request) => {
-  try {
-    logger.info('[getInstructors] Called');
-
-    // Check authentication
-    if (!request.auth) {
-      throw new Error('Hitelesítés szükséges');
-    }
-
-    const userId = request.auth.uid;
-
-    // Check if user has permission (ADMIN or INSTRUCTOR)
-    const userDoc = await firestore.collection('users').doc(userId).get();
-    const userData = userDoc.data();
-
-    if (!userData || !['ADMIN', 'INSTRUCTOR'].includes(userData.role)) {
-      throw new Error('Nincs jogosultságod az oktatók listázásához');
-    }
-
-    // Get all users with INSTRUCTOR role
-    const snapshot = await firestore
-      .collection('users')
-      .where('role', '==', 'INSTRUCTOR')
-      .get();
-
-    const instructors: any[] = [];
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      instructors.push({
-        id: doc.id,
-        firstName: data.firstName || '',
-        lastName: data.lastName || '',
-        email: data.email || '',
-        profilePictureUrl: data.profilePictureUrl || null,
-        title: data.title || null,
-        bio: data.bio || null,
-      });
-    });
-
-    logger.info(`[getInstructors] Found ${instructors.length} instructors`);
-
-    return {
-      success: true,
-      instructors
-    };
-
-  } catch (error: any) {
-    logger.error('[getInstructors] Error:', error);
-    return {
-      success: false,
-      error: error.message || 'Oktatók betöltése sikertelen'
-    };
-  }
-});
-
-/**
  * Seed default categories (ADMIN only)
  */
 export const seedCategories = onCall({
@@ -1971,3 +1909,16 @@ export {
 export {
   getResourceDownloadUrls,
 } from './courseResources';
+
+// ============================================
+// INSTRUCTOR MANAGEMENT
+// ============================================
+
+// Export instructor CRUD functions
+// Instructors are separate entities (not users), managed through admin dashboard
+export {
+  getInstructors,
+  createInstructor,
+  updateInstructor,
+  deleteInstructor,
+} from './instructorActions';
