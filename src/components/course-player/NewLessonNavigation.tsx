@@ -55,3 +55,4 @@ export function NewLessonNavigation({
     </div>
   );
 }
+

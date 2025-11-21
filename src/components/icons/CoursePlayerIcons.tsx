@@ -388,3 +388,4 @@ export function ArrowRightIcon({ className = '', size = 20 }: IconProps) {
     </svg>
   );
 }
+
