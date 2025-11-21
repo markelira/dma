@@ -125,6 +125,8 @@ export interface Lesson {
   resources?: LessonResource[];
   // Additional lesson description field
   description?: string;
+  // Learning outcomes/objectives for the lesson
+  learningOutcomes?: string[];
 }
 
 /**
@@ -168,6 +170,12 @@ export interface Course {
    * Use this field for all new code. Fetch instructor details from instructors collection using this ID.
    */
   instructorId?: string;
+
+  /**
+   * NEW: Support multiple instructors for a course
+   * Array of instructor IDs from the instructors collection
+   */
+  instructorIds?: string[];
 
   /**
    * @deprecated Use instructorId instead and fetch from instructors collection
@@ -628,4 +636,270 @@ export interface ActivityTimeline {
   totalCount: number;
   hasMore: boolean;
   timeRange: 'today' | '7days' | '30days' | 'all';
+}
+
+// ============================================================================
+// NEW: Dashboard Redesign Types (Phase 1)
+// ============================================================================
+
+/**
+ * User Preferences - Personalization data for adaptive dashboard
+ * Collection: userPreferences
+ */
+export interface UserPreferences {
+  userId: string;
+  role?: string; // Job role/title
+  interests: string[]; // Category IDs or topic strings
+  goals: string[]; // Career goals or learning objectives
+  learningStyle: 'visual' | 'reading' | 'interactive' | 'mixed';
+  weeklyHoursGoal: number; // Target learning minutes per week
+  dailyReminderTime?: string; // HH:mm format (e.g., "19:00")
+  dashboardLayout?: 'default' | 'compact' | 'detailed' | 'custom';
+  darkMode: boolean;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    reminders: boolean;
+    achievements: boolean;
+    courseUpdates: boolean;
+  };
+  onboardingCompleted: boolean;
+  onboardingCompletedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Learning Streak - Gamification data for daily learning tracking
+ * Collection: learningStreaks
+ */
+export interface LearningStreak {
+  userId: string;
+  currentStreak: number; // Current consecutive days with activity
+  longestStreak: number; // All-time longest streak
+  lastActivityDate: string; // ISO date string (YYYY-MM-DD)
+  activityCalendar: Record<string, number>; // date (YYYY-MM-DD) -> minutes spent
+  streakStartDate: string; // When current streak started
+  totalActiveDays: number; // Total days with any activity
+  milestones: StreakMilestone[]; // Earned streak milestones
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Streak Milestone - Achievement for reaching streak goals
+ */
+export interface StreakMilestone {
+  days: number; // Milestone threshold (7, 30, 100, etc.)
+  earnedAt: string;
+  celebrated: boolean; // Whether user has seen the celebration
+}
+
+/**
+ * User Achievement - Badge and accomplishment tracking
+ * Collection: userAchievements
+ */
+export interface UserAchievement {
+  id: string;
+  userId: string;
+  achievementId: string; // Reference to achievement definition
+  achievementType: 'completion' | 'mastery' | 'engagement' | 'streak' | 'speed' | 'social';
+  title: string; // Achievement name (e.g., "First Course Complete")
+  description: string; // Achievement description
+  iconUrl?: string; // Badge image URL
+  iconName?: string; // Icon identifier (e.g., "trophy", "fire", "star")
+  tier?: 'bronze' | 'silver' | 'gold' | 'platinum'; // Badge quality level
+  earnedAt: string;
+  notificationSent: boolean;
+  celebrated: boolean; // Whether user has seen the unlock animation
+  metadata: {
+    courseId?: string;
+    courseName?: string;
+    streakDays?: number;
+    quizScore?: number;
+    completionDays?: number; // Days taken to complete course
+    points?: number;
+    [key: string]: any;
+  };
+  createdAt: string;
+}
+
+/**
+ * Achievement Definition - Template for all possible achievements
+ * Collection: achievementDefinitions (admin-managed)
+ */
+export interface AchievementDefinition {
+  id: string;
+  type: 'completion' | 'mastery' | 'engagement' | 'streak' | 'speed' | 'social';
+  title: string;
+  description: string;
+  iconName: string;
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  unlockCondition: {
+    type: string; // e.g., "course_complete", "streak_days", "quiz_perfect"
+    threshold?: number;
+    metadata?: Record<string, any>;
+  };
+  points: number; // XP or gamification points awarded
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Learning Goal - Personal goal tracking for courses and learning hours
+ * Collection: learningGoals
+ */
+export interface LearningGoal {
+  id: string;
+  userId: string;
+  goalType: 'weekly_hours' | 'course_completion' | 'skill_mastery' | 'certificate';
+  title: string; // User-defined or auto-generated goal title
+  description?: string;
+  target: number; // Goal target (minutes for hours, 1 for completion, etc.)
+  current: number; // Current progress
+  unit: 'minutes' | 'courses' | 'lessons' | 'skills' | 'certificates';
+  deadline?: string; // Optional goal deadline (ISO string)
+  status: 'active' | 'completed' | 'abandoned' | 'overdue';
+  courseId?: string; // For course-specific goals
+  courseName?: string;
+  reminderEnabled: boolean;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Learning Session - Detailed tracking of individual learning sessions
+ * Collection: learningSessions
+ */
+export interface LearningSession {
+  id: string;
+  userId: string;
+  courseId: string;
+  courseName: string;
+  lessonId?: string;
+  lessonName?: string;
+  startTime: string;
+  endTime?: string; // null if session is active
+  duration: number; // Total minutes in session
+  activityType: 'video' | 'reading' | 'quiz' | 'interactive' | 'mixed';
+  progressMade: number; // Percentage progress made in this session
+  completed: boolean; // Whether session ended normally or was abandoned
+  deviceType: 'desktop' | 'mobile' | 'tablet';
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Course Recommendation - Personalized course suggestions with reasoning
+ * Collection: courseRecommendations (generated by Cloud Function)
+ */
+export interface CourseRecommendation {
+  id: string;
+  userId: string;
+  courseId: string;
+  recommendationType: 'collaborative' | 'content_based' | 'trending' | 'skill_gap' | 'career_path';
+  score: number; // Recommendation confidence score (0-1)
+  reasoning: string; // Human-readable explanation
+  metadata: {
+    similarUsers?: string[]; // For collaborative filtering
+    relatedCourses?: string[]; // For content-based
+    skillGap?: string; // For skill-based recommendations
+    [key: string]: any;
+  };
+  dismissed: boolean; // User dismissed this recommendation
+  enrolled: boolean; // User enrolled in recommended course
+  createdAt: string;
+  expiresAt: string; // Recommendations expire after 30 days
+}
+
+/**
+ * Dashboard Analytics - Pre-computed analytics for fast dashboard loading
+ * Collection: dashboardAnalytics (updated daily via Cloud Function)
+ */
+export interface DashboardAnalytics {
+  userId: string;
+  totalLearningMinutes: number; // All-time total
+  totalLearningHours: number; // Computed from minutes
+  learningMinutesThisWeek: number;
+  learningMinutesLastWeek: number;
+  learningMinutesThisMonth: number;
+  learningMinutesLastMonth: number;
+  weeklyLearningTrend: number; // Percentage change week-over-week
+  monthlyLearningTrend: number;
+  averageSessionDuration: number; // Average minutes per session
+  totalSessions: number;
+  coursesEnrolled: number;
+  coursesInProgress: number;
+  coursesCompleted: number;
+  lessonsCompleted: number;
+  certificatesEarned: number;
+  achievementsUnlocked: number;
+  currentStreak: number;
+  longestStreak: number;
+  averageQuizScore: number;
+  skillsAcquired: string[]; // List of skill categories mastered
+  lastCalculatedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Weekly Learning Data - Chart data for learning hours visualization
+ */
+export interface WeeklyLearningData {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+  label: string; // Day name or formatted date
+  isToday?: boolean;
+  goalMet?: boolean;
+}
+
+/**
+ * Chart Data Types for Dashboard Visualizations
+ */
+export interface LearningHoursChartData {
+  timeRange: 'week' | 'month' | 'year';
+  data: {
+    date: string;
+    minutes: number;
+    hours: number;
+    label: string;
+  }[];
+  goal?: number; // Weekly goal in minutes
+  totalMinutes: number;
+  averagePerDay: number;
+}
+
+/**
+ * Skill Proficiency - Track user's skill levels across categories
+ * Collection: skillProficiency
+ */
+export interface SkillProficiency {
+  userId: string;
+  skills: Record<string, SkillLevel>; // skillId/categoryId -> proficiency
+  lastUpdatedAt: string;
+  createdAt: string;
+}
+
+export interface SkillLevel {
+  name: string; // Skill or category name
+  level: number; // 0-100 proficiency
+  coursesCompleted: number;
+  lessonsCompleted: number;
+  lastPracticed: string;
+  trend: 'improving' | 'stable' | 'declining';
+}
+
+/**
+ * Onboarding State - Track user's onboarding progress
+ */
+export interface OnboardingState {
+  currentStep: number;
+  totalSteps: number;
+  completed: boolean;
+  skipped: boolean;
+  data: Partial<UserPreferences>;
 } 

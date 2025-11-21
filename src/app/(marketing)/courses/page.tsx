@@ -1,226 +1,439 @@
-"use client";
+'use client'
 
-import { useState, useMemo } from "react";
-import { useCourses } from "@/hooks/useCourseQueries";
-import { CourseCard } from "@/components/course/CourseCard";
-import { CourseType, COURSE_TYPE_LABELS, COURSE_TYPE_DESCRIPTIONS } from "@/types";
-import { FramerNavbarWrapper } from "@/components/navigation/framer-navbar-wrapper";
-import Footer from "@/components/landing-home/ui/footer";
-import { BookOpen, Video, GraduationCap, Loader2 } from "lucide-react";
+import { useState, useEffect, useMemo, useRef } from 'react'
+import { motion } from "motion/react"
+import { BookOpen, Video, GraduationCap, Loader2, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { db, functions as fbFunctions } from '@/lib/firebase'
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
+import { httpsCallable } from 'firebase/functions'
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
+import Footer from '@/components/landing-home/ui/footer'
+import { CourseStatsBar } from '@/components/courses/CourseStatsBar'
+import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
+import { useInstructors } from '@/hooks/useInstructorQueries'
 
-const COURSE_TYPE_ICONS: Record<CourseType, React.ReactNode> = {
-  ACADEMIA: <GraduationCap className="w-6 h-6" />,
-  WEBINAR: <Video className="w-6 h-6" />,
-  MASTERCLASS: <BookOpen className="w-6 h-6" />,
-};
+const COURSE_TYPE_ICONS: Record<string, any> = {
+  ACADEMIA: GraduationCap,
+  WEBINAR: Video,
+  MASTERCLASS: BookOpen,
+}
 
-export default function CoursesPage() {
-  const { data: courses = [], isLoading, error } = useCourses();
-  const [selectedType, setSelectedType] = useState<CourseType | "ALL">("ALL");
+const COURSE_TYPE_LABELS: Record<string, string> = {
+  ACADEMIA: 'Akadémia',
+  WEBINAR: 'Webinár',
+  MASTERCLASS: 'Masterclass',
+}
 
-  // Filter courses by type
-  const filteredCourses = useMemo(() => {
-    if (selectedType === "ALL") return courses;
-    return courses.filter((course) => course.courseType === selectedType);
-  }, [courses, selectedType]);
+const COURSE_TYPE_DESCRIPTIONS: Record<string, string> = {
+  ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
+  WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
+  MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+}
 
-  // Count courses by type
-  const courseCounts = useMemo(() => {
-    const counts: Record<CourseType, number> = {
-      ACADEMIA: 0,
-      WEBINAR: 0,
-      MASTERCLASS: 0,
-    };
+const COURSE_TYPE_GRADIENTS: Record<string, string> = {
+  ACADEMIA: 'from-blue-500 to-blue-600',
+  WEBINAR: 'from-purple-500 to-purple-600',
+  MASTERCLASS: 'from-teal-500 to-teal-600',
+}
 
-    courses.forEach((course) => {
-      if (course.courseType) {
-        counts[course.courseType]++;
+interface Course {
+  id: string
+  title: string
+  description: string
+  instructorId?: string
+  instructorName?: string
+  categoryId?: string
+  category?: string
+  level: string
+  duration: string
+  rating?: number
+  students?: number
+  enrollmentCount?: number
+  price?: number
+  thumbnailUrl?: string
+  lessons?: number
+  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
+  createdAt?: any
+  tags?: string[]
+}
+
+interface CourseCarouselSectionProps {
+  title: string
+  description: string
+  courses: Course[]
+  courseType: string
+  categories: any[]
+  instructors: any[]
+  viewAllLink: string
+}
+
+function CourseCarouselSection({
+  title,
+  description,
+  courses,
+  courseType,
+  categories,
+  instructors,
+  viewAllLink,
+}: CourseCarouselSectionProps) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const Icon = COURSE_TYPE_ICONS[courseType]
+  const gradient = COURSE_TYPE_GRADIENTS[courseType]
+
+  const checkScroll = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+      setCanScrollLeft(scrollLeft > 0)
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+    }
+  }
+
+  useEffect(() => {
+    checkScroll()
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', checkScroll)
+      window.addEventListener('resize', checkScroll)
+      return () => {
+        container.removeEventListener('scroll', checkScroll)
+        window.removeEventListener('resize', checkScroll)
       }
-    });
+    }
+  }, [courses])
 
-    return counts;
-  }, [courses]);
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = direction === 'left' ? -600 : 600
+      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+    }
+  }
+
+  if (!courses || courses.length === 0) return null
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <FramerNavbarWrapper />
-
-      <main className="grow">
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-b from-gray-50 to-white py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                Fedezze fel kurzusainkat
-              </h1>
-              <p className="text-xl text-gray-600 mb-8">
-                Válasszon szakértő oktatóinktól akadémiák, webináriumok és mesterkurzusok közül
-              </p>
-            </div>
+    <section className="mb-16">
+      {/* Section Header */}
+      <div className="flex items-center justify-between mb-6 px-6 lg:px-12">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}>
+            <Icon className="w-6 h-6 text-white" />
           </div>
-        </section>
-
-        {/* Filter Tabs */}
-        <section className="sticky top-20 z-40 bg-white border-b border-gray-200 shadow-sm">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex overflow-x-auto scrollbar-hide">
-              <button
-                onClick={() => setSelectedType("ALL")}
-                className={`flex-shrink-0 px-6 py-4 font-semibold transition-colors duration-200 border-b-2 ${
-                  selectedType === "ALL"
-                    ? "border-teal-600 text-teal-600"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <span>Összes</span>
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">
-                    {courses.length}
-                  </span>
-                </div>
-              </button>
-
-              {(["ACADEMIA", "WEBINAR", "MASTERCLASS"] as CourseType[]).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`flex-shrink-0 px-6 py-4 font-semibold transition-colors duration-200 border-b-2 ${
-                    selectedType === type
-                      ? "border-teal-600 text-teal-600"
-                      : "border-transparent text-gray-600 hover:text-gray-900"
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {COURSE_TYPE_ICONS[type]}
-                    <span>{COURSE_TYPE_LABELS[type]}</span>
-                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gray-100 text-gray-700">
-                      {courseCounts[type]}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
+            <p className="text-gray-600 mt-1">{description}</p>
           </div>
-        </section>
+        </div>
+        <a
+          href={viewAllLink}
+          className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 font-semibold hover:bg-white/80 hover:shadow-md transition-all duration-200"
+        >
+          Összes megtekintése
+          <ChevronRight className="w-4 h-4" />
+        </a>
+      </div>
 
-        {/* Course Type Description */}
-        {selectedType !== "ALL" && (
-          <section className="bg-teal-50 py-8">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center gap-4 max-w-4xl mx-auto">
-                <div className="p-3 bg-white rounded-lg shadow-sm">
-                  {COURSE_TYPE_ICONS[selectedType]}
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    {COURSE_TYPE_LABELS[selectedType]}
-                  </h2>
-                  <p className="text-gray-600">
-                    {COURSE_TYPE_DESCRIPTIONS[selectedType]}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+      {/* Carousel */}
+      <div className="relative group px-6 lg:px-12">
+        {/* Navigation Buttons */}
+        {canScrollLeft && (
+          <button
+            onClick={() => scroll('left')}
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-xl shadow-xl border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white ml-6 lg:ml-12"
+            aria-label="Scroll left"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-700" />
+          </button>
+        )}
+        {canScrollRight && (
+          <button
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-xl shadow-xl border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white mr-6 lg:mr-12"
+            aria-label="Scroll right"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-700" />
+          </button>
         )}
 
-        {/* Courses Grid */}
-        <section className="py-12 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {isLoading ? (
-              <div className="flex items-center justify-center py-20">
-                <div className="text-center">
-                  <Loader2 className="w-12 h-12 animate-spin text-teal-600 mx-auto mb-4" />
-                  <p className="text-gray-600">Kurzusok betöltése...</p>
-                </div>
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {courses.map((course, index) => (
+            <div key={course.id} className="flex-shrink-0 w-[300px] md:w-[340px]">
+              <PremiumCourseCard
+                course={course}
+                index={index}
+                categories={categories}
+                instructors={instructors}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Mobile View All Button */}
+        <div className="md:hidden mt-6 text-center">
+          <a
+            href={viewAllLink}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 font-semibold hover:bg-white/80 hover:shadow-md transition-all duration-200"
+          >
+            Összes {title}
+            <ChevronRight className="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function CoursesPage() {
+  const [courses, setCourses] = useState<Course[]>([])
+  const [loading, setLoading] = useState(true)
+  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
+  const [searchInput, setSearchInput] = useState('')
+  const { data: instructors = [] } = useInstructors()
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const getCategories = httpsCallable(fbFunctions, 'getCategories')
+        const result: any = await getCategories()
+        if (result.data?.success && result.data?.categories) {
+          setCategories(result.data.categories)
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  // Fetch all courses (no status filter - just like webinar page)
+  useEffect(() => {
+    const coursesQuery = query(
+      collection(db, 'courses'),
+      orderBy('createdAt', 'desc')
+    )
+
+    const unsubscribe = onSnapshot(coursesQuery, (snapshot) => {
+      const coursesData: Course[] = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Course[]
+
+      console.log('✅ Fetched courses:', coursesData.length)
+      console.log('📊 Courses by type:', {
+        ACADEMIA: coursesData.filter(c => c.courseType === 'ACADEMIA').length,
+        WEBINAR: coursesData.filter(c => c.courseType === 'WEBINAR').length,
+        MASTERCLASS: coursesData.filter(c => c.courseType === 'MASTERCLASS').length,
+      })
+
+      setCourses(coursesData)
+      setLoading(false)
+    }, (error) => {
+      console.error('❌ Error fetching courses:', error)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  // Organize courses by type
+  const coursesByType = useMemo(() => {
+    return {
+      ACADEMIA: courses.filter(c => c.courseType === 'ACADEMIA'),
+      WEBINAR: courses.filter(c => c.courseType === 'WEBINAR'),
+      MASTERCLASS: courses.filter(c => c.courseType === 'MASTERCLASS'),
+    }
+  }, [courses])
+
+  // Calculate stats
+  const stats = useMemo(() => {
+    const totalStudents = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
+    const categoryCount = new Set(courses.map(c => c.categoryId || c.category)).size
+    return {
+      totalCourses: courses.length,
+      totalStudents,
+      categoryCount,
+    }
+  }, [courses])
+
+  if (loading) {
+    return (
+      <>
+        <FramerNavbarWrapper />
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-purple-600" />
+            <p className="text-lg text-gray-600">Kurzusok betöltése...</p>
+          </div>
+        </div>
+        <Footer border={true} />
+      </>
+    )
+  }
+
+  return (
+    <>
+      <FramerNavbarWrapper />
+
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 relative overflow-hidden">
+        {/* Background blur shapes */}
+        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-blue-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-100/20 rounded-full blur-3xl" aria-hidden="true"></div>
+
+        {/* Hero Section */}
+        <div className="relative pt-20 pb-16 px-6 lg:px-12">
+          <div className="container mx-auto max-w-6xl text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="mb-6"
+            >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Fedezd fel kurzusainkat
+              </h1>
+              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+                Akadémiák, webináriumok és mesterkurzusok szakértő oktatóinktól.
+                Válaszd ki a számodra legmegfelelőbb tanulási formát.
+              </p>
+            </motion.div>
+
+            {/* Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="relative">
+                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Keress kurzusok között..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="w-full pl-14 pr-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-purple-500 transition-all text-gray-900 placeholder-gray-500"
+                />
               </div>
-            ) : error ? (
-              <div className="text-center py-20">
-                <div className="text-red-500 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Stats Bar */}
+        <CourseStatsBar
+          totalCourses={stats.totalCourses}
+          categoriesCount={stats.categoryCount}
+          filteredCount={stats.totalCourses}
+          courseType="ALL"
+        />
+
+        {/* Course Carousels */}
+        <div className="py-12">
+          {/* Academia Carousel */}
+          <CourseCarouselSection
+            title={COURSE_TYPE_LABELS.ACADEMIA}
+            description={COURSE_TYPE_DESCRIPTIONS.ACADEMIA}
+            courses={coursesByType.ACADEMIA}
+            courseType="ACADEMIA"
+            categories={categories}
+            instructors={instructors}
+            viewAllLink="/akadémia"
+          />
+
+          {/* Webinar Carousel */}
+          <CourseCarouselSection
+            title={COURSE_TYPE_LABELS.WEBINAR}
+            description={COURSE_TYPE_DESCRIPTIONS.WEBINAR}
+            courses={coursesByType.WEBINAR}
+            courseType="WEBINAR"
+            categories={categories}
+            instructors={instructors}
+            viewAllLink="/webinar"
+          />
+
+          {/* Masterclass Carousel */}
+          <CourseCarouselSection
+            title={COURSE_TYPE_LABELS.MASTERCLASS}
+            description={COURSE_TYPE_DESCRIPTIONS.MASTERCLASS}
+            courses={coursesByType.MASTERCLASS}
+            courseType="MASTERCLASS"
+            categories={categories}
+            instructors={instructors}
+            viewAllLink="/masterclass"
+          />
+
+          {/* Empty State */}
+          {courses.length === 0 && (
+            <div className="container mx-auto px-6 lg:px-12 py-20">
+              <motion.div
+                className="flex flex-col items-center justify-center py-20 px-6 bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl max-w-md mx-auto"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg">
+                  <BookOpen className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Hiba a kurzusok betöltése során
-                </h3>
-                <p className="text-gray-600">
-                  Kérjük, próbálja újra később
-                </p>
-              </div>
-            ) : filteredCourses.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="text-gray-400 mb-4">
-                  <svg className="w-16 h-16 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">
                   Nincsenek elérhető kurzusok
                 </h3>
-                <p className="text-gray-600">
-                  {selectedType === "ALL"
-                    ? "Jelenleg nincsenek közzétett kurzusok"
-                    : `Jelenleg nincsenek ${COURSE_TYPE_LABELS[selectedType]} típusú kurzusok`
-                  }
+                <p className="text-gray-600 text-center">
+                  Jelenleg nincsenek közzétett kurzusok
                 </p>
-              </div>
-            ) : (
-              <>
-                <div className="mb-6">
-                  <p className="text-gray-600">
-                    {filteredCourses.length} kurzus található
-                    {selectedType !== "ALL" && ` a(z) ${COURSE_TYPE_LABELS[selectedType]} kategóriában`}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredCourses.map((course) => (
-                    <CourseCard
-                      key={course.id}
-                      course={course}
-                      variant="compact"
-                      context="search"
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        </section>
+              </motion.div>
+            </div>
+          )}
+        </div>
 
         {/* CTA Section */}
-        {!isLoading && filteredCourses.length > 0 && (
-          <section className="bg-gradient-to-r from-teal-600 to-teal-700 py-16">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center max-w-3xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-                  Készen áll a tanulásra?
+        {courses.length > 0 && (
+          <section className="relative py-20 overflow-hidden mt-12">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600" />
+            <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10" />
+
+            <div className="container mx-auto px-6 lg:px-12 relative">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                className="max-w-4xl mx-auto text-center"
+              >
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                  Kezdd el még ma a tanulást
                 </h2>
-                <p className="text-xl text-teal-100 mb-8">
-                  Csatlakozzon több ezer diákunkhoz és kezdje el karrierjének fejlesztését ma
+                <p className="text-xl text-white/90 mb-8">
+                  Csatlakozz több ezer diákunkhoz és fejleszd karrieredet világszínvonalú oktatásunkkal
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/register"
-                    className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-teal-600 bg-white hover:bg-gray-50 transition-colors duration-200"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full bg-white text-gray-900 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
                   >
                     Ingyenes regisztráció
                   </a>
                   <a
                     href="/pricing"
-                    className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white hover:bg-teal-500 transition-colors duration-200"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full bg-white/10 backdrop-blur-xl text-white border-2 border-white/30 hover:bg-white/20 transition-all duration-200"
                   >
                     Árazás megtekintése
                   </a>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </section>
         )}
-      </main>
+      </div>
 
       <Footer border={true} />
-    </div>
-  );
+    </>
+  )
 }

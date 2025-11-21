@@ -100,15 +100,18 @@ exports.getDashboardStats = (0, https_1.onCall)(async (request) => {
             }
             // Current stats (all enrollments)
             totalEnrolled++;
-            if (data.status === 'in_progress' || data.status === 'active')
+            // Count both 'in_progress', 'active', and 'ACTIVE' as active courses
+            if (data.status === 'in_progress' || data.status === 'active' || data.status === 'ACTIVE') {
                 activeInProgress++;
+            }
             if (data.status === 'completed')
                 completed++;
             // Previous period stats (enrolled between 30-60 days ago)
             if (enrolledAt >= sixtyDaysAgo && enrolledAt < thirtyDaysAgo) {
                 prevTotalEnrolled++;
-                if (data.status === 'in_progress' || data.status === 'active')
+                if (data.status === 'in_progress' || data.status === 'active' || data.status === 'ACTIVE') {
                     prevActiveInProgress++;
+                }
                 if (data.status === 'completed')
                     prevCompleted++;
             }

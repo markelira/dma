@@ -97,39 +97,19 @@ export default function DashboardRouteGroupLayout({
 
         {/* Main Content Area */}
         <div className="flex flex-1 flex-col">
-          {/* Top Bar with Mobile Menu Button */}
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-gray-200 bg-white px-4 lg:px-6">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="rounded-lg p-2 hover:bg-gray-100 lg:hidden"
-            >
-              {sidebarOpen ? (
-                <X className="h-6 w-6 text-gray-600" />
-              ) : (
-                <Menu className="h-6 w-6 text-gray-600" />
-              )}
-            </button>
+          {/* Mobile Menu Button - Floating */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="fixed top-4 left-4 z-50 rounded-lg bg-white p-2 shadow-md hover:bg-gray-100 lg:hidden"
+          >
+            {sidebarOpen ? (
+              <X className="h-6 w-6 text-gray-600" />
+            ) : (
+              <Menu className="h-6 w-6 text-gray-600" />
+            )}
+          </button>
 
-            {/* Top Bar Content */}
-            <div className="flex flex-1 items-center justify-between">
-              <div className="flex flex-col">
-                <h2 className="text-lg font-semibold text-gray-900">
-                  Szia, {user?.firstName || 'Felhasználó'}!
-                </h2>
-                <p className="text-sm text-gray-500">
-                  Folytasd a tanulást, ahol abbahagytad
-                </p>
-              </div>
-
-              {/* Search and notifications can be added here */}
-              <div className="flex items-center gap-3">
-                {/* Placeholder for future search/notifications */}
-              </div>
-            </div>
-          </header>
-
-          {/* Main Content */}
+          {/* Main Content - No header bar */}
           <main className="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-6">
             {children}
           </main>

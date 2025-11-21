@@ -1,91 +1,84 @@
 'use client';
 
 import React from 'react';
-import { Play, Star, Clock, Award, Infinity, CheckCircle } from 'lucide-react';
+import { Play, Clock, Infinity, CheckCircle, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 
 interface CourseEnrollmentCardProps {
   price: number;
   duration: string;
   lessons: number;
-  rating: number;
-  students: number;
-  certificateIncluded: boolean;
   lifetimeAccess: boolean;
   onEnroll: () => void;
   onPreview?: () => void;
   isEnrolled: boolean;
+  thumbnailUrl?: string;
+  courseTitle?: string;
 }
 
 export function CourseEnrollmentCard({
   price,
   duration,
   lessons,
-  rating,
-  students,
-  certificateIncluded,
   lifetimeAccess,
   onEnroll,
   onPreview,
-  isEnrolled
+  isEnrolled,
+  thumbnailUrl,
+  courseTitle
 }: CourseEnrollmentCardProps) {
   const isFree = price === 0;
 
   return (
     <div className="sticky top-24">
       <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden">
-        {/* Price Header */}
+        {/* Course Thumbnail */}
+        {thumbnailUrl && (
+          <div className="relative aspect-video bg-gray-100 overflow-hidden">
+            <Image
+              src={thumbnailUrl}
+              alt={courseTitle || 'Course thumbnail'}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 400px"
+            />
+          </div>
+        )}
+        {!thumbnailUrl && (
+          <div className="relative aspect-video bg-gradient-to-br from-blue-100/50 to-purple-100/30 flex items-center justify-center">
+            <BookOpen className="w-16 h-16 text-blue-400 opacity-40" />
+          </div>
+        )}
+
+        {/* Subscription Header */}
         <div className="p-6 bg-gradient-to-br from-blue-600 to-blue-500 text-white">
           <div className="flex items-baseline gap-2 mb-2">
-            {isFree ? (
-              <span className="text-4xl font-bold">Ingyenes</span>
-            ) : (
-              <>
-                <span className="text-4xl font-bold">
-                  {price.toLocaleString('hu-HU')} Ft
-                </span>
-              </>
-            )}
+            <span className="text-2xl font-bold">Hozzáférés előfizetéssel</span>
           </div>
-          <p className="text-white/80 text-sm">
-            {isFree ? 'Korlátlan hozzáférés' : 'Egyszeri fizetés'}
+          <p className="text-white/90 text-sm">
+            Korlátlan tanulás, mindenhez hozzáférés
           </p>
         </div>
 
         {/* Course Info */}
         <div className="p-6 space-y-4">
           <div className="space-y-3">
-            <div className="flex items-center gap-3 text-gray-700">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <span>{duration} tartalom</span>
-            </div>
-            <div className="flex items-center gap-3 text-gray-700">
-              <Play className="w-5 h-5 text-blue-600" />
-              <span>{lessons} lecke</span>
-            </div>
-            {certificateIncluded && (
+            {duration && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Award className="w-5 h-5 text-blue-600" />
-                <span>Tanúsítvány</span>
+                <Clock className="w-5 h-5 text-blue-600" />
+                <span>{duration} tartalom</span>
               </div>
             )}
-            {lifetimeAccess && (
+            {lessons > 0 && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Infinity className="w-5 h-5 text-blue-600" />
-                <span>Élethosszig tartó hozzáférés</span>
+                <Play className="w-5 h-5 text-blue-600" />
+                <span>{lessons} lecke</span>
               </div>
             )}
-          </div>
-
-          <div className="pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                <span className="font-semibold">{rating.toFixed(1)}</span>
-              </div>
-              <span className="text-sm text-gray-600">
-                {students.toLocaleString('hu-HU')} hallgató
-              </span>
+            <div className="flex items-center gap-3 text-gray-700">
+              <Infinity className="w-5 h-5 text-blue-600" />
+              <span>Korlátlan hozzáférés</span>
             </div>
           </div>
 
@@ -93,7 +86,7 @@ export function CourseEnrollmentCard({
           <div className="space-y-3 pt-4">
             <Button
               onClick={onEnroll}
-              className="w-full bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-md text-white font-semibold py-6 text-lg transition-all"
+              className="w-full bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-xl text-white font-bold py-7 text-lg rounded-xl transition-all hover:scale-[1.02]"
               disabled={isEnrolled}
             >
               {isEnrolled ? (
@@ -101,10 +94,8 @@ export function CourseEnrollmentCard({
                   <CheckCircle className="w-5 h-5 mr-2" />
                   Beiratkozva
                 </>
-              ) : isFree ? (
-                'Ingyenes beiratkozás'
               ) : (
-                'Beiratkozás most'
+                'Feliratkozás most'
               )}
             </Button>
 
@@ -112,21 +103,12 @@ export function CourseEnrollmentCard({
               <Button
                 onClick={onPreview}
                 variant="outline"
-                className="w-full"
+                className="w-full border-2"
               >
                 Ingyenes előnézet
               </Button>
             )}
           </div>
-
-          {/* Guarantee */}
-          {!isFree && (
-            <div className="pt-4 text-center">
-              <p className="text-sm text-gray-600">
-                30 napos pénzvisszafizetési garancia
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

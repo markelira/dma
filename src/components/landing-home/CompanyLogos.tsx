@@ -27,10 +27,10 @@ const companies = [
 
 export default function CompanyLogos() {
   return (
-    <section className="w-full bg-white py-16">
+    <section className="w-full bg-gradient-to-br from-white to-[var(--unframer-blue-10)] py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
+          <p className="text-sm font-medium text-gray-600 uppercase tracking-wider">
             Vezető vállalatok bíznak bennünk
           </p>
         </div>

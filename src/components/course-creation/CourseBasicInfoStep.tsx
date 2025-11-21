@@ -28,24 +28,16 @@ import { CourseType } from '@/types';
 export interface BasicInfoData {
   title: string;
   description: string;
-  categoryId: string;
+  categoryId: string; // Keep for backward compatibility
+  categoryIds?: string[]; // NEW: Support multiple categories
   instructorId: string;
+  instructorIds?: string[]; // NEW: Support multiple instructors
   thumbnailUrl?: string;
   learningObjectives: string;
 
   // Marketing fields
-  shortDescription?: string;
   whatYouWillLearn?: string[];
   targetAudience?: string[];
-  guaranteeEnabled?: boolean;
-  guaranteeText?: string;
-  guaranteeDays?: number;
-
-  // Webinar-specific fields
-  webinarDate?: string;
-  webinarDuration?: number;
-  liveStreamUrl?: string;
-  recordingAvailable?: boolean;
 }
 
 interface Props {
@@ -57,24 +49,16 @@ interface Props {
 const schema = z.object({
   title: z.string().min(3, "A cím legalább 3 karakter legyen"),
   description: z.string().min(10, "A leírás legalább 10 karakter legyen"),
-  categoryId: z.string().min(1, "Válassz kategóriát"),
-  instructorId: z.string().min(1, "Válassz oktatót"),
+  categoryId: z.string().min(1, "Válassz legalább egy kategóriát"),
+  categoryIds: z.array(z.string()).min(1, "Válassz legalább egy kategóriát").optional(),
+  instructorId: z.string().min(1, "Válassz legalább egy oktatót"),
+  instructorIds: z.array(z.string()).min(1, "Válassz legalább egy oktatót").optional(),
   thumbnailUrl: z.string().optional(),
   learningObjectives: z.string().min(10, "A tanulási célok legalább 10 karakter legyen"),
 
   // Marketing fields (all optional)
-  shortDescription: z.string().max(160, "Maximum 160 karakter").optional(),
   whatYouWillLearn: z.array(z.string()).optional(),
   targetAudience: z.array(z.string()).optional(),
-  guaranteeEnabled: z.boolean().optional(),
-  guaranteeText: z.string().optional(),
-  guaranteeDays: z.number().optional(),
-
-  // Webinar-specific fields (all optional)
-  webinarDate: z.string().optional(),
-  webinarDuration: z.number().positive().optional(),
-  liveStreamUrl: z.string().url("Érvényes URL-t adj meg").optional().or(z.literal('')),
-  recordingAvailable: z.boolean().optional(),
 });
 
 export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: Props) {
@@ -92,6 +76,16 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
   // Marketing fields state
   const [whatYouWillLearn, setWhatYouWillLearn] = useState<string[]>(initial?.whatYouWillLearn || []);
   const [targetAudience, setTargetAudience] = useState<string[]>(initial?.targetAudience || []);
+
+  // Selected categories state
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    initial?.categoryIds || (initial?.categoryId ? [initial.categoryId] : [])
+  );
+
+  // Selected instructors state
+  const [selectedInstructors, setSelectedInstructors] = useState<string[]>(
+    initial?.instructorIds || (initial?.instructorId ? [initial.instructorId] : [])
+  );
 
   const {
     control,
@@ -250,6 +244,10 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       // Merge form data with state-managed arrays
       const completeData: BasicInfoData = {
         ...data,
+        categoryId: selectedCategories[0] || '', // Primary category (first selected)
+        categoryIds: selectedCategories, // All selected categories
+        instructorId: selectedInstructors[0] || '', // Primary instructor (first selected)
+        instructorIds: selectedInstructors, // All selected instructors
         whatYouWillLearn: whatYouWillLearn.filter(item => item.trim() !== ""),
         targetAudience: targetAudience.filter(item => item.trim() !== ""),
       };
@@ -288,65 +286,93 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
           )}
         </div>
 
-        {/* Category */}
+        {/* Categories - Multi-select */}
         <div className="space-y-2">
-          <Label htmlFor="category" required>Kategória</Label>
-          <Controller
-            name="categoryId"
-            control={control}
-            render={({ field }) => (
-              <Select 
-                value={field.value} 
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  trigger('categoryId');
-                }}
-              >
-                <SelectTrigger id="category" className={errors.categoryId ? "border-red-500" : ""}>
-                  <SelectValue placeholder="Válassz kategóriát" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Label htmlFor="categories" required>Kategóriák</Label>
+          <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+            {categories.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Kategóriák betöltése...</p>
+            ) : (
+              categories.map((cat) => (
+                <div key={cat.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`category-${cat.id}`}
+                    checked={selectedCategories.includes(cat.id)}
+                    onChange={(e) => {
+                      const newCategories = e.target.checked
+                        ? [...selectedCategories, cat.id]
+                        : selectedCategories.filter(id => id !== cat.id);
+                      setSelectedCategories(newCategories);
+                      // Update form value
+                      setValue('categoryId', newCategories[0] || ''); // Primary category
+                      setValue('categoryIds', newCategories);
+                      trigger('categoryId');
+                    }}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label
+                    htmlFor={`category-${cat.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    {cat.name}
+                  </label>
+                </div>
+              ))
             )}
-          />
+          </div>
+          {selectedCategories.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {selectedCategories.length} kategória kiválasztva
+            </p>
+          )}
           {errors.categoryId && (
             <p className="text-sm text-red-600">{errors.categoryId.message}</p>
           )}
         </div>
 
-        {/* Instructor */}
+        {/* Instructors - Multi-select */}
         <div className="space-y-2">
-          <Label htmlFor="instructor" required>Oktató</Label>
-          <Controller
-            name="instructorId"
-            control={control}
-            render={({ field }) => (
-              <Select 
-                value={field.value} 
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  trigger('instructorId');
-                }}
-              >
-                <SelectTrigger id="instructor" className={errors.instructorId ? "border-red-500" : ""}>
-                  <SelectValue placeholder="Válassz oktatót" />
-                </SelectTrigger>
-                <SelectContent>
-                  {instructors.map((instructor) => (
-                    <SelectItem key={instructor.id} value={instructor.id}>
-                      {instructor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <Label htmlFor="instructors" required>Oktatók</Label>
+          <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+            {instructorsLoading ? (
+              <p className="text-sm text-muted-foreground">Oktatók betöltése...</p>
+            ) : instructors.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Nincs elérhető oktató</p>
+            ) : (
+              instructors.map((instructor) => (
+                <div key={instructor.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`instructor-${instructor.id}`}
+                    checked={selectedInstructors.includes(instructor.id)}
+                    onChange={(e) => {
+                      const newInstructors = e.target.checked
+                        ? [...selectedInstructors, instructor.id]
+                        : selectedInstructors.filter(id => id !== instructor.id);
+                      setSelectedInstructors(newInstructors);
+                      // Update form value
+                      setValue('instructorId', newInstructors[0] || ''); // Primary instructor
+                      setValue('instructorIds', newInstructors);
+                      trigger('instructorId');
+                    }}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label
+                    htmlFor={`instructor-${instructor.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                  >
+                    {instructor.name}
+                  </label>
+                </div>
+              ))
             )}
-          />
+          </div>
+          {selectedInstructors.length > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {selectedInstructors.length} oktató kiválasztva
+            </p>
+          )}
           {errors.instructorId && (
             <p className="text-sm text-red-600">{errors.instructorId.message}</p>
           )}
@@ -382,85 +408,6 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
           <p className="text-sm text-red-600">{errors.learningObjectives.message}</p>
         )}
       </div>
-
-      {/* Webinar-specific fields (only shown for WEBINAR type) */}
-      {courseType === 'WEBINAR' && (
-        <div className="space-y-4 p-4 border-2 border-purple-200 rounded-lg bg-purple-50/30">
-          <h3 className="font-semibold text-purple-900 flex items-center gap-2">
-            <span className="text-purple-600">🎥</span>
-            Webinár beállítások
-          </h3>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Webinar Date */}
-            <div className="space-y-2">
-              <Label htmlFor="webinarDate">Webinár időpontja</Label>
-              <Input
-                id="webinarDate"
-                type="datetime-local"
-                {...register("webinarDate")}
-                className={errors.webinarDate ? "border-red-500" : ""}
-              />
-              {errors.webinarDate && (
-                <p className="text-sm text-red-600">{errors.webinarDate.message}</p>
-              )}
-            </div>
-
-            {/* Webinar Duration */}
-            <div className="space-y-2">
-              <Label htmlFor="webinarDuration">Időtartam (perc)</Label>
-              <Input
-                id="webinarDuration"
-                type="number"
-                min="15"
-                step="15"
-                placeholder="pl. 60"
-                {...register("webinarDuration", { valueAsNumber: true })}
-                className={errors.webinarDuration ? "border-red-500" : ""}
-              />
-              {errors.webinarDuration && (
-                <p className="text-sm text-red-600">{errors.webinarDuration.message}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Live Stream URL */}
-          <div className="space-y-2">
-            <Label htmlFor="liveStreamUrl">Élő közvetítés URL (opcionális)</Label>
-            <Input
-              id="liveStreamUrl"
-              type="url"
-              placeholder="https://zoom.us/j/... vagy YouTube link"
-              {...register("liveStreamUrl")}
-              className={errors.liveStreamUrl ? "border-red-500" : ""}
-            />
-            {errors.liveStreamUrl && (
-              <p className="text-sm text-red-600">{errors.liveStreamUrl.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              A résztvevők ezen a linken keresztül csatlakozhatnak az élő webinárhoz
-            </p>
-          </div>
-
-          {/* Recording Available */}
-          <div className="flex items-center space-x-2">
-            <Controller
-              name="recordingAvailable"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  id="recordingAvailable"
-                  checked={field.value || false}
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-            <Label htmlFor="recordingAvailable" className="cursor-pointer">
-              Felvétel elérhető lesz a webinár után
-            </Label>
-          </div>
-        </div>
-      )}
 
       {/* Thumbnail Upload */}
       <div className="space-y-2">
@@ -536,21 +483,6 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       <div className="border-t pt-6 mt-6">
         <h3 className="text-lg font-semibold mb-4">Marketing és értékesítési tartalom</h3>
 
-        {/* Short Description */}
-        <div className="space-y-2 mb-6">
-          <Label htmlFor="shortDescription">Rövid leírás (SEO)</Label>
-          <Textarea
-            id="shortDescription"
-            {...register("shortDescription")}
-            rows={2}
-            maxLength={160}
-            placeholder="Rövid, lényegre törő leírás (max 160 karakter)"
-          />
-          <p className="text-xs text-muted-foreground">
-            {watch('shortDescription')?.length || 0} / 160 karakter
-          </p>
-        </div>
-
         {/* What You'll Learn */}
         <div className="space-y-2 mb-6">
           <Label>Mit fogsz tanulni?</Label>
@@ -617,59 +549,6 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
               Új célcsoport hozzáadása
             </Button>
           </div>
-        </div>
-
-        {/* Guarantee Section */}
-        <div className="space-y-4 mb-6 p-4 border rounded-lg">
-          <div className="flex items-center space-x-2">
-            <Controller
-              name="guaranteeEnabled"
-              control={control}
-              render={({ field }) => (
-                <Switch
-                  id="guaranteeEnabled"
-                  checked={field.value || false}
-                  onCheckedChange={field.onChange}
-                />
-              )}
-            />
-            <Label htmlFor="guaranteeEnabled" className="font-semibold cursor-pointer">
-              Pénzvisszafizetési garancia
-            </Label>
-          </div>
-
-          {watch('guaranteeEnabled') && (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="guaranteeDays">Garancia időtartama (napok)</Label>
-                <Controller
-                  name="guaranteeDays"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      id="guaranteeDays"
-                      type="number"
-                      min={1}
-                      max={365}
-                      value={field.value || 30}
-                      onChange={(e) => field.onChange(parseInt(e.target.value) || 30)}
-                      placeholder="30"
-                    />
-                  )}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="guaranteeText">Garancia szöveg</Label>
-                <Textarea
-                  id="guaranteeText"
-                  {...register("guaranteeText")}
-                  rows={3}
-                  placeholder="Pl. Ha nem vagy elégedett a kurzussal, 30 napon belül teljes visszatérítést kapsz."
-                />
-              </div>
-            </>
-          )}
         </div>
       </div>
 

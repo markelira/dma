@@ -119,3 +119,58 @@ export const deleteAllCourses = onCall({
     throw new Error(`Failed to delete courses: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 });
+
+/**
+ * Restore soft-deleted courses by removing deletedAt field (Admin only)
+ */
+export const restoreSoftDeletedCourses = onCall({
+  region: 'us-central1',
+  maxInstances: 1,
+}, async (request) => {
+  const uid = request.auth?.uid;
+
+  // Authentication check
+  if (!uid) {
+    logger.warn('Unauthenticated restoreSoftDeletedCourses attempt');
+    throw new Error('Authentication required');
+  }
+
+  // Permission check - ADMIN only
+  const userDoc = await firestore.collection('users').doc(uid).get();
+  const userData = userDoc.data();
+
+  if (!userData || userData.role !== 'ADMIN') {
+    logger.warn(`Unauthorized restoreSoftDeletedCourses attempt by user ${uid}`);
+    throw new Error('Admin access required');
+  }
+
+  logger.info(`Admin ${uid} initiated restoreSoftDeletedCourses operation`);
+
+  try {
+    const coursesSnapshot = await firestore.collection('courses').get();
+    let restoredCount = 0;
+
+    for (const courseDoc of coursesSnapshot.docs) {
+      const data = courseDoc.data();
+      if (data.deletedAt) {
+        await courseDoc.ref.update({
+          deletedAt: FieldValue.delete()
+        });
+        restoredCount++;
+        logger.info(`Restored course: ${courseDoc.id} - ${data.title}`);
+      }
+    }
+
+    logger.info(`✅ Restored ${restoredCount} soft-deleted courses`);
+
+    return {
+      success: true,
+      message: `Restored ${restoredCount} courses`,
+      restoredCount,
+    };
+
+  } catch (error) {
+    logger.error('Error restoring courses:', error);
+    throw new Error(`Failed to restore courses: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+});

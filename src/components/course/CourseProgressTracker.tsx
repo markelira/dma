@@ -57,12 +57,6 @@ interface CourseProgressData {
   estimatedCompletionDate: Date
   learningVelocity: number // lessons per week
   skillLevel: 'Beginner' | 'Intermediate' | 'Advanced'
-  certificates: Array<{
-    id: string
-    title: string
-    earnedAt: Date
-    downloadUrl: string
-  }>
   milestones: Array<{
     id: string
     title: string
@@ -408,42 +402,6 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
                       Teljesítve: {formatDate(milestone.completedAt)}
                     </div>
                   )}
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Certificates */}
-      {courseProgress.certificates.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center space-x-2">
-              <Award className="w-5 h-5" />
-              <span>Tanúsítványok</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {courseProgress.certificates.map((certificate) => (
-                <div key={certificate.id} className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                  <div className="flex items-center space-x-3">
-                    <Star className="w-6 h-6 text-yellow-500" />
-                    <div>
-                      <h4 className="font-medium">{certificate.title}</h4>
-                      <p className="text-sm text-gray-600">
-                        Kiállítva: {formatDate(certificate.earnedAt)}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={certificate.downloadUrl} download>
-                      <Download className="w-4 h-4 mr-2" />
-                      Letöltés
-                    </a>
-                  </Button>
                 </div>
               ))}
             </div>

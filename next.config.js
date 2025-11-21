@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  generateBuildId: async () => {
+    // Use git commit hash as build ID
+    return process.env.VERCEL_GIT_COMMIT_SHA || 'development';
+  },
   images: {
     domains: [
       'images.unsplash.com',

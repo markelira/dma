@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAllCourses = void 0;
+exports.restoreSoftDeletedCourses = exports.deleteAllCourses = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const firestore_1 = require("firebase-admin/firestore");
 const v2_1 = require("firebase-functions/v2");
@@ -101,6 +101,52 @@ exports.deleteAllCourses = (0, https_1.onCall)({
     catch (error) {
         v2_1.logger.error('Error deleting courses:', error);
         throw new Error(`Failed to delete courses: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+});
+/**
+ * Restore soft-deleted courses by removing deletedAt field (Admin only)
+ */
+exports.restoreSoftDeletedCourses = (0, https_1.onCall)({
+    region: 'us-central1',
+    maxInstances: 1,
+}, async (request) => {
+    const uid = request.auth?.uid;
+    // Authentication check
+    if (!uid) {
+        v2_1.logger.warn('Unauthenticated restoreSoftDeletedCourses attempt');
+        throw new Error('Authentication required');
+    }
+    // Permission check - ADMIN only
+    const userDoc = await firestore.collection('users').doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.role !== 'ADMIN') {
+        v2_1.logger.warn(`Unauthorized restoreSoftDeletedCourses attempt by user ${uid}`);
+        throw new Error('Admin access required');
+    }
+    v2_1.logger.info(`Admin ${uid} initiated restoreSoftDeletedCourses operation`);
+    try {
+        const coursesSnapshot = await firestore.collection('courses').get();
+        let restoredCount = 0;
+        for (const courseDoc of coursesSnapshot.docs) {
+            const data = courseDoc.data();
+            if (data.deletedAt) {
+                await courseDoc.ref.update({
+                    deletedAt: firestore_1.FieldValue.delete()
+                });
+                restoredCount++;
+                v2_1.logger.info(`Restored course: ${courseDoc.id} - ${data.title}`);
+            }
+        }
+        v2_1.logger.info(`✅ Restored ${restoredCount} soft-deleted courses`);
+        return {
+            success: true,
+            message: `Restored ${restoredCount} courses`,
+            restoredCount,
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('Error restoring courses:', error);
+        throw new Error(`Failed to restore courses: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 });
 //# sourceMappingURL=dataCleanup.js.map

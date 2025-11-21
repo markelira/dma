@@ -103,11 +103,31 @@ export const VideoPlayer: React.FC<Props> = ({
   const [watchTime, setWatchTime] = useState(0)
   const [currentChapter, setCurrentChapter] = useState<VideoChapter | null>(null)
   const [isClient, setIsClient] = useState(false)
+  const [resumePosition, setResumePosition] = useState<number | null>(null)
+  const [showResumePrompt, setShowResumePrompt] = useState(false)
 
-  // Client-side hydration check
+  // Client-side hydration check & load resume position
   useEffect(() => {
     setIsClient(true)
-  }, [])
+
+    // Load resume position from localStorage (only on client)
+    if (typeof window !== 'undefined' && lessonId && userId) {
+      try {
+        const storageKey = `resume_${userId}_${lessonId}`
+        const saved = localStorage.getItem(storageKey)
+        if (saved) {
+          const savedPosition = parseFloat(saved)
+          // Only resume if more than 30 seconds in and not near the end (>90%)
+          if (savedPosition > 30 && !isNaN(savedPosition)) {
+            setResumePosition(savedPosition)
+            setShowResumePrompt(true)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading resume position:', error)
+      }
+    }
+  }, [lessonId, userId])
 
   // Analytics state
   const [analytics, setAnalytics] = useState<VideoAnalytics>({
@@ -210,6 +230,20 @@ export const VideoPlayer: React.FC<Props> = ({
     setCurrentTime(current)
     setDuration(totalDuration)
 
+    // Save resume position to localStorage (every 5 seconds)
+    if (typeof window !== 'undefined' && lessonId && userId && Math.floor(current) % 5 === 0) {
+      try {
+        const storageKey = `resume_${userId}_${lessonId}`
+        const percentage = (current / totalDuration) * 100
+        // Don't save if near the end (>90%) or at the start (<30s)
+        if (percentage < 90 && current > 30) {
+          localStorage.setItem(storageKey, current.toString())
+        }
+      } catch (error) {
+        console.error('Error saving resume position:', error)
+      }
+    }
+
     // Report progress every 10 seconds
     if (current - lastReportedTime >= 10) {
       const percentage = (current / totalDuration) * 100
@@ -221,7 +255,7 @@ export const VideoPlayer: React.FC<Props> = ({
       onProgress?.(Math.min(100, percentage), Math.floor(current), analytics)
       setLastReportedTime(current)
     }
-  }, [onProgress, lastReportedTime, analytics, trackProgressMarker, watchTime])
+  }, [onProgress, lastReportedTime, analytics, trackProgressMarker, watchTime, lessonId, userId])
 
   // Handle video end
   const handleEnded = useCallback(() => {
@@ -231,9 +265,40 @@ export const VideoPlayer: React.FC<Props> = ({
       trackProgressMarker(100, watchTime)
       onProgress?.(100, Math.floor(player.duration), analytics)
     }
+
+    // Clear resume position on completion
+    if (typeof window !== 'undefined' && lessonId && userId) {
+      try {
+        const storageKey = `resume_${userId}_${lessonId}`
+        localStorage.removeItem(storageKey)
+      } catch (error) {
+        console.error('Error clearing resume position:', error)
+      }
+    }
+
     onEnded?.()
     setIsPlaying(false)
-  }, [onProgress, onEnded, trackEvent, trackProgressMarker, watchTime, analytics])
+  }, [onProgress, onEnded, trackEvent, trackProgressMarker, watchTime, analytics, lessonId, userId])
+
+  // Resume from saved position
+  const handleResume = useCallback(() => {
+    if (resumePosition && playerRef.current) {
+      playerRef.current.currentTime = resumePosition
+      setShowResumePrompt(false)
+    }
+  }, [resumePosition])
+
+  const handleStartFromBeginning = useCallback(() => {
+    setShowResumePrompt(false)
+    if (typeof window !== 'undefined' && lessonId && userId) {
+      try {
+        const storageKey = `resume_${userId}_${lessonId}`
+        localStorage.removeItem(storageKey)
+      } catch (error) {
+        console.error('Error removing resume position:', error)
+      }
+    }
+  }, [lessonId, userId])
 
   // Handle play state changes
   const handlePlay = useCallback(() => {
@@ -323,6 +388,9 @@ export const VideoPlayer: React.FC<Props> = ({
         className="w-full h-auto"
         primaryColor="#16222F"
         secondaryColor="#1e2a37"
+        playbackRates={[0.5, 0.75, 1, 1.25, 1.5, 2]}
+        defaultShowCaptions={false}
+        accentColor="#3B82F6"
       />
 
       {/* Chapter overlay */}
@@ -374,11 +442,39 @@ export const VideoPlayer: React.FC<Props> = ({
       )}
 
       {/* Loading overlay */}
-      {duration === 0 && (
+      {duration === 0 && !showResumePrompt && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="flex flex-col items-center space-y-2 text-white">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <p className="text-sm">Loading video...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Resume prompt overlay */}
+      {showResumePrompt && resumePosition && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-20">
+          <div className="bg-white rounded-lg p-6 max-w-sm mx-4 text-center">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Folytatás ott, ahol abbahagytad?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Korábban a(z) {Math.floor(resumePosition / 60)}:{(Math.floor(resumePosition) % 60).toString().padStart(2, '0')} percnél tartottál.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleStartFromBeginning}
+                className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-lg font-medium transition-colors"
+              >
+                Kezdés elölről
+              </button>
+              <button
+                onClick={handleResume}
+                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Folytatás
+              </button>
+            </div>
           </div>
         </div>
       )}

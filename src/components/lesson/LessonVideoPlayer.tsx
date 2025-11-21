@@ -67,16 +67,6 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
   bookmarks = [],
   ...props
 }) => {
-  console.log('📺 [LessonVideoPlayer] Called with:', {
-    videoUrl,
-    src,
-    muxPlaybackId,
-    playbackId,
-    muxData,
-    chapters: chapters.length,
-    bookmarks: bookmarks.length
-  })
-
   // Determine playback ID (priority order)
   const finalPlaybackId = muxPlaybackId || playbackId || muxData?.playbackId
 
@@ -89,8 +79,6 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
     videoSource = `https://stream.mux.com/${finalPlaybackId}.m3u8`
   }
 
-  console.log('📺 [LessonVideoPlayer] Final video source:', { finalPlaybackId, videoSource })
-
   // If no valid source, show error
   if (!videoSource && !finalPlaybackId) {
     return (
@@ -102,30 +90,6 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
       </div>
     )
   }
-
-  // For MVP: Add sample chapters to demonstrate the feature
-  const sampleChapters: VideoChapter[] = chapters.length > 0 ? chapters : [
-    {
-      id: 'intro',
-      title: 'Bevezetés',
-      startTime: 0,
-      endTime: 60,
-      description: 'A lecke áttekintése és célkitűzések'
-    },
-    {
-      id: 'main-content',
-      title: 'Főbb pontok',
-      startTime: 60,
-      endTime: 180,
-      description: 'A legfontosabb koncepciók részletes tárgyalása'
-    },
-    {
-      id: 'summary',
-      title: 'Összefoglalás',
-      startTime: 180,
-      description: 'A lecke kulcspontjainak áttekintése'
-    }
-  ]
 
   return (
     <VideoPlayer
@@ -141,7 +105,7 @@ export const LessonVideoPlayer: React.FC<LessonVideoPlayerProps> = ({
       autoPlay={autoPlay}
       className={className}
       enableAnalytics={enableAnalytics}
-      chapters={sampleChapters}
+      chapters={chapters}
       bookmarks={bookmarks}
     />
   )

@@ -43,22 +43,35 @@ export function useRecommendedCourses(maxCount: number = 3) {
         enrolledCourseIds = enrollmentsSnap.docs.map(doc => doc.data().courseId)
       }
 
-      // 2. Fetch popular/trending courses
+      // 2. Fetch all courses (no orderBy to avoid index issues)
       const coursesRef = collection(db, 'courses')
-      // Fetch more than needed so we can filter out enrolled ones
-      const coursesQuery = query(
-        coursesRef,
-        where('published', '==', true),
-        orderBy('enrolledCount', 'desc'),
-        limit(maxCount + enrolledCourseIds.length)
-      )
+      // Fetch all courses - we'll filter and sort client-side
+      const coursesQuery = query(coursesRef)
 
       const coursesSnap = await getDocs(coursesQuery)
+
+      console.log('📊 [Recommended Courses] Fetched courses:', coursesSnap.docs.length)
+
+      // Filter for published courses (check both status field and published field)
+      const publishedCourses = coursesSnap.docs.filter(doc => {
+        const data = doc.data()
+        const isPublished = data.status === 'PUBLISHED' || data.published === true
+        console.log(`📊 [Recommended Courses] Course ${doc.id}:`, {
+          status: data.status,
+          published: data.published,
+          isPublished,
+          title: data.title
+        })
+        return isPublished
+      })
+
+      console.log('📊 [Recommended Courses] Published courses:', publishedCourses.length)
+      console.log('📊 [Recommended Courses] Enrolled course IDs:', enrolledCourseIds)
 
       // 3. Filter and process courses
       const recommendations: RecommendedCourse[] = []
 
-      for (const courseDoc of coursesSnap.docs) {
+      for (const courseDoc of publishedCourses) {
         // Skip if user is already enrolled
         if (enrolledCourseIds.includes(courseDoc.id)) {
           continue
@@ -105,7 +118,22 @@ export function useRecommendedCourses(maxCount: number = 3) {
         })
       }
 
-      return recommendations
+      // Sort by enrolledCount (or createdAt if enrolledCount doesn't exist)
+      recommendations.sort((a, b) => {
+        // Primary sort: by enrolled count (descending)
+        const enrollDiff = b.enrolledCount - a.enrolledCount
+        if (enrollDiff !== 0) return enrollDiff
+
+        // Secondary sort: by title
+        return a.title.localeCompare(b.title)
+      })
+
+      // Limit to maxCount
+      const finalRecommendations = recommendations.slice(0, maxCount)
+
+      console.log('📊 [Recommended Courses] Final recommendations:', finalRecommendations.length, finalRecommendations)
+
+      return finalRecommendations
     },
     enabled: true, // Always enabled, works with or without auth
     staleTime: 10 * 60 * 1000, // 10 minutes

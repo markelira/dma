@@ -1,7 +1,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Play, Award, Clock } from 'lucide-react'
+import { Play, Clock } from 'lucide-react'
 
 import { useInProgressCourses } from '@/hooks/useInProgressCourses'
 import { useAuthStore } from '@/stores/authStore'
@@ -65,15 +65,6 @@ export const ContinueSection: React.FC = () => {
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                     <Play className="w-8 h-8 text-white" />
-                  </div>
-                )}
-                
-
-
-                {/* Certificate badge */}
-                {course.certificateEarned && (
-                  <div className="absolute top-2 right-2 bg-yellow-500 text-white p-1 rounded-full">
-                    <Award className="w-4 h-4" />
                   </div>
                 )}
               </div>

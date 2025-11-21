@@ -190,7 +190,7 @@ export function UniversalCourseCard({
               e.preventDefault()
               e.stopPropagation()
               // Navigate to first lesson
-              window.location.href = `/courses/${course.slug || course.id}/lessons/lesson-1`
+              window.location.href = `/courses/${course.slug || course.id}/learn`
             }}
             className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white/30 transition-all hover:scale-110 cursor-pointer">
             <Play className="w-5 h-5 text-white ml-1" />

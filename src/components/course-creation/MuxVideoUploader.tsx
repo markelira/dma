@@ -12,12 +12,11 @@ import { useCourseWizardStore } from '@/stores/courseWizardStore';
 interface Props {
   onUploaded: (assetId: string, playbackId?: string) => void;
   lessonId?: string;
-  maxSizeMB?: number;
 }
 
 type UploadStatus = 'idle' | 'uploading' | 'processing' | 'done' | 'error';
 
-export default function MuxVideoUploader({ onUploaded, lessonId, maxSizeMB = 500 }: Props) {
+export default function MuxVideoUploader({ onUploaded, lessonId }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -36,12 +35,7 @@ export default function MuxVideoUploader({ onUploaded, lessonId, maxSizeMB = 500
       return 'Csak MP4, MOV, AVI vagy WebM videók engedélyezettek';
     }
 
-    // Check file size
-    const maxSize = maxSizeMB * 1024 * 1024;
-    if (file.size > maxSize) {
-      return `A videó mérete maximum ${maxSizeMB}MB lehet`;
-    }
-
+    // No file size limit
     return null;
   };
 
@@ -271,7 +265,7 @@ export default function MuxVideoUploader({ onUploaded, lessonId, maxSizeMB = 500
               Húzd ide a videófájlt vagy kattints a feltöltéshez
             </p>
             <p className="text-sm text-muted-foreground">
-              MP4, MOV, AVI vagy WebM • Maximum {maxSizeMB}MB
+              MP4, MOV, AVI vagy WebM formátum
             </p>
           </>
         )}

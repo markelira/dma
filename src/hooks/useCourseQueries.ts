@@ -296,20 +296,27 @@ export const useDeleteCourse = () => {
 
   return useMutation({
     mutationFn: async (courseId: string) => {
+      console.log('🗑️ useDeleteCourse: Starting delete for course:', courseId);
       const deleteCourseFn = httpsCallable(functions, 'deleteCourse');
       const result: any = await deleteCourseFn({ courseId });
-      
+
+      console.log('📊 Delete function result:', result.data);
+
       if (!result.data.success) {
         throw new Error(result.data.error || 'Kurzus törlése sikertelen');
       }
-      
+
       return result.data;
     },
-    onSuccess: (_, courseId) => {
+    onSuccess: (data, courseId) => {
+      console.log('✅ Delete mutation successful, invalidating queries...');
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['courses'] });
       queryClient.invalidateQueries({ queryKey: ['course', courseId] });
       queryClient.invalidateQueries({ queryKey: ['courseList'] });
+    },
+    onError: (error: any) => {
+      console.error('❌ Delete mutation failed:', error);
     },
   });
 };

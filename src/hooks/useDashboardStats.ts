@@ -52,13 +52,18 @@ async function calculateStatsClientSide(userId: string) {
 
     // Current stats
     totalEnrolled++
-    if (data.status === 'in_progress') activeInProgress++
+    // Count both 'in_progress' and 'ACTIVE' as active courses
+    if (data.status === 'in_progress' || data.status === 'ACTIVE' || data.status === 'active') {
+      activeInProgress++
+    }
     if (data.status === 'completed') completed++
 
     // Previous period stats
     if (enrolledAt >= sixtyDaysAgo && enrolledAt < thirtyDaysAgo) {
       prevTotalEnrolled++
-      if (data.status === 'in_progress') prevActiveInProgress++
+      if (data.status === 'in_progress' || data.status === 'ACTIVE' || data.status === 'active') {
+        prevActiveInProgress++
+      }
       if (data.status === 'completed') prevCompleted++
     }
   })

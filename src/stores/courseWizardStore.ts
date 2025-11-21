@@ -7,17 +7,12 @@ export interface WizardBasicInfo {
   description: string;
   categoryId: string;
   instructorId: string;
+  instructorIds?: string[]; // NEW: Support multiple instructors
   language: string;
   difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   certificateEnabled: boolean;
   thumbnailUrl?: string;
   learningObjectives: string;
-
-  // NEW: Webinar-specific fields
-  webinarDate?: string;
-  webinarDuration?: number;
-  liveStreamUrl?: string;
-  recordingAvailable?: boolean;
 }
 
 interface WizardModule extends Omit<Module, 'lessons'> {

@@ -11,16 +11,20 @@ import React, { useState, useMemo } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import Footer from '@/components/landing-home/ui/footer';
-import { CourseDetailHero } from '@/components/course/CourseDetailHero';
-import { CourseDetailStatsBar } from '@/components/course/CourseDetailStatsBar';
+import { Hero1ConversionFocused } from '@/components/course/heroes/Hero1ConversionFocused';
 import { CourseCurriculumSection } from '@/components/course/CourseCurriculumSection';
 import { CourseInstructorCard } from '@/components/course/CourseInstructorCard';
+import { CourseFeaturesSection } from '@/components/course/CourseFeaturesSection';
+import { CourseOutcomesSection } from '@/components/course/CourseOutcomesSection';
+import { RelatedCoursesSection } from '@/components/course/RelatedCoursesSection';
+import { StickyBottomCTA } from '@/components/course/StickyBottomCTA';
 import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
-import { CourseGuaranteeSection } from '@/components/course/CourseGuaranteeSection';
 import { SubscriptionRequiredModal } from '@/components/payment/SubscriptionRequiredModal';
 import { motion } from "motion/react";
-import { CheckCircle, ArrowRight, Shield } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useInstructors } from '@/hooks/useInstructorQueries';
+import { useCategories } from '@/hooks/useCategoryQueries';
+import { useCourses } from '@/hooks/useCourseQueries';
 
 export default function ClientCourseDetailPage({ id }: { id: string }) {
   const router = useRouter();
@@ -34,22 +38,73 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   // Fetch instructors to get full instructor data
   const { data: instructors = [] } = useInstructors();
 
-  // Fetch instructor data from instructors collection (moved before early returns)
-  const instructor = useMemo(() => {
-    if (!course) return null;
+  // Fetch categories to map categoryIds to names
+  const { data: categories = [] } = useCategories();
+
+  // Fetch all courses for related courses section
+  const { data: allCourses = [] } = useCourses();
+
+  // Get category names from categoryIds - SUPPORTS MULTIPLE CATEGORIES
+  const courseCategoryNames = useMemo(() => {
+    if (!course) return [];
 
     const c = course;
+    const categoryNames: string[] = [];
 
-    // First try to find instructor by instructorId in course
+    // NEW: Support multiple categories via categoryIds array
+    if (c.categoryIds && c.categoryIds.length > 0 && categories.length > 0) {
+      c.categoryIds.forEach(catId => {
+        const found = categories.find(cat => cat.id === catId);
+        if (found) categoryNames.push(found.name);
+      });
+
+      if (categoryNames.length > 0) return categoryNames;
+    }
+
+    // Fallback to single category
+    if (c.category && typeof c.category === 'object' && 'name' in c.category) {
+      return [c.category.name];
+    }
+
+    if (c.category && typeof c.category === 'string') {
+      return [c.category];
+    }
+
+    if (c.categoryId && categories.length > 0) {
+      const found = categories.find(cat => cat.id === c.categoryId);
+      if (found) return [found.name];
+    }
+
+    return ['Általános'];
+  }, [course, categories]);
+
+  // Fetch instructor data from instructors collection - SUPPORTS MULTIPLE INSTRUCTORS
+  const courseInstructors = useMemo(() => {
+    if (!course) return [];
+
+    const c = course;
+    const foundInstructors: any[] = [];
+
+    // NEW: Support multiple instructors via instructorIds array
+    if (c.instructorIds && c.instructorIds.length > 0 && instructors.length > 0) {
+      c.instructorIds.forEach(instId => {
+        const found = instructors.find(inst => inst.id === instId);
+        if (found) foundInstructors.push(found);
+      });
+
+      if (foundInstructors.length > 0) return foundInstructors;
+    }
+
+    // Fallback to single instructorId
     if (c.instructorId && instructors.length > 0) {
       const found = instructors.find(inst => inst.id === c.instructorId);
-      if (found) return found;
+      if (found) return [found];
     }
 
     // Fallback to legacy instructor data if available
     const legacyInstructor = c.instructor || {};
     if (legacyInstructor.firstName || legacyInstructor.lastName) {
-      return {
+      return [{
         id: c.instructorId || 'legacy',
         name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
         title: legacyInstructor.title,
@@ -57,11 +112,11 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         profilePictureUrl: legacyInstructor.profilePictureUrl,
         createdAt: '',
         updatedAt: ''
-      };
+      }];
     }
 
     // Default fallback
-    return {
+    return [{
       id: 'default',
       name: c.instructorName || 'DMA Oktató',
       title: c.instructorTitle,
@@ -69,8 +124,30 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
       profilePictureUrl: c.instructorImageUrl,
       createdAt: '',
       updatedAt: ''
-    };
+    }];
   }, [course, instructors]);
+
+  // Get related courses (same category or same instructor, excluding current course)
+  const relatedCourses = useMemo(() => {
+    if (!course || !allCourses || allCourses.length === 0) return [];
+
+    return allCourses
+      .filter(c => c.id !== course.id) // Exclude current course
+      .filter(c => {
+        // Match by category
+        const hasSameCategory =
+          (course.categoryIds && c.categoryIds && course.categoryIds.some(catId => c.categoryIds?.includes(catId))) ||
+          (course.categoryId && c.categoryId === course.categoryId);
+
+        // Match by instructor
+        const hasSameInstructor =
+          (course.instructorIds && c.instructorIds && course.instructorIds.some(instId => c.instructorIds?.includes(instId))) ||
+          (course.instructorId && c.instructorId === course.instructorId);
+
+        return hasSameCategory || hasSameInstructor;
+      })
+      .slice(0, 6); // Limit to 6 courses
+  }, [course, allCourses]);
 
   // Handle payment success/cancel
   React.useEffect(() => {
@@ -137,7 +214,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     lessons: lessonsData.length,
     students: c.enrollmentCount || c.students || 0,
     rating: c.averageRating || c.rating || 4.5,
-    duration: c.duration || `${Math.max(10, modulesData.length * 2)} óra`
+    duration: c.duration
   };
 
   // Course pricing
@@ -190,10 +267,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
   const courseFeatures = [
     `${stats.lessons} lecke`,
-    `${stats.duration} tartalom`,
-    'Tanúsítvány a sikeres elvégzés után',
     'Élethosszig tartó hozzáférés',
-    '30 napos pénzvisszafizetési garancia',
     'Letölthető anyagok',
     'Mobil hozzáférés'
   ];
@@ -202,36 +276,28 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 relative overflow-hidden">
-        {/* Background blur shapes */}
-        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
         {/* Hero Section */}
-        <CourseDetailHero
+        <Hero1ConversionFocused
           title={c.title}
           description={c.description || ''}
-          category={c.category || 'Általános'}
-          level={c.level || 'kezdő'}
-          duration={stats.duration}
-          rating={stats.rating}
-          students={stats.students}
-          lessons={stats.lessons}
+          categories={courseCategoryNames}
           imageUrl={c.thumbnailUrl || c.imageUrl}
-        />
-
-        {/* Stats Bar */}
-        <CourseDetailStatsBar
-          completionRate={94}
-          certificateAvailable={true}
-          skillsGained={12}
-          guarantee={true}
+          courseType={c.courseType}
+          instructors={courseInstructors}
+          keyOutcomes={c.whatYouWillLearn?.slice(0, 3)}
+          modules={modulesData}
+          price={coursePrice}
+          isSubscriptionIncluded={isFreeCourse || !coursePrice}
+          onEnroll={handleEnroll}
+          onPreview={() => console.log('Preview clicked')}
         />
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 lg:px-12 py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+        <div className="container mx-auto px-6 lg:px-12 py-10 lg:py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-16">
+            <div className="lg:col-span-2 space-y-10">
               {/* What You'll Learn Section */}
               {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
                 <motion.section
@@ -253,6 +319,15 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                     ))}
                   </div>
                 </motion.section>
+              )}
+
+              {/* Curriculum Section */}
+              {formattedModules.length > 0 && (
+                <CourseCurriculumSection
+                  modules={formattedModules}
+                  totalLessons={stats.lessons}
+                  totalDuration={stats.duration}
+                />
               )}
 
               {/* Requirements Section */}
@@ -301,31 +376,25 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                 </motion.section>
               )}
 
-              {/* Curriculum Section */}
-              {formattedModules.length > 0 && (
-                <CourseCurriculumSection
-                  modules={formattedModules}
-                  totalLessons={stats.lessons}
-                  totalDuration={stats.duration}
-                />
+              {/* Course Features Section */}
+              <CourseFeaturesSection />
+
+              {/* Course Outcomes Section */}
+              {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
+                <CourseOutcomesSection outcomes={c.whatYouWillLearn} />
               )}
 
-              {/* Instructor Card */}
-              {instructor && (
+              {/* Instructor Card(s) - Supports multiple instructors */}
+              {courseInstructors.map((instructor, idx) => (
                 <CourseInstructorCard
+                  key={instructor.id || idx}
                   name={instructor.name}
                   title={instructor.title}
                   bio={instructor.bio || 'Tapasztalt oktató az ELIRA platformon.'}
                   imageUrl={instructor.profilePictureUrl}
-                  stats={{
-                    students: stats.students,
-                    courses: 5,
-                    rating: stats.rating,
-                    reviews: Math.floor(stats.students * 0.3)
-                  }}
                   expertise={c.tags || ['Üzleti fejlődés', 'Soft skills', 'Szakmai képzés']}
                 />
-              )}
+              ))}
 
               {/* FAQ Section */}
               {c.faq && c.faq.length > 0 && (
@@ -385,15 +454,28 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                 lessons={stats.lessons}
                 rating={stats.rating}
                 students={stats.students}
-                certificateIncluded={true}
                 lifetimeAccess={true}
                 onEnroll={handleEnroll}
                 onPreview={() => console.log('Preview')}
                 isEnrolled={false}
+                thumbnailUrl={c.thumbnailUrl || c.imageUrl}
+                courseTitle={c.title}
               />
             </div>
           </div>
         </div>
+
+        {/* Related Courses Section */}
+        {relatedCourses.length > 0 && (
+          <div className="container mx-auto px-6 lg:px-12 pb-10 lg:pb-12">
+            <RelatedCoursesSection
+              courses={relatedCourses}
+              categories={categories}
+              instructors={instructors}
+              title="Kapcsolódó kurzusok"
+            />
+          </div>
+        )}
 
         {/* Subscription Required Modal */}
         <SubscriptionRequiredModal
@@ -403,27 +485,12 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           returnTo={`/courses/${id}`}
         />
 
-        {/* Guarantee Section */}
-        {c.guaranteeEnabled && c.guaranteeText && (
-          <div className="container mx-auto px-6 lg:px-12 py-16">
-            <motion.section
-              className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl p-10 text-center shadow-lg border border-blue-200"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-            >
-              <Shield className="w-16 h-16 text-blue-600 mx-auto mb-6" />
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                {c.guaranteeDays || 30} Napos Pénzvisszafizetési Garancia
-              </h2>
-              <p className="text-lg text-gray-700 max-w-2xl mx-auto">
-                {c.guaranteeText}
-              </p>
-            </motion.section>
-          </div>
-        )}
-        {!c.guaranteeEnabled && <CourseGuaranteeSection />}
+        {/* Sticky Bottom CTA (Mobile) */}
+        <StickyBottomCTA
+          courseTitle={c.title}
+          onEnroll={handleEnroll}
+          isEnrolled={false}
+        />
       </div>
 
       <Footer border={true} />

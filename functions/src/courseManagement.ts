@@ -14,7 +14,9 @@ const CourseSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   categoryId: z.string().min(1, "Category is required"),
+  categoryIds: z.array(z.string()).min(1, "At least one category is required").optional(), // NEW: Multiple categories support
   instructorId: z.string().min(1, "Instructor is required"),
+  instructorIds: z.array(z.string()).min(1, "At least one instructor is required").optional(), // NEW: Multiple instructors support
 
   // NEW: Course type field (REQUIRED)
   courseType: z.enum(['ACADEMIA', 'WEBINAR', 'MASTERCLASS'], {
@@ -28,20 +30,10 @@ const CourseSchema = z.object({
   thumbnailUrl: z.string().nullish().default(''),
   learningObjectives: z.string().min(10, "Learning objectives must be at least 10 characters"),
 
-  // NEW: Webinar-specific fields (optional, used when courseType === 'WEBINAR')
-  webinarDate: z.string().nullish(),
-  webinarDuration: z.number().positive().nullish(),
-  liveStreamUrl: z.string().url().nullish().or(z.literal('')),
-  recordingAvailable: z.boolean().nullish().default(false),
-
   // Marketing fields - all optional with defaults (nullish handles both null and undefined)
-  shortDescription: z.string().max(160).nullish().default(''),
   whatYouWillLearn: z.array(z.string()).nullish().default([]),
   requirements: z.array(z.string()).nullish().default([]),
   targetAudience: z.array(z.string()).nullish().default([]),
-  guaranteeEnabled: z.boolean().nullish().default(false),
-  guaranteeText: z.string().nullish().default(''),
-  guaranteeDays: z.number().nullish().default(30),
   faq: z.array(z.object({
     question: z.string(),
     answer: z.string()
@@ -112,7 +104,9 @@ export const createCourse = onCall({
       title: validatedData.title,
       description: validatedData.description,
       categoryId: validatedData.categoryId,
+      categoryIds: validatedData.categoryIds || [validatedData.categoryId], // NEW: Multiple categories
       instructorId: validatedData.instructorId,
+      instructorIds: validatedData.instructorIds || [validatedData.instructorId], // NEW: Multiple instructors
       courseType: validatedData.courseType, // NEW: Course type
       language: validatedData.language || 'hu',
       difficulty: validatedData.difficulty || 'BEGINNER',
@@ -120,28 +114,19 @@ export const createCourse = onCall({
       thumbnailUrl: thumbnailUrl,
       learningObjectives: validatedData.learningObjectives,
 
-      // Webinar-specific fields (only populated for WEBINAR type)
-      ...(validatedData.courseType === 'WEBINAR' && {
-        webinarDate: validatedData.webinarDate || null,
-        webinarDuration: validatedData.webinarDuration || null,
-        liveStreamUrl: validatedData.liveStreamUrl || '',
-        recordingAvailable: validatedData.recordingAvailable || false,
-      }),
-
       // Marketing fields
-      shortDescription: validatedData.shortDescription || '',
       whatYouWillLearn: validatedData.whatYouWillLearn || [],
       requirements: validatedData.requirements || [],
       targetAudience: validatedData.targetAudience || [],
-      guaranteeEnabled: validatedData.guaranteeEnabled || false,
-      guaranteeText: validatedData.guaranteeText || '',
-      guaranteeDays: validatedData.guaranteeDays || 30,
       faq: validatedData.faq || [],
 
       // System fields
       slug: finalSlug,
       price: validatedData.price || 0,
       published: validatedData.published || false,
+      status: 'DRAFT', // Default to draft, will be set to PUBLISHED when published
+      visibility: 'PUBLIC', // Default visibility
+      isPlus: false, // Default to free course
       featured: validatedData.featured || false,
       enrollmentCount: 0,
       rating: 0,
@@ -156,44 +141,6 @@ export const createCourse = onCall({
     const courseId = courseRef.id;
 
     logger.info(`Course created: ${courseId} by user ${userId} with type ${validatedData.courseType}`);
-
-    // Auto-create default module and lesson for WEBINAR type
-    if (validatedData.courseType === 'WEBINAR') {
-      logger.info(`Creating default module and lesson for webinar ${courseId}`);
-
-      // Create default module
-      const moduleRef = await firestore
-        .collection('courses')
-        .doc(courseId)
-        .collection('modules')
-        .add({
-          title: 'Webinár',
-          description: 'Webinár felvétel',
-          order: 0,
-          status: 'DRAFT',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-      // Create default lesson
-      await firestore
-        .collection('courses')
-        .doc(courseId)
-        .collection('modules')
-        .doc(moduleRef.id)
-        .collection('lessons')
-        .add({
-          title: 'Webinár felvétel',
-          content: 'Töltsd fel a webinár videót',
-          type: 'VIDEO',
-          order: 0,
-          status: 'DRAFT',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-
-      logger.info(`Default module and lesson created for webinar ${courseId}`);
-    }
 
     return {
       success: true,
@@ -280,7 +227,9 @@ export const updateCourse = onCall({
     if (updateData.title !== undefined) updates.title = updateData.title;
     if (updateData.description !== undefined) updates.description = updateData.description;
     if (updateData.categoryId !== undefined) updates.categoryId = updateData.categoryId;
+    if (updateData.categoryIds !== undefined) updates.categoryIds = updateData.categoryIds;
     if (updateData.instructorId !== undefined) updates.instructorId = updateData.instructorId;
+    if (updateData.instructorIds !== undefined) updates.instructorIds = updateData.instructorIds;
     if (updateData.language !== undefined) updates.language = updateData.language;
     if (updateData.difficulty !== undefined) updates.difficulty = updateData.difficulty;
     if (updateData.certificateEnabled !== undefined) updates.certificateEnabled = updateData.certificateEnabled;
@@ -295,13 +244,9 @@ export const updateCourse = onCall({
     if (updateData.learningObjectives !== undefined) updates.learningObjectives = updateData.learningObjectives;
 
     // Marketing fields
-    if (updateData.shortDescription !== undefined) updates.shortDescription = updateData.shortDescription;
     if (updateData.whatYouWillLearn !== undefined) updates.whatYouWillLearn = updateData.whatYouWillLearn;
     if (updateData.requirements !== undefined) updates.requirements = updateData.requirements;
     if (updateData.targetAudience !== undefined) updates.targetAudience = updateData.targetAudience;
-    if (updateData.guaranteeEnabled !== undefined) updates.guaranteeEnabled = updateData.guaranteeEnabled;
-    if (updateData.guaranteeText !== undefined) updates.guaranteeText = updateData.guaranteeText;
-    if (updateData.guaranteeDays !== undefined) updates.guaranteeDays = updateData.guaranteeDays;
     if (updateData.faq !== undefined) updates.faq = updateData.faq;
 
     // Optional fields
@@ -389,9 +334,38 @@ export const publishCourse = onCall({
       throw new Error('Nincs jogosultságod a kurzus publikálásához');
     }
 
-    // Publish the course
+    // Auto-generate slug if not exists
+    let slug = courseData?.slug;
+    if (!slug || slug.trim() === '') {
+      slug = (courseData?.title || 'course')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
+      // Check for uniqueness
+      const existingSlugQuery = await firestore
+        .collection('courses')
+        .where('slug', '==', slug)
+        .limit(1)
+        .get();
+
+      if (!existingSlugQuery.empty && existingSlugQuery.docs[0].id !== courseId) {
+        slug = `${slug}-${Date.now()}`;
+      }
+    }
+
+    // Auto-generate meta description from course description
+    const metaDescription = courseData?.description
+      ? courseData.description.substring(0, 160)
+      : '';
+
+    // Publish the course with defaults
     await courseRef.update({
       published: true,
+      status: 'PUBLISHED',
+      visibility: 'PUBLIC',
+      slug: slug,
+      metaDescription: metaDescription,
       publishedAt: new Date().toISOString(),
       publishedBy: userId,
       updatedAt: new Date().toISOString(),

@@ -62,17 +62,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
   onCompleted,
   hasAccess = true
 }) => {
-  // DEBUGGING: Log what lesson data we received
-  console.log('🔍 [LessonContentRenderer] Received lesson:', {
-    hasLesson: !!lesson,
-    lessonId: lesson?.id,
-    lessonTitle: lesson?.title,
-    lessonType: lesson?.type,
-    lessonKeys: Object.keys(lesson || {}),
-    fullLesson: lesson
-  });
-  
-  // DEFENSIVE: Check if lesson exists and has required type
+  // Check if lesson exists and has required type
   if (!lesson) {
     console.error('❌ [LessonContentRenderer] No lesson data provided');
     return (
@@ -258,7 +248,6 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
                 })
               }}
               onEnded={() => {
-                console.log('✅ [LessonContentRenderer] Video completed')
                 handleProgressUpdate(100, progress.timeSpent)
                 onCompleted()
               }}
@@ -409,7 +398,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
                 })
               }}
               onPageChange={(currentPage, totalPages) => {
-                console.log(`📄 PDF page ${currentPage}/${totalPages}`)
+                // Track PDF page navigation
               }}
               enableAnnotations={true}
               enableDownload={true}
@@ -465,7 +454,6 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
           quiz={lesson.quiz}
           lessonTitle={lesson.title}
           onCompleted={(results) => {
-            console.log('🎯 Quiz completed:', results)
             handleProgressUpdate(results.passed ? 100 : results.score, progress.timeSpent, {
               quizAttempts: (progress.metadata?.quizAttempts || 0) + 1,
               quizScore: results.score,

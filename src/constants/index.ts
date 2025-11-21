@@ -12,7 +12,7 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   COURSES: '/courses',
   COURSE_DETAILS: '/courses/:id',
-  LESSON: '/courses/:courseId/lessons/:lessonId',
+  LESSON: '/courses/:courseId/player/:lessonId',
   PROFILE: '/profile',
   SETTINGS: '/settings',
 } as const;
@@ -57,8 +57,8 @@ export const API_ENDPOINTS = {
     PROGRESS: '/courses/:id/progress',
   },
   LESSONS: {
-    DETAILS: '/courses/:courseId/lessons/:lessonId',
-    PROGRESS: '/courses/:courseId/lessons/:lessonId/progress',
+    DETAILS: '/courses/:courseId/player/:lessonId',
+    PROGRESS: '/courses/:courseId/player/:lessonId/progress',
   },
   USER: {
     PROFILE: '/user/profile',

@@ -1360,7 +1360,7 @@ export { muxWebhook } from './muxWebhook';
 export { createCourse, updateCourse, publishCourse, deleteCourse } from './courseManagement';
 
 // Export data cleanup functions (Admin only)
-export { deleteAllCourses } from './dataCleanup';
+export { deleteAllCourses, restoreSoftDeletedCourses } from './dataCleanup';
 
 // Export file actions
 export { getSignedUploadUrl } from './fileActions';
@@ -1921,3 +1921,73 @@ export {
   updateInstructor,
   deleteInstructor,
 } from './instructorActions';
+
+// ============================================
+// USER PREFERENCES & GAMIFICATION
+// ============================================
+
+// Export user preferences and gamification functions
+export {
+  saveUserPreferences,
+  getUserPreferences,
+  createLearningGoal,
+  getLearningGoals,
+  updateGoalProgress,
+  deleteLearningGoal,
+  getLearningStreak,
+  updateLearningStreak,
+  getDashboardAnalytics,
+} from './userPreferences';
+
+// ============================================
+// ACHIEVEMENTS
+// ============================================
+
+// Export achievement system functions
+export {
+  getUserAchievements,
+  getAllAchievements,
+  checkAchievements,
+  markAchievementCelebrated,
+} from './achievements';
+
+// ============================================
+// LEARNING TRACKING
+// ============================================
+
+// Export learning session tracking functions
+export {
+  startLearningSession,
+  endLearningSession,
+  trackLearningProgress,
+} from './learningTracking';
+
+// ============================================
+// AUTOMATED BACKGROUND TASKS
+// ============================================
+
+// Export scheduled analytics and recommendation functions
+export {
+  calculateDailyAnalytics,
+  generateDailyRecommendations,
+  generateRecommendationsForUser,
+  getPersonalizedRecommendations,
+} from './automatedTasks';
+
+// ============================================
+// PLATFORM ANALYTICS
+// ============================================
+
+// Export platform analytics public endpoint
+export {
+  getPlatformAnalytics,
+} from './platformAnalytics';
+
+// ============================================
+// COURSE CATALOG
+// ============================================
+
+// Export course catalog/browse endpoints
+export {
+  getCoursesWithFilters,
+} from './courseCatalog';

@@ -48,8 +48,6 @@ export function MuxVideoPlayer({
   autoPlay = false,
   startTime = 0,
 }: MuxVideoPlayerProps) {
-  console.log('🎥 [MuxVideoPlayer] Rendering:', { muxPlaybackId, videoUrl })
-
   const playerRef = useRef<any>(null)
   const lastReportedTime = useRef(0)
 

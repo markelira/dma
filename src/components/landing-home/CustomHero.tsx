@@ -30,14 +30,13 @@ export default function CustomHero() {
             className="mb-6 text-6xl font-bold tracking-tight text-gray-900 md:text-7xl lg:text-8xl"
             style={{ letterSpacing: "-0.03em", lineHeight: "1.2" }}
           >
-            Run your freelance
+            Építsd vállalkozásod
             <br />
-            business like a pro
+            struktúrával, ne káosszal
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-600 md:text-xl">
-            All-in-one platform for managing clients, projects, and payments
-            without the chaos. From first contract to final invoice, we've got
-            your back.
+            Professzionális fejlesztési kurzusok a DMA-tól. Akadémiák, webináriumok
+            és mesterkurzusok vállalati vezetőktől és szakértőktől.
           </p>
 
           {/* Buttons */}
@@ -47,7 +46,7 @@ export default function CustomHero() {
               href="/register"
             >
               <span className="relative inline-flex items-center">
-                Ingyenes próba
+                Próbáld ki 7 napig ingyen
                 <span className="ml-1 tracking-normal text-blue-300 transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
@@ -57,7 +56,7 @@ export default function CustomHero() {
               className="btn bg-white text-gray-800 shadow-sm hover:bg-gray-50"
               href="/courses"
             >
-              Kurzusok böngészése
+              Fedezd fel a kurzusokat
             </a>
           </div>
         </div>

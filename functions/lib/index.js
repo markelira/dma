@@ -36,8 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = void 0;
+exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = exports.restoreSoftDeletedCourses = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
+exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = void 0;
+exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -1266,6 +1267,7 @@ Object.defineProperty(exports, "deleteCourse", { enumerable: true, get: function
 // Export data cleanup functions (Admin only)
 var dataCleanup_1 = require("./dataCleanup");
 Object.defineProperty(exports, "deleteAllCourses", { enumerable: true, get: function () { return dataCleanup_1.deleteAllCourses; } });
+Object.defineProperty(exports, "restoreSoftDeletedCourses", { enumerable: true, get: function () { return dataCleanup_1.restoreSoftDeletedCourses; } });
 // Export file actions
 var fileActions_1 = require("./fileActions");
 Object.defineProperty(exports, "getSignedUploadUrl", { enumerable: true, get: function () { return fileActions_1.getSignedUploadUrl; } });
@@ -1730,4 +1732,56 @@ Object.defineProperty(exports, "getInstructors", { enumerable: true, get: functi
 Object.defineProperty(exports, "createInstructor", { enumerable: true, get: function () { return instructorActions_1.createInstructor; } });
 Object.defineProperty(exports, "updateInstructor", { enumerable: true, get: function () { return instructorActions_1.updateInstructor; } });
 Object.defineProperty(exports, "deleteInstructor", { enumerable: true, get: function () { return instructorActions_1.deleteInstructor; } });
+// ============================================
+// USER PREFERENCES & GAMIFICATION
+// ============================================
+// Export user preferences and gamification functions
+var userPreferences_1 = require("./userPreferences");
+Object.defineProperty(exports, "saveUserPreferences", { enumerable: true, get: function () { return userPreferences_1.saveUserPreferences; } });
+Object.defineProperty(exports, "getUserPreferences", { enumerable: true, get: function () { return userPreferences_1.getUserPreferences; } });
+Object.defineProperty(exports, "createLearningGoal", { enumerable: true, get: function () { return userPreferences_1.createLearningGoal; } });
+Object.defineProperty(exports, "getLearningGoals", { enumerable: true, get: function () { return userPreferences_1.getLearningGoals; } });
+Object.defineProperty(exports, "updateGoalProgress", { enumerable: true, get: function () { return userPreferences_1.updateGoalProgress; } });
+Object.defineProperty(exports, "deleteLearningGoal", { enumerable: true, get: function () { return userPreferences_1.deleteLearningGoal; } });
+Object.defineProperty(exports, "getLearningStreak", { enumerable: true, get: function () { return userPreferences_1.getLearningStreak; } });
+Object.defineProperty(exports, "updateLearningStreak", { enumerable: true, get: function () { return userPreferences_1.updateLearningStreak; } });
+Object.defineProperty(exports, "getDashboardAnalytics", { enumerable: true, get: function () { return userPreferences_1.getDashboardAnalytics; } });
+// ============================================
+// ACHIEVEMENTS
+// ============================================
+// Export achievement system functions
+var achievements_1 = require("./achievements");
+Object.defineProperty(exports, "getUserAchievements", { enumerable: true, get: function () { return achievements_1.getUserAchievements; } });
+Object.defineProperty(exports, "getAllAchievements", { enumerable: true, get: function () { return achievements_1.getAllAchievements; } });
+Object.defineProperty(exports, "checkAchievements", { enumerable: true, get: function () { return achievements_1.checkAchievements; } });
+Object.defineProperty(exports, "markAchievementCelebrated", { enumerable: true, get: function () { return achievements_1.markAchievementCelebrated; } });
+// ============================================
+// LEARNING TRACKING
+// ============================================
+// Export learning session tracking functions
+var learningTracking_1 = require("./learningTracking");
+Object.defineProperty(exports, "startLearningSession", { enumerable: true, get: function () { return learningTracking_1.startLearningSession; } });
+Object.defineProperty(exports, "endLearningSession", { enumerable: true, get: function () { return learningTracking_1.endLearningSession; } });
+Object.defineProperty(exports, "trackLearningProgress", { enumerable: true, get: function () { return learningTracking_1.trackLearningProgress; } });
+// ============================================
+// AUTOMATED BACKGROUND TASKS
+// ============================================
+// Export scheduled analytics and recommendation functions
+var automatedTasks_1 = require("./automatedTasks");
+Object.defineProperty(exports, "calculateDailyAnalytics", { enumerable: true, get: function () { return automatedTasks_1.calculateDailyAnalytics; } });
+Object.defineProperty(exports, "generateDailyRecommendations", { enumerable: true, get: function () { return automatedTasks_1.generateDailyRecommendations; } });
+Object.defineProperty(exports, "generateRecommendationsForUser", { enumerable: true, get: function () { return automatedTasks_1.generateRecommendationsForUser; } });
+Object.defineProperty(exports, "getPersonalizedRecommendations", { enumerable: true, get: function () { return automatedTasks_1.getPersonalizedRecommendations; } });
+// ============================================
+// PLATFORM ANALYTICS
+// ============================================
+// Export platform analytics public endpoint
+var platformAnalytics_1 = require("./platformAnalytics");
+Object.defineProperty(exports, "getPlatformAnalytics", { enumerable: true, get: function () { return platformAnalytics_1.getPlatformAnalytics; } });
+// ============================================
+// COURSE CATALOG
+// ============================================
+// Export course catalog/browse endpoints
+var courseCatalog_1 = require("./courseCatalog");
+Object.defineProperty(exports, "getCoursesWithFilters", { enumerable: true, get: function () { return courseCatalog_1.getCoursesWithFilters; } });
 //# sourceMappingURL=index.js.map

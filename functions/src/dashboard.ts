@@ -96,13 +96,18 @@ export const getDashboardStats = onCall<typeof GetDashboardStatsSchema>(
 
         // Current stats (all enrollments)
         totalEnrolled++;
-        if (data.status === 'in_progress' || data.status === 'active') activeInProgress++;
+        // Count both 'in_progress', 'active', and 'ACTIVE' as active courses
+        if (data.status === 'in_progress' || data.status === 'active' || data.status === 'ACTIVE') {
+          activeInProgress++;
+        }
         if (data.status === 'completed') completed++;
 
         // Previous period stats (enrolled between 30-60 days ago)
         if (enrolledAt >= sixtyDaysAgo && enrolledAt < thirtyDaysAgo) {
           prevTotalEnrolled++;
-          if (data.status === 'in_progress' || data.status === 'active') prevActiveInProgress++;
+          if (data.status === 'in_progress' || data.status === 'active' || data.status === 'ACTIVE') {
+            prevActiveInProgress++;
+          }
           if (data.status === 'completed') prevCompleted++;
         }
       });

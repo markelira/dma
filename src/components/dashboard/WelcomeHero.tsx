@@ -41,52 +41,12 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
 
   // Real trending courses data
   const { data: trendingData, isLoading: trendingLoading } = useTrendingCourses(3)
-  
+
   // Real platform analytics for hero stats
   const { data: platformData } = usePlatformAnalytics()
 
-  // Fallback courses data (for loading/error states)
-  const fallbackCourses = [
-    {
-      id: '1',
-      title: 'Modern React Fejlesztés',
-      instructor: { firstName: 'Dr. Kovács', lastName: 'János' },
-      difficulty: 'INTERMEDIATE' as const,
-      rating: 4.8,
-      enrollmentCount: 2847,
-      thumbnailUrl: '/images/course-react.jpg',
-      category: { name: 'Webfejlesztés' },
-      isPlus: false,
-      highlights: ['Hooks & Context', 'TypeScript', 'Testing']
-    },
-    {
-      id: '2',
-      title: 'Digital Marketing Stratégia',
-      instructor: { firstName: 'Nagy', lastName: 'Éva' },
-      difficulty: 'BEGINNER' as const,
-      rating: 4.9,
-      enrollmentCount: 1923,
-      thumbnailUrl: '/images/course-marketing.jpg',
-      category: { name: 'Marketing' },
-      isPlus: true,
-      highlights: ['SEO alapok', 'Social Media', 'Analytics']
-    },
-    {
-      id: '3',
-      title: 'Python Adattudomány',
-      instructor: { firstName: 'Szabó', lastName: 'Péter' },
-      difficulty: 'ADVANCED' as const,
-      rating: 4.7,
-      enrollmentCount: 1456,
-      thumbnailUrl: '/images/course-python.jpg',
-      category: { name: 'Data Science' },
-      isPlus: false,
-      highlights: ['Pandas', 'Machine Learning', 'Visualization']
-    }
-  ]
-
-  // Use real data when available, fallback otherwise
-  const featuredCourses = trendingData?.courses?.slice(0, 3) || fallbackCourses
+  // Only use real data - no fallback mock data
+  const featuredCourses = trendingData?.courses?.slice(0, 3) || []
 
   const learningTips = [
     "💡 Tipp: Kezdje 15-20 perces leckékkel a hatékony tanuláshoz",
@@ -328,10 +288,32 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
               </Card>
             ))}
           </div>
+        ) : featuredCourses.length === 0 ? (
+          // Empty state when no courses available
+          <Card className="p-8 text-center">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-gray-400" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Nincsenek elérhető kurzusok
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  Jelenleg nincs megjeleníthető kurzus. Kérjük, látogasson vissza később.
+                </p>
+              </div>
+              <Link href="/dashboard/browse">
+                <Button variant="outline">
+                  Kurzusok böngészése
+                </Button>
+              </Link>
+            </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredCourses.map((course, index) => {
-              // Handle both API data structure and fallback data structure
+              // Map course data to display format
               const courseData = {
                 id: course.id,
                 title: course.title,

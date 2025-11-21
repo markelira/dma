@@ -47,19 +47,26 @@ export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const deleteCourseMutation = useDeleteCourse();
 
-  const { data: coursesData, isLoading } = useQuery<CoursesResponse>({
-    queryKey: ["courses"],
+  const { data: coursesData, isLoading, refetch } = useQuery<CoursesResponse>({
+    queryKey: ["courses", "admin"],
     queryFn: async () => {
+      console.log('🔍 Fetching courses for admin...');
       const getCoursesCallableFn = httpsCallable(functions, 'getCoursesCallable');
       const result: any = await getCoursesCallableFn({});
-      
+
       if (!result.data.success) {
         throw new Error(result.data.error || 'Hiba a kurzusok betöltésekor');
       }
-      
+
+      // Filter out soft-deleted courses (those with deletedAt field)
+      const allCourses = result.data.courses || [];
+      const activeCourses = allCourses.filter((course: any) => !course.deletedAt);
+
+      console.log(`✅ Fetched ${allCourses.length} total courses, ${activeCourses.length} active courses`);
+
       return {
-        courses: result.data.courses || [],
-        total: result.data.total || 0
+        courses: activeCourses,
+        total: activeCourses.length
       };
     },
   });
@@ -217,16 +224,19 @@ export default function CoursesPage() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Mégse</AlertDialogCancel>
-                        <AlertDialogAction 
-                          onClick={() => {
-                            deleteCourseMutation.mutate(course.id, {
-                              onSuccess: () => {
-                                toast.success("Kurzus sikeresen törölve");
-                              },
-                              onError: (error: any) => {
-                                toast.error(error?.response?.data?.message || "Hiba történt a törlés során");
-                              }
-                            });
+                        <AlertDialogAction
+                          onClick={async () => {
+                            try {
+                              console.log('🗑️ Deleting course:', course.id, course.title);
+                              await deleteCourseMutation.mutateAsync(course.id);
+                              console.log('✅ Course deleted successfully');
+                              toast.success("Kurzus sikeresen törölve");
+                              // Refetch courses to update the list
+                              refetch();
+                            } catch (error: any) {
+                              console.error('❌ Delete error:', error);
+                              toast.error(error?.message || "Hiba történt a törlés során");
+                            }
                           }}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >

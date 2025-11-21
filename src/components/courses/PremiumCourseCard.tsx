@@ -11,9 +11,11 @@ interface Course {
   title: string;
   description: string;
   instructorId?: string; // Reference to instructor
+  instructorIds?: string[]; // NEW: Multiple instructors
   instructorName?: string; // Legacy field
   category?: string; // Category name (optional, might be categoryId)
   categoryId?: string; // Category ID from Firestore
+  categoryIds?: string[]; // NEW: Multiple categories
   level: string;
   duration: string;
   rating?: number;
@@ -22,6 +24,7 @@ interface Course {
   price?: number;
   thumbnailUrl?: string;
   lessons?: number;
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
 }
 
 interface Instructor {
@@ -42,34 +45,100 @@ interface PremiumCourseCardProps {
 export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
 
-  // Get category display name
-  // Courses store categoryId in Firestore, so we need to map it to the category name
-  const getCategoryName = () => {
-    // First check if category name is directly available
-    if (course.category && typeof course.category === 'string') {
-      return course.category;
+  // Get category display names (supports multiple categories)
+  // Courses store categoryId/categoryIds in Firestore, so we need to map to category names
+  const getCategoryNames = () => {
+    const names: string[] = [];
+
+    // Check for multiple categories first (new system)
+    if (course.categoryIds && course.categoryIds.length > 0 && categories) {
+      course.categoryIds.forEach(catId => {
+        const cat = categories.find(c => c.id === catId);
+        if (cat) names.push(cat.name);
+      });
+      if (names.length > 0) return names;
     }
-    // Otherwise, look up the category name from categoryId
+
+    // Fallback to single category
+    if (course.category && typeof course.category === 'string') {
+      return [course.category];
+    }
+
     if (course.categoryId && categories) {
       const category = categories.find(cat => cat.id === course.categoryId);
-      return category?.name || null;
+      if (category) return [category.name];
     }
-    return null;
+
+    return [];
   };
 
-  // Get instructor name
-  // Courses store instructorId in Firestore, so we need to map it to the instructor name
-  const getInstructorName = () => {
-    // First check if instructor name is directly available (legacy field)
-    if (course.instructorName) {
-      return course.instructorName;
+  // Get instructor names (supports multiple instructors)
+  // Courses store instructorId/instructorIds in Firestore, so we need to map to instructor names
+  const getInstructorNames = () => {
+    const names: string[] = [];
+
+    // Check for multiple instructors first (new system)
+    if (course.instructorIds && course.instructorIds.length > 0 && instructors) {
+      course.instructorIds.forEach(instId => {
+        const inst = instructors.find(i => i.id === instId);
+        if (inst) names.push(inst.name);
+      });
+      if (names.length > 0) return names;
     }
-    // Otherwise, look up the instructor name from instructorId
+
+    // Fallback to single instructor
+    if (course.instructorName) {
+      return [course.instructorName];
+    }
+
     if (course.instructorId && instructors) {
       const instructor = instructors.find(inst => inst.id === course.instructorId);
-      return instructor?.name || null;
+      if (instructor) return [instructor.name];
     }
-    return null;
+
+    return [];
+  };
+
+  const getCourseTypeLabel = (courseType?: string) => {
+    switch (courseType) {
+      case 'ACADEMIA':
+        return 'Akadémia';
+      case 'WEBINAR':
+        return 'Webinár';
+      case 'MASTERCLASS':
+        return 'Masterclass';
+      default:
+        return null;
+    }
+  };
+
+  const getCourseTypeColor = (courseType?: string) => {
+    switch (courseType) {
+      case 'ACADEMIA':
+        return {
+          bg: 'rgba(59, 130, 246, 0.1)', // blue-500
+          border: 'rgba(59, 130, 246, 0.3)',
+          text: '#3B82F6'
+        };
+      case 'WEBINAR':
+        return {
+          bg: 'rgba(168, 85, 247, 0.1)', // purple-500
+          border: 'rgba(168, 85, 247, 0.3)',
+          text: '#A855F7'
+        };
+      case 'MASTERCLASS':
+        return {
+          bg: 'rgba(20, 184, 166, 0.1)', // teal-500
+          border: 'rgba(20, 184, 166, 0.3)',
+          text: '#14B8A6'
+        };
+      default:
+        return {
+          bg: 'rgba(107, 114, 128, 0.1)',
+          border: 'rgba(107, 114, 128, 0.3)',
+          text: '#6B7280'
+        };
+    }
   };
 
   const getLevelColor = (level: string) => {
@@ -105,6 +174,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   };
 
   const levelColors = getLevelColor(course.level);
+  const courseTypeColors = getCourseTypeColor(course.courseType);
 
   return (
     <motion.div
@@ -145,16 +215,33 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
 
         {/* Content */}
         <div className="flex-1 flex flex-col p-5">
-          {/* Category and Level Badges */}
-          <div className="flex items-center justify-between mb-3">
-            {getCategoryName() && (
-              <div className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
-                {getCategoryName()}
-              </div>
-            )}
+          {/* Course Type, Category and Level Badges */}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Course Type Badge */}
+              {getCourseTypeLabel(course.courseType) && (
+                <div
+                  className="px-2.5 py-1 rounded-md text-xs font-medium"
+                  style={{
+                    background: courseTypeColors.bg,
+                    border: `1px solid ${courseTypeColors.border}`,
+                    color: courseTypeColors.text
+                  }}
+                >
+                  {getCourseTypeLabel(course.courseType)}
+                </div>
+              )}
+              {/* Category Badges - supports multiple */}
+              {getCategoryNames().map((catName, idx) => (
+                <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
+                  {catName}
+                </div>
+              ))}
+            </div>
+            {/* Level Badge */}
             {course.level && (
               <div
-                className="px-2.5 py-1 rounded-md text-xs font-medium"
+                className="px-2.5 py-1 rounded-md text-xs font-medium flex-shrink-0"
                 style={{
                   background: levelColors.bg,
                   border: `1px solid ${levelColors.border}`,
@@ -176,10 +263,10 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             {course.description}
           </p>
 
-          {/* Instructor */}
-          {getInstructorName() && (
+          {/* Instructor(s) - supports multiple */}
+          {getInstructorNames().length > 0 && (
             <p className="text-xs text-gray-500 mb-3">
-              Oktató: <span className="font-medium">{getInstructorName()}</span>
+              {getInstructorNames().length > 1 ? 'Oktatók' : 'Oktató'}: <span className="font-medium">{getInstructorNames().join(', ')}</span>
             </p>
           )}
 

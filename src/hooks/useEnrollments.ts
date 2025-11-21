@@ -11,15 +11,19 @@ export interface Enrollment {
   progress: number
   enrolledAt: Date
   lastAccessedAt?: Date
+  currentLessonId?: string
   courseName?: string
   courseInstructor?: string
   courseDescription?: string
+  thumbnailUrl?: string
 }
 
 interface EnrollmentWithCourse extends Enrollment {
   courseName: string
   courseInstructor: string
   courseDescription?: string
+  thumbnailUrl?: string
+  currentLessonId?: string
 }
 
 /**
@@ -56,7 +60,11 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
       let q = query(enrollmentsRef, where('userId', '==', user.uid))
 
       if (status) {
-        q = query(q, where('status', '==', status))
+        // Handle status variations: 'in_progress' can be stored as 'ACTIVE' or 'in_progress'
+        const statusValues = status === 'in_progress'
+          ? ['in_progress', 'ACTIVE', 'active']
+          : [status]
+        q = query(q, where('status', 'in', statusValues))
       }
 
       const enrollmentsSnap = await getDocs(q)
@@ -79,11 +87,11 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
           let instructorName = 'Unknown Instructor'
           if (courseData?.instructorId) {
             try {
-              const instructorRef = doc(db, 'users', courseData.instructorId)
+              const instructorRef = doc(db, 'instructors', courseData.instructorId)
               const instructorSnap = await getDoc(instructorRef)
               if (instructorSnap.exists()) {
                 const instructorData = instructorSnap.data()
-                instructorName = `${instructorData.firstName || ''} ${instructorData.lastName || ''}`.trim() || 'Unknown Instructor'
+                instructorName = instructorData.name || 'Unknown Instructor'
               }
             } catch (error) {
               console.error('Error fetching instructor:', error)
@@ -98,9 +106,11 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             progress: enrollmentData.progress || 0,
             enrolledAt: enrollmentData.enrolledAt?.toDate() || new Date(),
             lastAccessedAt: enrollmentData.lastAccessedAt?.toDate(),
+            currentLessonId: enrollmentData.currentLessonId,
             courseName: courseData?.title || 'Unknown Course',
             courseInstructor: instructorName,
             courseDescription: courseData?.description,
+            thumbnailUrl: courseData?.thumbnailUrl,
           } as EnrollmentWithCourse
         })
       )
@@ -120,11 +130,11 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
               let instructorName = 'Unknown Instructor'
               if (courseData.instructorId) {
                 try {
-                  const instructorRef = doc(db, 'users', courseData.instructorId)
+                  const instructorRef = doc(db, 'instructors', courseData.instructorId)
                   const instructorSnap = await getDoc(instructorRef)
                   if (instructorSnap.exists()) {
                     const instructorData = instructorSnap.data()
-                    instructorName = `${instructorData.firstName || ''} ${instructorData.lastName || ''}`.trim() || 'Unknown Instructor'
+                    instructorName = instructorData.name || 'Unknown Instructor'
                   }
                 } catch (error) {
                   console.error('Error fetching instructor:', error)
@@ -142,6 +152,7 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
                 courseName: courseData.title || 'Unknown Course',
                 courseInstructor: instructorName,
                 courseDescription: courseData.description,
+                thumbnailUrl: courseData.thumbnailUrl,
               } as EnrollmentWithCourse
             })
         )

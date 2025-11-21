@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // Prevent automatic system dark mode - only use when .dark class is present
   content: [
     './src/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
@@ -30,9 +31,9 @@ module.exports = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: '#2C3E54', // DMA navy (main brand color)
-          hover: '#1e2a37', // DMA navy hover
-          foreground: '#FFFFFF',
+          DEFAULT: 'hsl(var(--primary))', // Uses CSS variable (Coursera blue #0056D2 for course player)
+          hover: 'hsl(215 100% 35%)', // Darker Coursera blue
+          foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Star, Users, BookOpen } from 'lucide-react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
 
@@ -60,21 +59,6 @@ export function CourseInstructorCard({
         <div className="flex-1">
           <h3 className="text-xl font-bold text-gray-900">{name}</h3>
           {title && <p className="text-gray-600 mb-3">{title}</p>}
-
-          <div className="flex flex-wrap gap-4 mb-4 text-sm text-gray-600">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span>{stats.rating.toFixed(1)} értékelés</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Users className="w-4 h-4" />
-              <span>{stats.students.toLocaleString('hu-HU')} hallgató</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <BookOpen className="w-4 h-4" />
-              <span>{stats.courses} kurzus</span>
-            </div>
-          </div>
 
           <p className="text-gray-700 mb-4">{bio}</p>
 

@@ -27,7 +27,7 @@ export const LessonSidebar: React.FC<Props> = ({ courseId, modules, currentLesso
                   {locked ? (
                     <div className="px-2 py-1 text-gray-400 text-xs">{lesson.title}</div>
                   ) : (
-                    <Link href={`/courses/${courseId}/lessons/${lesson.id}`} className={`block px-2 py-1 text-sm rounded ${lesson.id===currentLessonId? 'bg-primary/10 text-primary font-medium': 'text-gray-600 hover:bg-gray-100'}`}>{lesson.title}</Link>
+                    <Link href={`/courses/${courseId}/player/${lesson.id}`} className={`block px-2 py-1 text-sm rounded ${lesson.id===currentLessonId? 'bg-primary/10 text-primary font-medium': 'text-gray-600 hover:bg-gray-100'}`}>{lesson.title}</Link>
                   )}
                 </li>
               )

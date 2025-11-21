@@ -535,7 +535,6 @@ export default function LessonContentEditorModal({ lesson, open, onOpenChange, o
                       toast.success("Videó sikeresen feltöltve Mux-ba!");
                     }}
                     lessonId={lesson.id}
-                    maxSizeMB={500}
                   />
                   {muxAssetId && (
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
