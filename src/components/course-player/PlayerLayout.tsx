@@ -7,7 +7,6 @@ import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
 import { LessonContentRenderer } from '@/components/lesson/LessonContentRenderer'
 import { CourseNavigationSidebar } from './CourseNavigationSidebar'
-import { LessonTabs } from './LessonTabs'
 import { LearningCompanionPanel } from './LearningCompanionPanel'
 import { PlayerHeader } from './PlayerHeader'
 import { ReportIssueDialog } from './ReportIssueDialog'
@@ -15,6 +14,7 @@ import { Button } from '@/components/ui/button'
 import { playerComponents } from '@/lib/course-player-design-system'
 import { useTranslation } from '@/hooks/useTranslation'
 import { useToast } from '@/hooks/use-toast'
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 interface PlayerLayoutProps {
   course: any
@@ -47,6 +47,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
   const [showReportIssueDialog, setShowReportIssueDialog] = useState(false)
   const [isMarkingComplete, setIsMarkingComplete] = useState(false)
   const [isDownloadingResources, setIsDownloadingResources] = useState(false)
+  const [theaterMode, setTheaterMode] = useState(false)
 
   // Calculate navigation
   const flatLessons = useMemo(() => {
@@ -85,12 +86,14 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
     m.lessons.some((l: any) => l.id === currentLessonId)
   )
 
-  // Learning outcomes - use from lesson data or fallback to placeholders
-  const learningOutcomes = lesson?.learningOutcomes || [
-    t('placeholders.learningOutcome1'),
-    t('placeholders.learningOutcome2'),
-    t('placeholders.learningOutcome3')
-  ]
+  // Create a properly structured course object for the sidebar
+  const courseWithModules = useMemo(() => ({
+    ...course,
+    modules: modules
+  }), [course, modules])
+
+  // Learning outcomes - use from lesson data or empty array
+  const learningOutcomes = lesson?.learningOutcomes || []
 
   const locked = !hasSubscription && lesson?.subscriptionTier === 'PREMIUM'
 
@@ -219,9 +222,9 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
       {/* Main Content Area - 3 Column Layout */}
       <div className="flex-1 flex min-h-0">
         {/* Left Sidebar - Course Navigation */}
-        {showLeftSidebar && (
+        {showLeftSidebar && !theaterMode && (
           <CourseNavigationSidebar
-            course={course}
+            course={courseWithModules}
             currentLessonId={currentLessonId}
             onLessonClick={handleLessonClick}
             onClose={() => setShowLeftSidebar(false)}
@@ -231,11 +234,20 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
 
         {/* Main Content Column */}
         <main className="flex-1 overflow-y-auto" role="main">
-          <div className="max-w-5xl mx-auto p-6 space-y-6">
+          <div className={`${theaterMode ? 'max-w-full' : 'max-w-5xl'} mx-auto p-6 space-y-6 transition-all duration-300`}>
             {/* Video Player / Content Area */}
             {!locked && lesson && (
               <div className={playerComponents.card}>
-                <div className="bg-black rounded-t-lg overflow-hidden">
+                <div className="bg-black rounded-t-lg overflow-hidden relative group">
+                  {/* Theater Mode Toggle */}
+                  <button
+                    onClick={() => setTheaterMode(!theaterMode)}
+                    className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    title={theaterMode ? 'Exit Theater Mode' : 'Theater Mode'}
+                  >
+                    {theaterMode ? <Minimize2 size={20} /> : <Maximize2 size={20} />}
+                  </button>
+
                   <LessonContentRenderer
                     lesson={lesson}
                     playerData={playerData}
@@ -282,10 +294,6 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
               </div>
             )}
 
-            {/* Lesson Tabs */}
-            {!locked && (
-              <LessonTabs lesson={lesson} learningOutcomes={learningOutcomes} />
-            )}
 
             {/* Bottom Navigation */}
             {!locked && (
@@ -340,7 +348,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
         </main>
 
         {/* Right Panel - Learning Companion */}
-        {showRightPanel && !locked && (
+        {showRightPanel && !locked && !theaterMode && (
           <LearningCompanionPanel
             lesson={lesson}
             courseProgress={courseStats.overallProgress}
@@ -373,7 +381,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
         >
           <div className="h-full" onClick={(e) => e.stopPropagation()}>
             <CourseNavigationSidebar
-              course={course}
+              course={courseWithModules}
               currentLessonId={currentLessonId}
               onLessonClick={(lessonId) => {
                 handleLessonClick(lessonId)

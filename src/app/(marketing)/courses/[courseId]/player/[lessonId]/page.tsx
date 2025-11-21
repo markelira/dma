@@ -1,204 +1,420 @@
-"use client"
+'use client';
 
-import { useRouter } from 'next/navigation'
-import { useParams } from 'next/navigation'
-import { usePlayerData } from '@/hooks/usePlayerData'
-import { useLesson } from '@/hooks/useLessonQueries'
-import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus'
-import { useLessonProgress } from '@/hooks/useLessonProgress'
-import { useAuthStore } from '@/stores/authStore'
-import { PlayerLayout } from '@/components/course-player/PlayerLayout'
-import { useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import Link from 'next/link';
+import { useRouter, useParams } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { NewSidebar } from '@/components/course-player/NewSidebar';
+import { NewVideoPlayer } from '@/components/course-player/NewVideoPlayer';
+import { NewLessonContent } from '@/components/course-player/NewLessonContent';
+import { NewLessonNavigation } from '@/components/course-player/NewLessonNavigation';
+import { MobileBottomTabs, MobileTab } from '@/components/course-player/MobileBottomTabs';
+import { ArrowLeftIcon } from '@/components/icons/CoursePlayerIcons';
+import { usePlayerData } from '@/hooks/usePlayerData';
+import { useCourseProgress, useResumePosition } from '@/hooks/useCourseProgress';
+import { useLessonProgress } from '@/hooks/useLessonProgress';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { useEnrollmentTracking } from '@/hooks/useEnrollmentTracking';
+import { useAuthStore } from '@/stores/authStore';
+import { fetchLesson } from '@/hooks/useLessonQueries';
+import { Module, Lesson } from '@/types';
 
-export default function PlayerPage() {
-  const { courseId, lessonId } = useParams() as { courseId: string; lessonId: string }
-  const router = useRouter()
-  const { user, authReady, isAuthenticated } = useAuthStore()
+/**
+ * Course Player Page - New Design
+ * Pixel-perfect implementation matching the approved design
+ */
+export default function CoursePlayerPage() {
+  const router = useRouter();
+  const params = useParams();
+  const queryClient = useQueryClient();
 
-  // Debug log
-  console.log('🎬 Player Page - courseId:', courseId, 'lessonId:', lessonId)
-  console.log('🎬 Player Page - Auth status:', { authReady, isAuthenticated, hasUser: !!user })
+  // Get route parameters
+  const courseId = params.courseId as string;
+  const lessonId = params.lessonId as string;
 
-  const { data: playerData, isLoading: playerLoading, error: playerError } = usePlayerData(courseId, lessonId)
-  const course = playerData?.course
-  const { data: lesson, isLoading: lessonLoading, error: lessonError } = useLesson(lessonId, courseId)
-  const { data: subStatus } = useSubscriptionStatus()
-  const progressMutation = useLessonProgress()
+  // Auth state
+  const { user, authReady, isAuthenticated } = useAuthStore();
 
-  // Debug log
-  console.log('🎬 Player Page - Data status:', {
-    playerLoading,
-    lessonLoading,
-    hasCourse: !!course,
-    hasLesson: !!lesson,
-    playerError: playerError?.message,
-    lessonError: lessonError?.message
-  })
+  // State
+  const [currentLessonId, setCurrentLessonId] = useState(lessonId);
+  const [mobileTab, setMobileTab] = useState<MobileTab>('video');
 
-  const hasSub = subStatus?.hasActiveSubscription ?? false
+  // Fetch data
+  const { data: playerData, isLoading: isLoadingPlayer, error: playerError } = usePlayerData(courseId, currentLessonId);
+  const { data: progressData } = useCourseProgress(courseId);
+  const { data: subStatus } = useSubscriptionStatus();
+  const { data: resumePosition } = useResumePosition(currentLessonId);
+  const { trackLessonAccess } = useEnrollmentTracking();
+
+  // Progress mutation
+  const progressMutation = useLessonProgress();
+
+  // Extract data
+  const course = playerData?.course;
+  const modules = course?.modules || [];  // Fixed: modules are in course object
+  const signedPlaybackUrl = playerData?.signedPlaybackUrl;
+
+  // Subscription check
+  const hasSub = subStatus?.hasActiveSubscription ?? false;
+
+  // Find current lesson
+  const currentLesson = useMemo(() => {
+    for (const module of modules) {
+      const lesson = module.lessons?.find(l => l.id === currentLessonId);
+      if (lesson) {
+        return lesson;
+      }
+    }
+    return null;
+  }, [modules, currentLessonId]);
+
+  // Find current module
+  const currentModule = useMemo(() => {
+    return modules.find(m =>
+      m.lessons?.some(l => l.id === currentLessonId)
+    );
+  }, [modules, currentLessonId]);
+
+  // Get completed lesson IDs
+  const completedLessonIds = useMemo(() => {
+    return new Set(progressData?.completedLessonIds || []);
+  }, [progressData]);
+
+  // Calculate course progress
+  const courseProgress = useMemo(() => {
+    const totalLessons = modules.reduce((sum, m) => sum + (m.lessons?.length || 0), 0);
+    if (totalLessons === 0) return 0;
+    return (completedLessonIds.size / totalLessons) * 100;
+  }, [modules, completedLessonIds]);
+
+  // Find previous/next lessons
+  const { previousLesson, nextLesson } = useMemo(() => {
+    const allLessons: Array<{ lesson: Lesson; moduleIndex: number }> = [];
+    modules.forEach((module, moduleIndex) => {
+      module.lessons
+        ?.filter(l => l.status?.toUpperCase() === 'PUBLISHED')
+        .sort((a, b) => a.order - b.order)
+        .forEach(lesson => {
+          allLessons.push({ lesson, moduleIndex });
+        });
+    });
+
+    const currentIndex = allLessons.findIndex(
+      item => item.lesson.id === currentLessonId
+    );
+
+    return {
+      previousLesson: currentIndex > 0 ? allLessons[currentIndex - 1]?.lesson : null,
+      nextLesson: currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1]?.lesson : null,
+    };
+  }, [modules, currentLessonId]);
+
+  // Handlers
+  const handleLessonClick = useCallback((newLessonId: string) => {
+    setCurrentLessonId(newLessonId);
+    router.push(`/courses/${courseId}/player/${newLessonId}`);
+    setMobileTab('video');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [courseId, router]);
+
+  const handlePreviousLesson = useCallback(() => {
+    if (previousLesson) {
+      handleLessonClick(previousLesson.id);
+    }
+  }, [previousLesson, handleLessonClick]);
+
+  const handleNextLesson = useCallback(() => {
+    if (nextLesson) {
+      handleLessonClick(nextLesson.id);
+    }
+  }, [nextLesson, handleLessonClick]);
+
+  const handleProgress = useCallback((currentTime: number, duration: number, percentage: number) => {
+    if (percentage < 5) return;
+    progressMutation.mutate({
+      lessonId: currentLessonId,
+      watchPercentage: percentage,
+      timeSpent: currentTime,
+      courseId,
+    });
+  }, [currentLessonId, courseId, progressMutation]);
+
+  const handleVideoEnded = useCallback(() => {
+    // Mark as completed
+    progressMutation.mutate({
+      lessonId: currentLessonId,
+      watchPercentage: 100,
+      completed: true,
+      courseId,
+    });
+
+    // Auto-advance to next lesson after 2 seconds
+    if (nextLesson) {
+      setTimeout(() => {
+        handleNextLesson();
+      }, 2000);
+    }
+  }, [currentLessonId, courseId, nextLesson, handleNextLesson, progressMutation]);
+
+  // Get video source
+  const videoSource = useMemo(() => {
+    if (!currentLesson) return '';
+    if (signedPlaybackUrl) return signedPlaybackUrl;
+    if (currentLesson.videoUrl) return currentLesson.videoUrl;
+    if (currentLesson.muxPlaybackId) {
+      return `https://stream.mux.com/${currentLesson.muxPlaybackId}.m3u8`;
+    }
+    return '';
+  }, [currentLesson, signedPlaybackUrl]);
+
+  // Track lesson access
+  useEffect(() => {
+    if (!authReady || !isAuthenticated) return;
+    if (isLoadingPlayer) return;
+    if (!course || !currentLesson) return;
+
+    trackLessonAccess(courseId, currentLessonId);
+  }, [authReady, isAuthenticated, isLoadingPlayer, course, currentLesson, courseId, currentLessonId, trackLessonAccess]);
+
+  // Preload next lesson
+  useEffect(() => {
+    if (nextLesson && course) {
+      queryClient.prefetchQuery({
+        queryKey: ['lesson', nextLesson.id, courseId],
+        queryFn: () => fetchLesson(nextLesson.id, courseId),
+        staleTime: 5 * 60 * 1000,
+      });
+    }
+  }, [nextLesson, courseId, queryClient, course]);
+
+  // Sync currentLessonId with URL lessonId
+  useEffect(() => {
+    if (lessonId !== currentLessonId) {
+      setCurrentLessonId(lessonId);
+    }
+  }, [lessonId, currentLessonId]);
 
   // Check auth status first
   if (!authReady) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="fixed inset-0 bg-background flex items-center justify-center">
+        <div className="text-center text-foreground">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Autentikáció inicializálása...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Redirect if not authenticated
   if (!isAuthenticated || !user) {
-    router.push('/login')
-    return null
+    router.push('/login');
+    return null;
   }
 
-  // Hard block: Check subscription status
+  // Check subscription status
   if (subStatus && !hasSub) {
     const returnUrl = `/courses/${courseId}/player/${lessonId}`;
     router.push(`/pricing?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+      <div className="fixed inset-0 bg-background flex items-center justify-center">
+        <div className="text-center text-foreground">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p>Átirányítás az előfizetés oldalra...</p>
         </div>
       </div>
     );
   }
 
-  // Auto-redirect if course/lesson not found
-  // Only redirect after both queries have finished loading
-  useEffect(() => {
-    // Wait for both to finish loading
-    if (playerLoading || lessonLoading) return
-    
-    // Only check after loading is complete
-    if (!playerLoading && !lessonLoading) {
-      // Check for missing data
-      if (!course && !playerError) {
-        console.error('Player: Course not found, redirecting to /courses')
-        router.push('/courses')
-        return
-      }
-      
-      if (!lesson && !lessonError) {
-        console.error('Player: Lesson not found, redirecting to course page')
-        router.push(`/courses/${courseId}`)
-        return
-      }
-    }
-  }, [playerLoading, lessonLoading, course, lesson, courseId, router, playerError, lessonError])
-
-  // Show loading state
-  if (playerLoading || lessonLoading) {
+  // Loading state
+  if (isLoadingPlayer) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Lecke betöltése...</p>
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4 mx-auto" />
+          <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
-    )
+    );
   }
 
-  // Show error if there was an error loading
-  if (playerError || lessonError) {
+  // Error state
+  if (playerError || !course || !currentLesson) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <h2 className="text-xl font-semibold mb-2">Hiba történt a betöltés során</h2>
-          <p className="text-gray-300 mb-4">
-            {playerError?.message || lessonError?.message || 'Ismeretlen hiba'}
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center max-w-md p-8">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Hiba történt a betöltés során
+          </h1>
+          <p className="text-gray-600 mb-6">
+            {playerError?.message || 'A kurzus vagy lecke nem található.'}
           </p>
-          <button 
-            onClick={() => router.push('/courses')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          <Link
+            href={`/courses/${courseId}`}
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
           >
-            Vissza a kurzusokhoz
-          </button>
+            <ArrowLeftIcon size={20} />
+            Vissza a kurzushoz
+          </Link>
         </div>
       </div>
-    )
-  }
-
-  // Show error if data missing after loading
-  if (!playerLoading && !lessonLoading && (!course || !lesson)) {
-    return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="text-center text-white">
-          <h2 className="text-xl font-semibold mb-2">Tartalom nem található</h2>
-          <p className="text-gray-300 mb-4">A kért lecke vagy kurzus nem érhető el.</p>
-          <button 
-            onClick={() => router.push('/courses')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Vissza a kurzusokhoz
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  const modules = course?.modules || []
-
-  // Calculate navigation
-  const flatLessons = modules.flatMap((m: any) =>
-    (m.lessons as any[]).sort((a: any, b: any) => a.order - b.order).map((l: any) => ({ 
-      ...l, 
-      moduleId: m.id, 
-      moduleOrder: m.order 
-    }))
-  )
-  const currentIndex = flatLessons.findIndex((l: any) => l.id === lessonId)
-  const nextLesson = currentIndex < flatLessons.length-1 ? flatLessons[currentIndex+1] : null
-
-  const handleProgress = (percentage: number, time: number, analytics?: any) => {
-    if (percentage < 5) return
-    
-    // Send progress to backend
-    progressMutation.mutate({ lessonId, watchPercentage: percentage, timeSpent: time })
-    
-    // Enhanced analytics logging for player mode
-    if (analytics && analytics.engagementEvents.length > 0) {
-      console.log('🎥 Player Analytics:', {
-        mode: 'dedicated_player',
-        sessionId: analytics.sessionId,
-        courseId,
-        lessonId,
-        totalEvents: analytics.engagementEvents.length,
-        progressMarkers: analytics.progressMarkers.length,
-        watchTime: time,
-        engagementScore: analytics.engagementEvents.length / Math.max(1, Math.floor(time / 60)) // events per minute
-      })
-    }
-  }
-
-  const handleEnded = () => {
-    // Mark as complete
-    progressMutation.mutate({ lessonId, watchPercentage: 100 })
-    
-    // Auto-advance to next lesson in player mode
-    if (course?.autoplayNext && nextLesson) {
-      setTimeout(() => {
-        router.push(`/courses/${courseId}/player/${nextLesson.id}`)
-      }, 2000) // 2 second delay for better UX
-    }
+    );
   }
 
   return (
-    <PlayerLayout
-      course={course}
-      lesson={lesson}
-      playerData={playerData}
-      modules={modules}
-      currentLessonId={lessonId}
-      userId={user?.uid}
-      onProgress={handleProgress}
-      onEnded={handleEnded}
-      hasSubscription={hasSub}
-    />
-  )
+    <>
+      {/* Desktop Layout */}
+      <div className="hidden md:flex h-screen overflow-hidden">
+        {/* Sidebar */}
+        <NewSidebar
+          courseTitle={course.title}
+          modules={modules}
+          currentLessonId={currentLessonId}
+          completedLessonIds={completedLessonIds}
+          progress={courseProgress}
+          onLessonClick={handleLessonClick}
+        />
+
+        {/* Main Content */}
+        <div className="flex-1 overflow-y-auto">
+          <div className="max-w-5xl mx-auto px-12 py-8 space-y-8">
+            {/* Back Link */}
+            <Link
+              href={`/courses/${courseId}`}
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+            >
+              <ArrowLeftIcon size={20} />
+              Vissza a kurzushoz
+            </Link>
+
+            {/* Video Player */}
+            {videoSource && currentLesson.type === 'VIDEO' && (
+              <NewVideoPlayer
+                src={videoSource}
+                poster={currentLesson.thumbnailUrl || currentLesson.muxThumbnailUrl}
+                initialTime={resumePosition || 0}
+                onProgress={handleProgress}
+                onEnded={handleVideoEnded}
+              />
+            )}
+
+            {/* Lesson Title and Breadcrumb */}
+            <div className="space-y-3">
+              <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+                {currentLesson.title}
+              </h1>
+              {currentModule && (
+                <p className="text-sm text-gray-600">
+                  {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
+                </p>
+              )}
+            </div>
+
+            {/* Navigation Buttons */}
+            <NewLessonNavigation
+              hasPrevious={!!previousLesson}
+              hasNext={!!nextLesson}
+              onPrevious={handlePreviousLesson}
+              onNext={handleNextLesson}
+            />
+
+            {/* Divider */}
+            <div className="border-t border-gray-200" />
+
+            {/* Lesson Content (Description & Outcomes) */}
+            <NewLessonContent
+              lesson={currentLesson}
+              moduleName={currentModule?.title}
+              moduleNumber={modules.findIndex(m => m.id === currentModule?.id) + 1}
+              showTitle={false}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="md:hidden h-screen overflow-hidden flex flex-col">
+        {/* Back Link */}
+        <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 bg-white">
+          <Link
+            href={`/courses/${courseId}`}
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
+          >
+            <ArrowLeftIcon size={20} />
+            Vissza a kurzushoz
+          </Link>
+        </div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto pb-20">
+          {/* Video Tab Content */}
+          {mobileTab === 'video' && (
+            <div className="p-6 space-y-6">
+              {/* Video Player */}
+              {videoSource && currentLesson.type === 'VIDEO' && (
+                <NewVideoPlayer
+                  src={videoSource}
+                  poster={currentLesson.thumbnailUrl || currentLesson.muxThumbnailUrl}
+                  initialTime={resumePosition || 0}
+                  onProgress={handleProgress}
+                  onEnded={handleVideoEnded}
+                />
+              )}
+
+              {/* Lesson Title and Breadcrumb */}
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+                  {currentLesson.title}
+                </h1>
+                {currentModule && (
+                  <p className="text-sm text-gray-600">
+                    {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
+                  </p>
+                )}
+              </div>
+
+              {/* Navigation Buttons */}
+              <NewLessonNavigation
+                hasPrevious={!!previousLesson}
+                hasNext={!!nextLesson}
+                onPrevious={handlePreviousLesson}
+                onNext={handleNextLesson}
+              />
+
+              {/* Divider */}
+              <div className="border-t border-gray-200" />
+
+              {/* Lesson Content (Description & Outcomes) */}
+              <NewLessonContent
+                lesson={currentLesson}
+                moduleName={currentModule?.title}
+                moduleNumber={modules.findIndex(m => m.id === currentModule?.id) + 1}
+                showTitle={false}
+              />
+            </div>
+          )}
+
+          {/* Lessons Tab Content */}
+          {mobileTab === 'lessons' && (
+            <div className="h-full overflow-y-auto">
+              <NewSidebar
+                courseTitle={course.title}
+                modules={modules}
+                currentLessonId={currentLessonId}
+                completedLessonIds={completedLessonIds}
+                progress={courseProgress}
+                onLessonClick={handleLessonClick}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Tabs */}
+        <MobileBottomTabs
+          activeTab={mobileTab}
+          onTabChange={setMobileTab}
+        />
+      </div>
+    </>
+  );
 }
