@@ -17,7 +17,6 @@ interface NetflixPlayerLayoutProps {
     title: string;
     type?: CourseType;
     description?: string;
-    whatYouWillLearn?: string[];
   };
   lessons: Lesson[];
   currentLesson: Lesson;
@@ -104,7 +103,6 @@ export function NetflixPlayerLayout({
           courseDescription={course.description}
           instructor={instructor}
           currentLesson={currentLesson}
-          learningOutcomes={course.whatYouWillLearn}
           totalDuration={totalDuration}
         />
 
@@ -157,30 +155,6 @@ export function NetflixPlayerLayout({
             )}
           </div>
 
-          {/* Bottom Navigation */}
-          <div className="bg-[#1a1a1a] border-t border-gray-800 px-6 py-4 flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-400">
-                  {lessonLabel} {currentIndex + 1} / {lessons.length}
-                </span>
-                {currentLesson.duration && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-sm text-gray-400">
-                      {formatDuration(currentLesson.duration)}
-                    </span>
-                  </>
-                )}
-              </div>
-              <NewLessonNavigation
-                hasPrevious={!!previousLesson}
-                hasNext={!!nextLesson}
-                onPrevious={onPreviousLesson}
-                onNext={onNextLesson}
-              />
-            </div>
-          </div>
         </div>
       </div>
     );

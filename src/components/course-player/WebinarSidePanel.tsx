@@ -10,7 +10,6 @@ interface WebinarSidePanelProps {
   courseDescription?: string;
   instructor?: Instructor | null;
   currentLesson: Lesson;
-  learningOutcomes?: string[];
   totalDuration?: number; // in seconds
 }
 
@@ -24,7 +23,6 @@ export function WebinarSidePanel({
   courseDescription,
   instructor,
   currentLesson,
-  learningOutcomes,
   totalDuration,
 }: WebinarSidePanelProps) {
   // Format duration from seconds to readable format
@@ -41,7 +39,7 @@ export function WebinarSidePanel({
   const duration = formatDuration(totalDuration || currentLesson.duration);
 
   return (
-    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
+    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] min-h-screen overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
         {/* Mentor Card */}
         {instructor && (
@@ -109,7 +107,7 @@ export function WebinarSidePanel({
             </div>
             <div>
               <p className="text-sm text-gray-500">Típus</p>
-              <p className="font-medium">Webinárium</p>
+              <p className="font-medium">Webinár</p>
             </div>
           </div>
         </div>
@@ -126,26 +124,6 @@ export function WebinarSidePanel({
             {courseDescription || currentLesson.description || 'Nincs leírás.'}
           </p>
         </div>
-
-        {/* Learning Outcomes */}
-        {learningOutcomes && learningOutcomes.length > 0 && (
-          <>
-            <div className="h-px bg-gray-800" />
-            <div className="space-y-3">
-              <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-                Amit tanulni fogsz
-              </h4>
-              <ul className="space-y-2">
-                {learningOutcomes.map((outcome, index) => (
-                  <li key={index} className="flex items-start gap-3 text-sm text-gray-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2 flex-shrink-0" />
-                    <span>{outcome}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </>
-        )}
 
         {/* Current Lesson Title */}
         <div className="h-px bg-gray-800" />
