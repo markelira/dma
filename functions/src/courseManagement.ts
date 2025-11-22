@@ -385,7 +385,7 @@ export const publishCourse = onCall({
 });
 
 /**
- * Delete a course (soft delete by setting published = false)
+ * Delete a course (HARD delete - removes course and all related data)
  */
 export const deleteCourse = onCall({
   cors: true,
@@ -426,19 +426,72 @@ export const deleteCourse = onCall({
       throw new Error('Nincs jogosultságod a kurzus törléséhez');
     }
 
-    // Soft delete - unpublish the course
-    await courseRef.update({
-      published: false,
-      deletedAt: new Date().toISOString(),
-      deletedBy: userId,
-      updatedAt: new Date().toISOString(),
-    });
+    // HARD DELETE: Remove all related data
 
-    logger.info(`Course deleted (unpublished): ${courseId} by user ${userId}`);
+    // 1) Delete flat lessons subcollection (courses/{courseId}/lessons)
+    const lessonsSnapshot = await firestore
+      .collection('courses')
+      .doc(courseId)
+      .collection('lessons')
+      .get();
+
+    const lessonDeletePromises = lessonsSnapshot.docs.map(doc => doc.ref.delete());
+    await Promise.all(lessonDeletePromises);
+    logger.info(`Deleted ${lessonsSnapshot.size} lessons for course ${courseId}`);
+
+    // 2) Delete modules and their lessons subcollections
+    const modulesSnapshot = await firestore
+      .collection('courses')
+      .doc(courseId)
+      .collection('modules')
+      .get();
+
+    for (const moduleDoc of modulesSnapshot.docs) {
+      // Delete lessons within module
+      const moduleLessonsSnapshot = await firestore
+        .collection('courses')
+        .doc(courseId)
+        .collection('modules')
+        .doc(moduleDoc.id)
+        .collection('lessons')
+        .get();
+
+      const moduleLessonDeletePromises = moduleLessonsSnapshot.docs.map(doc => doc.ref.delete());
+      await Promise.all(moduleLessonDeletePromises);
+
+      // Delete module itself
+      await moduleDoc.ref.delete();
+    }
+    logger.info(`Deleted ${modulesSnapshot.size} modules for course ${courseId}`);
+
+    // 3) Delete enrollments for this course
+    const enrollmentsSnapshot = await firestore
+      .collection('enrollments')
+      .where('courseId', '==', courseId)
+      .get();
+
+    const enrollmentDeletePromises = enrollmentsSnapshot.docs.map(doc => doc.ref.delete());
+    await Promise.all(enrollmentDeletePromises);
+    logger.info(`Deleted ${enrollmentsSnapshot.size} enrollments for course ${courseId}`);
+
+    // 4) Delete lesson progress records for this course
+    const progressSnapshot = await firestore
+      .collection('lessonProgress')
+      .where('courseId', '==', courseId)
+      .get();
+
+    const progressDeletePromises = progressSnapshot.docs.map(doc => doc.ref.delete());
+    await Promise.all(progressDeletePromises);
+    logger.info(`Deleted ${progressSnapshot.size} progress records for course ${courseId}`);
+
+    // 5) Delete the course document itself
+    await courseRef.delete();
+
+    logger.info(`Course HARD DELETED: ${courseId} by user ${userId}`);
 
     return {
       success: true,
-      message: 'Kurzus sikeresen törölve'
+      message: 'Kurzus és összes kapcsolódó adat sikeresen törölve'
     };
 
   } catch (error: any) {
