@@ -12,7 +12,7 @@ import CoursePublishStep from './CoursePublishStep';
 import { toast } from 'sonner';
 import { httpsCallable } from 'firebase/functions';
 import { functions as fbFunctions, db } from '@/lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourseWizardStore, getAllPendingVideoFiles, clearAllPendingVideoFiles } from '@/stores/courseWizardStore';
 import { Progress } from '@/components/ui/progress';
@@ -379,7 +379,49 @@ export default function CourseCreationWizard() {
         toast.success('Minden videó sikeresen feltöltve!');
       }
 
-      // 2) Publish the course
+      // 2) Save lessons to Firestore (flat lessons subcollection)
+      toast.info('Leckék mentése...');
+      const currentLessons = useCourseWizardStore.getState().lessons;
+
+      for (const lesson of currentLessons) {
+        // Generate a proper lesson ID (remove temp_ prefix)
+        const lessonId = lesson.id?.startsWith('temp_')
+          ? `lesson_${lesson.id.replace('temp_', '')}`
+          : (lesson.id || `lesson_${Date.now()}_${Math.random().toString(36).substring(7)}`);
+
+        const lessonRef = doc(db, 'courses', courseId, 'lessons', lessonId);
+
+        // Prepare lesson data for Firestore
+        const lessonData = {
+          title: lesson.title || '',
+          description: lesson.description || '',
+          type: lesson.type || 'VIDEO',
+          content: lesson.content || '',
+          order: lesson.order || 0,
+          status: 'PUBLISHED',
+          courseId: courseId,
+          duration: lesson.duration || 0,
+          videoUrl: lesson.videoUrl || '',
+          muxPlaybackId: lesson.muxPlaybackId || '',
+          muxAssetId: lesson.videoAssetId || '',
+          thumbnailUrl: lesson.thumbnailUrl || '',
+          // For imported lessons (MASTERCLASS)
+          ...(lesson.isImported && {
+            isImported: true,
+            sourceCourseId: lesson.sourceCourseid || lesson.sourceCourseId || '',
+            sourceLessonId: lesson.sourceLessonId || '',
+          }),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        await setDoc(lessonRef, lessonData);
+        console.log(`✅ Saved lesson to Firestore: ${lessonId}`, lessonData);
+      }
+
+      toast.success(`${currentLessons.length} lecke sikeresen mentve!`);
+
+      // 3) Publish the course
       const publishFn = httpsCallable(fbFunctions, 'publishCourse');
       const res: any = await publishFn({ courseId });
 
