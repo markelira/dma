@@ -306,7 +306,7 @@ export default function CoursePlayerPage() {
     );
   }
 
-  // Render Netflix-style layout for WEBINAR/PODCAST
+  // Render Netflix-style layout for WEBINAR/PODCAST/ACADEMIA
   if (usesNetflixLayout) {
     const lessonsForPlayer = flatLessons.length > 0 ? flatLessons : modules.flatMap(m => m.lessons || []);
 
@@ -319,6 +319,7 @@ export default function CoursePlayerPage() {
           description: course.description,
         }}
         lessons={lessonsForPlayer}
+        modules={modules}
         currentLesson={currentLesson}
         currentLessonId={currentLessonId}
         completedLessonIds={completedLessonIds}

@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { NewVideoPlayer } from './NewVideoPlayer';
 import { NewLessonNavigation } from './NewLessonNavigation';
 import { WebinarSidePanel } from './WebinarSidePanel';
+import { AcademiaSidePanel } from './AcademiaSidePanel';
 import { ArrowLeftIcon, PlayCircleIcon, CheckCircleIcon, EmptyCircleIcon } from '@/components/icons/CoursePlayerIcons';
-import { Lesson, CourseType, Instructor } from '@/types';
+import { Lesson, CourseType, Instructor, Module } from '@/types';
 import { getCourseTypeTerminology } from '@/lib/terminology';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -19,6 +20,7 @@ interface NetflixPlayerLayoutProps {
     description?: string;
   };
   lessons: Lesson[];
+  modules?: Module[];
   currentLesson: Lesson;
   currentLessonId: string;
   completedLessonIds: Set<string>;
@@ -42,6 +44,7 @@ interface NetflixPlayerLayoutProps {
 export function NetflixPlayerLayout({
   course,
   lessons,
+  modules = [],
   currentLesson,
   currentLessonId,
   completedLessonIds,
@@ -60,8 +63,9 @@ export function NetflixPlayerLayout({
   const router = useRouter();
   const [episodesExpanded, setEpisodesExpanded] = useState(false);
 
-  // Check if this is a WEBINAR (uses split layout with side panel)
+  // Check course type for layout selection
   const isWebinar = course.type === 'WEBINAR';
+  const isAcademia = course.type === 'ACADEMIA';
 
   // Calculate total duration from all lessons
   const totalDuration = lessons.reduce((sum, l) => sum + (l.duration || 0), 0);
@@ -155,6 +159,114 @@ export function NetflixPlayerLayout({
             )}
           </div>
 
+        </div>
+      </div>
+    );
+  }
+
+  // ACADEMIA Layout: Side panel with lesson navigation + Video on right
+  if (isAcademia) {
+    return (
+      <div className="min-h-screen bg-black flex">
+        {/* Left Side Panel with Lesson Navigation */}
+        <AcademiaSidePanel
+          courseTitle={course.title}
+          courseDescription={course.description}
+          instructor={instructor}
+          modules={modules}
+          currentLessonId={currentLessonId}
+          completedLessonIds={completedLessonIds}
+          onLessonClick={onLessonClick}
+        />
+
+        {/* Right Side - Video and Controls */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Top bar with back link and title */}
+          <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
+            <div className="flex items-center gap-4">
+              <Link
+                href={`/courses/${course.id}`}
+                className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
+              >
+                <ArrowLeftIcon size={20} />
+                <span className="hidden sm:inline">Vissza</span>
+              </Link>
+              <div className="h-6 w-px bg-white/20" />
+              <h1 className="text-white font-medium truncate">{course.title}</h1>
+            </div>
+          </div>
+
+          {/* Video Player Area */}
+          <div className="flex-1 bg-black flex items-center justify-center">
+            {videoSource && currentLesson.type === 'VIDEO' && (
+              <div className="w-full h-full">
+                <NewVideoPlayer
+                  src={videoSource}
+                  poster={currentLesson.thumbnailUrl || currentLesson.muxThumbnailUrl}
+                  initialTime={resumePosition}
+                  onProgress={onProgress}
+                  onEnded={onVideoEnded}
+                  accentColor="red"
+                />
+              </div>
+            )}
+
+            {/* Non-video content placeholder */}
+            {currentLesson.type !== 'VIDEO' && (
+              <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                <div className="text-center text-white p-8 max-w-2xl">
+                  <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
+                  {currentLesson.content && (
+                    <div className="prose prose-invert prose-lg max-w-none">
+                      <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        {currentLesson.content}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Navigation with Previous/Next buttons */}
+          <div className="bg-[#1a1a1a] border-t border-gray-800 px-6 py-4 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              {/* Previous Button */}
+              <button
+                onClick={onPreviousLesson}
+                disabled={!previousLesson}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  previousLesson
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <ArrowLeftIcon size={18} />
+                Előző lecke
+              </button>
+
+              {/* Lesson indicator */}
+              <span className="text-sm text-gray-400">
+                Lecke {currentIndex + 1} / {lessons.length}
+              </span>
+
+              {/* Next Button */}
+              <button
+                onClick={onNextLesson}
+                disabled={!nextLesson}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                  nextLesson
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                Következő lecke
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
