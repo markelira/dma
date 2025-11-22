@@ -7,7 +7,7 @@ import { CarouselCourseCard } from './CarouselCourseCard';
 import { useCoursesCatalog } from '@/hooks/useCoursesCatalog';
 
 interface CourseCarouselProps {
-  courseType: 'webinar' | 'akademia' | 'masterclass';
+  courseType: 'webinar' | 'akademia' | 'masterclass' | 'podcast';
   title: string;
 }
 

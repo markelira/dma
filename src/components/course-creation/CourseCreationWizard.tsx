@@ -197,7 +197,13 @@ export default function CourseCreationWizard() {
     setCourseType(type);
     markStepCompleted(0);
     setCurrentStep(1); // Move to basic info step
-    toast.success(`${type === 'ACADEMIA' ? 'Akadémia' : type === 'WEBINAR' ? 'Webinár' : 'Masterclass'} típus kiválasztva`);
+    const typeLabels: Record<string, string> = {
+      ACADEMIA: 'Akadémia',
+      WEBINAR: 'Webinár',
+      MASTERCLASS: 'Masterclass',
+      PODCAST: 'Podcast'
+    };
+    toast.success(`${typeLabels[type] || type} típus kiválasztva`);
   };
 
   // Check if can proceed to next step
@@ -319,12 +325,15 @@ export default function CourseCreationWizard() {
         })
       ]);
 
-      // Navigate to next step - skip curriculum for webinars
-      if (courseType === 'WEBINAR') {
-        // For webinars, skip curriculum step and go directly to publish
+      // Navigate to next step - skip curriculum for webinars and podcasts
+      if (courseType === 'WEBINAR' || courseType === 'PODCAST') {
+        // For webinars and podcasts, skip curriculum step and go directly to publish
         markStepCompleted(2); // Mark curriculum as complete
         setCurrentStep(3); // Go to publish
-        toast.info('Webinár típusnál nincs tanterv lépés - egy videó leckét fog tartalmazni');
+        const msg = courseType === 'WEBINAR'
+          ? 'Webinár típusnál nincs tanterv lépés - egy videó leckét fog tartalmazni'
+          : 'Podcast típusnál nincs tanterv lépés - egy epizódot fog tartalmazni';
+        toast.info(msg);
       } else {
         // For Academia and Masterclass, go to curriculum step
         setCurrentStep(2);

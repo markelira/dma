@@ -22,7 +22,7 @@ interface CourseDetailHeroProps {
   students: number;
   lessons: number;
   imageUrl?: string;
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
   instructors?: Instructor[]; // NEW: Instructor objects
 }
 
@@ -51,6 +51,8 @@ export function CourseDetailHero({
         return 'Webinár';
       case 'MASTERCLASS':
         return 'Masterclass';
+      case 'PODCAST':
+        return 'Podcast';
       default:
         return null;
     }
@@ -64,6 +66,8 @@ export function CourseDetailHero({
         return 'bg-purple-100 border-purple-300 text-purple-700';
       case 'MASTERCLASS':
         return 'bg-teal-100 border-teal-300 text-teal-700';
+      case 'PODCAST':
+        return 'bg-green-100 border-green-300 text-green-700';
       default:
         return 'bg-gray-100 border-gray-300 text-gray-700';
     }

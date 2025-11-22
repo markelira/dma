@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo, useRef } from 'react'
 import { motion } from "motion/react"
-import { BookOpen, Video, GraduationCap, Loader2, ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { BookOpen, Video, GraduationCap, Mic, Loader2, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
@@ -16,24 +16,28 @@ const COURSE_TYPE_ICONS: Record<string, any> = {
   ACADEMIA: GraduationCap,
   WEBINAR: Video,
   MASTERCLASS: BookOpen,
+  PODCAST: Mic,
 }
 
 const COURSE_TYPE_LABELS: Record<string, string> = {
   ACADEMIA: 'Akadémia',
   WEBINAR: 'Webinár',
   MASTERCLASS: 'Masterclass',
+  PODCAST: 'Podcast',
 }
 
 const COURSE_TYPE_DESCRIPTIONS: Record<string, string> = {
   ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
   WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
   MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+  PODCAST: 'Egyszeri podcast epizód audio- vagy videótartalommal',
 }
 
 const COURSE_TYPE_GRADIENTS: Record<string, string> = {
   ACADEMIA: 'from-blue-500 to-blue-600',
   WEBINAR: 'from-purple-500 to-purple-600',
   MASTERCLASS: 'from-teal-500 to-teal-600',
+  PODCAST: 'from-green-500 to-green-600',
 }
 
 interface Course {
@@ -52,7 +56,7 @@ interface Course {
   price?: number
   thumbnailUrl?: string
   lessons?: number
-  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
+  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
   createdAt?: any
   tags?: string[]
 }
@@ -231,6 +235,7 @@ export default function CoursesPage() {
         ACADEMIA: coursesData.filter(c => c.courseType === 'ACADEMIA').length,
         WEBINAR: coursesData.filter(c => c.courseType === 'WEBINAR').length,
         MASTERCLASS: coursesData.filter(c => c.courseType === 'MASTERCLASS').length,
+        PODCAST: coursesData.filter(c => c.courseType === 'PODCAST').length,
       })
 
       setCourses(coursesData)
@@ -249,6 +254,7 @@ export default function CoursesPage() {
       ACADEMIA: courses.filter(c => c.courseType === 'ACADEMIA'),
       WEBINAR: courses.filter(c => c.courseType === 'WEBINAR'),
       MASTERCLASS: courses.filter(c => c.courseType === 'MASTERCLASS'),
+      PODCAST: courses.filter(c => c.courseType === 'PODCAST'),
     }
   }, [courses])
 
@@ -368,6 +374,17 @@ export default function CoursesPage() {
             categories={categories}
             instructors={instructors}
             viewAllLink="/masterclass"
+          />
+
+          {/* Podcast Carousel */}
+          <CourseCarouselSection
+            title={COURSE_TYPE_LABELS.PODCAST}
+            description={COURSE_TYPE_DESCRIPTIONS.PODCAST}
+            courses={coursesByType.PODCAST}
+            courseType="PODCAST"
+            categories={categories}
+            instructors={instructors}
+            viewAllLink="/podcast"
           />
 
           {/* Empty State */}

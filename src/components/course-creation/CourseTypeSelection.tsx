@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { CourseType, COURSE_TYPE_LABELS, COURSE_TYPE_DESCRIPTIONS } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Video, GraduationCap, ArrowRight, Check } from 'lucide-react';
+import { BookOpen, Video, GraduationCap, Mic, ArrowRight, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface CourseTypeSelectionProps {
@@ -52,6 +52,17 @@ const courseTypeConfig: Record<CourseType, {
       'Komplex témakörök',
     ],
   },
+  PODCAST: {
+    icon: Mic,
+    color: 'text-green-600',
+    bgColor: 'bg-green-50',
+    borderColor: 'border-green-200 hover:border-green-400',
+    examples: [
+      'Egyszeri podcast epizódok',
+      'Audio vagy videó formátum',
+      'Beszélgetések és interjúk',
+    ],
+  },
 };
 
 export default function CourseTypeSelection({ onSelect, initialSelection }: CourseTypeSelectionProps) {
@@ -79,7 +90,7 @@ export default function CourseTypeSelection({ onSelect, initialSelection }: Cour
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {(Object.entries(courseTypeConfig) as [CourseType, typeof courseTypeConfig[CourseType]][]).map(
           ([type, config]) => {
             const Icon = config.icon;

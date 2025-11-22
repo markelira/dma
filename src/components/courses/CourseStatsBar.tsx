@@ -7,13 +7,15 @@ interface CourseStatsBarProps {
   totalCourses: number
   categoriesCount: number
   filteredCount: number
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | 'ALL'
 }
 
-const courseTypeLabels = {
+const courseTypeLabels: Record<string, string> = {
   WEBINAR: 'Webinárok',
   ACADEMIA: 'Akadémia kurzusok',
-  MASTERCLASS: 'Masterclass kurzusok'
+  MASTERCLASS: 'Masterclass kurzusok',
+  PODCAST: 'Podcastok',
+  ALL: 'Összes kurzus'
 };
 
 /**

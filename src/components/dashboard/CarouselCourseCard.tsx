@@ -11,7 +11,7 @@ export interface CarouselCourseCardProps {
   title: string;
   instructor: string;
   thumbnailUrl?: string;
-  courseType: 'webinar' | 'akademia' | 'masterclass';
+  courseType: 'webinar' | 'akademia' | 'masterclass' | 'podcast';
   duration?: number;
   enrolled?: boolean;
   enrollmentCount?: number;
@@ -22,12 +22,14 @@ const courseTypeLabels: Record<string, string> = {
   webinar: 'Webinar',
   akademia: 'Akademia',
   masterclass: 'Masterclass',
+  podcast: 'Podcast',
 };
 
 const courseTypeColors: Record<string, string> = {
   webinar: 'bg-purple-100 text-purple-700 border-purple-200',
   akademia: 'bg-blue-100 text-blue-700 border-blue-200',
   masterclass: 'bg-amber-100 text-amber-700 border-amber-200',
+  podcast: 'bg-green-100 text-green-700 border-green-200',
 };
 
 export function CarouselCourseCard({

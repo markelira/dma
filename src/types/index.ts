@@ -131,12 +131,13 @@ export interface Lesson {
 
 /**
  * Course Type enum
- * Defines the 3 types of courses in the platform:
+ * Defines the 4 types of courses in the platform:
  * - ACADEMIA: Long, multi-module video course
  * - WEBINAR: Single-lesson webinar with optional resources
  * - MASTERCLASS: Comprehensive multi-module master course
+ * - PODCAST: Single-episode audio/video podcast
  */
-export type CourseType = 'ACADEMIA' | 'WEBINAR' | 'MASTERCLASS';
+export type CourseType = 'ACADEMIA' | 'WEBINAR' | 'MASTERCLASS' | 'PODCAST';
 
 /**
  * Course Type labels in Hungarian for UI display
@@ -145,6 +146,7 @@ export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
   ACADEMIA: 'Akadémia',
   WEBINAR: 'Webinár',
   MASTERCLASS: 'Masterclass',
+  PODCAST: 'Podcast',
 };
 
 /**
@@ -154,6 +156,7 @@ export const COURSE_TYPE_DESCRIPTIONS: Record<CourseType, string> = {
   ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
   WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
   MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+  PODCAST: 'Egyszeri podcast epizód audio- vagy videótartalommal',
 };
 
 export interface Course {

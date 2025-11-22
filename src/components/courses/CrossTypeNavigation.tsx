@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { motion } from 'motion/react';
-import { ArrowRight, BookOpen, Video, GraduationCap } from 'lucide-react';
+import { ArrowRight, BookOpen, Video, GraduationCap, Mic } from 'lucide-react';
 
 interface CrossTypeNavigationProps {
-  currentType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  currentType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
 }
 
 const courseTypeConfig = {
@@ -26,6 +26,12 @@ const courseTypeConfig = {
     url: '/masterclass',
     icon: GraduationCap,
     color: 'amber'
+  },
+  PODCAST: {
+    label: 'Podcastok',
+    url: '/podcast',
+    icon: Mic,
+    color: 'green'
   }
 };
 
@@ -71,6 +77,11 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
                 bg: 'from-amber-500 to-amber-600',
                 hover: 'hover:from-amber-600 hover:to-amber-700',
                 text: 'text-amber-600'
+              },
+              green: {
+                bg: 'from-green-500 to-green-600',
+                hover: 'hover:from-green-600 hover:to-green-700',
+                text: 'text-green-600'
               }
             }[config.color];
 

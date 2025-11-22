@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { GraduationCap, Video, BookOpen, ArrowRight } from "lucide-react";
+import { GraduationCap, Video, BookOpen, Mic, ArrowRight } from "lucide-react";
 import AOS from "aos";
 import Link from "next/link";
 
@@ -63,6 +63,22 @@ export default function CourseTypesSection() {
       bgGradient: "from-teal-50 to-teal-100",
       href: "/courses?type=masterclass",
     },
+    {
+      type: "podcast",
+      title: "Podcast",
+      icon: Mic,
+      description:
+        "Podcast epizódok szakértőkkel és gondolatvezetőkkel. Inspiráló beszélgetések és interjúk, bármikor meghallgathatók.",
+      features: [
+        "Audio vagy videó formátum",
+        "Beszélgetések szakértőkkel",
+        "Bárhol hallgatható",
+        "Inspiráló tartalmak",
+      ],
+      gradient: "from-green-500 to-green-600",
+      bgGradient: "from-green-50 to-green-100",
+      href: "/podcast",
+    },
   ];
 
   return (
@@ -71,7 +87,7 @@ export default function CourseTypesSection() {
         {/* Section Header */}
         <div className="mb-16 text-center" data-aos="fade-up">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Három tanulási forma
+            Négy tanulási forma
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 md:text-xl">
             Válaszd ki azt, ami a legjobban illik a céljaidhoz és tempódhoz
@@ -79,7 +95,7 @@ export default function CourseTypesSection() {
         </div>
 
         {/* Course Type Cards */}
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {courseTypes.map((course, index) => {
             const Icon = course.icon;
             return (

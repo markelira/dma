@@ -24,7 +24,7 @@ interface Course {
   price?: number;
   thumbnailUrl?: string;
   lessons?: number;
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
 }
 
 interface Instructor {
@@ -107,6 +107,8 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
         return 'Webinár';
       case 'MASTERCLASS':
         return 'Masterclass';
+      case 'PODCAST':
+        return 'Podcast';
       default:
         return null;
     }
@@ -131,6 +133,12 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           bg: 'rgba(20, 184, 166, 0.1)', // teal-500
           border: 'rgba(20, 184, 166, 0.3)',
           text: '#14B8A6'
+        };
+      case 'PODCAST':
+        return {
+          bg: 'rgba(34, 197, 94, 0.1)', // green-500
+          border: 'rgba(34, 197, 94, 0.3)',
+          text: '#22C55E'
         };
       default:
         return {

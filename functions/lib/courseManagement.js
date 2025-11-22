@@ -52,9 +52,9 @@ const CourseSchema = z.object({
     instructorId: z.string().min(1, "Instructor is required"),
     instructorIds: z.array(z.string()).min(1, "At least one instructor is required").optional(), // NEW: Multiple instructors support
     // NEW: Course type field (REQUIRED)
-    courseType: z.enum(['ACADEMIA', 'WEBINAR', 'MASTERCLASS'], {
+    courseType: z.enum(['ACADEMIA', 'WEBINAR', 'MASTERCLASS', 'PODCAST'], {
         required_error: "Course type is required",
-        invalid_type_error: "Course type must be ACADEMIA, WEBINAR, or MASTERCLASS"
+        invalid_type_error: "Course type must be ACADEMIA, WEBINAR, MASTERCLASS, or PODCAST"
     }),
     language: z.string().nullish().default('hu'),
     difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).nullish().default('BEGINNER'),

@@ -34,7 +34,7 @@ interface Hero1Props {
   description: string;
   categories?: string[];
   imageUrl?: string;
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
   instructors?: Instructor[];
   keyOutcomes?: string[];
   price?: number;
@@ -66,6 +66,7 @@ export function Hero1ConversionFocused({
       case 'ACADEMIA': return 'Akadémia';
       case 'WEBINAR': return 'Webinár';
       case 'MASTERCLASS': return 'Masterclass';
+      case 'PODCAST': return 'Podcast';
       default: return null;
     }
   };
@@ -75,6 +76,7 @@ export function Hero1ConversionFocused({
       case 'ACADEMIA': return 'bg-blue-100 border-blue-300 text-blue-700';
       case 'WEBINAR': return 'bg-purple-100 border-purple-300 text-purple-700';
       case 'MASTERCLASS': return 'bg-teal-100 border-teal-300 text-teal-700';
+      case 'PODCAST': return 'bg-green-100 border-green-300 text-green-700';
       default: return 'bg-gray-100 border-gray-300 text-gray-700';
     }
   };

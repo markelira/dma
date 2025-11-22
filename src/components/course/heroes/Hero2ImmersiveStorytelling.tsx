@@ -24,7 +24,7 @@ interface Hero2Props {
   students: number;
   lessons: number;
   imageUrl?: string;
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
   instructors?: Instructor[];
   onEnroll?: () => void;
 }
@@ -47,6 +47,7 @@ export function Hero2ImmersiveStorytelling({
       case 'ACADEMIA': return 'Akadémia';
       case 'WEBINAR': return 'Webinár';
       case 'MASTERCLASS': return 'Masterclass';
+      case 'PODCAST': return 'Podcast';
       default: return 'Kurzus';
     }
   };
@@ -56,6 +57,7 @@ export function Hero2ImmersiveStorytelling({
       case 'ACADEMIA': return 'bg-blue-100/20 border-blue-300/30 text-blue-100';
       case 'WEBINAR': return 'bg-purple-100/20 border-purple-300/30 text-purple-100';
       case 'MASTERCLASS': return 'bg-teal-100/20 border-teal-300/30 text-teal-100';
+      case 'PODCAST': return 'bg-green-100/20 border-green-300/30 text-green-100';
       default: return 'bg-white/10 border-white/20 text-white';
     }
   };
