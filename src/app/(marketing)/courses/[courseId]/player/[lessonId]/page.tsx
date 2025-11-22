@@ -60,6 +60,23 @@ export default function CoursePlayerPage() {
   const usesNetflixLayout = playerData?.usesNetflixLayout || false;
   const courseType = course?.type as CourseType | undefined;
 
+  // DIAGNOSTIC: Log player layout decision
+  useEffect(() => {
+    if (playerData) {
+      console.log('[CoursePlayer] Layout decision:', {
+        courseId,
+        courseTitle: course?.title,
+        'course?.type': course?.type,
+        'playerData.usesNetflixLayout': playerData.usesNetflixLayout,
+        usesNetflixLayout,
+        courseType,
+        willRenderNetflix: usesNetflixLayout,
+        willRenderMasterclass: !usesNetflixLayout && courseType === 'MASTERCLASS',
+        willRenderDefault: !usesNetflixLayout && courseType !== 'MASTERCLASS',
+      });
+    }
+  }, [playerData, course, courseId, usesNetflixLayout, courseType]);
+
   // Subscription check
   const hasSub = subStatus?.hasActiveSubscription ?? false;
 

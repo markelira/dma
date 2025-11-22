@@ -57,6 +57,15 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
         const actualCourseId = courseDoc.id;
         const courseType = courseData.type as CourseType | undefined;
 
+        // DIAGNOSTIC: Trace courseType detection
+        console.log('[usePlayerData] Course type detection:', {
+          courseId: actualCourseId,
+          'courseData.type': courseData.type,
+          'courseData.courseType': courseData.courseType,
+          resolvedCourseType: courseType,
+          isInNetflixTypes: courseType ? NETFLIX_STYLE_COURSE_TYPES.includes(courseType) : false,
+        });
+
         // For flat lesson course types, fetch lessons directly
         const usesFlatLessons = courseType && FLAT_LESSON_COURSE_TYPES.includes(courseType);
 
