@@ -192,6 +192,12 @@ const allNavItems: NavItem[] = [
     roles: ['ADMIN'] // CSAK admin
   },
   {
+    title: 'Célközönségek',
+    href: '/admin/target-audiences',
+    icon: Users,
+    roles: ['ADMIN'] // CSAK admin
+  },
+  {
     title: 'Oktatók',
     href: '/admin/instructors',
     icon: UserCog,
