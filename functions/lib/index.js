@@ -1095,15 +1095,30 @@ exports.getCoursesCallable = (0, https_1.onCall)({
                 })));
                 lessonsSource = 'modules_array';
             }
-            // If still no lessons, check for modules subcollection (each module contains lessons[])
+            // If still no lessons, check for modules subcollection
             if (lessons.length === 0) {
                 const modulesSnapshot = await firestore.collection('courses').doc(doc.id).collection('modules').get();
                 if (!modulesSnapshot.empty) {
                     v2_1.logger.info(`[getCoursesCallable] Course ${doc.id} has ${modulesSnapshot.size} modules in subcollection`);
                     for (const moduleDoc of modulesSnapshot.docs) {
                         const moduleData = moduleDoc.data();
-                        const moduleLessons = moduleData.lessons || [];
-                        v2_1.logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} lessons`);
+                        // First check if lessons are embedded in module document
+                        let moduleLessons = moduleData.lessons || [];
+                        v2_1.logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} embedded lessons`);
+                        // If no embedded lessons, check for lessons subcollection inside module
+                        if (moduleLessons.length === 0) {
+                            const lessonsSubSnapshot = await firestore
+                                .collection('courses').doc(doc.id)
+                                .collection('modules').doc(moduleDoc.id)
+                                .collection('lessons').get();
+                            if (!lessonsSubSnapshot.empty) {
+                                moduleLessons = lessonsSubSnapshot.docs.map(lessonDoc => ({
+                                    id: lessonDoc.id,
+                                    ...lessonDoc.data()
+                                }));
+                                v2_1.logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} lessons in subcollection`);
+                            }
+                        }
                         lessons.push(...moduleLessons.map((lesson) => ({
                             ...lesson,
                             moduleName: moduleData.title || moduleData.name,
