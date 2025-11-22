@@ -1099,20 +1099,27 @@ export const getCourse = onCall({
 
 /**
  * Get all courses with optional filters
+ * Used by LessonImportModal for MASTERCLASS course creation
  */
 export const getCoursesCallable = onCall({
   region: 'us-central1',
 }, async (request) => {
   try {
-    logger.info('[getCoursesCallable] Called');
-    
-    // Simple query - get all courses
-    const snapshot = await firestore.collection('courses').get();
+    const { forImport } = request.data || {};
+    logger.info('[getCoursesCallable] Called', { forImport });
+
+    // Build query - optionally filter by PUBLISHED status for import
+    let query: FirebaseFirestore.Query = firestore.collection('courses');
+    if (forImport) {
+      query = query.where('status', '==', 'PUBLISHED');
+    }
+
+    const snapshot = await query.get();
     const courses: any[] = [];
-    
+
     for (const doc of snapshot.docs) {
       const courseData = doc.data();
-      
+
       // Get instructor data
       let instructor = null;
       if (courseData?.instructorId) {
@@ -1127,7 +1134,7 @@ export const getCoursesCallable = onCall({
           };
         }
       }
-      
+
       // Get category data
       let category = null;
       if (courseData?.categoryId) {
@@ -1140,23 +1147,38 @@ export const getCoursesCallable = onCall({
           };
         }
       }
-      
+
+      // Get lessons - either from embedded array or from the course document
+      // Lessons are stored as embedded array in the course document (flat structure)
+      let lessons = courseData.lessons || [];
+
+      // If no embedded lessons, check for modules with lessons (legacy structure)
+      if (lessons.length === 0 && courseData.modules && Array.isArray(courseData.modules)) {
+        lessons = courseData.modules.flatMap((module: any) =>
+          (module.lessons || []).map((lesson: any) => ({
+            ...lesson,
+            moduleName: module.title,
+          }))
+        );
+      }
+
       courses.push({
         id: doc.id,
         ...courseData,
+        lessons, // Ensure lessons are always included
         instructor,
         category
       });
     }
-    
+
     logger.info(`[getCoursesCallable] Found ${courses.length} courses`);
-    
+
     return {
       success: true,
       courses,
       total: courses.length
     };
-    
+
   } catch (error: any) {
     logger.error('[getCoursesCallable] Error:', error);
     return {

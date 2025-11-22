@@ -50,11 +50,11 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const getCoursesFn = httpsCallable<{}, { success: boolean; courses: CourseWithLessons[] }>(
+        const getCoursesFn = httpsCallable<{ forImport?: boolean }, { success: boolean; courses: CourseWithLessons[] }>(
           fbFunctions,
           "getCoursesCallable"
         );
-        const result = await getCoursesFn({});
+        const result = await getCoursesFn({ forImport: true });
 
         if (result.data.success) {
           // Filter out current course and only show published courses with lessons
@@ -122,7 +122,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
       id: undefined, // Will get new ID
       tempId: `imported_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       sourceLessonId: lesson.id,
-      sourceCourseid: lesson.sourceCourseId,
+      sourceCourseId: lesson.sourceCourseId,
       isImported: true,
     }));
 

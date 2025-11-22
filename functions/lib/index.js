@@ -1030,14 +1030,20 @@ exports.getCourse = (0, https_1.onCall)({
 });
 /**
  * Get all courses with optional filters
+ * Used by LessonImportModal for MASTERCLASS course creation
  */
 exports.getCoursesCallable = (0, https_1.onCall)({
     region: 'us-central1',
 }, async (request) => {
     try {
-        v2_1.logger.info('[getCoursesCallable] Called');
-        // Simple query - get all courses
-        const snapshot = await firestore.collection('courses').get();
+        const { forImport } = request.data || {};
+        v2_1.logger.info('[getCoursesCallable] Called', { forImport });
+        // Build query - optionally filter by PUBLISHED status for import
+        let query = firestore.collection('courses');
+        if (forImport) {
+            query = query.where('status', '==', 'PUBLISHED');
+        }
+        const snapshot = await query.get();
         const courses = [];
         for (const doc of snapshot.docs) {
             const courseData = doc.data();
@@ -1067,9 +1073,20 @@ exports.getCoursesCallable = (0, https_1.onCall)({
                     };
                 }
             }
+            // Get lessons - either from embedded array or from the course document
+            // Lessons are stored as embedded array in the course document (flat structure)
+            let lessons = courseData.lessons || [];
+            // If no embedded lessons, check for modules with lessons (legacy structure)
+            if (lessons.length === 0 && courseData.modules && Array.isArray(courseData.modules)) {
+                lessons = courseData.modules.flatMap((module) => (module.lessons || []).map((lesson) => ({
+                    ...lesson,
+                    moduleName: module.title,
+                })));
+            }
             courses.push({
                 id: doc.id,
                 ...courseData,
+                lessons, // Ensure lessons are always included
                 instructor,
                 category
             });
