@@ -93,25 +93,25 @@ export default function SettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Profil beállítások</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold text-white mb-2">Profil beállítások</h1>
+        <p className="text-gray-400">
           Frissítse profil adatait
         </p>
       </div>
 
       {/* Main Content */}
       <div className="max-w-6xl">
-            <Card className="border border-gray-200 shadow-sm bg-white">
-                <CardContent className="p-10 space-y-7">
+            <div className="rounded-xl bg-[#1a1a1a] border border-gray-800">
+                <div className="p-10 space-y-7">
                   {/* Profile Picture */}
-                  <div className="flex items-center gap-5 pb-7 border-b border-gray-200">
+                  <div className="flex items-center gap-5 pb-7 border-b border-gray-800">
                     <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                       <span className="text-white text-2xl font-semibold">
                         {firstName?.[0]?.toUpperCase() || 'U'}{lastName?.[0]?.toUpperCase() || ''}
                       </span>
                     </div>
                     <div>
-                      <p className="text-base font-medium text-gray-900">Profilkép</p>
+                      <p className="text-base font-medium text-white">Profilkép</p>
                       <p className="text-sm text-gray-500 mt-1">JPG, PNG max. 2MB</p>
                     </div>
                   </div>
@@ -119,26 +119,26 @@ export default function SettingsPage() {
                 {/* Name Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-                    <Label htmlFor="firstName" className="text-sm font-medium text-gray-900">
+                    <Label htmlFor="firstName" className="text-sm font-medium text-white">
                       Keresztnév
                     </Label>
                     <Input
                       id="firstName"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500"
                       placeholder="János"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="lastName" className="text-sm font-medium text-gray-900">
+                    <Label htmlFor="lastName" className="text-sm font-medium text-white">
                       Vezetéknév
                     </Label>
                     <Input
                       id="lastName"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500"
                       placeholder="Kovács"
                     />
                   </div>
@@ -147,7 +147,7 @@ export default function SettingsPage() {
                 {/* Contact Info */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-1.5">
-                    <Label htmlFor="email" className="text-sm font-medium text-gray-900">
+                    <Label htmlFor="email" className="text-sm font-medium text-white">
                       Email cím
                     </Label>
                     <Input
@@ -155,14 +155,14 @@ export default function SettingsPage() {
                       type="email"
                       value={email}
                       disabled
-                      className="h-10 bg-gray-50 border-gray-300 cursor-not-allowed text-gray-500"
+                      className="h-10 bg-gray-800 border-gray-700 cursor-not-allowed text-gray-500"
                     />
                     <p className="text-xs text-gray-500 mt-1.5">Az email cím nem módosítható</p>
                   </div>
 
                   <div className="space-y-1.5">
-                    <Label htmlFor="phone" className="text-sm font-medium text-gray-900">
-                      Telefonszám <span className="text-gray-400 font-normal">(opcionális)</span>
+                    <Label htmlFor="phone" className="text-sm font-medium text-white">
+                      Telefonszám <span className="text-gray-500 font-normal">(opcionális)</span>
                     </Label>
                     <Input
                       id="phone"
@@ -170,28 +170,28 @@ export default function SettingsPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+36 30 123 4567"
-                      className="h-10 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-gray-900 border-gray-700 text-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 {/* Bio */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="bio" className="text-sm font-medium text-gray-900">
-                    Bemutatkozás <span className="text-gray-400 font-normal">(opcionális)</span>
+                  <Label htmlFor="bio" className="text-sm font-medium text-white">
+                    Bemutatkozás <span className="text-gray-500 font-normal">(opcionális)</span>
                   </Label>
                   <textarea
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full px-3 py-2.5 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
+                    className="w-full px-3 py-2.5 bg-gray-900 border border-gray-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm text-white placeholder:text-gray-500"
                     rows={4}
                     placeholder="Írjon magáról pár mondatot..."
                   />
                 </div>
 
                 {/* Save Button */}
-                <div className="flex justify-end pt-7 border-t border-gray-200">
+                <div className="flex justify-end pt-7 border-t border-gray-800">
                   <Button
                     onClick={saveProfile}
                     disabled={profileSaving}
@@ -210,8 +210,8 @@ export default function SettingsPage() {
                     )}
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
       </div>
     </div>
   )

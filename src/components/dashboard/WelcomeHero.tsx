@@ -69,7 +69,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       title: 'Kurzusok böngészése',
       description: 'Fedezze fel 100+ szakmai kurzust',
       href: '/dashboard/browse',
-      color: 'bg-gray-900 hover:bg-black',
+      color: 'bg-blue-600 hover:bg-blue-700',
       badge: 'Népszerű'
     },
     {
@@ -77,7 +77,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       title: 'Személyre szabott javaslatok',
       description: 'AI-alapú kurzusajánlatok',
       href: '/dashboard/browse?tab=recommended',
-      color: 'bg-gray-800 hover:bg-gray-900',
+      color: 'bg-gray-700 hover:bg-gray-600',
       badge: 'Új'
     }
   ]
@@ -229,29 +229,29 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
         {quickActions.map((action, index) => (
           <Link key={index} href={action.href}>
             <motion.div
-              className={`${cardStyles.flat} p-6 cursor-pointer group`}
+              className="rounded-xl bg-[#1a1a1a] border border-gray-800 p-6 cursor-pointer group hover:border-gray-700 transition-all"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
               whileHover={{ y: -4 }}
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-lg ${action?.color || 'bg-gray-900'} flex items-center justify-center text-white group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-lg ${action?.color || 'bg-blue-600'} flex items-center justify-center text-white group-hover:scale-110 transition-transform`}>
                   {action?.icon}
                 </div>
                 {action?.badge && (
-                  <Badge variant="secondary" className="text-xs">
+                  <span className="text-xs px-2 py-1 bg-blue-900/30 text-blue-400 rounded-full">
                     {action.badge}
-                  </Badge>
+                  </span>
                 )}
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-[#466C95] transition-colors">
+              <h3 className="font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
                 {action?.title}
               </h3>
-              <p className="text-gray-600 text-sm mb-4">
+              <p className="text-gray-400 text-sm mb-4">
                 {action?.description}
               </p>
-              <div className="flex items-center text-gray-900 text-sm font-medium group-hover:text-[#466C95] transition-colors">
+              <div className="flex items-center text-blue-400 text-sm font-medium group-hover:text-blue-300 transition-colors">
                 Kezdés
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -264,10 +264,10 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Kiemelt Kurzusok</h2>
-            <p className="text-gray-600 mt-1">A legkeresettebb tanulási lehetőségek</p>
+            <h2 className="text-2xl font-bold text-white">Kiemelt Kurzusok</h2>
+            <p className="text-gray-400 mt-1">A legkeresettebb tanulási lehetőségek</p>
           </div>
-          <Link href="/dashboard/browse" className="text-gray-900 hover:text-gray-700 font-medium flex items-center">
+          <Link href="/dashboard/browse" className="text-blue-400 hover:text-blue-300 font-medium flex items-center">
             Összes megtekintése
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
@@ -277,134 +277,165 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
           // Loading skeleton for trending courses
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden animate-pulse">
-                <div className="h-48 bg-gray-200" />
-                <CardContent className="p-6 space-y-4">
-                  <div className="h-4 bg-gray-200 rounded w-3/4" />
-                  <div className="h-6 bg-gray-200 rounded" />
-                  <div className="h-4 bg-gray-200 rounded w-1/2" />
-                  <div className="h-10 bg-gray-200 rounded" />
-                </CardContent>
-              </Card>
+              <div key={i} className="rounded-xl bg-[#1a1a1a] border border-gray-800 overflow-hidden animate-pulse">
+                <div className="aspect-video bg-gray-800" />
+                <div className="p-5 space-y-3">
+                  <div className="flex gap-2">
+                    <div className="h-5 bg-gray-700 rounded-full w-16" />
+                    <div className="h-5 bg-gray-700 rounded-full w-20" />
+                  </div>
+                  <div className="h-5 bg-gray-700 rounded w-full" />
+                  <div className="h-4 bg-gray-700 rounded w-3/4" />
+                  <div className="h-4 bg-gray-700 rounded w-1/2" />
+                  <div className="h-10 bg-gray-700 rounded mt-4" />
+                </div>
+              </div>
             ))}
           </div>
         ) : featuredCourses.length === 0 ? (
           // Empty state when no courses available
-          <Card className="p-8 text-center">
+          <div className="rounded-xl bg-[#1a1a1a] border border-gray-800 p-8 text-center">
             <div className="flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-gray-500" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold text-white mb-2">
                   Nincsenek elérhető kurzusok
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-400 text-sm">
                   Jelenleg nincs megjeleníthető kurzus. Kérjük, látogasson vissza később.
                 </p>
               </div>
               <Link href="/dashboard/browse">
-                <Button variant="outline">
+                <button className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors">
                   Kurzusok böngészése
-                </Button>
+                </button>
               </Link>
             </div>
-          </Card>
+          </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {featuredCourses.map((course, index) => {
               // Map course data to display format
               const courseData = {
                 id: course.id,
+                slug: course.slug,
                 title: course.title,
+                description: course.description || course.shortDescription || '',
+                thumbnail: course.thumbnailUrl || course.thumbnail || null,
                 category: course.category?.name || course.category || 'Általános',
                 rating: course.averageRating || course.rating || 4.8,
                 students: course.enrollmentCount || course.students || 0,
                 instructor: course.instructor ?
-                  `${course.instructor.firstName} ${course.instructor.lastName}` :
-                  course.instructor || 'Oktató',
+                  (typeof course.instructor === 'string' ? course.instructor : `${course.instructor.firstName || ''} ${course.instructor.lastName || ''}`.trim()) :
+                  'Oktató',
                 level: course.difficulty || course.level || 'Kezdő',
-                isPlus: course.isPlus || false,
-                highlights: course.highlights || ['Gyakorlati', 'Interaktív', 'Tanúsítvány']
+                duration: course.totalDuration || course.duration || 0,
+                lessonCount: course.lessonCount || course.totalLessons || 0,
+              }
+
+              // Format duration in hours and minutes
+              const formatDuration = (minutes: number) => {
+                if (minutes < 60) return `${minutes} perc`
+                const hours = Math.floor(minutes / 60)
+                const mins = minutes % 60
+                return mins > 0 ? `${hours} ó ${mins} p` : `${hours} óra`
+              }
+
+              // Map level to Hungarian
+              const getLevelText = (level: string) => {
+                const levelMap: Record<string, string> = {
+                  'BEGINNER': 'Kezdő',
+                  'INTERMEDIATE': 'Középhaladó',
+                  'ADVANCED': 'Haladó',
+                  'EXPERT': 'Szakértő'
+                }
+                return levelMap[level] || level
               }
 
               return (
-                <motion.div
-                  key={courseData.id}
-                  className={`${cardStyles.flat} cursor-pointer group overflow-hidden`}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  whileHover={{ y: -4 }}
-                >
-                  <div className="h-48 relative" style={{ background: brandGradient }}>
-                    <div className="absolute inset-0 bg-black/20" />
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-white/20 text-white border-white/30">
-                        {typeof courseData.category === 'string' ? courseData.category : (courseData.category as any)?.name || 'N/A'}
-                      </Badge>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <Badge className="bg-yellow-500 text-yellow-900">
-                        {courseData.isPlus ? 'DMA Plus' : 'Ingyenes próba'}
-                      </Badge>
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <div className="text-white">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Star className="w-4 h-4 text-yellow-300" />
-                          <span className="text-sm font-medium">{courseData.rating.toFixed(1)}</span>
-                          <span className="text-sm text-white/80">({courseData.students} tanuló)</span>
+                <Link key={courseData.id} href={`/courses/${courseData.slug || courseData.id}`}>
+                  <motion.div
+                    className="rounded-xl bg-[#1a1a1a] border border-gray-800 cursor-pointer group overflow-hidden hover:border-gray-700 hover:shadow-xl hover:shadow-black/20 transition-all h-full flex flex-col"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    whileHover={{ y: -4 }}
+                  >
+                    {/* Thumbnail */}
+                    <div className="aspect-video relative bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden">
+                      {courseData.thumbnail ? (
+                        <img
+                          src={courseData.thumbnail}
+                          alt={courseData.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <BookOpen className="w-12 h-12 text-white/30" />
                         </div>
-                      </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     </div>
-                  </div>
 
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      <div>
-                        <Badge variant="outline" className="text-xs mb-2">
-                          {courseData.level === 'BEGINNER' ? 'Kezdő' :
-                           courseData.level === 'INTERMEDIATE' ? 'Középhaladó' :
-                           courseData.level === 'ADVANCED' ? 'Haladó' :
-                           courseData.level === 'EXPERT' ? 'Szakértő' : courseData.level}
-                        </Badge>
-                        <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 transition-colors">
-                          {courseData.title}
-                        </h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {courseData.instructor}
+                    {/* Content */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      {/* Tags */}
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        <span className="px-2 py-0.5 bg-blue-900/40 text-blue-400 text-xs font-medium rounded">
+                          {typeof courseData.category === 'string' ? courseData.category : 'Kurzus'}
+                        </span>
+                        <span className="px-2 py-0.5 bg-gray-800 text-gray-400 text-xs rounded">
+                          {getLevelText(courseData.level)}
+                        </span>
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="font-semibold text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-400 transition-colors mb-2">
+                        {courseData.title}
+                      </h3>
+
+                      {/* Description */}
+                      {courseData.description && (
+                        <p className="text-sm text-gray-400 line-clamp-2 mb-3">
+                          {courseData.description}
                         </p>
-                      </div>
+                      )}
 
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <div className="flex items-center">
-                          <Users className="w-4 h-4 mr-1" />
-                          {courseData.students}
+                      {/* Instructor */}
+                      <p className="text-sm text-gray-500 mb-4">
+                        {courseData.instructor}
+                      </p>
+
+                      {/* Stats */}
+                      <div className="flex items-center gap-4 text-xs text-gray-500 mt-auto mb-4">
+                        {courseData.duration > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5" />
+                            <span>{formatDuration(courseData.duration)}</span>
+                          </div>
+                        )}
+                        {courseData.lessonCount > 0 && (
+                          <div className="flex items-center gap-1">
+                            <Play className="w-3.5 h-3.5" />
+                            <span>{courseData.lessonCount} lecke</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <Star className="w-3.5 h-3.5 text-yellow-500" />
+                          <span>{courseData.rating.toFixed(1)}</span>
                         </div>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 mr-1" />
-                          {courseData.rating.toFixed(1)}
-                        </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2">
-                        {courseData.highlights.map((highlight, idx) => (
-                          <Badge key={idx} variant="secondary" className="text-xs">
-                            {highlight}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <Link href={`/courses/${courseData.slug || courseData.id}`}>
-                        <button className={`w-full ${buttonStyles.primaryLight} !rounded-lg !py-2.5 text-sm`}>
-                          <Play className="w-4 h-4" />
-                          <span>Kurzus megtekintése</span>
-                        </button>
-                      </Link>
+                      {/* CTA Button */}
+                      <button className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2.5 text-sm font-medium transition-colors shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
+                        <span>Megtekintés</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Link>
               )
             })}
           </div>

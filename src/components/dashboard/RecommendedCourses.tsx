@@ -16,11 +16,11 @@ export function RecommendedCourses() {
   const { data: courses = [], isLoading, error } = useRecommendedCourses(3)
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
-        <div className="h-6 w-40 bg-gray-200 rounded animate-pulse mb-4" />
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
+        <div className="h-6 w-40 bg-gray-700 rounded animate-pulse mb-4" />
         <div className="space-y-4">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-24 bg-gray-100 rounded animate-pulse" />
+            <div key={item} className="h-24 bg-gray-800 rounded animate-pulse" />
           ))}
         </div>
       </div>
@@ -28,26 +28,26 @@ export function RecommendedCourses() {
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
+    <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
           Ajánlott kurzusok
         </h2>
         <Link
           href="/courses"
-          className="text-sm font-medium text-blue-600 hover:text-blue-700"
+          className="text-sm font-medium text-blue-400 hover:text-blue-300"
         >
           Összes →
         </Link>
       </div>
 
       {error && (
-        <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-600">
+        <div className="mb-4 rounded-lg bg-red-900/30 border border-red-800 p-4 text-sm text-red-400">
           Hiba történt a kurzusok betöltése közben. {error instanceof Error ? error.message : 'Ismeretlen hiba'}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {courses.length === 0 && !error ? (
           <div className="py-8 text-center text-sm text-gray-500">
             Jelenleg nincs elérhető kurzus ajánlat.
@@ -58,22 +58,22 @@ export function RecommendedCourses() {
             <Link
               key={course.id}
               href={`/courses/${course.id}`}
-              className="block rounded-lg border border-gray-200 p-4 transition-all hover:shadow-md hover:border-blue-200"
+              className="block rounded-lg border border-gray-800 p-4 transition-all hover:border-gray-700 hover:bg-gray-800/50"
             >
               {/* Course Title */}
-              <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2">
+              <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2">
                 {course.title}
               </h3>
 
               {/* Instructor */}
-              <p className="text-xs text-gray-600 mb-3">{course.instructor}</p>
+              <p className="text-xs text-gray-400 mb-3">{course.instructor}</p>
 
               {/* Stats */}
               <div className="flex items-center gap-3 text-xs text-gray-500">
                 {/* Rating */}
                 <div className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                  <span className="font-medium text-gray-900">{course.rating}</span>
+                  <span className="font-medium text-white">{course.rating}</span>
                 </div>
 
                 {/* Enrolled Count */}
@@ -92,7 +92,7 @@ export function RecommendedCourses() {
               {/* Category Badge */}
               {course.category && (
                 <div className="mt-3">
-                  <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-50 text-blue-600 rounded">
+                  <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-900/30 text-blue-400 rounded">
                     {course.category}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export function RecommendedCourses() {
       {/* CTA Button */}
       <Link
         href="/courses"
-        className="mt-4 block w-full rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-center text-sm font-medium text-blue-600 hover:bg-blue-100 transition-colors"
+        className="mt-4 block w-full rounded-lg border border-gray-700 bg-gray-800/50 px-4 py-2.5 text-center text-sm font-medium text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
       >
         További kurzusok felfedezése
       </Link>

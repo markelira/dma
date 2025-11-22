@@ -35,16 +35,16 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-          <p className="font-medium text-sm mb-1">{payload[0].payload.label}</p>
+        <div className="bg-[#1a1a1a] p-3 rounded-lg shadow-lg border border-gray-700">
+          <p className="font-medium text-sm mb-1 text-white">{payload[0].payload.label}</p>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-600" />
-            <span className="text-sm">
+            <Clock className="w-4 h-4 text-blue-400" />
+            <span className="text-sm text-gray-300">
               {payload[0].value} óra ({(payload[0].value * 60).toFixed(0)} perc)
             </span>
           </div>
           {goalHours && (
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Cél: {goalHours} óra
             </p>
           )}
@@ -56,29 +56,29 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
 
   if (isLoading) {
     return (
-      <Card className="p-6">
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
         <div className="flex items-center justify-between mb-6">
           <div className="space-y-2">
-            <div className="h-6 w-48 bg-muted animate-pulse rounded" />
-            <div className="h-4 w-32 bg-muted animate-pulse rounded" />
+            <div className="h-6 w-48 bg-gray-700 animate-pulse rounded" />
+            <div className="h-4 w-32 bg-gray-700 animate-pulse rounded" />
           </div>
-          <div className="h-10 w-64 bg-muted animate-pulse rounded" />
+          <div className="h-10 w-64 bg-gray-700 animate-pulse rounded" />
         </div>
-        <div className="h-64 bg-muted animate-pulse rounded" />
-      </Card>
+        <div className="h-64 bg-gray-800 animate-pulse rounded" />
+      </div>
     );
   }
 
   return (
-    <Card className="p-6">
+    <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
+            <TrendingUp className="w-5 h-5 text-blue-400" />
             Tanulási aktivitás
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             {timeRange === 'week' && 'Heti tanulási órák'}
             {timeRange === 'month' && 'Havi tanulási órák'}
             {timeRange === 'year' && 'Éves tanulási órák'}
@@ -87,66 +87,75 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
 
         {/* Time Range Selector */}
         <div className="flex gap-2">
-          <Button
-            variant={timeRange === 'week' ? 'default' : 'outline'}
-            size="sm"
+          <button
             onClick={() => handleTimeRangeChange('week')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              timeRange === 'week'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             Hét
-          </Button>
-          <Button
-            variant={timeRange === 'month' ? 'default' : 'outline'}
-            size="sm"
+          </button>
+          <button
             onClick={() => handleTimeRangeChange('month')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              timeRange === 'month'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             Hónap
-          </Button>
-          <Button
-            variant={timeRange === 'year' ? 'default' : 'outline'}
-            size="sm"
+          </button>
+          <button
             onClick={() => handleTimeRangeChange('year')}
+            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              timeRange === 'year'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             Év
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4">
+        <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Calendar className="w-4 h-4 text-blue-600" />
-            <span className="text-xs font-medium text-blue-600">Összesen</span>
+            <Calendar className="w-4 h-4 text-blue-400" />
+            <span className="text-xs font-medium text-blue-400">Összesen</span>
           </div>
-          <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+          <div className="text-2xl font-bold text-blue-400">
             {totalHours}h
           </div>
-          <p className="text-xs text-muted-foreground mt-1">
+          <p className="text-xs text-gray-500 mt-1">
             {data.totalMinutes} perc
           </p>
         </div>
 
-        <div className="bg-purple-50 dark:bg-purple-950/20 rounded-lg p-4">
+        <div className="bg-purple-900/20 border border-purple-800/50 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Clock className="w-4 h-4 text-purple-600" />
-            <span className="text-xs font-medium text-purple-600">Átlag</span>
+            <Clock className="w-4 h-4 text-purple-400" />
+            <span className="text-xs font-medium text-purple-400">Átlag</span>
           </div>
-          <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
+          <div className="text-2xl font-bold text-purple-400">
             {avgHours}h
           </div>
-          <p className="text-xs text-muted-foreground mt-1">naponta</p>
+          <p className="text-xs text-gray-500 mt-1">naponta</p>
         </div>
 
         {goalHours && (
-          <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-4">
+          <div className="bg-green-900/20 border border-green-800/50 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-1">
-              <TrendingUp className="w-4 h-4 text-green-600" />
-              <span className="text-xs font-medium text-green-600">Heti cél</span>
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              <span className="text-xs font-medium text-green-400">Heti cél</span>
             </div>
-            <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+            <div className="text-2xl font-bold text-green-400">
               {goalHours}h
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               {((totalHours / goalHours) * 100).toFixed(0)}% teljesítve
             </p>
           </div>
@@ -163,18 +172,18 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
                 <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.2}/>
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
             <XAxis
               dataKey="label"
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 12, fill: '#9ca3af' }}
               tickLine={false}
-              axisLine={{ stroke: '#e5e7eb' }}
+              axisLine={{ stroke: '#374151' }}
             />
             <YAxis
-              tick={{ fontSize: 12 }}
+              tick={{ fontSize: 12, fill: '#9ca3af' }}
               tickLine={false}
-              axisLine={{ stroke: '#e5e7eb' }}
-              label={{ value: 'Órák', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+              axisLine={{ stroke: '#374151' }}
+              label={{ value: 'Órák', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#9ca3af' } }}
             />
             <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(59, 130, 246, 0.1)' }} />
             <Bar
@@ -198,6 +207,6 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
         </ResponsiveContainer>
       </div>
 
-    </Card>
+    </div>
   );
 }

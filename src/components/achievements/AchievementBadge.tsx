@@ -69,7 +69,7 @@ export function AchievementBadge({
       <div
         className={`
           relative p-4 rounded-lg border-2 transition-all
-          ${isLocked ? 'bg-gray-50 dark:bg-gray-900 border-gray-300 dark:border-gray-700' : `bg-gradient-to-br ${colors.bg} ${colors.border}`}
+          ${isLocked ? 'bg-gray-900 border-gray-700' : `bg-gradient-to-br ${colors.bg} ${colors.border}`}
           ${!isLocked && `shadow-lg ${colors.glow}`}
         `}
       >
@@ -78,11 +78,11 @@ export function AchievementBadge({
           <div
             className={`
               w-16 h-16 rounded-full flex items-center justify-center
-              ${isLocked ? 'bg-gray-200 dark:bg-gray-800' : 'bg-white/20 backdrop-blur-sm'}
+              ${isLocked ? 'bg-gray-800' : 'bg-white/20 backdrop-blur-sm'}
             `}
           >
             {isLocked ? (
-              <Lock className="w-8 h-8 text-gray-400" />
+              <Lock className="w-8 h-8 text-gray-500" />
             ) : (
               <IconComponent className="w-8 h-8 text-white" />
             )}
@@ -90,7 +90,7 @@ export function AchievementBadge({
 
           {/* Tier Badge */}
           {!isLocked && tier && (
-            <div className="absolute -top-1 -right-1 px-2 py-0.5 bg-white dark:bg-gray-900 rounded-full text-xs font-bold uppercase shadow-md">
+            <div className="absolute -top-1 -right-1 px-2 py-0.5 bg-gray-900 rounded-full text-xs font-bold uppercase shadow-md">
               <span className={colors.text}>{tier}</span>
             </div>
           )}
@@ -100,7 +100,7 @@ export function AchievementBadge({
         <h4
           className={`
             text-sm font-semibold text-center mb-1
-            ${isLocked ? 'text-gray-500' : 'text-white'}
+            ${isLocked ? 'text-gray-400' : 'text-white'}
           `}
         >
           {isLocked ? '???' : achievement.title}
@@ -110,7 +110,7 @@ export function AchievementBadge({
         <p
           className={`
             text-xs text-center line-clamp-2
-            ${isLocked ? 'text-gray-400' : 'text-white/80'}
+            ${isLocked ? 'text-gray-500' : 'text-white/80'}
           `}
         >
           {isLocked ? 'Oldja fel ezt a jelvényt' : achievement.description}
@@ -128,12 +128,12 @@ export function AchievementBadge({
         {/* Progress Bar for Locked Achievements */}
         {isLocked && showProgress && (
           <div className="mt-3">
-            <div className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5 }}
-                className="h-full bg-blue-600 rounded-full"
+                className="h-full bg-blue-500 rounded-full"
               />
             </div>
             <p className="text-xs text-gray-500 text-center mt-1">{progress}% kész</p>

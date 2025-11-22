@@ -87,17 +87,15 @@ export function AchievementUnlockModal({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
-              <Button
-                variant="ghost"
-                size="sm"
+              <button
                 onClick={onClose}
-                className="absolute -top-2 -right-2 z-10 rounded-full bg-white dark:bg-gray-900 shadow-lg"
+                className="absolute -top-2 -right-2 z-10 p-2 rounded-full bg-gray-900 shadow-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
               >
                 <X className="w-4 h-4" />
-              </Button>
+              </button>
 
               {/* Card */}
-              <div className="bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl">
+              <div className="bg-[#1a1a1a] rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
                 {/* Header with Gradient */}
                 <div className={`relative bg-gradient-to-br ${tierColor} p-8`}>
                   {/* Sparkles Animation */}
@@ -169,7 +167,7 @@ export function AchievementUnlockModal({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="text-xl font-bold text-center mb-3"
+                    className="text-xl font-bold text-center mb-3 text-white"
                   >
                     {achievement.title}
                   </motion.h3>
@@ -178,7 +176,7 @@ export function AchievementUnlockModal({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="text-muted-foreground text-center mb-6"
+                    className="text-gray-400 text-center mb-6"
                   >
                     {achievement.description}
                   </motion.p>
@@ -189,30 +187,30 @@ export function AchievementUnlockModal({
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.7 }}
-                      className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mb-6"
+                      className="bg-gray-800 rounded-lg p-4 mb-6"
                     >
                       {achievement.metadata.courseName && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Kurzus: </span>
-                          <span className="font-medium">{achievement.metadata.courseName}</span>
+                          <span className="text-gray-400">Kurzus: </span>
+                          <span className="font-medium text-white">{achievement.metadata.courseName}</span>
                         </div>
                       )}
                       {achievement.metadata.streakDays && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Sorozat: </span>
-                          <span className="font-medium">{achievement.metadata.streakDays} nap</span>
+                          <span className="text-gray-400">Sorozat: </span>
+                          <span className="font-medium text-white">{achievement.metadata.streakDays} nap</span>
                         </div>
                       )}
                       {achievement.metadata.quizScore && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Pontszám: </span>
-                          <span className="font-medium">{achievement.metadata.quizScore}%</span>
+                          <span className="text-gray-400">Pontszám: </span>
+                          <span className="font-medium text-white">{achievement.metadata.quizScore}%</span>
                         </div>
                       )}
                       {achievement.metadata.points && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Pont: </span>
-                          <span className="font-medium">+{achievement.metadata.points} XP</span>
+                          <span className="text-gray-400">Pont: </span>
+                          <span className="font-medium text-white">+{achievement.metadata.points} XP</span>
                         </div>
                       )}
                     </motion.div>
@@ -224,13 +222,12 @@ export function AchievementUnlockModal({
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                   >
-                    <Button
+                    <button
                       onClick={onClose}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                      size="lg"
+                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all"
                     >
                       Nagyszerű!
-                    </Button>
+                    </button>
                   </motion.div>
                 </div>
               </div>

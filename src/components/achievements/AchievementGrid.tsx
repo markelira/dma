@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Award, Filter, Lock, CheckCircle } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { AchievementBadge } from './AchievementBadge';
 import type { UserAchievement } from '@/types';
 
@@ -32,79 +30,85 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
 
   if (isLoading) {
     return (
-      <Card className="p-6">
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
         <div className="space-y-4">
-          <div className="h-8 w-48 bg-muted animate-pulse rounded" />
+          <div className="h-8 w-48 bg-gray-700 animate-pulse rounded" />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-48 bg-muted animate-pulse rounded-lg" />
+              <div key={i} className="h-48 bg-gray-800 animate-pulse rounded-lg" />
             ))}
           </div>
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-6">
+    <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <Award className="w-5 h-5 text-yellow-600" />
+          <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
+            <Award className="w-5 h-5 text-yellow-500" />
             Eredmények
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm text-gray-400 mt-1">
             {unlockedCount} / {achievements.length} jelvény feloldva
           </p>
         </div>
 
         {/* Filter Buttons */}
         <div className="flex gap-2">
-          <Button
-            variant={filter === 'all' ? 'default' : 'outline'}
-            size="sm"
+          <button
             onClick={() => setFilter('all')}
-            className="gap-2"
+            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              filter === 'all'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             <Filter className="w-4 h-4" />
             Mind ({achievements.length})
-          </Button>
-          <Button
-            variant={filter === 'unlocked' ? 'default' : 'outline'}
-            size="sm"
+          </button>
+          <button
             onClick={() => setFilter('unlocked')}
-            className="gap-2"
+            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              filter === 'unlocked'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             <CheckCircle className="w-4 h-4" />
             Feloldva ({unlockedCount})
-          </Button>
-          <Button
-            variant={filter === 'locked' ? 'default' : 'outline'}
-            size="sm"
+          </button>
+          <button
             onClick={() => setFilter('locked')}
-            className="gap-2"
+            className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+              filter === 'locked'
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
+            }`}
           >
             <Lock className="w-4 h-4" />
             Zárolva ({lockedCount})
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex items-center justify-between text-sm mb-2">
-          <span className="font-medium">Összes haladás</span>
-          <span className="text-muted-foreground">
+          <span className="font-medium text-white">Összes haladás</span>
+          <span className="text-gray-400">
             {((unlockedCount / achievements.length) * 100).toFixed(0)}%
           </span>
         </div>
-        <div className="h-2 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${(unlockedCount / achievements.length) * 100}%` }}
             transition={{ duration: 1, ease: 'easeOut' }}
-            className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full"
+            className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full"
           />
         </div>
       </div>
@@ -139,18 +143,18 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
       {/* Empty State */}
       {filteredAchievements.length === 0 && (
         <div className="text-center py-12">
-          <Award className="w-16 h-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-          <p className="font-medium text-muted-foreground mb-1">
+          <Award className="w-16 h-16 text-gray-600 mx-auto mb-4 opacity-50" />
+          <p className="font-medium text-gray-400 mb-1">
             {filter === 'unlocked' && 'Még nincs feloldott jelvény'}
             {filter === 'locked' && 'Minden jelvény feloldva!'}
             {filter === 'all' && 'Nincsenek jelvények'}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-gray-500">
             {filter === 'unlocked' && 'Kezdj el tanulni és szerezz jelvényeket'}
             {filter === 'locked' && 'Gratulálunk, mindent elértél!'}
           </p>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

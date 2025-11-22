@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { LucideIcon, BookOpen, Play, Edit, Award } from 'lucide-react'
+import { LucideIcon, BookOpen, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface QuickAction {
@@ -22,21 +22,20 @@ const DEFAULT_ACTIONS: QuickAction[] = [
     label: 'Kurzusok böngészése',
     icon: BookOpen,
     href: '/courses',
-    color: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+    color: 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30',
   },
   {
     label: 'Tanulás folytatása',
     icon: Play,
     href: '/dashboard/courses',
-    color: 'bg-green-50 text-green-600 hover:bg-green-100',
+    color: 'bg-green-600/20 text-green-400 hover:bg-green-600/30',
   },
 ]
 
 /**
- * Quick Actions Component
+ * Quick Actions Component - Dark Theme
  *
- * Displays 4 action buttons for common student tasks
- * Matches the preview design's clean grid layout
+ * Displays action buttons for common student tasks
  */
 export function QuickActions({
   actions = DEFAULT_ACTIONS,
@@ -44,13 +43,13 @@ export function QuickActions({
 }: QuickActionsProps) {
   if (isLoading) {
     return (
-      <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
-        <div className="mb-4 h-6 w-32 bg-gray-200 rounded animate-pulse" />
-        <div className="grid grid-cols-2 gap-3">
-          {[1, 2, 3, 4].map((item) => (
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
+        <div className="mb-4 h-6 w-32 bg-gray-700 rounded animate-pulse" />
+        <div className="grid grid-cols-1 gap-3">
+          {[1, 2].map((item) => (
             <div
               key={item}
-              className="h-24 rounded-lg bg-gray-100 animate-pulse"
+              className="h-20 rounded-lg bg-gray-800 animate-pulse"
             />
           ))}
         </div>
@@ -59,8 +58,8 @@ export function QuickActions({
   }
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
+    <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
+      <h2 className="mb-4 text-sm font-semibold text-gray-400 uppercase tracking-wide">
         Gyors műveletek
       </h2>
 
@@ -72,15 +71,15 @@ export function QuickActions({
               key={index}
               href={action.href}
               className={cn(
-                'flex flex-col items-center justify-center gap-3 rounded-lg border border-gray-200 p-4 text-center transition-all duration-200',
-                action.color || 'bg-gray-50 hover:bg-gray-100',
-                'hover:shadow-md hover:scale-105'
+                'flex items-center gap-4 rounded-lg border border-gray-800 p-4 transition-all duration-200',
+                action.color || 'bg-gray-800/50 hover:bg-gray-800',
+                'hover:border-gray-700'
               )}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-800">
                 <Icon className="h-5 w-5" />
               </div>
-              <span className="text-xs font-medium leading-tight">
+              <span className="text-sm font-medium text-gray-200">
                 {action.label}
               </span>
             </Link>

@@ -27,34 +27,34 @@ export function GoalProgressWidget({
 
   if (isLoading) {
     return (
-      <Card className="p-6">
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
         <div className="space-y-4">
-          <div className="h-6 w-32 bg-muted animate-pulse rounded" />
-          <div className="w-32 h-32 mx-auto bg-muted animate-pulse rounded-full" />
-          <div className="h-4 w-full bg-muted animate-pulse rounded" />
+          <div className="h-6 w-32 bg-gray-700 animate-pulse rounded" />
+          <div className="w-32 h-32 mx-auto bg-gray-800 animate-pulse rounded-full" />
+          <div className="h-4 w-full bg-gray-700 animate-pulse rounded" />
         </div>
-      </Card>
+      </div>
     );
   }
 
   // No goal set
   if (!goal) {
     return (
-      <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
+      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
         <div className="text-center py-4">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Target className="w-8 h-8 text-blue-600" />
+          <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="w-8 h-8 text-blue-400" />
           </div>
-          <h3 className="font-semibold mb-2">Állíts be tanulási célt</h3>
-          <p className="text-sm text-muted-foreground mb-4">
+          <h3 className="font-semibold mb-2 text-white">Állíts be tanulási célt</h3>
+          <p className="text-sm text-gray-400 mb-4">
             Tűzz ki heti tanulási időt és kövesd a haladásod
           </p>
-          <Button onClick={onCreateGoal} size="sm" className="gap-2">
+          <button onClick={onCreateGoal} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
             <Plus className="w-4 h-4" />
             Cél létrehozása
-          </Button>
+          </button>
         </div>
-      </Card>
+      </div>
     );
   }
 
@@ -87,8 +87,8 @@ export function GoalProgressWidget({
   const offset = circumference - (progressPercentage / 100) * circumference;
 
   return (
-    <Card
-      className="p-6 relative overflow-hidden transition-shadow hover:shadow-md"
+    <div
+      className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800 relative overflow-hidden transition-all hover:border-gray-700"
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
@@ -98,18 +98,16 @@ export function GoalProgressWidget({
       {/* Header */}
       <div className="flex items-center justify-between mb-6 relative">
         <div className="flex items-center gap-2">
-          <Target className="w-5 h-5 text-blue-600" />
-          <h3 className="font-semibold">{goal.title}</h3>
+          <Target className="w-5 h-5 text-blue-400" />
+          <h3 className="font-semibold text-white">{goal.title}</h3>
         </div>
         {onEditGoal && (
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={onEditGoal}
-            className={`transition-opacity ${isHovering ? 'opacity-100' : 'opacity-0'}`}
+            className={`p-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-all ${isHovering ? 'opacity-100' : 'opacity-0'}`}
           >
             <Edit2 className="w-4 h-4" />
-          </Button>
+          </button>
         )}
       </div>
 
@@ -122,7 +120,7 @@ export function GoalProgressWidget({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#e5e7eb"
+            stroke="#374151"
             strokeWidth={strokeWidth}
           />
           {/* Progress Circle */}
@@ -151,10 +149,10 @@ export function GoalProgressWidget({
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+            <div className="text-3xl font-bold text-blue-400">
               {progressPercentage.toFixed(0)}%
             </div>
-            <div className="text-xs text-muted-foreground mt-1">
+            <div className="text-xs text-gray-500 mt-1">
               {progressHours}h / {targetHours}h
             </div>
           </motion.div>
@@ -164,7 +162,7 @@ export function GoalProgressWidget({
       {/* Status Message */}
       <div
         className={`text-center mb-4 font-medium ${
-          isCompleted ? 'text-green-600' : 'text-blue-600'
+          isCompleted ? 'text-green-400' : 'text-blue-400'
         }`}
       >
         {getMessage()}
@@ -174,27 +172,32 @@ export function GoalProgressWidget({
       <div className="space-y-3">
         {!isCompleted && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Hátralevő:</span>
-            <span className="font-medium">{remainingHours} óra</span>
+            <span className="text-gray-500">Hátralevő:</span>
+            <span className="font-medium text-white">{remainingHours} óra</span>
           </div>
         )}
 
         {goal.deadline && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Határidő:</span>
-            <span className="font-medium">
+            <span className="text-gray-500">Határidő:</span>
+            <span className="font-medium text-white">
               {new Date(goal.deadline).toLocaleDateString('hu-HU')}
             </span>
           </div>
         )}
 
         {/* Progress Bar (alternative visualization) */}
-        <div className="pt-3 border-t">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+        <div className="pt-3 border-t border-gray-800">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
             <span>Heti előrehaladás</span>
             <span>{progress} / {target} perc</span>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
+          <div className="w-full bg-gray-800 rounded-full h-2">
+            <div
+              className={`h-2 rounded-full transition-all duration-300 ${isCompleted ? 'bg-green-500' : 'bg-blue-500'}`}
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
         </div>
       </div>
 
@@ -211,6 +214,6 @@ export function GoalProgressWidget({
           </div>
         </motion.div>
       )}
-    </Card>
+    </div>
   );
 }

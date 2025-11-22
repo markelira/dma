@@ -60,10 +60,10 @@ export default function DashboardRouteGroupLayout({
 
   if (!authReady || isLoading || !user) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-[#000]">
         <div className="text-center">
-          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-gray-600">
+          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-blue-500" />
+          <p className="text-gray-400">
             {!authReady ? 'Hitelesítés inicializálása...' :
              isLoading ? 'Betöltés...' :
              'Bejelentkezés szükséges...'}
@@ -75,11 +75,11 @@ export default function DashboardRouteGroupLayout({
 
   return (
     <AuthProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="flex min-h-screen bg-[#000]">
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div
-            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+            className="fixed inset-0 z-40 bg-black/70 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           />
         )}
@@ -87,8 +87,8 @@ export default function DashboardRouteGroupLayout({
         {/* Sidebar - Fixed on desktop, overlay on mobile */}
         <aside
           className={`
-            fixed top-0 left-0 z-50 h-screen w-64 transform bg-white shadow-lg transition-transform duration-300 ease-in-out
-            lg:relative lg:translate-x-0 lg:shadow-none
+            fixed top-0 left-0 z-50 h-screen w-64 transform bg-[#1a1a1a] border-r border-gray-800 transition-transform duration-300 ease-in-out
+            lg:relative lg:translate-x-0
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
         >
@@ -100,17 +100,17 @@ export default function DashboardRouteGroupLayout({
           {/* Mobile Menu Button - Floating */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="fixed top-4 left-4 z-50 rounded-lg bg-white p-2 shadow-md hover:bg-gray-100 lg:hidden"
+            className="fixed top-4 left-4 z-50 rounded-lg bg-[#1a1a1a] border border-gray-800 p-2 hover:bg-gray-800 lg:hidden"
           >
             {sidebarOpen ? (
-              <X className="h-6 w-6 text-gray-600" />
+              <X className="h-6 w-6 text-gray-300" />
             ) : (
-              <Menu className="h-6 w-6 text-gray-600" />
+              <Menu className="h-6 w-6 text-gray-300" />
             )}
           </button>
 
-          {/* Main Content - No header bar */}
-          <main className="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-6">
+          {/* Main Content - Dark theme */}
+          <main className="flex-1 overflow-y-auto bg-[#000] p-4 lg:p-6">
             {children}
           </main>
         </div>
