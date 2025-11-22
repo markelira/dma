@@ -42,6 +42,7 @@ import {
   Download,
   Loader2,
   Import,
+  Upload,
 } from "lucide-react";
 import { useCourseWizardStore } from "@/stores/courseWizardStore";
 import { LessonType, CourseType } from "@/types";
