@@ -48,6 +48,7 @@ import { LessonType, CourseType } from "@/types";
 import { getCourseTypeTerminology } from "@/lib/terminology";
 import { toast } from "sonner";
 import LessonImportModal from "./LessonImportModal";
+import InlineMuxUploader from "./InlineMuxUploader";
 
 interface LessonFormData {
   title: string;
@@ -86,6 +87,7 @@ export default function CourseLessonsStep({ courseId }: Props) {
     updateLesson,
     deleteLesson,
     reorderLessons,
+    setPendingVideoFile,
   } = useCourseWizardStore();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -93,6 +95,8 @@ export default function CourseLessonsStep({ courseId }: Props) {
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
   const [form, setForm] = useState<LessonFormData>(emptyLessonForm);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [newLessonPendingFile, setNewLessonPendingFile] = useState<File | null>(null);
+  const [newLessonTempId] = useState(`temp_${Date.now()}`);
 
   const terminology = courseType ? getCourseTypeTerminology(courseType) : null;
   const lessonLabel = terminology?.lessonLabel || "Lecke";
@@ -102,6 +106,7 @@ export default function CourseLessonsStep({ courseId }: Props) {
   const openForCreate = () => {
     setEditingLessonId(null);
     setForm(emptyLessonForm);
+    setNewLessonPendingFile(null);
     setDialogOpen(true);
   };
 
@@ -146,13 +151,24 @@ export default function CourseLessonsStep({ courseId }: Props) {
       updateLesson(editingLessonId, lessonData);
       toast.success(`${lessonLabel} frissítve`);
     } else {
-      addLesson(lessonData);
+      // Create new lesson with tempId
+      const newLessonTempId = `temp_${Date.now()}`;
+      addLesson({ ...lessonData, tempId: newLessonTempId });
+
+      // If there's a pending file for the new lesson, set it
+      if (newLessonPendingFile) {
+        // Small delay to ensure lesson is added to store
+        setTimeout(() => {
+          setPendingVideoFile(newLessonTempId, newLessonPendingFile);
+        }, 100);
+      }
       toast.success(`${lessonLabel} hozzáadva`);
     }
 
     setDialogOpen(false);
     setForm(emptyLessonForm);
     setEditingLessonId(null);
+    setNewLessonPendingFile(null);
   };
 
   // Handle lesson delete
@@ -268,6 +284,12 @@ export default function CourseLessonsStep({ courseId }: Props) {
                     {lesson.isImported && (
                       <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
                         Importált
+                      </span>
+                    )}
+                    {lesson.pendingVideoFile && (
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded flex items-center gap-1">
+                        <Upload className="h-3 w-3" />
+                        Videó várakozik
                       </span>
                     )}
                   </div>
@@ -386,19 +408,45 @@ export default function CourseLessonsStep({ courseId }: Props) {
               />
             </div>
 
-            {/* Video URL (for VIDEO type) */}
+            {/* Video Upload (for VIDEO type) */}
             {form.type === "VIDEO" && (
               <div className="space-y-2">
-                <Label htmlFor="lesson-video-url">Videó URL</Label>
-                <Input
-                  id="lesson-video-url"
-                  value={form.videoUrl}
-                  onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
-                  placeholder="https://..."
-                />
-                <p className="text-xs text-muted-foreground">
-                  Később feltölthetsz videót a Mux rendszerbe
-                </p>
+                <Label>Videó feltöltése</Label>
+                {(() => {
+                  const isEditing = !!editingLessonId;
+                  const editingLesson = isEditing
+                    ? lessons.find(l => l.id === editingLessonId || l.tempId === editingLessonId)
+                    : null;
+
+                  // For new lessons, show pending file info from local state
+                  const pendingFileInfo = isEditing
+                    ? editingLesson?.pendingVideoFile
+                    : newLessonPendingFile
+                      ? { name: newLessonPendingFile.name, size: newLessonPendingFile.size, type: newLessonPendingFile.type }
+                      : undefined;
+
+                  return (
+                    <InlineMuxUploader
+                      lessonId={editingLessonId || newLessonTempId}
+                      pendingFile={pendingFileInfo}
+                      existingVideoUrl={form.videoUrl}
+                      existingPlaybackId={editingLesson?.muxPlaybackId}
+                      onFileSelected={(file) => {
+                        if (isEditing) {
+                          // Editing existing lesson - update store directly
+                          setPendingVideoFile(editingLessonId!, file);
+                        } else {
+                          // New lesson - store in local state until save
+                          setNewLessonPendingFile(file);
+                        }
+                        // Clear videoUrl when selecting a file (will be set after upload)
+                        if (file) {
+                          setForm({ ...form, videoUrl: "" });
+                        }
+                      }}
+                    />
+                  );
+                })()}
               </div>
             )}
 

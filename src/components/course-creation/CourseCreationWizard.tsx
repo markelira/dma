@@ -14,7 +14,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions as fbFunctions, db } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
-import { useCourseWizardStore } from '@/stores/courseWizardStore';
+import { useCourseWizardStore, getAllPendingVideoFiles, clearAllPendingVideoFiles } from '@/stores/courseWizardStore';
 import { Progress } from '@/components/ui/progress';
 import { CourseType } from '@/types';
 import {
@@ -235,24 +235,90 @@ export default function CourseCreationWizard() {
         })
       ]);
 
-      // Navigate to next step - skip curriculum for webinars and podcasts
-      if (courseType === 'WEBINAR' || courseType === 'PODCAST') {
-        // For webinars and podcasts, skip curriculum step and go directly to publish
-        markStepCompleted(2); // Mark curriculum as complete
-        setCurrentStep(3); // Go to publish
-        const msg = courseType === 'WEBINAR'
-          ? 'Webinár típusnál nincs tanterv lépés - egy videó leckét fog tartalmazni'
-          : 'Podcast típusnál nincs tanterv lépés - egy epizódot fog tartalmazni';
-        toast.info(msg);
-      } else {
-        // For Academia and Masterclass, go to curriculum step
-        setCurrentStep(2);
-      }
+      // Navigate to next step - ALL course types now go through lessons step
+      setCurrentStep(2);
     } catch (err: any) {
       console.error('Error saving basic info:', err);
       toast.error(err.message || 'Hiba történt a mentés során');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Upload a single video file to Mux
+  const uploadVideoToMux = async (file: File, lessonId: string): Promise<{ assetId: string; playbackId: string } | null> => {
+    try {
+      // 1) Get upload URL from backend
+      const getMuxUploadUrlFn = httpsCallable(fbFunctions, 'getMuxUploadUrl');
+      const result: any = await getMuxUploadUrlFn();
+
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || 'Feltöltési URL lekérése sikertelen');
+      }
+
+      const { id, url, assetId } = result.data;
+
+      // 2) Upload file to Mux
+      if (url.includes('localhost') && url.includes('testVideoUpload')) {
+        // Development mode - simulate upload
+        console.log('🧪 Development upload simulation for lesson:', lessonId);
+        const testUploadFn = httpsCallable(fbFunctions, 'testVideoUpload');
+        await testUploadFn({ assetId: assetId || id });
+      } else {
+        // Real Mux upload
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+
+          xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              resolve();
+            } else {
+              reject(new Error(`Feltöltés sikertelen: ${xhr.statusText}`));
+            }
+          });
+
+          xhr.addEventListener('error', () => reject(new Error('Hálózati hiba történt')));
+          xhr.addEventListener('abort', () => reject(new Error('Feltöltés megszakítva')));
+
+          xhr.open('PUT', url);
+          xhr.setRequestHeader('Content-Type', file.type);
+          xhr.send(file);
+        });
+      }
+
+      // 3) Poll for asset status to get playbackId
+      const getMuxAssetStatusFn = httpsCallable(fbFunctions, 'getMuxAssetStatus');
+      let attempts = 0;
+      const maxAttempts = 30;
+
+      while (attempts < maxAttempts) {
+        attempts++;
+        const statusResult: any = await getMuxAssetStatusFn({ assetId: assetId || id });
+
+        if (statusResult.data?.success) {
+          const { status, playbackId, errors } = statusResult.data;
+
+          if (errors && errors.length > 0) {
+            throw new Error(`Videó feldolgozási hiba: ${errors[0].message}`);
+          }
+
+          if (status === 'ready' && playbackId) {
+            return { assetId: assetId || id, playbackId };
+          }
+
+          if (status === 'error') {
+            throw new Error('Videó feldolgozás sikertelen');
+          }
+        }
+
+        // Wait 10 seconds before next check
+        await new Promise(resolve => setTimeout(resolve, 10000));
+      }
+
+      throw new Error('Videó feldolgozás időtúllépés');
+    } catch (error) {
+      console.error('Video upload error for lesson', lessonId, error);
+      throw error;
     }
   };
 
@@ -277,13 +343,50 @@ export default function CourseCreationWizard() {
 
     setIsPublishing(true);
     try {
+      // 1) Upload pending video files
+      const pendingVideoFiles = getAllPendingVideoFiles();
+
+      if (pendingVideoFiles.size > 0) {
+        toast.info(`${pendingVideoFiles.size} videó feltöltése folyamatban...`);
+
+        for (const [lessonId, file] of pendingVideoFiles) {
+          console.log(`📤 Uploading video for lesson ${lessonId}:`, file.name);
+          toast.info(`Feltöltés: ${file.name}`);
+
+          try {
+            const result = await uploadVideoToMux(file, lessonId);
+
+            if (result) {
+              // Update lesson with Mux playbackId
+              const { updateLesson } = useCourseWizardStore.getState();
+              updateLesson(lessonId, {
+                muxPlaybackId: result.playbackId,
+                videoAssetId: result.assetId,
+                pendingVideoFile: undefined, // Clear pending file
+              });
+
+              console.log(`✅ Video uploaded for lesson ${lessonId}:`, result);
+            }
+          } catch (uploadError: any) {
+            console.error(`❌ Failed to upload video for lesson ${lessonId}:`, uploadError);
+            toast.error(`Videó feltöltés sikertelen: ${file.name}`);
+            throw uploadError;
+          }
+        }
+
+        // Clear all pending files after successful uploads
+        clearAllPendingVideoFiles();
+        toast.success('Minden videó sikeresen feltöltve!');
+      }
+
+      // 2) Publish the course
       const publishFn = httpsCallable(fbFunctions, 'publishCourse');
       const res: any = await publishFn({ courseId });
-      
+
       if (!res.data?.success) {
         throw new Error(res.data?.error || 'Publikálás sikertelen');
       }
-      
+
       // Create audit log entry for course publication
       try {
         await addDoc(collection(db, 'auditLogs'), {
@@ -305,15 +408,15 @@ export default function CourseCreationWizard() {
       } catch (logError) {
         console.error('Failed to create audit log:', logError);
       }
-      
+
       toast.success('Kurzus sikeresen publikálva!');
-      
+
       // Clear wizard state and redirect
       resetWizard();
       setTimeout(() => {
         router.push('/admin/courses');
       }, 1500);
-      
+
     } catch (err: any) {
       console.error('Publish failed:', err);
       toast.error(err.message || 'Publikálás sikertelen');

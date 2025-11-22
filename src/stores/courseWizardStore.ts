@@ -26,7 +26,29 @@ interface WizardLesson extends Omit<Lesson, 'id'> {
   isImported?: boolean; // For MASTERCLASS imported lessons
   sourceCourseid?: string; // Original course ID for imported lessons
   sourceLessonId?: string; // Original lesson ID for imported lessons
+  // Pending video file metadata (for UI display - actual File stored separately)
+  pendingVideoFile?: {
+    name: string;
+    size: number;
+    type: string;
+  };
 }
+
+// Non-persisted storage for actual File objects (can't serialize to localStorage)
+const pendingVideoFilesMap = new Map<string, File>();
+
+// Export functions to access the file map
+export const getPendingVideoFile = (lessonId: string): File | undefined => {
+  return pendingVideoFilesMap.get(lessonId);
+};
+
+export const getAllPendingVideoFiles = (): Map<string, File> => {
+  return pendingVideoFilesMap;
+};
+
+export const clearAllPendingVideoFiles = (): void => {
+  pendingVideoFilesMap.clear();
+};
 
 interface CourseWizardState {
   // Step tracking
@@ -74,6 +96,10 @@ interface CourseWizardState {
 
   // Upload actions
   setUploadProgress: (lessonId: string, progress: number, status: 'pending' | 'uploading' | 'completed' | 'failed', error?: string) => void;
+
+  // Pending video file actions
+  setPendingVideoFile: (lessonId: string, file: File | null) => void;
+  clearPendingVideoFile: (lessonId: string) => void;
 
   // Validation
   setValidationErrors: (step: string, errors: string[]) => void;
@@ -179,6 +205,50 @@ export const useCourseWizardStore = create<CourseWizardState>()(
           [lessonId]: { progress, status, error }
         }
       })),
+
+      // Pending video file management
+      setPendingVideoFile: (lessonId, file) => {
+        if (file) {
+          // Store actual File object in non-persisted map
+          pendingVideoFilesMap.set(lessonId, file);
+          // Store metadata in state for UI display
+          set((state) => ({
+            lessons: state.lessons.map(l =>
+              (l.id === lessonId || l.tempId === lessonId)
+                ? {
+                    ...l,
+                    pendingVideoFile: {
+                      name: file.name,
+                      size: file.size,
+                      type: file.type,
+                    }
+                  }
+                : l
+            )
+          }));
+        } else {
+          // Clear the file
+          pendingVideoFilesMap.delete(lessonId);
+          set((state) => ({
+            lessons: state.lessons.map(l =>
+              (l.id === lessonId || l.tempId === lessonId)
+                ? { ...l, pendingVideoFile: undefined }
+                : l
+            )
+          }));
+        }
+      },
+
+      clearPendingVideoFile: (lessonId) => {
+        pendingVideoFilesMap.delete(lessonId);
+        set((state) => ({
+          lessons: state.lessons.map(l =>
+            (l.id === lessonId || l.tempId === lessonId)
+              ? { ...l, pendingVideoFile: undefined }
+              : l
+          )
+        }));
+      },
 
       // Validation
       setValidationErrors: (step, errors) => set((state) => ({
