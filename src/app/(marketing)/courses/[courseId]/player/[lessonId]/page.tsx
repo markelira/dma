@@ -58,7 +58,8 @@ export default function CoursePlayerPage() {
   const flatLessons = playerData?.flatLessons || [];
   const sourceCourseNames = playerData?.sourceCourseNames || {};
   const usesNetflixLayout = playerData?.usesNetflixLayout || false;
-  const courseType = course?.type as CourseType | undefined;
+  // FIX: Read courseType, not type
+  const courseType = course?.courseType as CourseType | undefined;
 
   // DIAGNOSTIC: Log player layout decision
   useEffect(() => {
@@ -66,7 +67,7 @@ export default function CoursePlayerPage() {
       console.log('[CoursePlayer] Layout decision:', {
         courseId,
         courseTitle: course?.title,
-        'course?.type': course?.type,
+        'course?.courseType': course?.courseType,
         'playerData.usesNetflixLayout': playerData.usesNetflixLayout,
         usesNetflixLayout,
         courseType,

@@ -15,8 +15,8 @@ export interface PlayerCourse extends Omit<Course, 'modules'> {
   id: string;
   modules: Module[];
   autoplayNext: boolean;
-  // Firestore stores courseType as 'type' field
-  type?: CourseType;
+  // Firestore stores as 'courseType' field
+  courseType?: CourseType;
 }
 
 // Player data return type
@@ -55,13 +55,14 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
 
         const courseData = courseDoc.data();
         const actualCourseId = courseDoc.id;
-        const courseType = courseData.type as CourseType | undefined;
+        // FIX: Firestore stores courseType, not type
+        const courseType = (courseData.courseType || courseData.type) as CourseType | undefined;
 
         // DIAGNOSTIC: Trace courseType detection
         console.log('[usePlayerData] Course type detection:', {
           courseId: actualCourseId,
-          'courseData.type': courseData.type,
           'courseData.courseType': courseData.courseType,
+          'courseData.type': courseData.type,
           resolvedCourseType: courseType,
           isInNetflixTypes: courseType ? NETFLIX_STYLE_COURSE_TYPES.includes(courseType) : false,
         });
