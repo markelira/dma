@@ -63,26 +63,55 @@ const migrateVideoToMuxSchema = z.object({
 
 /**
  * Update lesson document with mock playback ID (development mode only)
+ * Searches both flat lessons (PODCAST/WEBINAR/MASTERCLASS) and module lessons (ACADEMIA)
  */
 async function updateLessonWithMockPlaybackId(assetId: string, playbackId: string): Promise<void> {
   console.log(`🔍 [updateLessonWithMockPlaybackId] Searching for lessons with muxAssetId: ${assetId}`);
-  
+
+  let foundLesson = false;
+
   // Query all courses to find lessons with matching muxAssetId
   const coursesSnapshot = await firestore.collection('courses').get();
-  
+
   for (const courseDoc of coursesSnapshot.docs) {
     const courseId = courseDoc.id;
-    
-    // Query modules within this course
+
+    // 1) Check FLAT lessons (courses/{courseId}/lessons/{lessonId})
+    // Used by PODCAST, WEBINAR, MASTERCLASS course types
+    const flatLessonsSnapshot = await firestore
+      .collection('courses')
+      .doc(courseId)
+      .collection('lessons')
+      .where('muxAssetId', '==', assetId)
+      .get();
+
+    for (const lessonDoc of flatLessonsSnapshot.docs) {
+      const lessonId = lessonDoc.id;
+      const lessonPath = `courses/${courseId}/lessons/${lessonId}`;
+
+      console.log(`✅ [updateLessonWithMockPlaybackId] Updating FLAT lesson ${lessonId} with mock playbackId: ${playbackId}`);
+
+      await firestore.doc(lessonPath).update({
+        muxPlaybackId: playbackId,
+        videoUrl: `https://stream.mux.com/${playbackId}`,
+        updatedAt: new Date().toISOString()
+      });
+
+      console.log(`🎉 [updateLessonWithMockPlaybackId] Successfully updated flat lesson ${lessonId}`);
+      foundLesson = true;
+    }
+
+    // 2) Check MODULE lessons (courses/{courseId}/modules/{moduleId}/lessons/{lessonId})
+    // Used by ACADEMIA course type
     const modulesSnapshot = await firestore
       .collection('courses')
       .doc(courseId)
       .collection('modules')
       .get();
-    
+
     for (const moduleDoc of modulesSnapshot.docs) {
       const moduleId = moduleDoc.id;
-      
+
       // Query lessons within this module
       const lessonsSnapshot = await firestore
         .collection('courses')
@@ -92,23 +121,28 @@ async function updateLessonWithMockPlaybackId(assetId: string, playbackId: strin
         .collection('lessons')
         .where('muxAssetId', '==', assetId)
         .get();
-      
+
       // Update all matching lessons
       for (const lessonDoc of lessonsSnapshot.docs) {
         const lessonId = lessonDoc.id;
         const lessonPath = `courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`;
-        
-        console.log(`✅ [updateLessonWithMockPlaybackId] Updating lesson ${lessonId} with mock playbackId: ${playbackId}`);
-        
+
+        console.log(`✅ [updateLessonWithMockPlaybackId] Updating MODULE lesson ${lessonId} with mock playbackId: ${playbackId}`);
+
         await firestore.doc(lessonPath).update({
           muxPlaybackId: playbackId,
           videoUrl: `https://stream.mux.com/${playbackId}`,
           updatedAt: new Date().toISOString()
         });
-        
-        console.log(`🎉 [updateLessonWithMockPlaybackId] Successfully updated lesson ${lessonId}`);
+
+        console.log(`🎉 [updateLessonWithMockPlaybackId] Successfully updated module lesson ${lessonId}`);
+        foundLesson = true;
       }
     }
+  }
+
+  if (!foundLesson) {
+    console.warn(`⚠️ [updateLessonWithMockPlaybackId] No lessons found with muxAssetId: ${assetId}`);
   }
 }
 
