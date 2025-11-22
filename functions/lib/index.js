@@ -1045,8 +1045,18 @@ exports.getCoursesCallable = (0, https_1.onCall)({
         }
         const snapshot = await query.get();
         const courses = [];
+        v2_1.logger.info(`[getCoursesCallable] Query returned ${snapshot.docs.length} documents`);
         for (const doc of snapshot.docs) {
             const courseData = doc.data();
+            // DIAGNOSTIC: Log course data structure
+            v2_1.logger.info(`[getCoursesCallable] Processing course: ${doc.id}`, {
+                title: courseData.title,
+                status: courseData.status,
+                hasEmbeddedLessons: Array.isArray(courseData.lessons),
+                embeddedLessonsCount: courseData.lessons?.length || 0,
+                hasModulesArray: Array.isArray(courseData.modules),
+                modulesCount: courseData.modules?.length || 0,
+            });
             // Get instructor data
             let instructor = null;
             if (courseData?.instructorId) {
@@ -1076,13 +1086,27 @@ exports.getCoursesCallable = (0, https_1.onCall)({
             // Get lessons - either from embedded array or from the course document
             // Lessons are stored as embedded array in the course document (flat structure)
             let lessons = courseData.lessons || [];
+            let lessonsSource = 'embedded';
             // If no embedded lessons, check for modules with lessons (legacy structure)
             if (lessons.length === 0 && courseData.modules && Array.isArray(courseData.modules)) {
                 lessons = courseData.modules.flatMap((module) => (module.lessons || []).map((lesson) => ({
                     ...lesson,
                     moduleName: module.title,
                 })));
+                lessonsSource = 'modules_array';
             }
+            // If still no lessons, check for lessons subcollection
+            if (lessons.length === 0) {
+                const lessonsSnapshot = await firestore.collection('courses').doc(doc.id).collection('lessons').get();
+                if (!lessonsSnapshot.empty) {
+                    lessons = lessonsSnapshot.docs.map(lessonDoc => ({
+                        id: lessonDoc.id,
+                        ...lessonDoc.data()
+                    }));
+                    lessonsSource = 'subcollection';
+                }
+            }
+            v2_1.logger.info(`[getCoursesCallable] Course ${doc.id} lessons: ${lessons.length} from ${lessonsSource}`);
             courses.push({
                 id: doc.id,
                 ...courseData,
@@ -1091,7 +1115,8 @@ exports.getCoursesCallable = (0, https_1.onCall)({
                 category
             });
         }
-        v2_1.logger.info(`[getCoursesCallable] Found ${courses.length} courses`);
+        const coursesWithLessons = courses.filter(c => c.lessons && c.lessons.length > 0);
+        v2_1.logger.info(`[getCoursesCallable] Summary: ${courses.length} total courses, ${coursesWithLessons.length} with lessons`);
         return {
             success: true,
             courses,

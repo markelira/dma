@@ -56,6 +56,18 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
         );
         const result = await getCoursesFn({ forImport: true });
 
+        // DIAGNOSTIC: Log API response
+        console.log("[LessonImportModal] API Response:", {
+          success: result.data.success,
+          totalCourses: result.data.courses?.length || 0,
+          courses: result.data.courses?.map(c => ({
+            id: c.id,
+            title: c.title,
+            status: c.status,
+            lessonsCount: c.lessons?.length || 0,
+          }))
+        });
+
         if (result.data.success) {
           // Filter out current course and only show published courses with lessons
           const filteredCourses = result.data.courses.filter(
@@ -65,6 +77,13 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
               course.lessons &&
               course.lessons.length > 0
           );
+
+          console.log("[LessonImportModal] After filtering:", {
+            excludeCourseId,
+            filteredCount: filteredCourses.length,
+            filtered: filteredCourses.map(c => ({ id: c.id, title: c.title }))
+          });
+
           setCourses(filteredCourses);
         }
       } catch (error) {
