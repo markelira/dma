@@ -112,7 +112,7 @@ export function AcademiaSidePanel({
                       <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
                     )}
                     <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Oktató'}
+                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor'}
                     </span>
                     <p className="text-xs text-gray-500 mt-2">
                       {selectedInstructorIndex + 1} / {instructors.length} oktató
@@ -149,7 +149,7 @@ export function AcademiaSidePanel({
                       <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
                     )}
                     <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Oktató'}
+                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor'}
                     </span>
                   </div>
                 </>
@@ -164,7 +164,7 @@ export function AcademiaSidePanel({
         {/* About Section - Collapsible */}
         <div className="space-y-2">
           <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-            A kurzusról
+            Leírás
           </h4>
           {courseDescription ? (
             <div>
@@ -203,64 +203,50 @@ export function AcademiaSidePanel({
         {/* Lesson Navigation */}
         <div className="space-y-4">
           <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-            Leckék
+            Részek
           </h4>
 
-          {/* Modules with lessons */}
-          <div className="space-y-6">
-            {modules.map((module, moduleIndex) => {
+          {/* Lessons (flat list without module headers) */}
+          <div className="space-y-1">
+            {modules.map((module) => {
               const publishedLessons = module.lessons?.filter(
                 l => !l.status || l.status.toUpperCase() === 'PUBLISHED'
               ) || [];
 
-              if (publishedLessons.length === 0) return null;
+              return publishedLessons
+                .sort((a, b) => (a.order || 0) - (b.order || 0))
+                .map((lesson) => {
+                  const isCurrent = lesson.id === currentLessonId;
 
-              return (
-                <div key={module.id} className="space-y-2">
-                  {/* Module Header */}
-                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                    {moduleIndex + 1}. Modul: {module.title}
-                  </h5>
+                  return (
+                    <button
+                      key={lesson.id}
+                      onClick={() => !isCurrent && onLessonClick(lesson.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                        isCurrent
+                          ? 'bg-red-600/20 border-l-2 border-red-500'
+                          : 'hover:bg-gray-800/50 border-l-2 border-transparent'
+                      }`}
+                    >
+                      {/* Status Icon */}
+                      {getLessonStatusIcon(lesson.id, isCurrent)}
 
-                  {/* Lessons in this module */}
-                  <div className="space-y-1">
-                    {publishedLessons
-                      .sort((a, b) => (a.order || 0) - (b.order || 0))
-                      .map((lesson) => {
-                        const isCurrent = lesson.id === currentLessonId;
-
-                        return (
-                          <button
-                            key={lesson.id}
-                            onClick={() => !isCurrent && onLessonClick(lesson.id)}
-                            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
-                              isCurrent
-                                ? 'bg-red-600/20 border-l-2 border-red-500'
-                                : 'hover:bg-gray-800/50 border-l-2 border-transparent'
-                            }`}
-                          >
-                            {/* Status Icon */}
-                            {getLessonStatusIcon(lesson.id, isCurrent)}
-
-                            {/* Lesson Info */}
-                            <div className="flex-1 min-w-0">
-                              <p className={`text-sm font-medium truncate ${
-                                isCurrent ? 'text-white' : 'text-gray-300'
-                              }`}>
-                                {lesson.title}
-                              </p>
-                              {lesson.duration && (
-                                <p className="text-xs text-gray-500">
-                                  {formatDuration(lesson.duration)}
-                                </p>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                  </div>
-                </div>
-              );
+                      {/* Lesson Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium truncate ${
+                          isCurrent ? 'text-white' : 'text-gray-300'
+                        }`}>
+                          {lesson.title}
+                        </p>
+                        {lesson.duration && (
+                          <p className="text-xs text-gray-500">
+                            {formatDuration(lesson.duration)}
+                          </p>
+                        )}
+                      </div>
+                    </button>
+                  );
+                });
             })}
           </div>
         </div>
