@@ -8,7 +8,7 @@ import { CourseType, Lesson, Module, Course, Instructor } from '@/types'
 const FLAT_LESSON_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST', 'MASTERCLASS'];
 
 // Course types that use Netflix-style player (split layout with side panel)
-export const NETFLIX_STYLE_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST', 'ACADEMIA'];
+export const NETFLIX_STYLE_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST', 'ACADEMIA', 'MASTERCLASS'];
 
 // Player data course type (extends Course with modules)
 export interface PlayerCourse extends Omit<Course, 'modules'> {
