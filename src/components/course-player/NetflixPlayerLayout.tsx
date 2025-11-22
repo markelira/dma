@@ -135,7 +135,7 @@ export function NetflixPlayerLayout({
 
           {/* Video Player Area */}
           <div className="flex-1 bg-black flex items-center justify-center">
-            {videoSource && currentLesson.type === 'VIDEO' && (
+            {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
                   src={videoSource}
@@ -148,8 +148,8 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content placeholder */}
-            {currentLesson.type !== 'VIDEO' && (
+            {/* Non-video content or no video available */}
+            {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
               <div className="w-full h-full flex items-center justify-center bg-gray-900">
                 <div className="text-center text-white p-8 max-w-2xl">
                   <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
@@ -159,6 +159,9 @@ export function NetflixPlayerLayout({
                         {currentLesson.content}
                       </p>
                     </div>
+                  )}
+                  {!videoSource && !currentLesson.content && (
+                    <p className="text-gray-500">Nincs elérhető tartalom</p>
                   )}
                 </div>
               </div>
@@ -204,7 +207,7 @@ export function NetflixPlayerLayout({
 
           {/* Video Player Area */}
           <div className="flex-1 bg-black flex items-center justify-center">
-            {videoSource && currentLesson.type === 'VIDEO' && (
+            {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
                   src={videoSource}
@@ -217,8 +220,8 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content placeholder */}
-            {currentLesson.type !== 'VIDEO' && (
+            {/* Non-video content or no video available */}
+            {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
               <div className="w-full h-full flex items-center justify-center bg-gray-900">
                 <div className="text-center text-white p-8 max-w-2xl">
                   <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
@@ -228,6 +231,9 @@ export function NetflixPlayerLayout({
                         {currentLesson.content}
                       </p>
                     </div>
+                  )}
+                  {!videoSource && !currentLesson.content && (
+                    <p className="text-gray-500">Nincs elérhető tartalom</p>
                   )}
                 </div>
               </div>
@@ -312,7 +318,7 @@ export function NetflixPlayerLayout({
 
           {/* Video Player Area */}
           <div className="flex-1 bg-black flex items-center justify-center">
-            {videoSource && currentLesson.type === 'VIDEO' && (
+            {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
                   src={videoSource}
@@ -325,8 +331,8 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content placeholder */}
-            {currentLesson.type !== 'VIDEO' && (
+            {/* Non-video content or no video available */}
+            {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
               <div className="w-full h-full flex items-center justify-center bg-gray-900">
                 <div className="text-center text-white p-8 max-w-2xl">
                   <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
@@ -336,6 +342,9 @@ export function NetflixPlayerLayout({
                         {currentLesson.content}
                       </p>
                     </div>
+                  )}
+                  {!videoSource && !currentLesson.content && (
+                    <p className="text-gray-500">Nincs elérhető tartalom</p>
                   )}
                 </div>
               </div>
@@ -418,7 +427,7 @@ export function NetflixPlayerLayout({
 
           {/* Video Player Area */}
           <div className="flex-1 bg-black flex items-center justify-center">
-            {videoSource && currentLesson.type === 'VIDEO' && (
+            {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
                   src={videoSource}
@@ -431,8 +440,8 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content placeholder */}
-            {currentLesson.type !== 'VIDEO' && (
+            {/* Non-video content or no video available */}
+            {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
               <div className="w-full h-full flex items-center justify-center bg-gray-900">
                 <div className="text-center text-white p-8 max-w-2xl">
                   <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
@@ -442,6 +451,9 @@ export function NetflixPlayerLayout({
                         {currentLesson.content}
                       </p>
                     </div>
+                  )}
+                  {!videoSource && !currentLesson.content && (
+                    <p className="text-gray-500">Nincs elérhető tartalom</p>
                   )}
                 </div>
               </div>
