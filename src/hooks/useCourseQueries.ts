@@ -71,7 +71,7 @@ export const useCourse = (identifier: string) => {
       }
       
       if (!courseData) {
-        throw new Error('Kurzus nem található');
+        throw new Error('Tartalom nem található');
       }
       
       // Fetch lessons - try multiple locations
@@ -175,7 +175,7 @@ export const useEnrollInCourse = () => {
       
       // Check authentication
       if (!isAuthenticated || !user) {
-        throw new Error('Bejelentkezés szükséges a kurzusra való feliratkozáshoz');
+        throw new Error('Bejelentkezés szükséges a tartalomra való feliratkozáshoz');
       }
       
       console.log('🔧 Creating enrollment for courseId:', courseId);
@@ -220,7 +220,7 @@ export const useEnrollInCourse = () => {
       if (existingEnrollment.exists()) {
         return {
           success: true,
-          message: 'Már beiratkozott erre a kurzusra',
+          message: 'Már beiratkozott erre a tartalomra',
           enrollmentId,
           courseId,
           userId: user.id,
@@ -303,7 +303,7 @@ export const useDeleteCourse = () => {
       console.log('📊 Delete function result:', result.data);
 
       if (!result.data.success) {
-        throw new Error(result.data.error || 'Kurzus törlése sikertelen');
+        throw new Error(result.data.error || 'Tartalom törlése sikertelen');
       }
 
       return result.data;

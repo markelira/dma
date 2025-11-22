@@ -43,12 +43,15 @@ const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const zod_1 = require("zod");
 const firestore = admin.firestore();
+// Valid instructor roles
+const VALID_INSTRUCTOR_ROLES = ['MENTOR', 'SZEREPLŐ'];
 // Zod schema for instructor creation
 const createInstructorSchema = zod_1.z.object({
     name: zod_1.z.string().min(1, 'A név kötelező.'),
     title: zod_1.z.string().optional(),
     bio: zod_1.z.string().optional(),
     profilePictureUrl: zod_1.z.string().url('Érvényes URL szükséges.').optional().or(zod_1.z.literal('')),
+    role: zod_1.z.enum(VALID_INSTRUCTOR_ROLES).default('MENTOR'),
 });
 // Zod schema for instructor update
 const updateInstructorSchema = zod_1.z.object({
@@ -57,6 +60,7 @@ const updateInstructorSchema = zod_1.z.object({
     title: zod_1.z.string().optional(),
     bio: zod_1.z.string().optional(),
     profilePictureUrl: zod_1.z.string().url('Érvényes URL szükséges.').optional().or(zod_1.z.literal('')),
+    role: zod_1.z.enum(VALID_INSTRUCTOR_ROLES).optional(),
 });
 // Zod schema for instructor deletion
 const deleteInstructorSchema = zod_1.z.object({
@@ -131,11 +135,12 @@ exports.createInstructor = (0, https_1.onCall)({
             title: data.title || null,
             bio: data.bio || null,
             profilePictureUrl: data.profilePictureUrl || null,
+            role: data.role || 'MENTOR',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
         };
         const instructorRef = await firestore.collection('instructors').add(instructorData);
-        v2_1.logger.info(`[createInstructor] Created instructor: ${instructorRef.id}`);
+        v2_1.logger.info(`[createInstructor] Created instructor: ${instructorRef.id} with role: ${instructorData.role}`);
         return {
             success: true,
             message: 'Oktató sikeresen létrehozva.',
@@ -206,6 +211,10 @@ exports.updateInstructor = (0, https_1.onCall)({
             profilePictureUrl: data.profilePictureUrl || null,
             updatedAt: new Date().toISOString(),
         };
+        // Only update role if provided
+        if (data.role) {
+            updateData.role = data.role;
+        }
         await instructorRef.update(updateData);
         const updatedDoc = await instructorRef.get();
         v2_1.logger.info(`[updateInstructor] Updated instructor: ${data.id}`);

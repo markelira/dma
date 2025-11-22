@@ -72,6 +72,35 @@ export interface Category {
 }
 
 /**
+ * Instructor Role Type
+ * Defines the display role of an instructor based on course type context
+ * - MENTOR: Used for ACADEMIA, WEBINAR, MASTERCLASS courses
+ * - SZEREPLŐ: Used for PODCAST courses
+ */
+export type InstructorRole = 'MENTOR' | 'SZEREPLŐ';
+
+/**
+ * Instructor Role Labels (Hungarian) for UI display
+ */
+export const INSTRUCTOR_ROLE_LABELS: Record<InstructorRole, string> = {
+  MENTOR: 'Mentor',
+  SZEREPLŐ: 'Szereplő',
+};
+
+/**
+ * Target Audience Interface
+ * Represents a target audience entity for courses (like categories)
+ * Managed through admin dashboard
+ */
+export interface TargetAudience {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
  * Instructor entity - separate from User accounts
  * Instructors are managed through admin dashboard like categories
  */
@@ -81,6 +110,7 @@ export interface Instructor {
   title?: string;                  // Optional - role/position (e.g., "Lead Marketing Instructor")
   bio?: string;                    // Optional - instructor description/background
   profilePictureUrl?: string;      // Optional - instructor photo URL
+  role: InstructorRole;            // Required - display role (Mentor/Szereplő)
   createdAt: string;
   updatedAt: string;
 }
@@ -94,11 +124,14 @@ export interface Module {
   lessons: Lesson[];
 }
 
+// Lesson type for categorizing lesson content
+export type LessonType = 'TEXT' | 'VIDEO' | 'QUIZ' | 'READING' | 'PDF' | 'AUDIO' | 'DOWNLOAD';
+
 export interface Lesson {
   id: string;
   title: string;
   content: string;
-  type: 'TEXT' | 'VIDEO' | 'QUIZ' | 'READING' | 'PDF' | 'AUDIO';
+  type: LessonType;
   order: number;
   status: 'DRAFT' | 'PUBLISHED' | 'SOON' | 'ARCHIVED';
   videoUrl?: string; // Firebase Storage URL for video OR Mux stream URL
@@ -188,8 +221,35 @@ export interface Course {
 
   category: Category;
 
-  // UPDATED: modules is now optional (Webinars don't have modules)
+  /**
+   * NEW: Category IDs (multiple categories support)
+   */
+  categoryIds?: string[];
+
+  /**
+   * NEW: Target Audience IDs (multi-select)
+   * References targetAudiences collection
+   */
+  targetAudienceIds?: string[];
+
+  /**
+   * NEW: Flat lessons array (replaces module structure)
+   * All course types now use flat lessons instead of modules
+   */
+  lessons?: Lesson[];
+
+  /**
+   * @deprecated Modules are being phased out in favor of flat lessons
+   * Kept temporarily for migration compatibility
+   */
   modules?: Module[];
+
+  /**
+   * NEW: Imported lesson IDs (for MASTERCLASS only)
+   * References lessons from other courses that are imported into this masterclass
+   * These are shared references, not copies
+   */
+  importedLessonIds?: string[];
 
   // NEW: Webinar-specific fields (only used when courseType === 'WEBINAR')
   webinarDate?: string; // ISO timestamp for scheduled webinar

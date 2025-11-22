@@ -52,7 +52,7 @@ export default function Cta() {
                 href="/courses"
               >
                 <span className="relative inline-flex items-center">
-                  Kurzusok megtekintése
+                  Tartalmak megtekintése
                 </span>
               </a>
             </div>

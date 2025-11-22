@@ -1923,6 +1923,19 @@ export {
 } from './instructorActions';
 
 // ============================================
+// TARGET AUDIENCE MANAGEMENT
+// ============================================
+
+// Export target audience CRUD functions
+// Target Audiences are entities for course targeting (like categories)
+export {
+  getTargetAudiences,
+  createTargetAudience,
+  updateTargetAudience,
+  deleteTargetAudience,
+} from './targetAudienceActions';
+
+// ============================================
 // USER PREFERENCES & GAMIFICATION
 // ============================================
 
@@ -1991,3 +2004,16 @@ export {
 export {
   getCoursesWithFilters,
 } from './courseCatalog';
+
+// ============================================
+// DATABASE MIGRATIONS
+// ============================================
+
+// Export migration functions (Admin only)
+// Use these to migrate existing data to new schema
+export {
+  migrateCoursesToFlatLessons,
+  addDefaultInstructorRoles,
+  seedDefaultTargetAudiences,
+  getMigrationStatus,
+} from './migrations/flattenCoursesToLessons';

@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableHead, TableHeader, TableRow, TableCell, TableBody } from "@/components/ui/table";
 import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 import { useInstructors, useCreateInstructor, useUpdateInstructor, useDeleteInstructor } from "@/hooks/useInstructorQueries";
-import { Instructor } from "@/types";
+import { Instructor, InstructorRole, INSTRUCTOR_ROLE_LABELS } from "@/types";
 import { User, Trash2, Pencil, Plus, Upload, Loader2, X } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { storage } from "@/lib/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ interface InstructorForm {
   title: string;
   bio: string;
   profilePictureUrl: string;
+  role: InstructorRole;
 }
 
 const emptyForm: InstructorForm = {
@@ -26,6 +28,7 @@ const emptyForm: InstructorForm = {
   title: "",
   bio: "",
   profilePictureUrl: "",
+  role: "MENTOR",
 };
 
 export default function InstructorsPage() {
@@ -57,6 +60,7 @@ export default function InstructorsPage() {
       title: instructor.title || "",
       bio: instructor.bio || "",
       profilePictureUrl: instructor.profilePictureUrl || "",
+      role: instructor.role || "MENTOR",
     });
     setDialogOpen(true);
   };
@@ -77,6 +81,7 @@ export default function InstructorsPage() {
           title: form.title.trim() || undefined,
           bio: form.bio.trim() || undefined,
           profilePictureUrl: form.profilePictureUrl.trim() || undefined,
+          role: form.role,
         },
         {
           onSuccess: () => {
@@ -94,6 +99,7 @@ export default function InstructorsPage() {
           title: form.title.trim() || undefined,
           bio: form.bio.trim() || undefined,
           profilePictureUrl: form.profilePictureUrl.trim() || undefined,
+          role: form.role,
         },
         {
           onSuccess: () => {
@@ -216,6 +222,7 @@ export default function InstructorsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Név</TableHead>
+                <TableHead>Típus</TableHead>
                 <TableHead>Beosztás</TableHead>
                 <TableHead>Bio</TableHead>
                 <TableHead className="text-right">Műveletek</TableHead>
@@ -239,6 +246,15 @@ export default function InstructorsPage() {
                       )}
                       {instructor.name}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      instructor.role === 'SZEREPLŐ'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {INSTRUCTOR_ROLE_LABELS[instructor.role || 'MENTOR']}
+                    </span>
                   </TableCell>
                   <TableCell className="text-gray-600">
                     {instructor.title || <span className="text-gray-400">—</span>}
@@ -337,6 +353,38 @@ export default function InstructorsPage() {
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="pl. Vezető Marketing Oktató"
               />
+            </div>
+
+            {/* Role Field */}
+            <div>
+              <label className="block text-sm font-medium mb-1.5">
+                Típus <span className="text-red-500">*</span>
+              </label>
+              <Select
+                value={form.role}
+                onValueChange={(value: InstructorRole) => setForm({ ...form, role: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Válassz típust" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MENTOR">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      Mentor
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="SZEREPLŐ">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-purple-500" />
+                      Szereplő (Podcast)
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500 mt-1">
+                A mentor megjelölés minden tartalomtípusnál, a szereplő csak podcastoknál jelenik meg.
+              </p>
             </div>
 
             {/* Bio Field */}

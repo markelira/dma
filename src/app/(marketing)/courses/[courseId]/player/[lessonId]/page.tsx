@@ -9,15 +9,17 @@ import { NewVideoPlayer } from '@/components/course-player/NewVideoPlayer';
 import { NewLessonContent } from '@/components/course-player/NewLessonContent';
 import { NewLessonNavigation } from '@/components/course-player/NewLessonNavigation';
 import { MobileBottomTabs, MobileTab } from '@/components/course-player/MobileBottomTabs';
+import { NetflixPlayerLayout } from '@/components/course-player/NetflixPlayerLayout';
+import { MasterclassSidebar } from '@/components/course-player/MasterclassSidebar';
 import { ArrowLeftIcon } from '@/components/icons/CoursePlayerIcons';
-import { usePlayerData } from '@/hooks/usePlayerData';
+import { usePlayerData, NETFLIX_STYLE_COURSE_TYPES } from '@/hooks/usePlayerData';
 import { useCourseProgress, useResumePosition } from '@/hooks/useCourseProgress';
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useEnrollmentTracking } from '@/hooks/useEnrollmentTracking';
 import { useAuthStore } from '@/stores/authStore';
 import { fetchLesson } from '@/hooks/useLessonQueries';
-import { Module, Lesson } from '@/types';
+import { Module, Lesson, CourseType } from '@/types';
 
 /**
  * Course Player Page - New Design
@@ -53,12 +55,22 @@ export default function CoursePlayerPage() {
   const course = playerData?.course;
   const modules = course?.modules || [];  // Fixed: modules are in course object
   const signedPlaybackUrl = playerData?.signedPlaybackUrl;
+  const flatLessons = playerData?.flatLessons || [];
+  const sourceCourseNames = playerData?.sourceCourseNames || {};
+  const usesNetflixLayout = playerData?.usesNetflixLayout || false;
+  const courseType = course?.type as CourseType | undefined;
 
   // Subscription check
   const hasSub = subStatus?.hasActiveSubscription ?? false;
 
   // Find current lesson
   const currentLesson = useMemo(() => {
+    // First check flat lessons
+    if (flatLessons.length > 0) {
+      const flatLesson = flatLessons.find(l => l.id === currentLessonId);
+      if (flatLesson) return flatLesson;
+    }
+    // Fall back to module lessons
     for (const module of modules) {
       const lesson = module.lessons?.find(l => l.id === currentLessonId);
       if (lesson) {
@@ -66,7 +78,7 @@ export default function CoursePlayerPage() {
       }
     }
     return null;
-  }, [modules, currentLessonId]);
+  }, [modules, flatLessons, currentLessonId]);
 
   // Find current module
   const currentModule = useMemo(() => {
@@ -89,6 +101,21 @@ export default function CoursePlayerPage() {
 
   // Find previous/next lessons
   const { previousLesson, nextLesson } = useMemo(() => {
+    // For flat lesson courses, use flatLessons directly
+    if (flatLessons.length > 0) {
+      const publishedLessons = flatLessons
+        .filter(l => !l.status || l.status.toUpperCase() === 'PUBLISHED')
+        .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+      const currentIndex = publishedLessons.findIndex(l => l.id === currentLessonId);
+
+      return {
+        previousLesson: currentIndex > 0 ? publishedLessons[currentIndex - 1] : null,
+        nextLesson: currentIndex < publishedLessons.length - 1 ? publishedLessons[currentIndex + 1] : null,
+      };
+    }
+
+    // Fall back to module-based navigation
     const allLessons: Array<{ lesson: Lesson; moduleIndex: number }> = [];
     modules.forEach((module, moduleIndex) => {
       module.lessons
@@ -107,7 +134,7 @@ export default function CoursePlayerPage() {
       previousLesson: currentIndex > 0 ? allLessons[currentIndex - 1]?.lesson : null,
       nextLesson: currentIndex < allLessons.length - 1 ? allLessons[currentIndex + 1]?.lesson : null,
     };
-  }, [modules, currentLessonId]);
+  }, [modules, flatLessons, currentLessonId]);
 
   // Handlers
   const handleLessonClick = useCallback((newLessonId: string) => {
@@ -247,33 +274,81 @@ export default function CoursePlayerPage() {
             Hiba történt a betöltés során
           </h1>
           <p className="text-gray-600 mb-6">
-            {playerError?.message || 'A kurzus vagy lecke nem található.'}
+            {playerError?.message || 'A tartalom vagy lecke nem található.'}
           </p>
           <Link
             href={`/courses/${courseId}`}
             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
           >
             <ArrowLeftIcon size={20} />
-            Vissza a kurzushoz
+            Vissza a tartalomhoz
           </Link>
         </div>
       </div>
     );
   }
 
+  // Render Netflix-style layout for WEBINAR/PODCAST
+  if (usesNetflixLayout) {
+    const lessonsForPlayer = flatLessons.length > 0 ? flatLessons : modules.flatMap(m => m.lessons || []);
+
+    return (
+      <NetflixPlayerLayout
+        course={{
+          id: course.id,
+          title: course.title,
+          type: courseType,
+          description: course.description,
+        }}
+        lessons={lessonsForPlayer}
+        currentLesson={currentLesson}
+        currentLessonId={currentLessonId}
+        completedLessonIds={completedLessonIds}
+        progress={courseProgress}
+        videoSource={videoSource}
+        resumePosition={resumePosition || 0}
+        onLessonClick={handleLessonClick}
+        onProgress={handleProgress}
+        onVideoEnded={handleVideoEnded}
+        previousLesson={previousLesson}
+        nextLesson={nextLesson}
+        onPreviousLesson={handlePreviousLesson}
+        onNextLesson={handleNextLesson}
+      />
+    );
+  }
+
+  // Determine which sidebar to use based on course type
+  const useMasterclassSidebar = courseType === 'MASTERCLASS';
+  const lessonsForSidebar = flatLessons.length > 0 ? flatLessons : modules.flatMap(m => m.lessons || []);
+
+  // Render sidebar-based layout (MASTERCLASS, ACADEMIA, or default)
   return (
     <>
       {/* Desktop Layout */}
       <div className="hidden md:flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <NewSidebar
-          courseTitle={course.title}
-          modules={modules}
-          currentLessonId={currentLessonId}
-          completedLessonIds={completedLessonIds}
-          progress={courseProgress}
-          onLessonClick={handleLessonClick}
-        />
+        {/* Sidebar - Masterclass style or traditional module-based */}
+        {useMasterclassSidebar ? (
+          <MasterclassSidebar
+            courseTitle={course.title}
+            courseType={courseType}
+            lessons={lessonsForSidebar}
+            currentLessonId={currentLessonId}
+            completedLessonIds={completedLessonIds}
+            progress={courseProgress}
+            onLessonClick={handleLessonClick}
+            sourceCourseNames={sourceCourseNames}
+          />
+        ) : (
+          <NewSidebar
+            courseTitle={course.title}
+            modules={modules}
+            currentLessonId={currentLessonId}
+            completedLessonIds={completedLessonIds}
+            progress={courseProgress}
+            onLessonClick={handleLessonClick}
+          />
+        )}
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto">
@@ -284,7 +359,7 @@ export default function CoursePlayerPage() {
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
               <ArrowLeftIcon size={20} />
-              Vissza a kurzushoz
+              Vissza a tartalomhoz
             </Link>
 
             {/* Video Player */}
@@ -303,9 +378,14 @@ export default function CoursePlayerPage() {
               <h1 className="text-3xl font-bold text-gray-900 leading-tight">
                 {currentLesson.title}
               </h1>
-              {currentModule && (
+              {currentModule && !useMasterclassSidebar && (
                 <p className="text-sm text-gray-600">
                   {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
+                </p>
+              )}
+              {useMasterclassSidebar && (
+                <p className="text-sm text-gray-600">
+                  Lecke {lessonsForSidebar.findIndex(l => l.id === currentLessonId) + 1} / {lessonsForSidebar.length}
                 </p>
               )}
             </div>
@@ -341,7 +421,7 @@ export default function CoursePlayerPage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             <ArrowLeftIcon size={20} />
-            Vissza a kurzushoz
+            Vissza a tartalomhoz
           </Link>
         </div>
 
@@ -366,9 +446,14 @@ export default function CoursePlayerPage() {
                 <h1 className="text-2xl font-bold text-gray-900 leading-tight">
                   {currentLesson.title}
                 </h1>
-                {currentModule && (
+                {currentModule && !useMasterclassSidebar && (
                   <p className="text-sm text-gray-600">
                     {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
+                  </p>
+                )}
+                {useMasterclassSidebar && (
+                  <p className="text-sm text-gray-600">
+                    Lecke {lessonsForSidebar.findIndex(l => l.id === currentLessonId) + 1} / {lessonsForSidebar.length}
                   </p>
                 )}
               </div>
@@ -397,14 +482,27 @@ export default function CoursePlayerPage() {
           {/* Lessons Tab Content */}
           {mobileTab === 'lessons' && (
             <div className="h-full overflow-y-auto">
-              <NewSidebar
-                courseTitle={course.title}
-                modules={modules}
-                currentLessonId={currentLessonId}
-                completedLessonIds={completedLessonIds}
-                progress={courseProgress}
-                onLessonClick={handleLessonClick}
-              />
+              {useMasterclassSidebar ? (
+                <MasterclassSidebar
+                  courseTitle={course.title}
+                  courseType={courseType}
+                  lessons={lessonsForSidebar}
+                  currentLessonId={currentLessonId}
+                  completedLessonIds={completedLessonIds}
+                  progress={courseProgress}
+                  onLessonClick={handleLessonClick}
+                  sourceCourseNames={sourceCourseNames}
+                />
+              ) : (
+                <NewSidebar
+                  courseTitle={course.title}
+                  modules={modules}
+                  currentLessonId={currentLessonId}
+                  completedLessonIds={completedLessonIds}
+                  progress={courseProgress}
+                  onLessonClick={handleLessonClick}
+                />
+              )}
             </div>
           )}
         </div>

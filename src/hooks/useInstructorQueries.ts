@@ -3,7 +3,7 @@
  * Instructors are managed like categories - separate entities, not users
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Instructor } from '@/types';
+import { Instructor, InstructorRole } from '@/types';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import { useAuthStore } from '@/stores/authStore';
@@ -42,6 +42,7 @@ interface CreateInstructorInput {
   title?: string;
   bio?: string;
   profilePictureUrl?: string;
+  role?: InstructorRole;
 }
 
 interface UpdateInstructorInput {
@@ -50,6 +51,7 @@ interface UpdateInstructorInput {
   title?: string;
   bio?: string;
   profilePictureUrl?: string;
+  role?: InstructorRole;
 }
 
 interface DeleteInstructorInput {

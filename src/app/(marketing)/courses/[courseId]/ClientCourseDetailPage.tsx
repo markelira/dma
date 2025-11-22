@@ -25,6 +25,8 @@ import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useCourses } from '@/hooks/useCourseQueries';
+import { getCourseTypeTerminology, getDefaultInstructorRole } from '@/lib/terminology';
+import { CourseType } from '@/types';
 
 export default function ClientCourseDetailPage({ id }: { id: string }) {
   const router = useRouter();
@@ -154,7 +156,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     const success = searchParams.get('success');
     const canceled = searchParams.get('canceled');
     if (success) {
-      toast.success('Sikeres beiratkozás! A kurzushoz hozzáférsz.');
+      toast.success('Sikeres beiratkozás! A tartalomhoz hozzáférsz.');
       queryClient.invalidateQueries({ queryKey: ['course', id] });
       router.replace(`/courses/${id}`);
     } else if (canceled) {
@@ -171,7 +173,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
-            <p className="text-lg text-gray-600">Kurzus betöltése...</p>
+            <p className="text-lg text-gray-600">Tartalom betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -186,15 +188,15 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         <FramerNavbarWrapper />
         <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Kurzus nem található</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Tartalom nem található</h1>
             <p className="text-gray-600 mb-6">
-              A keresett kurzus nem létezik vagy nem elérhető.
+              A keresett tartalom nem létezik vagy nem elérhető.
             </p>
             <button
               onClick={() => router.push('/courses')}
               className="px-6 py-3 bg-gradient-to-t from-blue-600 to-blue-500 text-white rounded-lg font-semibold hover:shadow-md transition-all"
             >
-              Vissza a kurzusokhoz
+              Vissza a tartalmakhoz
             </button>
           </div>
         </div>
@@ -207,6 +209,11 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const c = course;
   const modulesData = Array.isArray(c.modules) ? c.modules : [];
   const lessonsData = modulesData.flatMap(mod => Array.isArray(mod.lessons) ? mod.lessons : []);
+
+  // Get course type-specific terminology
+  const courseType = (c.courseType || c.type || 'ACADEMIA') as CourseType;
+  const terminology = getCourseTypeTerminology(courseType);
+  const defaultInstructorRole = getDefaultInstructorRole(courseType);
 
   // Calculate course stats
   const stats = {
@@ -248,7 +255,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     try {
       const result = await enrollMutation.mutateAsync(id);
       if (result.alreadyEnrolled) {
-        toast.info('Már beiratkozott erre a kurzusra!');
+        toast.info('Már beiratkozott erre a tartalomra!');
       } else {
         toast.success('Sikeres beiratkozás!');
       }
@@ -266,7 +273,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   };
 
   const courseFeatures = [
-    `${stats.lessons} lecke`,
+    `${stats.lessons} ${terminology.lessonsLabel.toLowerCase()}`,
     'Élethosszig tartó hozzáférés',
     'Letölthető anyagok',
     'Mobil hozzáférés'
@@ -308,7 +315,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   transition={{ duration: 0.5 }}
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                    Mit fogsz megtanulni?
+                    {terminology.outcomesLabel}
                   </h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {c.whatYouWillLearn.map((item: string, index: number) => (
@@ -327,6 +334,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   modules={formattedModules}
                   totalLessons={stats.lessons}
                   totalDuration={stats.duration}
+                  sectionTitle={terminology.curriculumLabel}
+                  lessonLabel={terminology.lessonLabel}
+                  lessonsLabel={terminology.lessonsLabel}
+                  flatLessonMode={courseType !== 'ACADEMIA'}
                 />
               )}
 
@@ -363,7 +374,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                    Kinek ajánlott ez a kurzus?
+                    Kinek ajánlott ez a tartalom?
                   </h2>
                   <div className="space-y-3">
                     {c.targetAudience.map((item: string, index: number) => (
@@ -390,9 +401,11 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   key={instructor.id || idx}
                   name={instructor.name}
                   title={instructor.title}
-                  bio={instructor.bio || 'Tapasztalt oktató az ELIRA platformon.'}
+                  bio={instructor.bio || 'Tapasztalt előadó az Academion platformon.'}
                   imageUrl={instructor.profilePictureUrl}
                   expertise={c.tags || ['Üzleti fejlődés', 'Soft skills', 'Szakmai képzés']}
+                  roleLabel={terminology.instructorLabel}
+                  instructorRole={instructor.role as 'MENTOR' | 'SZEREPLŐ' | undefined}
                 />
               ))}
 
@@ -472,7 +485,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               courses={relatedCourses}
               categories={categories}
               instructors={instructors}
-              title="Kapcsolódó kurzusok"
+              title="Kapcsolódó tartalmak"
             />
           </div>
         )}

@@ -9,12 +9,17 @@ import { z } from 'zod';
 
 const firestore = admin.firestore();
 
+// Valid instructor roles
+const VALID_INSTRUCTOR_ROLES = ['MENTOR', 'SZEREPLŐ'] as const;
+type InstructorRole = typeof VALID_INSTRUCTOR_ROLES[number];
+
 // Zod schema for instructor creation
 const createInstructorSchema = z.object({
   name: z.string().min(1, 'A név kötelező.'),
   title: z.string().optional(),
   bio: z.string().optional(),
   profilePictureUrl: z.string().url('Érvényes URL szükséges.').optional().or(z.literal('')),
+  role: z.enum(VALID_INSTRUCTOR_ROLES).default('MENTOR'),
 });
 
 // Zod schema for instructor update
@@ -24,6 +29,7 @@ const updateInstructorSchema = z.object({
   title: z.string().optional(),
   bio: z.string().optional(),
   profilePictureUrl: z.string().url('Érvényes URL szükséges.').optional().or(z.literal('')),
+  role: z.enum(VALID_INSTRUCTOR_ROLES).optional(),
 });
 
 // Zod schema for instructor deletion
@@ -112,13 +118,14 @@ export const createInstructor = onCall({
       title: data.title || null,
       bio: data.bio || null,
       profilePictureUrl: data.profilePictureUrl || null,
+      role: data.role || 'MENTOR',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     const instructorRef = await firestore.collection('instructors').add(instructorData);
 
-    logger.info(`[createInstructor] Created instructor: ${instructorRef.id}`);
+    logger.info(`[createInstructor] Created instructor: ${instructorRef.id} with role: ${instructorData.role}`);
 
     return {
       success: true,
@@ -196,13 +203,18 @@ export const updateInstructor = onCall({
     }
 
     // Update instructor
-    const updateData = {
+    const updateData: Record<string, unknown> = {
       name: data.name,
       title: data.title || null,
       bio: data.bio || null,
       profilePictureUrl: data.profilePictureUrl || null,
       updatedAt: new Date().toISOString(),
     };
+
+    // Only update role if provided
+    if (data.role) {
+      updateData.role = data.role;
+    }
 
     await instructorRef.update(updateData);
 

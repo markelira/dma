@@ -7,12 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { ArrowLeft, ArrowRight, Check, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import CourseTypeSelection from './CourseTypeSelection';
 import CourseBasicInfoStep, { BasicInfoData } from './CourseBasicInfoStep';
-import CurriculumStructureStep from './CurriculumStructureStep';
+import CourseLessonsStep from './CourseLessonsStep';
 import CoursePublishStep from './CoursePublishStep';
 import { toast } from 'sonner';
 import { httpsCallable } from 'firebase/functions';
 import { functions as fbFunctions, db } from '@/lib/firebase';
-import { collection, doc, getDocs, query, addDoc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import { useAuth } from '@/hooks/useAuth';
 import { useCourseWizardStore } from '@/stores/courseWizardStore';
 import { Progress } from '@/components/ui/progress';
@@ -32,20 +32,20 @@ const steps = [
   {
     id: 0,
     title: 'Típus',
-    description: 'Válassz kurzus típust',
+    description: 'Válassz tartalom típust',
     validation: ['courseType']
   },
   {
     id: 1,
     title: 'Alapadatok',
-    description: 'Kurzus alapinformációk megadása',
-    validation: ['title', 'description', 'categoryId', 'instructorId', 'learningObjectives']
+    description: 'Tartalom alapinformációk megadása',
+    validation: ['title', 'description', 'categoryId', 'instructorId']
   },
   {
     id: 2,
-    title: 'Tanterv',
-    description: 'Modulok és leckék létrehozása',
-    validation: ['modules']
+    title: 'Leckék',
+    description: 'Leckék hozzáadása',
+    validation: ['lessons']
   },
   {
     id: 3,
@@ -61,8 +61,6 @@ export default function CourseCreationWizard() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [firestoreModuleCount, setFirestoreModuleCount] = useState(0);
-  const [firestoreLessonCount, setFirestoreLessonCount] = useState(0);
   
   const {
     currentStep,
@@ -70,7 +68,7 @@ export default function CourseCreationWizard() {
     courseId,
     courseType,
     basicInfo,
-    modules,
+    lessons,
     validationErrors,
     setCurrentStep,
     markStepCompleted,
@@ -104,87 +102,6 @@ export default function CourseCreationWizard() {
   // Calculate progress
   const progress = (completedSteps.length / steps.length) * 100;
 
-  // Check actual Firestore content for step 2 validation
-  const checkFirestoreContent = async () => {
-    if (!courseId) {
-      console.log('❌ No courseId for Firestore check');
-      return;
-    }
-    
-    try {
-      console.log('🔍 Checking Firestore content for courseId:', courseId);
-      
-      // Count modules
-      const modulesPath = collection(doc(db, 'courses', courseId), 'modules');
-      console.log('📂 Checking modules path:', `courses/${courseId}/modules`);
-      
-      const modulesSnapshot = await getDocs(modulesPath);
-      const moduleCount = modulesSnapshot.size;
-      setFirestoreModuleCount(moduleCount);
-      
-      console.log('📊 Found modules:', moduleCount);
-      
-      // Count lessons across all modules
-      let totalLessons = 0;
-      const moduleDetails = [];
-      
-      for (const moduleDoc of modulesSnapshot.docs) {
-        const moduleData = moduleDoc.data();
-        console.log('📋 Module:', moduleDoc.id, moduleData);
-        
-        const lessonsPath = collection(doc(db, 'courses', courseId, 'modules', moduleDoc.id), 'lessons');
-        console.log('📂 Checking lessons path:', `courses/${courseId}/modules/${moduleDoc.id}/lessons`);
-        
-        const lessonsSnapshot = await getDocs(lessonsPath);
-        const lessonCount = lessonsSnapshot.size;
-        totalLessons += lessonCount;
-        
-        moduleDetails.push({
-          id: moduleDoc.id,
-          title: moduleData.title,
-          lessons: lessonCount
-        });
-        
-        console.log('📋 Module lessons:', moduleDoc.id, lessonCount);
-      }
-      
-      setFirestoreLessonCount(totalLessons);
-      
-      console.log('📊 Firestore content check complete:', {
-        courseId,
-        modules: moduleCount,
-        lessons: totalLessons,
-        details: moduleDetails
-      });
-      
-    } catch (error) {
-      console.error('❌ Error checking Firestore content:', error);
-      console.error('❌ CourseId was:', courseId);
-    }
-  };
-
-  // Auto-refresh Firestore content when on step 2 (curriculum)
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-
-    if (courseId && currentStep === 2) {
-      // Initial check
-      checkFirestoreContent();
-
-      // Set up auto-refresh every 3 seconds while on step 2
-      // This ensures the "Next" button becomes enabled when modules/lessons are added
-      intervalId = setInterval(() => {
-        checkFirestoreContent();
-      }, 3000);
-    }
-
-    // Cleanup interval when leaving step 2
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
-  }, [courseId, currentStep]);
 
   // Check if step is valid
   const isStepValid = (stepId: number) => {
@@ -211,22 +128,15 @@ export default function CourseCreationWizard() {
     if (stepId === 0) return !!courseType;
     if (stepId === 1) return !!courseId;
     if (stepId === 2) {
-      // Check Firestore directly since CurriculumStructureStep works with Firestore
-      const hasFirestoreContent = firestoreModuleCount > 0 && firestoreLessonCount > 0;
-      
-      // Also check store as backup
-      const hasStoreModules = modules.length > 0 && modules.some(m => m.lessons.length > 0);
-      
+      // Check flat lessons from store
+      const hasLessons = lessons.length > 0;
+
       console.log('🔍 Step 2 validation:', {
-        firestoreModules: firestoreModuleCount,
-        firestoreLessons: firestoreLessonCount,
-        hasFirestoreContent,
-        storeModules: modules.length,
-        hasStoreModules,
-        canProceed: hasFirestoreContent || hasStoreModules
+        storeLessons: lessons.length,
+        canProceed: hasLessons
       });
-      
-      return hasFirestoreContent || hasStoreModules;
+
+      return hasLessons;
     }
     return true;
   };
@@ -349,51 +259,12 @@ export default function CourseCreationWizard() {
   // Handle course publish
   const handlePublish = async () => {
     if (!courseId) {
-      toast.error('Nincs kurzus ID a publikáláshoz');
+      toast.error('Nincs tartalom ID a publikáláshoz');
       return;
     }
 
-    // Check Firestore content before publish and get fresh counts
-    await checkFirestoreContent();
-    
-    // Wait a moment for state to update, then check again
-    await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // Get fresh counts directly from Firestore instead of relying on state
-    let moduleCount = firestoreModuleCount;
-    let lessonCount = firestoreLessonCount;
-    
-    // If counts are still 0, do a direct check
-    if (moduleCount === 0 || lessonCount === 0) {
-      try {
-        const modulesSnapshot = await getDocs(
-          collection(doc(db, 'courses', courseId), 'modules')
-        );
-        moduleCount = modulesSnapshot.size;
-        
-        let totalLessons = 0;
-        for (const moduleDoc of modulesSnapshot.docs) {
-          const lessonsSnapshot = await getDocs(
-            collection(doc(db, 'courses', courseId, 'modules', moduleDoc.id), 'lessons')
-          );
-          totalLessons += lessonsSnapshot.size;
-        }
-        lessonCount = totalLessons;
-        
-        console.log('🔄 Direct Firestore check for publish:', {
-          modules: moduleCount,
-          lessons: lessonCount
-        });
-      } catch (error) {
-        console.error('Error in direct Firestore check:', error);
-      }
-    }
-    
-    // Validate before publish using fresh counts
-    if (moduleCount === 0) {
-      toast.error('Legalább egy modul szükséges a publikáláshoz');
-      return;
-    }
+    // Validate lessons from store
+    const lessonCount = lessons.length;
 
     if (lessonCount === 0) {
       toast.error('Legalább egy lecke szükséges a publikáláshoz');
@@ -401,7 +272,6 @@ export default function CourseCreationWizard() {
     }
 
     console.log('✅ Publishing validation passed:', {
-      modules: moduleCount,
       lessons: lessonCount
     });
 
@@ -425,7 +295,6 @@ export default function CourseCreationWizard() {
           resourceId: courseId,
           details: JSON.stringify({
             courseTitle: basicInfo?.title || 'N/A',
-            moduleCount,
             lessonCount
           }),
           severity: 'HIGH',
@@ -571,12 +440,13 @@ export default function CourseCreationWizard() {
           {currentStep === 2 && courseId && (
             <div>
               <CardHeader className="px-0 pt-0">
-                <CardTitle>Tanterv összeállítása</CardTitle>
+                <CardTitle>Leckék hozzáadása</CardTitle>
                 <CardDescription>
-                  Hozz létre modulokat és adj hozzájuk leckéket. A sorrend később is módosítható.
+                  Add hozzá a leckéket. A sorrend húzással módosítható.
+                  {courseType === 'MASTERCLASS' && ' Masterclass esetén importálhatsz leckéket más kurzusokból.'}
                 </CardDescription>
               </CardHeader>
-              <CurriculumStructureStep courseId={courseId} />
+              <CourseLessonsStep courseId={courseId} />
             </div>
           )}
 
@@ -609,29 +479,18 @@ export default function CourseCreationWizard() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Előző
               </Button>
-              
+
               <div className="flex items-center gap-2">
                 {!canProceed(2) && (
                   <div className="text-sm text-muted-foreground">
-                    <p>Adj hozzá legalább egy modult és leckét a folytatáshoz</p>
-                    <p className="text-xs mt-1">
-                      Jelenleg: {firestoreModuleCount} modul, {firestoreLessonCount} lecke
-                    </p>
+                    <p>Adj hozzá legalább egy leckét a folytatáshoz</p>
                   </div>
                 )}
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    console.log('🔄 Manual refresh clicked');
-                    checkFirestoreContent();
-                  }}
-                  disabled={!courseId}
-                >
-                  Frissítés ({firestoreModuleCount}m, {firestoreLessonCount}l)
-                </Button>
-                
+
+                <span className="text-sm text-muted-foreground">
+                  {lessons.length} lecke
+                </span>
+
                 <Button
                   onClick={() => {
                     markStepCompleted(2);

@@ -35,7 +35,7 @@ export default function CustomHero() {
             struktúrával, ne káosszal
           </h1>
           <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-600 md:text-xl">
-            Professzionális fejlesztési kurzusok a DMA-tól. Akadémiák, webináriumok
+            Professzionális fejlesztési tartalmak a DMA-tól. Akadémiák, webináriumok
             és mesterkurzusok vállalati vezetőktől és szakértőktől.
           </p>
 
@@ -56,7 +56,7 @@ export default function CustomHero() {
               className="btn bg-white text-gray-800 shadow-sm hover:bg-gray-50"
               href="/courses"
             >
-              Fedezd fel a kurzusokat
+              Fedezd fel a tartalmakat
             </a>
           </div>
         </div>

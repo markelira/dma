@@ -12,6 +12,7 @@ interface ProgressPayload {
   sessionId?: string
   courseId?: string
   resumePosition?: number
+  completed?: boolean
 }
 
 // Generate a persistent device ID

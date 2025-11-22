@@ -129,7 +129,7 @@ export default function AkadémiaPage() {
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
-            <p className="text-lg text-gray-600">Akadémia kurzusok betöltése...</p>
+            <p className="text-lg text-gray-600">Akadémia tartalmak betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -176,7 +176,7 @@ export default function AkadémiaPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Keress akadémia kurzusok között..."
+                  placeholder="Keress akadémia tartalmak között..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500"

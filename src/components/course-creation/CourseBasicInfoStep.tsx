@@ -19,7 +19,9 @@ import { Upload, X, Loader2, Plus } from "lucide-react";
 import { useCourseWizardStore } from "@/stores/courseWizardStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useInstructors } from "@/hooks/useInstructorQueries";
-import { Instructor } from "@/types";
+import { useTargetAudiences } from "@/hooks/useTargetAudienceQueries";
+import { Instructor, TargetAudience } from "@/types";
+import { getCourseTypeTerminology } from "@/lib/terminology";
 
 interface Category { id: string; name: string }
 
@@ -28,16 +30,18 @@ import { CourseType } from '@/types';
 export interface BasicInfoData {
   title: string;
   description: string;
-  categoryId: string; // Keep for backward compatibility
-  categoryIds?: string[]; // NEW: Support multiple categories
+  categoryId: string;
+  categoryIds?: string[];
   instructorId: string;
-  instructorIds?: string[]; // NEW: Support multiple instructors
+  instructorIds?: string[];
   thumbnailUrl?: string;
-  learningObjectives: string;
+  language?: string;
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  certificateEnabled?: boolean;
 
   // Marketing fields
   whatYouWillLearn?: string[];
-  targetAudience?: string[];
+  targetAudienceIds?: string[]; // Entity-based target audiences
 }
 
 interface Props {
@@ -54,11 +58,8 @@ const schema = z.object({
   instructorId: z.string().min(1, "Válassz legalább egy oktatót"),
   instructorIds: z.array(z.string()).min(1, "Válassz legalább egy oktatót").optional(),
   thumbnailUrl: z.string().optional(),
-  learningObjectives: z.string().min(10, "A tanulási célok legalább 10 karakter legyen"),
-
-  // Marketing fields (all optional)
   whatYouWillLearn: z.array(z.string()).optional(),
-  targetAudience: z.array(z.string()).optional(),
+  targetAudienceIds: z.array(z.string()).optional(),
 });
 
 export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: Props) {
@@ -70,12 +71,20 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Use instructor query hook
+  // Use instructor and target audience query hooks
   const { data: instructors = [], isLoading: instructorsLoading } = useInstructors();
+  const { data: targetAudiences = [], isLoading: targetAudiencesLoading } = useTargetAudiences();
 
   // Marketing fields state
   const [whatYouWillLearn, setWhatYouWillLearn] = useState<string[]>(initial?.whatYouWillLearn || []);
-  const [targetAudience, setTargetAudience] = useState<string[]>(initial?.targetAudience || []);
+
+  // Selected target audiences (entity-based)
+  const [selectedTargetAudiences, setSelectedTargetAudiences] = useState<string[]>(
+    initial?.targetAudienceIds || []
+  );
+
+  // Get type-specific terminology
+  const terminology = courseType ? getCourseTypeTerminology(courseType) : null;
 
   // Selected categories state
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
@@ -104,13 +113,12 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       categoryId: "",
       instructorId: "",
       thumbnailUrl: "",
-      learningObjectives: "",
     },
   });
 
   const { authReady, isAuthenticated, user } = useAuthStore();
 
-  // Helper functions for array management
+  // Helper functions for whatYouWillLearn array
   const addWhatYouWillLearn = () => setWhatYouWillLearn([...whatYouWillLearn, ""]);
   const updateWhatYouWillLearn = (index: number, value: string) => {
     const updated = [...whatYouWillLearn];
@@ -119,16 +127,6 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
   };
   const removeWhatYouWillLearn = (index: number) => {
     setWhatYouWillLearn(whatYouWillLearn.filter((_, i) => i !== index));
-  };
-
-  const addTargetAudience = () => setTargetAudience([...targetAudience, ""]);
-  const updateTargetAudience = (index: number, value: string) => {
-    const updated = [...targetAudience];
-    updated[index] = value;
-    setTargetAudience(updated);
-  };
-  const removeTargetAudience = (index: number) => {
-    setTargetAudience(targetAudience.filter((_, i) => i !== index));
   };
 
 
@@ -244,12 +242,12 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       // Merge form data with state-managed arrays
       const completeData: BasicInfoData = {
         ...data,
-        categoryId: selectedCategories[0] || '', // Primary category (first selected)
-        categoryIds: selectedCategories, // All selected categories
-        instructorId: selectedInstructors[0] || '', // Primary instructor (first selected)
-        instructorIds: selectedInstructors, // All selected instructors
+        categoryId: selectedCategories[0] || '',
+        categoryIds: selectedCategories,
+        instructorId: selectedInstructors[0] || '',
+        instructorIds: selectedInstructors,
         whatYouWillLearn: whatYouWillLearn.filter(item => item.trim() !== ""),
-        targetAudience: targetAudience.filter(item => item.trim() !== ""),
+        targetAudienceIds: selectedTargetAudiences,
       };
       await onSubmit(completeData);
     } catch (error) {
@@ -394,18 +392,43 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
         )}
       </div>
 
-      {/* Learning Objectives */}
+      {/* Target Audiences - Entity-based multi-select */}
       <div className="space-y-2">
-        <Label htmlFor="objectives" required>Tanulási célok</Label>
-        <Textarea
-          id="objectives"
-          {...register("learningObjectives")}
-          rows={4}
-          placeholder="Mit fog megtanulni a diák a kurzus végére? (Soronként egy cél)"
-          className={errors.learningObjectives ? "border-red-500" : ""}
-        />
-        {errors.learningObjectives && (
-          <p className="text-sm text-red-600">{errors.learningObjectives.message}</p>
+        <Label>Célközönségek</Label>
+        <div className="border rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+          {targetAudiencesLoading ? (
+            <p className="text-sm text-muted-foreground">Célközönségek betöltése...</p>
+          ) : targetAudiences.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nincs elérhető célközönség</p>
+          ) : (
+            targetAudiences.map((audience) => (
+              <div key={audience.id} className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id={`audience-${audience.id}`}
+                  checked={selectedTargetAudiences.includes(audience.id)}
+                  onChange={(e) => {
+                    const newAudiences = e.target.checked
+                      ? [...selectedTargetAudiences, audience.id]
+                      : selectedTargetAudiences.filter(id => id !== audience.id);
+                    setSelectedTargetAudiences(newAudiences);
+                  }}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <label
+                  htmlFor={`audience-${audience.id}`}
+                  className="text-sm font-medium leading-none cursor-pointer"
+                >
+                  {audience.name}
+                </label>
+              </div>
+            ))
+          )}
+        </div>
+        {selectedTargetAudiences.length > 0 && (
+          <p className="text-xs text-muted-foreground">
+            {selectedTargetAudiences.length} célközönség kiválasztva
+          </p>
         )}
       </div>
 
@@ -481,18 +504,23 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
 
       {/* Marketing Section */}
       <div className="border-t pt-6 mt-6">
-        <h3 className="text-lg font-semibold mb-4">Marketing és értékesítési tartalom</h3>
+        <h3 className="text-lg font-semibold mb-4">Marketing tartalom</h3>
 
-        {/* What You'll Learn */}
+        {/* What You'll Learn - Type-specific label */}
         <div className="space-y-2 mb-6">
-          <Label>Mit fogsz tanulni?</Label>
+          <Label>{terminology?.outcomesLabel || 'Mit fogsz megtanulni?'}</Label>
+          <p className="text-xs text-muted-foreground mb-2">
+            {courseType === 'PODCAST'
+              ? 'A podcast témái és tartalma'
+              : 'A tanulási eredmények, amiket a résztvevők elérnek'}
+          </p>
           <div className="space-y-2">
             {whatYouWillLearn.map((item, index) => (
               <div key={index} className="flex gap-2">
                 <Input
                   value={item}
                   onChange={(e) => updateWhatYouWillLearn(index, e.target.value)}
-                  placeholder="pl. React komponensek létrehozása"
+                  placeholder={courseType === 'PODCAST' ? 'pl. A siker titka' : 'pl. React komponensek létrehozása'}
                 />
                 <Button
                   type="button"
@@ -512,41 +540,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
               className="w-full"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Új tanulási cél hozzáadása
-            </Button>
-          </div>
-        </div>
-
-        {/* Target Audience */}
-        <div className="space-y-2 mb-6">
-          <Label>Célközönség</Label>
-          <div className="space-y-2">
-            {targetAudience.map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) => updateTargetAudience(index, e.target.value)}
-                  placeholder="pl. Kezdő fejlesztők"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeTargetAudience(index)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addTargetAudience}
-              className="w-full"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Új célcsoport hozzáadása
+              Új elem hozzáadása
             </Button>
           </div>
         </div>

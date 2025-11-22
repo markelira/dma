@@ -50,7 +50,7 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
       >
         <div className="text-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900">
-            Fedezd fel a többi kurzus típust is
+            Fedezd fel a többi tartalom típust is
           </h3>
           <p className="text-sm text-gray-600 mt-1">
             Keresd meg a számodra legmegfelelőbb tanulási formátumot
@@ -102,7 +102,7 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
                           {config.label}
                         </h4>
                         <p className="text-xs text-gray-500 mt-0.5">
-                          Böngészd a kurzusokat
+                          Böngészd a tartalmakat
                         </p>
                       </div>
                     </div>

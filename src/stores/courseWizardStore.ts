@@ -1,30 +1,31 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Module, Lesson, CourseType } from '@/types';
+import { Lesson, CourseType } from '@/types';
 
 export interface WizardBasicInfo {
   title: string;
   description: string;
   categoryId: string;
+  categoryIds?: string[];
   instructorId: string;
-  instructorIds?: string[]; // NEW: Support multiple instructors
-  language: string;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  certificateEnabled: boolean;
+  instructorIds?: string[];
+  language?: string;
+  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  certificateEnabled?: boolean;
   thumbnailUrl?: string;
-  learningObjectives: string;
-}
-
-interface WizardModule extends Omit<Module, 'lessons'> {
-  lessons: WizardLesson[];
-  tempId?: string; // For unsaved modules
+  // Marketing fields
+  whatYouWillLearn?: string[];
+  targetAudienceIds?: string[]; // Entity-based target audiences
 }
 
 interface WizardLesson extends Omit<Lesson, 'id'> {
   id?: string;
-  tempId?: string; // For unsaved lessons
-  videoAssetId?: string; // Mux asset ID
+  tempId?: string;
+  videoAssetId?: string;
   videoUploadProgress?: number;
+  isImported?: boolean; // For MASTERCLASS imported lessons
+  sourceCourseid?: string; // Original course ID for imported lessons
+  sourceLessonId?: string; // Original lesson ID for imported lessons
 }
 
 interface CourseWizardState {
@@ -34,57 +35,62 @@ interface CourseWizardState {
 
   // Course data
   courseId: string | null;
-  courseType: CourseType | null; // NEW: Selected course type
+  courseType: CourseType | null;
   basicInfo: WizardBasicInfo | null;
-  modules: WizardModule[];
-  
+
+  // Flat lessons (replaces modules)
+  lessons: WizardLesson[];
+
+  // For MASTERCLASS - imported lesson references
+  importedLessonIds: string[];
+
   // Upload states
   uploads: Record<string, {
     progress: number;
     status: 'pending' | 'uploading' | 'completed' | 'failed';
     error?: string;
   }>;
-  
+
   // Validation states
   validationErrors: Record<string, string[]>;
-  
+
   // Actions
   setCurrentStep: (step: number) => void;
   markStepCompleted: (step: number) => void;
   setCourseId: (id: string) => void;
-  setCourseType: (type: CourseType) => void; // NEW: Set course type
+  setCourseType: (type: CourseType) => void;
   setBasicInfo: (info: WizardBasicInfo) => void;
-  
-  // Module actions
-  addModule: (module: Omit<WizardModule, 'id' | 'order'>) => void;
-  updateModule: (moduleId: string, updates: Partial<WizardModule>) => void;
-  deleteModule: (moduleId: string) => void;
-  reorderModules: (startIndex: number, endIndex: number) => void;
-  
-  // Lesson actions
-  addLesson: (moduleId: string, lesson: Omit<WizardLesson, 'order'>) => void;
-  updateLesson: (moduleId: string, lessonId: string, updates: Partial<WizardLesson>) => void;
-  deleteLesson: (moduleId: string, lessonId: string) => void;
-  reorderLessons: (moduleId: string, startIndex: number, endIndex: number) => void;
-  
+
+  // Flat lesson actions (replaces module actions)
+  addLesson: (lesson: Omit<WizardLesson, 'order'>) => void;
+  updateLesson: (lessonId: string, updates: Partial<WizardLesson>) => void;
+  deleteLesson: (lessonId: string) => void;
+  reorderLessons: (startIndex: number, endIndex: number) => void;
+  setLessons: (lessons: WizardLesson[]) => void;
+
+  // Import actions for MASTERCLASS
+  importLessons: (lessons: WizardLesson[]) => void;
+  removeImportedLesson: (lessonId: string) => void;
+
   // Upload actions
   setUploadProgress: (lessonId: string, progress: number, status: 'pending' | 'uploading' | 'completed' | 'failed', error?: string) => void;
-  
+
   // Validation
   setValidationErrors: (step: string, errors: string[]) => void;
   clearValidationErrors: (step?: string) => void;
-  
+
   // Reset
   resetWizard: () => void;
 }
 
 const initialState = {
-  currentStep: 0, // Start at Step 0 (type selection)
+  currentStep: 0,
   completedSteps: [],
   courseId: null,
-  courseType: null, // NEW: Initialize course type as null
+  courseType: null,
   basicInfo: null,
-  modules: [],
+  lessons: [],
+  importedLessonIds: [],
   uploads: {},
   validationErrors: {},
 };
@@ -93,116 +99,79 @@ export const useCourseWizardStore = create<CourseWizardState>()(
   persist(
     (set, get) => ({
       ...initialState,
-      
+
       // Step management
       setCurrentStep: (step) => set({ currentStep: step }),
       markStepCompleted: (step) => set((state) => ({
-        completedSteps: [...new Set([...state.completedSteps, step])].sort()
+        completedSteps: Array.from(new Set([...state.completedSteps, step])).sort()
       })),
 
       // Course data
       setCourseId: (id) => set({ courseId: id }),
-      setCourseType: (type) => set({ courseType: type }), // NEW: Set course type
+      setCourseType: (type) => set({ courseType: type }),
       setBasicInfo: (info) => set({ basicInfo: info }),
-      
-      // Module actions
-      addModule: (module) => set((state) => ({
-        modules: [...state.modules, {
-          ...module,
-          id: `temp_${Date.now()}`,
+
+      // Flat lesson actions
+      addLesson: (lesson) => set((state) => ({
+        lessons: [...state.lessons, {
+          ...lesson,
+          id: lesson.id || `temp_${Date.now()}`,
           tempId: `temp_${Date.now()}`,
-          order: state.modules.length,
-          lessons: []
+          order: state.lessons.length,
+          courseId: state.courseId || '',
         }]
       })),
-      
-      updateModule: (moduleId, updates) => set((state) => ({
-        modules: state.modules.map(m => 
-          (m.id === moduleId || m.tempId === moduleId) 
-            ? { ...m, ...updates } 
-            : m
+
+      updateLesson: (lessonId, updates) => set((state) => ({
+        lessons: state.lessons.map(l =>
+          (l.id === lessonId || l.tempId === lessonId)
+            ? { ...l, ...updates }
+            : l
         )
       })),
-      
-      deleteModule: (moduleId) => set((state) => ({
-        modules: state.modules
-          .filter(m => m.id !== moduleId && m.tempId !== moduleId)
-          .map((m, idx) => ({ ...m, order: idx }))
+
+      deleteLesson: (lessonId) => set((state) => ({
+        lessons: state.lessons
+          .filter(l => l.id !== lessonId && l.tempId !== lessonId)
+          .map((l, idx) => ({ ...l, order: idx })),
+        importedLessonIds: state.importedLessonIds.filter(id => id !== lessonId)
       })),
-      
-      reorderModules: (startIndex, endIndex) => set((state) => {
-        const modules = [...state.modules];
-        const [removed] = modules.splice(startIndex, 1);
-        modules.splice(endIndex, 0, removed);
-        return { 
-          modules: modules.map((m, idx) => ({ ...m, order: idx })) 
+
+      reorderLessons: (startIndex, endIndex) => set((state) => {
+        const lessons = [...state.lessons];
+        const [removed] = lessons.splice(startIndex, 1);
+        lessons.splice(endIndex, 0, removed);
+        return {
+          lessons: lessons.map((l, idx) => ({ ...l, order: idx }))
         };
       }),
-      
-      // Lesson actions
-      addLesson: (moduleId, lesson) => set((state) => ({
-        modules: state.modules.map(m => {
-          if (m.id === moduleId || m.tempId === moduleId) {
-            return {
-              ...m,
-              lessons: [...m.lessons, {
-                ...lesson,
-                tempId: `temp_${Date.now()}`,
-                order: m.lessons.length,
-                moduleId: m.id || m.tempId!,
-                courseId: state.courseId!
-              }]
-            };
-          }
-          return m;
-        })
+
+      setLessons: (lessons) => set({ lessons }),
+
+      // Import actions for MASTERCLASS
+      importLessons: (newLessons) => set((state) => {
+        const currentOrder = state.lessons.length;
+        const importedWithOrder = newLessons.map((lesson, idx) => ({
+          ...lesson,
+          order: currentOrder + idx,
+          isImported: true,
+        }));
+        return {
+          lessons: [...state.lessons, ...importedWithOrder],
+          importedLessonIds: [
+            ...state.importedLessonIds,
+            ...newLessons.map(l => l.sourceLessonId || l.id || l.tempId || '')
+          ].filter(Boolean)
+        };
+      }),
+
+      removeImportedLesson: (lessonId) => set((state) => ({
+        lessons: state.lessons
+          .filter(l => l.id !== lessonId && l.tempId !== lessonId && l.sourceLessonId !== lessonId)
+          .map((l, idx) => ({ ...l, order: idx })),
+        importedLessonIds: state.importedLessonIds.filter(id => id !== lessonId)
       })),
-      
-      updateLesson: (moduleId, lessonId, updates) => set((state) => ({
-        modules: state.modules.map(m => {
-          if (m.id === moduleId || m.tempId === moduleId) {
-            return {
-              ...m,
-              lessons: m.lessons.map(l => 
-                (l.id === lessonId || l.tempId === lessonId)
-                  ? { ...l, ...updates }
-                  : l
-              )
-            };
-          }
-          return m;
-        })
-      })),
-      
-      deleteLesson: (moduleId, lessonId) => set((state) => ({
-        modules: state.modules.map(m => {
-          if (m.id === moduleId || m.tempId === moduleId) {
-            return {
-              ...m,
-              lessons: m.lessons
-                .filter(l => l.id !== lessonId && l.tempId !== lessonId)
-                .map((l, idx) => ({ ...l, order: idx }))
-            };
-          }
-          return m;
-        })
-      })),
-      
-      reorderLessons: (moduleId, startIndex, endIndex) => set((state) => ({
-        modules: state.modules.map(m => {
-          if (m.id === moduleId || m.tempId === moduleId) {
-            const lessons = [...m.lessons];
-            const [removed] = lessons.splice(startIndex, 1);
-            lessons.splice(endIndex, 0, removed);
-            return {
-              ...m,
-              lessons: lessons.map((l, idx) => ({ ...l, order: idx }))
-            };
-          }
-          return m;
-        })
-      })),
-      
+
       // Upload tracking
       setUploadProgress: (lessonId, progress, status, error) => set((state) => ({
         uploads: {
@@ -210,18 +179,18 @@ export const useCourseWizardStore = create<CourseWizardState>()(
           [lessonId]: { progress, status, error }
         }
       })),
-      
+
       // Validation
       setValidationErrors: (step, errors) => set((state) => ({
         validationErrors: { ...state.validationErrors, [step]: errors }
       })),
-      
+
       clearValidationErrors: (step) => set((state) => ({
-        validationErrors: step 
+        validationErrors: step
           ? { ...state.validationErrors, [step]: [] }
           : {}
       })),
-      
+
       // Reset
       resetWizard: () => set(initialState),
     }),
@@ -231,9 +200,10 @@ export const useCourseWizardStore = create<CourseWizardState>()(
         currentStep: state.currentStep,
         completedSteps: state.completedSteps,
         courseId: state.courseId,
-        courseType: state.courseType, // NEW: Persist course type
+        courseType: state.courseType,
         basicInfo: state.basicInfo,
-        modules: state.modules,
+        lessons: state.lessons,
+        importedLessonIds: state.importedLessonIds,
         uploads: state.uploads,
       }),
     }

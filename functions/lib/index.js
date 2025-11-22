@@ -37,8 +37,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = exports.restoreSoftDeletedCourses = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = void 0;
-exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = void 0;
+exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = void 0;
+exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -1733,6 +1733,16 @@ Object.defineProperty(exports, "createInstructor", { enumerable: true, get: func
 Object.defineProperty(exports, "updateInstructor", { enumerable: true, get: function () { return instructorActions_1.updateInstructor; } });
 Object.defineProperty(exports, "deleteInstructor", { enumerable: true, get: function () { return instructorActions_1.deleteInstructor; } });
 // ============================================
+// TARGET AUDIENCE MANAGEMENT
+// ============================================
+// Export target audience CRUD functions
+// Target Audiences are entities for course targeting (like categories)
+var targetAudienceActions_1 = require("./targetAudienceActions");
+Object.defineProperty(exports, "getTargetAudiences", { enumerable: true, get: function () { return targetAudienceActions_1.getTargetAudiences; } });
+Object.defineProperty(exports, "createTargetAudience", { enumerable: true, get: function () { return targetAudienceActions_1.createTargetAudience; } });
+Object.defineProperty(exports, "updateTargetAudience", { enumerable: true, get: function () { return targetAudienceActions_1.updateTargetAudience; } });
+Object.defineProperty(exports, "deleteTargetAudience", { enumerable: true, get: function () { return targetAudienceActions_1.deleteTargetAudience; } });
+// ============================================
 // USER PREFERENCES & GAMIFICATION
 // ============================================
 // Export user preferences and gamification functions
@@ -1784,4 +1794,14 @@ Object.defineProperty(exports, "getPlatformAnalytics", { enumerable: true, get: 
 // Export course catalog/browse endpoints
 var courseCatalog_1 = require("./courseCatalog");
 Object.defineProperty(exports, "getCoursesWithFilters", { enumerable: true, get: function () { return courseCatalog_1.getCoursesWithFilters; } });
+// ============================================
+// DATABASE MIGRATIONS
+// ============================================
+// Export migration functions (Admin only)
+// Use these to migrate existing data to new schema
+var flattenCoursesToLessons_1 = require("./migrations/flattenCoursesToLessons");
+Object.defineProperty(exports, "migrateCoursesToFlatLessons", { enumerable: true, get: function () { return flattenCoursesToLessons_1.migrateCoursesToFlatLessons; } });
+Object.defineProperty(exports, "addDefaultInstructorRoles", { enumerable: true, get: function () { return flattenCoursesToLessons_1.addDefaultInstructorRoles; } });
+Object.defineProperty(exports, "seedDefaultTargetAudiences", { enumerable: true, get: function () { return flattenCoursesToLessons_1.seedDefaultTargetAudiences; } });
+Object.defineProperty(exports, "getMigrationStatus", { enumerable: true, get: function () { return flattenCoursesToLessons_1.getMigrationStatus; } });
 //# sourceMappingURL=index.js.map

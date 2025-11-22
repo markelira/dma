@@ -2,6 +2,33 @@ import { useQuery } from '@tanstack/react-query'
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
+import { CourseType, Lesson, Module, Course } from '@/types'
+
+// Course types that use flat lessons (no modules)
+const FLAT_LESSON_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST', 'MASTERCLASS'];
+
+// Course types that use Netflix-style player (full-width video)
+export const NETFLIX_STYLE_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST'];
+
+// Player data course type (extends Course with modules)
+export interface PlayerCourse extends Omit<Course, 'modules'> {
+  id: string;
+  modules: Module[];
+  autoplayNext: boolean;
+  // Firestore stores courseType as 'type' field
+  type?: CourseType;
+}
+
+// Player data return type
+export interface PlayerData {
+  success: boolean;
+  course: PlayerCourse;
+  flatLessons: Lesson[];
+  sourceCourseNames: Record<string, string>;
+  usesFlatLessons: boolean | undefined;
+  usesNetflixLayout: boolean | undefined;
+  signedPlaybackUrl: string | null;
+}
 
 export const usePlayerData = (courseId: string | undefined, lessonId: string | undefined) => {
   const { user } = useAuthStore();
@@ -21,19 +48,50 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
         } else {
           const docSnap = await getDoc(doc(db, 'courses', courseId));
           if (!docSnap.exists()) {
-            throw new Error('Kurzus nem található');
+            throw new Error('Tartalom nem található');
           }
           courseDoc = docSnap;
         }
 
         const courseData = courseDoc.data();
         const actualCourseId = courseDoc.id;
+        const courseType = courseData.type as CourseType | undefined;
+
+        // For flat lesson course types, fetch lessons directly
+        const usesFlatLessons = courseType && FLAT_LESSON_COURSE_TYPES.includes(courseType);
+
+        // Flat lessons storage
+        let flatLessons: Lesson[] = [];
 
         // Use existing modules from course data, or fetch from subcollections
         let modules = courseData.modules || [];
 
-        if (modules.length === 0) {
-          // NEW: First try fetching modules subcollection (new structure)
+        // First, try to fetch flat lessons from the lessons subcollection
+        const lessonsSnapshot = await getDocs(
+          query(collection(db, 'courses', actualCourseId, 'lessons'), orderBy('order', 'asc'))
+        );
+
+        if (!lessonsSnapshot.empty) {
+          flatLessons = lessonsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+            progress: { completed: false, watchPercentage: 0 }
+          })) as unknown as Lesson[];
+        }
+
+        // If we have flat lessons and this is a flat lesson course type, use them directly
+        if (usesFlatLessons && flatLessons.length > 0) {
+          // Return flat lessons structure - wrap in a single "default" module for backwards compatibility
+          modules = [{
+            id: 'flat-lessons',
+            title: courseData.title || 'Tartalom',
+            description: '',
+            order: 0,
+            status: 'PUBLISHED',
+            lessons: flatLessons
+          }];
+        } else if (modules.length === 0) {
+          // Fall back to checking modules subcollection (for ACADEMIA type)
           const modulesSnapshot = await getDocs(
             query(collection(db, 'courses', actualCourseId, 'modules'), orderBy('order', 'asc'))
           );
@@ -42,14 +100,14 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
             // Fetch lessons from each module's subcollection
             const modulesPromises = modulesSnapshot.docs.map(async (moduleDoc) => {
               const moduleData = moduleDoc.data();
-              const lessonsSnapshot = await getDocs(
+              const moduleLessonsSnapshot = await getDocs(
                 query(
                   collection(db, 'courses', actualCourseId, 'modules', moduleDoc.id, 'lessons'),
                   orderBy('order', 'asc')
                 )
               );
 
-              const lessons = lessonsSnapshot.docs.map(doc => ({
+              const lessons = moduleLessonsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
                 progress: { completed: false, watchPercentage: 0 }
@@ -66,27 +124,38 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
             });
 
             modules = await Promise.all(modulesPromises);
-          } else {
-            // Fallback: fetch lessons from direct subcollection (old structure)
-            const lessonsSnapshot = await getDocs(
-              query(collection(db, 'courses', actualCourseId, 'lessons'), orderBy('order', 'asc'))
-            );
+          } else if (flatLessons.length > 0) {
+            // Use flat lessons as fallback even for non-flat course types
+            modules = [{
+              id: 'default-module',
+              title: courseData.title || 'Course Content',
+              description: '',
+              order: 1,
+              status: 'PUBLISHED',
+              lessons: flatLessons
+            }];
+          }
+        }
 
-            if (!lessonsSnapshot.empty) {
-              const lessons = lessonsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                progress: { completed: false, watchPercentage: 0 }
-              }));
+        // Fetch source course names for imported lessons (MASTERCLASS)
+        const sourceCourseNames: Record<string, string> = {};
+        if (courseType === 'MASTERCLASS') {
+          const sourceCourseIds = new Set<string>();
+          flatLessons.forEach((lesson: any) => {
+            if (lesson.sourceCourseid || lesson.sourceCourseId) {
+              sourceCourseIds.add(lesson.sourceCourseid || lesson.sourceCourseId);
+            }
+          });
 
-              modules = [{
-                id: 'default-module',
-                title: courseData.title || 'Course Content',
-                description: '',
-                order: 1,
-                status: 'PUBLISHED',
-                lessons
-              }];
+          // Fetch source course names
+          for (const sourceCourseId of Array.from(sourceCourseIds)) {
+            try {
+              const sourceDoc = await getDoc(doc(db, 'courses', sourceCourseId));
+              if (sourceDoc.exists()) {
+                sourceCourseNames[sourceCourseId] = sourceDoc.data().title || 'Ismeretlen tartalom';
+              }
+            } catch (e) {
+              console.error('Error fetching source course:', sourceCourseId, e);
             }
           }
         }
@@ -98,9 +167,16 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
             ...courseData,
             modules,
             autoplayNext: courseData.autoplayNext ?? true
-          },
+          } as PlayerCourse,
+          // Flat lessons for new player layouts
+          flatLessons,
+          // Source course names for imported lessons
+          sourceCourseNames,
+          // Player layout hints
+          usesFlatLessons,
+          usesNetflixLayout: courseType && NETFLIX_STYLE_COURSE_TYPES.includes(courseType),
           signedPlaybackUrl: null
-        };
+        } as PlayerData;
 
       } catch (error) {
         console.error('Error fetching player data:', error);

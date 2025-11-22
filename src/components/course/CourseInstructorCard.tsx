@@ -3,19 +3,24 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
+import { CourseType } from '@/types';
 
 interface CourseInstructorCardProps {
   name: string;
   title?: string;
   bio: string;
   imageUrl?: string;
-  stats: {
+  stats?: {
     students: number;
     courses: number;
     rating: number;
     reviews: number;
   };
-  expertise: string[];
+  expertise?: string[];
+  /** Role label based on course type (e.g., "Mentor", "Szereplő") */
+  roleLabel?: string;
+  /** Instructor's role from the instructors collection */
+  instructorRole?: 'MENTOR' | 'SZEREPLŐ';
 }
 
 export function CourseInstructorCard({
@@ -24,8 +29,15 @@ export function CourseInstructorCard({
   bio,
   imageUrl,
   stats,
-  expertise
+  expertise,
+  roleLabel = 'Oktató',
+  instructorRole
 }: CourseInstructorCardProps) {
+  // Use instructor's actual role if available, otherwise use the passed roleLabel
+  const displayRole = instructorRole
+    ? (instructorRole === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor')
+    : roleLabel;
+
   return (
     <motion.section
       className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
@@ -35,7 +47,7 @@ export function CourseInstructorCard({
       transition={{ duration: 0.5 }}
     >
       <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        Oktatód
+        {displayRole}
       </h2>
 
       <div className="flex items-start gap-6">

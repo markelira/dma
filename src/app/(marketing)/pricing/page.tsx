@@ -37,7 +37,7 @@ export default function PricingPage() {
                     Előfizetés szükséges
                   </p>
                   <p className="text-blue-800 text-sm mt-1">
-                    A kurzusokhoz való hozzáféréshez aktív előfizetés szükséges. Válasszon egy csomagot az alábbiak közül.
+                    A tartalmakhoz való hozzáféréshez aktív előfizetés szükséges. Válasszon egy csomagot az alábbiak közül.
                   </p>
                 </div>
               </div>

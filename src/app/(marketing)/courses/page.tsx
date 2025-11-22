@@ -276,7 +276,7 @@ export default function CoursesPage() {
         <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-purple-600" />
-            <p className="text-lg text-gray-600">Kurzusok betöltése...</p>
+            <p className="text-lg text-gray-600">Tartalmak betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -304,10 +304,10 @@ export default function CoursesPage() {
               className="mb-6"
             >
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Fedezd fel kurzusainkat
+                Fedezd fel tartalmainkat
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                Akadémiák, webináriumok és mesterkurzusok szakértő oktatóinktól.
+                Akadémiák, webinárok, mesterkurzusok és podcastok szakértő mentoroktól.
                 Válaszd ki a számodra legmegfelelőbb tanulási formát.
               </p>
             </motion.div>
@@ -323,7 +323,7 @@ export default function CoursesPage() {
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Keress kurzusok között..."
+                  placeholder="Keress tartalmak között..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="w-full pl-14 pr-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-purple-500 transition-all text-gray-900 placeholder-gray-500"
@@ -400,10 +400,10 @@ export default function CoursesPage() {
                   <BookOpen className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                  Nincsenek elérhető kurzusok
+                  Nincsenek elérhető tartalmak
                 </h3>
                 <p className="text-gray-600 text-center">
-                  Jelenleg nincsenek közzétett kurzusok
+                  Jelenleg nincsenek közzétett tartalmak
                 </p>
               </motion.div>
             </div>

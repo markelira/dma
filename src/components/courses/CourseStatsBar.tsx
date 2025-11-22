@@ -12,10 +12,10 @@ interface CourseStatsBarProps {
 
 const courseTypeLabels: Record<string, string> = {
   WEBINAR: 'Webinárok',
-  ACADEMIA: 'Akadémia kurzusok',
-  MASTERCLASS: 'Masterclass kurzusok',
+  ACADEMIA: 'Akadémia',
+  MASTERCLASS: 'Masterclass',
   PODCAST: 'Podcastok',
-  ALL: 'Összes kurzus'
+  ALL: 'Összes tartalom'
 };
 
 /**
@@ -29,7 +29,7 @@ export function CourseStatsBar({
   filteredCount,
   courseType
 }: CourseStatsBarProps) {
-  const courseLabel = courseType ? courseTypeLabels[courseType] : 'Összes kurzus';
+  const courseLabel = courseType ? courseTypeLabels[courseType] : 'Összes tartalom';
   return (
     <div className="relative py-6 border-b border-gray-200/50">
       <div className="container mx-auto px-6 lg:px-12">
