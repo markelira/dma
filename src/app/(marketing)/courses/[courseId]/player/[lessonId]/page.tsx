@@ -317,6 +317,7 @@ export default function CoursePlayerPage() {
           title: course.title,
           type: courseType,
           description: course.description,
+          whatYouWillLearn: course.whatYouWillLearn,
         }}
         lessons={lessonsForPlayer}
         currentLesson={currentLesson}
@@ -332,6 +333,7 @@ export default function CoursePlayerPage() {
         nextLesson={nextLesson}
         onPreviousLesson={handlePreviousLesson}
         onNextLesson={handleNextLesson}
+        instructor={playerData?.instructor}
       />
     );
   }

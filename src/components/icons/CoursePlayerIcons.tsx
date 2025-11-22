@@ -188,11 +188,16 @@ export function ChevronUpIcon({ className = '', size = 20 }: IconProps) {
   );
 }
 
+interface LargePlayButtonProps extends IconProps {
+  color?: 'blue' | 'red';
+}
+
 /**
  * Large centered play button for video player
  * Used as the main play overlay on the video
  */
-export function LargePlayButton({ className = '', size = 72 }: IconProps) {
+export function LargePlayButton({ className = '', size = 72, color = 'blue' }: LargePlayButtonProps) {
+  const fillColor = color === 'red' ? '#DC2626' : '#3B82F6';
   return (
     <svg
       width={size}
@@ -202,7 +207,7 @@ export function LargePlayButton({ className = '', size = 72 }: IconProps) {
       xmlns="http://www.w3.org/2000/svg"
       className={className}
     >
-      <circle cx="36" cy="36" r="36" fill="#3B82F6" opacity="0.95" />
+      <circle cx="36" cy="36" r="36" fill={fillColor} opacity="0.95" />
       <path
         d="M28 24L50 36L28 48V24Z"
         fill="white"

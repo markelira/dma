@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { NewVideoPlayer } from './NewVideoPlayer';
 import { NewLessonNavigation } from './NewLessonNavigation';
+import { WebinarSidePanel } from './WebinarSidePanel';
 import { ArrowLeftIcon, PlayCircleIcon, CheckCircleIcon, EmptyCircleIcon } from '@/components/icons/CoursePlayerIcons';
-import { Lesson, CourseType } from '@/types';
+import { Lesson, CourseType, Instructor } from '@/types';
 import { getCourseTypeTerminology } from '@/lib/terminology';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -16,6 +17,7 @@ interface NetflixPlayerLayoutProps {
     title: string;
     type?: CourseType;
     description?: string;
+    whatYouWillLearn?: string[];
   };
   lessons: Lesson[];
   currentLesson: Lesson;
@@ -31,6 +33,7 @@ interface NetflixPlayerLayoutProps {
   nextLesson: Lesson | null;
   onPreviousLesson: () => void;
   onNextLesson: () => void;
+  instructor?: Instructor | null;
 }
 
 /**
@@ -53,19 +56,26 @@ export function NetflixPlayerLayout({
   nextLesson,
   onPreviousLesson,
   onNextLesson,
+  instructor,
 }: NetflixPlayerLayoutProps) {
   const router = useRouter();
   const [episodesExpanded, setEpisodesExpanded] = useState(false);
+
+  // Check if this is a WEBINAR (uses split layout with side panel)
+  const isWebinar = course.type === 'WEBINAR';
+
+  // Calculate total duration from all lessons
+  const totalDuration = lessons.reduce((sum, l) => sum + (l.duration || 0), 0);
 
   const terminology = course.type ? getCourseTypeTerminology(course.type) : null;
   const lessonLabel = terminology?.lessonLabel || 'Lecke';
   const lessonsLabel = terminology?.lessonsLabel || 'Leckék';
   const contentLabel = terminology?.contentLabel || 'Tartalom';
 
-  // Get lesson status icon
+  // Get lesson status icon (red accents for Netflix style)
   const getLessonStatusIcon = (lessonId: string, isCurrent: boolean) => {
     if (isCurrent) {
-      return <PlayCircleIcon className="w-5 h-5 text-blue-500" />;
+      return <PlayCircleIcon className="w-5 h-5 text-red-500" />;
     }
     if (completedLessonIds.has(lessonId)) {
       return <CheckCircleIcon className="w-5 h-5 text-green-500" />;
@@ -84,6 +94,99 @@ export function NetflixPlayerLayout({
   // Current lesson index for display
   const currentIndex = lessons.findIndex(l => l.id === currentLessonId);
 
+  // WEBINAR Layout: Side panel on left + Video on right
+  if (isWebinar) {
+    return (
+      <div className="min-h-screen bg-black flex">
+        {/* Left Side Panel */}
+        <WebinarSidePanel
+          courseTitle={course.title}
+          courseDescription={course.description}
+          instructor={instructor}
+          currentLesson={currentLesson}
+          learningOutcomes={course.whatYouWillLearn}
+          totalDuration={totalDuration}
+        />
+
+        {/* Right Side - Video and Controls */}
+        <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          {/* Top bar with back link and title */}
+          <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
+            <div className="flex items-center gap-4">
+              <Link
+                href={`/courses/${course.id}`}
+                className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
+              >
+                <ArrowLeftIcon size={20} />
+                <span className="hidden sm:inline">Vissza</span>
+              </Link>
+              <div className="h-6 w-px bg-white/20" />
+              <h1 className="text-white font-medium truncate">{course.title}</h1>
+            </div>
+          </div>
+
+          {/* Video Player Area */}
+          <div className="flex-1 bg-black flex items-center justify-center">
+            {videoSource && currentLesson.type === 'VIDEO' && (
+              <div className="w-full h-full">
+                <NewVideoPlayer
+                  src={videoSource}
+                  poster={currentLesson.thumbnailUrl || currentLesson.muxThumbnailUrl}
+                  initialTime={resumePosition}
+                  onProgress={onProgress}
+                  onEnded={onVideoEnded}
+                  accentColor="red"
+                />
+              </div>
+            )}
+
+            {/* Non-video content placeholder */}
+            {currentLesson.type !== 'VIDEO' && (
+              <div className="w-full h-full flex items-center justify-center bg-gray-900">
+                <div className="text-center text-white p-8 max-w-2xl">
+                  <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
+                  {currentLesson.content && (
+                    <div className="prose prose-invert prose-lg max-w-none">
+                      <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+                        {currentLesson.content}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Navigation */}
+          <div className="bg-[#1a1a1a] border-t border-gray-800 px-6 py-4 flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-400">
+                  {lessonLabel} {currentIndex + 1} / {lessons.length}
+                </span>
+                {currentLesson.duration && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-sm text-gray-400">
+                      {formatDuration(currentLesson.duration)}
+                    </span>
+                  </>
+                )}
+              </div>
+              <NewLessonNavigation
+                hasPrevious={!!previousLesson}
+                hasNext={!!nextLesson}
+                onPrevious={onPreviousLesson}
+                onNext={onNextLesson}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // PODCAST Layout: Full-width video (original Netflix style)
   return (
     <div className="min-h-screen bg-black">
       {/* Top bar with back link and title */}
@@ -91,7 +194,7 @@ export function NetflixPlayerLayout({
         <div className="max-w-7xl mx-auto flex items-center gap-4">
           <Link
             href={`/courses/${course.id}`}
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white font-medium transition-colors"
+            className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
           >
             <ArrowLeftIcon size={20} />
             <span className="hidden sm:inline">Vissza</span>
@@ -110,6 +213,7 @@ export function NetflixPlayerLayout({
             initialTime={resumePosition}
             onProgress={onProgress}
             onEnded={onVideoEnded}
+            accentColor="red"
           />
         )}
 
@@ -176,7 +280,7 @@ export function NetflixPlayerLayout({
             </div>
             <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                className="h-full bg-red-600 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -210,7 +314,7 @@ export function NetflixPlayerLayout({
                       onClick={() => !isCurrent && onLessonClick(lesson.id)}
                       className={`w-full flex items-center gap-4 p-4 rounded-lg transition-all ${
                         isCurrent
-                          ? 'bg-blue-500/20 border border-blue-500/50'
+                          ? 'bg-red-600/20 border border-red-600/50'
                           : 'bg-gray-900/50 hover:bg-gray-800/70 border border-transparent'
                       }`}
                     >
@@ -219,7 +323,7 @@ export function NetflixPlayerLayout({
 
                       {/* Episode number */}
                       <span className={`font-bold text-xl min-w-[2rem] ${
-                        isCurrent ? 'text-blue-400' : 'text-gray-500'
+                        isCurrent ? 'text-red-400' : 'text-gray-500'
                       }`}>
                         {index + 1}
                       </span>

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { doc, getDoc, collection, getDocs, query, orderBy, where } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
-import { CourseType, Lesson, Module, Course } from '@/types'
+import { CourseType, Lesson, Module, Course, Instructor } from '@/types'
 
 // Course types that use flat lessons (no modules)
 const FLAT_LESSON_COURSE_TYPES: CourseType[] = ['WEBINAR', 'PODCAST', 'MASTERCLASS'];
@@ -28,6 +28,7 @@ export interface PlayerData {
   usesFlatLessons: boolean | undefined;
   usesNetflixLayout: boolean | undefined;
   signedPlaybackUrl: string | null;
+  instructor: Instructor | null;
 }
 
 export const usePlayerData = (courseId: string | undefined, lessonId: string | undefined) => {
@@ -170,6 +171,30 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           }
         }
 
+        // Fetch instructor data (for WEBINAR/PODCAST mentor display)
+        let instructor: Instructor | null = null;
+        const instructorId = courseData.instructorId || courseData.instructorIds?.[0];
+        if (instructorId) {
+          try {
+            const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
+            if (instructorDoc.exists()) {
+              const instructorData = instructorDoc.data();
+              instructor = {
+                id: instructorDoc.id,
+                name: instructorData.name || 'Ismeretlen',
+                title: instructorData.title,
+                bio: instructorData.bio,
+                profilePictureUrl: instructorData.profilePictureUrl,
+                role: instructorData.role || 'MENTOR',
+                createdAt: instructorData.createdAt,
+                updatedAt: instructorData.updatedAt,
+              } as Instructor;
+            }
+          } catch (e) {
+            console.error('Error fetching instructor:', instructorId, e);
+          }
+        }
+
         return {
           success: true,
           course: {
@@ -185,7 +210,9 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           // Player layout hints
           usesFlatLessons,
           usesNetflixLayout: courseType && NETFLIX_STYLE_COURSE_TYPES.includes(courseType),
-          signedPlaybackUrl: null
+          signedPlaybackUrl: null,
+          // Instructor data for mentor display
+          instructor,
         } as PlayerData;
 
       } catch (error) {

@@ -16,6 +16,7 @@ interface NewVideoPlayerProps {
   initialTime?: number;
   onProgress?: (currentTime: number, duration: number, percentage: number) => void;
   onEnded?: () => void;
+  accentColor?: 'blue' | 'red';
 }
 
 /**
@@ -30,7 +31,11 @@ export function NewVideoPlayer({
   initialTime = 0,
   onProgress,
   onEnded,
+  accentColor = 'blue',
 }: NewVideoPlayerProps) {
+  // Accent color classes for progress bar
+  const progressColorClass = accentColor === 'red' ? 'bg-red-600' : 'bg-blue-500';
+  const progressHoverClass = accentColor === 'red' ? 'bg-red-500/50' : 'bg-blue-400/50';
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const progressTrackingRef = useRef<NodeJS.Timeout | null>(null);
@@ -204,7 +209,7 @@ export function NewVideoPlayer({
           onClick={togglePlay}
         >
           <div className="transition-transform hover:scale-110">
-            <LargePlayButton size={72} />
+            <LargePlayButton size={72} color={accentColor} />
           </div>
         </div>
       )}
@@ -224,13 +229,13 @@ export function NewVideoPlayer({
         >
           {/* Progress Fill */}
           <div
-            className="h-full bg-blue-500 transition-all"
+            className={`h-full ${progressColorClass} transition-all`}
             style={{ width: `${progressPercentage}%` }}
           />
           {/* Hover effect */}
           <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">
             <div
-              className="h-full bg-blue-400/50"
+              className={`h-full ${progressHoverClass}`}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
