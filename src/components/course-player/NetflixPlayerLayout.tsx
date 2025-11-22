@@ -35,6 +35,7 @@ interface NetflixPlayerLayoutProps {
   onPreviousLesson: () => void;
   onNextLesson: () => void;
   instructor?: Instructor | null;
+  instructors?: Instructor[];
 }
 
 /**
@@ -59,6 +60,7 @@ export function NetflixPlayerLayout({
   onPreviousLesson,
   onNextLesson,
   instructor,
+  instructors = [],
 }: NetflixPlayerLayoutProps) {
   const router = useRouter();
   const [episodesExpanded, setEpisodesExpanded] = useState(false);
@@ -172,7 +174,7 @@ export function NetflixPlayerLayout({
         <AcademiaSidePanel
           courseTitle={course.title}
           courseDescription={course.description}
-          instructor={instructor}
+          instructors={instructors.length > 0 ? instructors : (instructor ? [instructor] : [])}
           modules={modules}
           currentLessonId={currentLessonId}
           completedLessonIds={completedLessonIds}

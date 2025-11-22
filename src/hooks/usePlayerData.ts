@@ -29,6 +29,7 @@ export interface PlayerData {
   usesNetflixLayout: boolean | undefined;
   signedPlaybackUrl: string | null;
   instructor: Instructor | null;
+  instructors: Instructor[];
 }
 
 export const usePlayerData = (courseId: string | undefined, lessonId: string | undefined) => {
@@ -171,15 +172,25 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           }
         }
 
-        // Fetch instructor data (for WEBINAR/PODCAST mentor display)
+        // Fetch instructor data (supports multiple instructors)
         let instructor: Instructor | null = null;
-        const instructorId = courseData.instructorId || courseData.instructorIds?.[0];
-        if (instructorId) {
+        const instructors: Instructor[] = [];
+
+        // Get all instructor IDs (from instructorIds array or single instructorId)
+        const allInstructorIds: string[] = [];
+        if (courseData.instructorIds && Array.isArray(courseData.instructorIds)) {
+          allInstructorIds.push(...courseData.instructorIds);
+        } else if (courseData.instructorId) {
+          allInstructorIds.push(courseData.instructorId);
+        }
+
+        // Fetch all instructors
+        for (const instructorId of allInstructorIds) {
           try {
             const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
             if (instructorDoc.exists()) {
               const instructorData = instructorDoc.data();
-              instructor = {
+              const inst = {
                 id: instructorDoc.id,
                 name: instructorData.name || 'Ismeretlen',
                 title: instructorData.title,
@@ -189,6 +200,11 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
                 createdAt: instructorData.createdAt,
                 updatedAt: instructorData.updatedAt,
               } as Instructor;
+              instructors.push(inst);
+              // Set first instructor as the primary one (for backwards compatibility)
+              if (!instructor) {
+                instructor = inst;
+              }
             }
           } catch (e) {
             console.error('Error fetching instructor:', instructorId, e);
@@ -213,6 +229,7 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           signedPlaybackUrl: null,
           // Instructor data for mentor display
           instructor,
+          instructors,
         } as PlayerData;
 
       } catch (error) {

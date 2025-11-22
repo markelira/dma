@@ -137,8 +137,8 @@ export default function CoursePlayerPage() {
     const allLessons: Array<{ lesson: Lesson; moduleIndex: number }> = [];
     modules.forEach((module, moduleIndex) => {
       module.lessons
-        ?.filter(l => l.status?.toUpperCase() === 'PUBLISHED')
-        .sort((a, b) => a.order - b.order)
+        ?.filter(l => !l.status || l.status.toUpperCase() === 'PUBLISHED')
+        .sort((a, b) => (a.order || 0) - (b.order || 0))
         .forEach(lesson => {
           allLessons.push({ lesson, moduleIndex });
         });
@@ -334,6 +334,7 @@ export default function CoursePlayerPage() {
         onPreviousLesson={handlePreviousLesson}
         onNextLesson={handleNextLesson}
         instructor={playerData?.instructor}
+        instructors={playerData?.instructors || []}
       />
     );
   }
