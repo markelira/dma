@@ -1176,7 +1176,28 @@ export const getCoursesCallable = onCall({
         lessonsSource = 'modules_array';
       }
 
-      // If still no lessons, check for lessons subcollection
+      // If still no lessons, check for modules subcollection (each module contains lessons[])
+      if (lessons.length === 0) {
+        const modulesSnapshot = await firestore.collection('courses').doc(doc.id).collection('modules').get();
+        if (!modulesSnapshot.empty) {
+          logger.info(`[getCoursesCallable] Course ${doc.id} has ${modulesSnapshot.size} modules in subcollection`);
+          for (const moduleDoc of modulesSnapshot.docs) {
+            const moduleData = moduleDoc.data();
+            const moduleLessons = moduleData.lessons || [];
+            logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} lessons`);
+            lessons.push(...moduleLessons.map((lesson: any) => ({
+              ...lesson,
+              moduleName: moduleData.title || moduleData.name,
+              moduleId: moduleDoc.id,
+            })));
+          }
+          if (lessons.length > 0) {
+            lessonsSource = 'modules_subcollection';
+          }
+        }
+      }
+
+      // If STILL no lessons, check for direct lessons subcollection (flat structure)
       if (lessons.length === 0) {
         const lessonsSnapshot = await firestore.collection('courses').doc(doc.id).collection('lessons').get();
         if (!lessonsSnapshot.empty) {
@@ -1184,7 +1205,7 @@ export const getCoursesCallable = onCall({
             id: lessonDoc.id,
             ...lessonDoc.data()
           }));
-          lessonsSource = 'subcollection';
+          lessonsSource = 'lessons_subcollection';
         }
       }
 
