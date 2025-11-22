@@ -28,7 +28,7 @@ const CourseSchema = z.object({
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).nullish().default('BEGINNER'),
   certificateEnabled: z.boolean().nullish().default(false),
   thumbnailUrl: z.string().nullish().default(''),
-  learningObjectives: z.string().min(10, "Learning objectives must be at least 10 characters"),
+  learningObjectives: z.string().nullish().default(''),
 
   // Marketing fields - all optional with defaults (nullish handles both null and undefined)
   whatYouWillLearn: z.array(z.string()).nullish().default([]),
