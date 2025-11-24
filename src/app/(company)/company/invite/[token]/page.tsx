@@ -34,9 +34,18 @@ export default function InviteAcceptancePage() {
 
   const token = params.token as string;
 
+  // 🔍 DIAGNOSTIC: Log page mount
+  console.log('🎫 [INVITE PAGE] Mounted', {
+    token: token?.substring(0, 10) + '...',
+    hasUser: !!user,
+    userEmail: user?.email,
+    authLoading,
+  });
+
   // Verify invitation token on mount
   useEffect(() => {
     const verifyInvite = async () => {
+      console.log('🔍 [INVITE PAGE] Calling verifyEmployeeInvite...', { token: token?.substring(0, 10) + '...' });
       try {
         const verify = httpsCallable<{ token: string }, VerifyInviteResponse>(
           functions,
@@ -44,6 +53,7 @@ export default function InviteAcceptancePage() {
         );
 
         const result = await verify({ token });
+        console.log('✅ [INVITE PAGE] verifyEmployeeInvite result:', result.data);
 
         if (result.data.valid) {
           setInviteData(result.data);
@@ -53,7 +63,7 @@ export default function InviteAcceptancePage() {
           setError('Érvénytelen meghívó link');
         }
       } catch (err: any) {
-        console.error('Error verifying invite:', err);
+        console.error('❌ [INVITE PAGE] Error verifying invite:', err);
 
         if (err.code === 'not-found') {
           setError('Ez a meghívó nem található vagy már fel lett használva');
@@ -74,7 +84,15 @@ export default function InviteAcceptancePage() {
   }, [token]);
 
   const handleAcceptInvite = async () => {
+    console.log('🎯 [INVITE PAGE] handleAcceptInvite called', {
+      hasUser: !!user,
+      userEmail: user?.email,
+      userId: user?.uid,
+      token: token?.substring(0, 10) + '...',
+    });
+
     if (!user) {
+      console.log('⚠️ [INVITE PAGE] No user, redirecting to login with redirect_to');
       // Redirect to login with return URL
       router.push(`/login?redirect_to=/company/invite/${token}`);
       return;
@@ -83,6 +101,7 @@ export default function InviteAcceptancePage() {
     setAccepting(true);
     setError('');
 
+    console.log('📤 [INVITE PAGE] Calling acceptEmployeeInvite Cloud Function...');
     try {
       const accept = httpsCallable<{ token: string }, AcceptInviteResponse>(
         functions,
@@ -90,9 +109,11 @@ export default function InviteAcceptancePage() {
       );
 
       const result = await accept({ token });
+      console.log('✅ [INVITE PAGE] acceptEmployeeInvite result:', result.data);
 
       if (result.data.success) {
         setAccepted(true);
+        console.log('🎉 [INVITE PAGE] Invite accepted successfully, redirecting to dashboard...');
 
         // Redirect employees to their personal dashboard (not company dashboard)
         // They'll see courses there with company badge
@@ -101,7 +122,7 @@ export default function InviteAcceptancePage() {
         }, 2000);
       }
     } catch (err: any) {
-      console.error('Error accepting invite:', err);
+      console.error('❌ [INVITE PAGE] Error accepting invite:', err);
 
       if (err.code === 'unauthenticated') {
         router.push(`/login?redirect_to=/company/invite/${token}`);

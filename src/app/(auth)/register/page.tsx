@@ -196,8 +196,10 @@ function RegisterPageContent() {
           // Sign out and redirect to login for fresh authentication
           // This ensures custom claims are properly loaded on next login
           await logout();
-          console.log('[Register Page] Email verified, redirecting to login');
-          router.push('/login?verified=true&email=' + encodeURIComponent(formData.email));
+          // Preserve redirect_to for invite flows
+          const redirectParam = redirectTo !== '/dashboard' ? `&redirect_to=${encodeURIComponent(redirectTo)}` : '';
+          console.log('[Register Page] Email verified, redirecting to login with redirect_to:', redirectTo);
+          router.push('/login?verified=true&email=' + encodeURIComponent(formData.email) + redirectParam);
         }}
       />
     );

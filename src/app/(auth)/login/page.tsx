@@ -315,12 +315,12 @@ export default function LoginPage() {
         </AnimatePresence>
       </div>
 
-      {/* Register link */}
+      {/* Register link - preserve redirect_to for invite flows */}
       <div className="mt-6 text-center text-sm text-gray-600">
         Még nincs fiókod?{' '}
         <Link
           className="font-medium text-gray-900 underline hover:no-underline"
-          href="/register"
+          href={redirectTo !== '/dashboard' ? `/register?redirect_to=${encodeURIComponent(redirectTo)}` : '/register'}
         >
           Regisztrálj itt
         </Link>

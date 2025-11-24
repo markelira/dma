@@ -195,13 +195,12 @@ async function sendWelcomeEmail(
   }
 ) {
   const sgMail = require('@sendgrid/mail');
-  const functions = require('firebase-functions');
 
-  // Get SendGrid API key
-  const sendgridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
+  // Get SendGrid API key from environment variable (Firebase Functions v2)
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
 
   if (!sendgridApiKey) {
-    console.error('SendGrid API key not configured - skipping welcome email');
+    console.error('SendGrid API key not configured (SENDGRID_API_KEY) - skipping welcome email');
     return { success: false, message: 'Email service not configured' };
   }
 

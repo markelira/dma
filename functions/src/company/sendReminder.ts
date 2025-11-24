@@ -150,13 +150,12 @@ async function sendReminderEmail(
   }
 ) {
   const sgMail = require('@sendgrid/mail');
-  const functions = require('firebase-functions');
 
-  // Get SendGrid API key
-  const sendgridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
+  // Get SendGrid API key from environment variable (Firebase Functions v2)
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
 
   if (!sendgridApiKey) {
-    console.error('SendGrid API key not configured');
+    console.error('SendGrid API key not configured (SENDGRID_API_KEY)');
     throw new Error('Email service not configured');
   }
 
