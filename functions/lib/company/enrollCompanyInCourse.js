@@ -124,11 +124,11 @@ exports.enrollCompanyInCourse = (0, https_1.onCall)({
             const enrollmentData = {
                 userId: employeeUserId,
                 courseId,
-                enrolledAt: new Date().toISOString(),
+                enrolledAt: admin.firestore.FieldValue.serverTimestamp(),
                 progress: 0,
                 status: 'ACTIVE',
                 completedLessons: [],
-                lastAccessedAt: new Date().toISOString(),
+                lastAccessedAt: admin.firestore.FieldValue.serverTimestamp(),
                 enrolledByCompany: companyId, // Track that this was a company enrollment
             };
             batch.set(enrollmentRef, enrollmentData);

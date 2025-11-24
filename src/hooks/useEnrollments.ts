@@ -122,14 +122,34 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             }
           }
 
+          // Handle both Firestore Timestamp and ISO string formats for enrolledAt
+          let enrolledAtDate: Date;
+          if (enrollmentData.enrolledAt?.toDate) {
+            // Firestore Timestamp
+            enrolledAtDate = enrollmentData.enrolledAt.toDate();
+          } else if (typeof enrollmentData.enrolledAt === 'string') {
+            // ISO string format
+            enrolledAtDate = new Date(enrollmentData.enrolledAt);
+          } else {
+            enrolledAtDate = new Date();
+          }
+
+          // Handle both formats for lastAccessedAt
+          let lastAccessedAtDate: Date | undefined;
+          if (enrollmentData.lastAccessedAt?.toDate) {
+            lastAccessedAtDate = enrollmentData.lastAccessedAt.toDate();
+          } else if (typeof enrollmentData.lastAccessedAt === 'string') {
+            lastAccessedAtDate = new Date(enrollmentData.lastAccessedAt);
+          }
+
           return {
             id: enrollmentDoc.id,
             userId: enrollmentData.userId,
             courseId: enrollmentData.courseId,
             status: enrollmentData.status || 'not_started',
             progress: enrollmentData.progress || 0,
-            enrolledAt: enrollmentData.enrolledAt?.toDate() || new Date(),
-            lastAccessedAt: enrollmentData.lastAccessedAt?.toDate(),
+            enrolledAt: enrolledAtDate,
+            lastAccessedAt: lastAccessedAtDate,
             currentLessonId: enrollmentData.currentLessonId,
             courseName: courseData?.title || 'Unknown Course',
             courseInstructor: instructorName,
