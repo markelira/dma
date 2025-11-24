@@ -37,9 +37,9 @@ const navigationSections = [
     ]
   },
   {
-    title: 'Egyéb',
+    title: 'Saját tanulás',
     items: [
-      { title: 'Saját tanulás', href: '/dashboard', icon: GraduationCap },
+      { title: 'Beiratkozásaim', href: '/company/dashboard/my-courses', icon: GraduationCap },
     ]
   }
 ]
