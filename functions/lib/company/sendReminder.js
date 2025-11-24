@@ -109,7 +109,7 @@ exports.sendEmployeeReminder = v2_1.https.onCall({
             firstName: employeeData.firstName,
             companyName,
             masterclassTitle,
-            dashboardUrl: `${process.env.APP_URL || 'https://localhost:3000'}/dashboard`,
+            dashboardUrl: `${process.env.APP_URL || 'https://academion.hu'}/dashboard`,
         });
         // 6. Log activity
         await db.collection('companies').doc(companyId).collection('activity').add({
@@ -140,11 +140,10 @@ exports.sendEmployeeReminder = v2_1.https.onCall({
  */
 async function sendReminderEmail(to, data) {
     const sgMail = require('@sendgrid/mail');
-    const functions = require('firebase-functions');
-    // Get SendGrid API key
-    const sendgridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
+    // Get SendGrid API key from environment variable (Firebase Functions v2)
+    const sendgridApiKey = process.env.SENDGRID_API_KEY;
     if (!sendgridApiKey) {
-        console.error('SendGrid API key not configured');
+        console.error('SendGrid API key not configured (SENDGRID_API_KEY)');
         throw new Error('Email service not configured');
     }
     sgMail.setApiKey(sendgridApiKey);
@@ -249,7 +248,7 @@ ${data.companyName} & Az DMA csapata
         await sgMail.send({
             to,
             from: {
-                email: 'info@dma.hu',
+                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
                 name: 'DMA Masterclass',
             },
             subject,

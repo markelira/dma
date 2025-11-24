@@ -38,6 +38,7 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = void 0;
+exports.sendInvitationEmail = sendInvitationEmail;
 const v2_1 = require("firebase-functions/v2");
 const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
@@ -52,11 +53,18 @@ exports.addEmployee = v2_1.https.onCall({
     memory: '256MiB',
     cors: true,
 }, async (request) => {
+    console.log('📧 [addEmployee] Function called', {
+        hasAuth: !!request.auth,
+        userId: request.auth?.uid,
+        data: { ...request.data, email: request.data?.email?.substring(0, 5) + '...' },
+    });
     if (!request.auth) {
+        console.log('❌ [addEmployee] No auth - rejecting');
         throw new https_1.HttpsError('unauthenticated', 'Must be logged in');
     }
     const { companyId, email, firstName, lastName, jobTitle } = request.data;
     const userId = request.auth.uid;
+    console.log('📧 [addEmployee] Processing invite for:', { companyId, email, firstName, lastName });
     // Validation
     if (!companyId || !email || !firstName || !lastName) {
         throw new https_1.HttpsError('invalid-argument', 'Missing required fields');
@@ -117,22 +125,31 @@ exports.addEmployee = v2_1.https.onCall({
             .doc(companyId)
             .collection('employees')
             .add(employeeData);
+        console.log('✅ [addEmployee] Employee document created:', employeeRef.id);
         // 5. Get company name for email
         const companyDoc = await db.collection('companies').doc(companyId).get();
         const companyName = companyDoc.data()?.name || 'DMA';
         // 6. Send invitation email via SendGrid (non-blocking)
+        const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`;
+        console.log('📨 [addEmployee] Attempting to send email...', {
+            to: email,
+            companyName,
+            inviteUrl: inviteUrl.substring(0, 50) + '...',
+            hasSendgridKey: !!process.env.SENDGRID_API_KEY,
+        });
         try {
-            await sendInvitationEmail(email, {
+            const emailResult = await sendInvitationEmail(email, {
                 firstName,
                 companyName,
-                inviteUrl: `${process.env.APP_URL || 'https://localhost:3000'}/company/invite/${inviteToken}`,
+                inviteUrl,
             });
-            console.log(`Invitation email sent to ${email}`);
+            console.log('✅ [addEmployee] Invitation email sent to', email, 'Result:', emailResult);
         }
         catch (emailError) {
-            console.warn(`Failed to send invitation email to ${email}:`, emailError.message);
+            console.error('❌ [addEmployee] Failed to send invitation email to', email, ':', emailError.message);
             // Don't throw - employee was still added successfully
         }
+        console.log('🎉 [addEmployee] Complete - returning success');
         return {
             success: true,
             employeeId: employeeRef.id,
@@ -187,14 +204,12 @@ exports.verifyEmployeeInvite = v2_1.https.onCall({
             .collection('companies')
             .doc(employeeData.companyId)
             .get();
+        // Return format expected by frontend invite page
         return {
-            success: true,
-            employee: {
-                firstName: employeeData.firstName,
-                lastName: employeeData.lastName,
-                email: employeeData.email,
-                companyName: companyDoc.data()?.name || 'Unknown Company',
-            },
+            valid: true,
+            companyName: companyDoc.data()?.name || 'Unknown Company',
+            employeeEmail: employeeData.email,
+            employeeName: `${employeeData.firstName} ${employeeData.lastName}`,
         };
     }
     catch (error) {
@@ -214,15 +229,25 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
     memory: '256MiB',
     cors: true,
 }, async (request) => {
+    console.log('🎫 [acceptEmployeeInvite] Function called', {
+        hasAuth: !!request.auth,
+        userId: request.auth?.uid,
+        userEmail: request.auth?.token?.email,
+        tokenProvided: !!request.data?.token,
+        tokenPrefix: request.data?.token?.substring(0, 10) + '...',
+    });
     if (!request.auth) {
+        console.log('❌ [acceptEmployeeInvite] No auth - rejecting');
         throw new https_1.HttpsError('unauthenticated', 'Must be logged in');
     }
     const { token } = request.data;
     const userId = request.auth.uid;
     const userEmail = request.auth.token.email;
     if (!token) {
+        console.log('❌ [acceptEmployeeInvite] No token provided');
         throw new https_1.HttpsError('invalid-argument', 'Invite token is required');
     }
+    console.log('🔄 [acceptEmployeeInvite] Starting transaction to accept invite...');
     // 🔴 CRITICAL FIX: Use transaction to prevent double-use of token
     const result = await db.runTransaction(async (transaction) => {
         // 1. Find employee by token
@@ -232,19 +257,28 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
             .limit(1)
             .get();
         if (employeeQuery.empty) {
+            console.log('❌ [acceptEmployeeInvite] Token not found in any employee document');
             throw new https_1.HttpsError('not-found', 'Invalid invite token');
         }
         const employeeDocRef = employeeQuery.docs[0].ref;
         const employeeDoc = await transaction.get(employeeDocRef);
         const employeeData = employeeDoc.data();
+        console.log('✅ [acceptEmployeeInvite] Found employee document:', {
+            employeeId: employeeDocRef.id,
+            employeeEmail: employeeData.email,
+            employeeStatus: employeeData.status,
+            companyId: employeeData.companyId,
+        });
         // 2. Check if already accepted (in transaction)
         if (employeeData.status !== 'invited') {
             throw new https_1.HttpsError('failed-precondition', 'Invite has already been used');
         }
-        // 3. Verify email matches (security check)
-        if (userEmail &&
-            employeeData.email.toLowerCase() !== userEmail.toLowerCase()) {
-            throw new https_1.HttpsError('permission-denied', 'Email does not match the invited email');
+        // 3. Email matching is now optional - allow existing users with different email
+        // This enables "merge accounts" flow where existing users can join companies
+        // The invite token itself is the security measure
+        const emailMatches = userEmail && employeeData.email.toLowerCase() === userEmail.toLowerCase();
+        if (!emailMatches) {
+            console.log(`Employee ${userId} accepting invite with different email. Invited: ${employeeData.email}, Logged in: ${userEmail}`);
         }
         // 4. Check if token has expired
         const now = new Date();
@@ -260,25 +294,63 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
             inviteToken: firestore_1.FieldValue.delete(),
             inviteExpiresAt: firestore_1.FieldValue.delete(),
         });
+        console.log('✅ [acceptEmployeeInvite] Transaction: Updating employee status to active');
         return {
             success: true,
             companyId: employeeData.companyId,
             employeeId: employeeDocRef.id,
         };
     });
+    console.log('✅ [acceptEmployeeInvite] Transaction completed successfully:', result);
     // 6. Set custom user claims for COMPANY_EMPLOYEE role
+    console.log('🔑 [acceptEmployeeInvite] Setting custom claims for user...');
     try {
         await admin.auth().setCustomUserClaims(userId, {
             role: 'COMPANY_EMPLOYEE',
             companyId: result.companyId,
         });
-        console.log(`Custom claims set for employee ${userId}`);
+        console.log('✅ [acceptEmployeeInvite] Custom claims set for employee', userId);
     }
     catch (claimsError) {
-        console.error('Error setting custom claims:', claimsError);
+        console.error('❌ [acceptEmployeeInvite] Error setting custom claims:', claimsError);
         // Don't throw - invite was already accepted successfully
     }
-    // 7. Auto-enroll employee in all company-purchased masterclasses
+    // 7. Update user document with company info (for dashboard display)
+    console.log('📝 [acceptEmployeeInvite] Updating user document with company info...');
+    try {
+        const userRef = db.collection('users').doc(userId);
+        const userDoc = await userRef.get();
+        if (userDoc.exists) {
+            // Update existing user - merge accounts
+            await userRef.update({
+                companyId: result.companyId,
+                companyRole: 'employee',
+                updatedAt: firestore_1.FieldValue.serverTimestamp(),
+            });
+            console.log(`Updated existing user ${userId} with company ${result.companyId}`);
+        }
+        else {
+            // Create user document if doesn't exist (shouldn't happen normally)
+            const authUser = await admin.auth().getUser(userId);
+            await userRef.set({
+                id: userId,
+                email: authUser.email || '',
+                firstName: authUser.displayName?.split(' ')[0] || '',
+                lastName: authUser.displayName?.split(' ').slice(1).join(' ') || '',
+                role: 'STUDENT', // Keep as student for course access
+                companyId: result.companyId,
+                companyRole: 'employee',
+                createdAt: firestore_1.FieldValue.serverTimestamp(),
+                updatedAt: firestore_1.FieldValue.serverTimestamp(),
+            });
+            console.log(`Created user document for ${userId} with company ${result.companyId}`);
+        }
+    }
+    catch (userError) {
+        console.error('Error updating user document:', userError);
+        // Don't throw - invite was already accepted successfully
+    }
+    // 8. Auto-enroll employee in all company-purchased masterclasses
     try {
         const companyDoc = await db.collection('companies').doc(result.companyId).get();
         const companyData = companyDoc.data();
@@ -325,14 +397,14 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
 });
 /**
  * Send Invitation Email via SendGrid
+ * Exported for use in completeOnboarding
  */
 async function sendInvitationEmail(to, data) {
     const sgMail = require('@sendgrid/mail');
-    const functions = require('firebase-functions');
-    // Get SendGrid API key from Firebase Functions config
-    const sendgridApiKey = functions.config().sendgrid?.api_key || process.env.SENDGRID_API_KEY;
+    // Get SendGrid API key from environment variable (Firebase Functions v2)
+    const sendgridApiKey = process.env.SENDGRID_API_KEY;
     if (!sendgridApiKey) {
-        console.warn('SendGrid API key not configured - skipping email');
+        console.warn('SendGrid API key not configured (SENDGRID_API_KEY) - skipping email');
         return { success: false, message: 'Email service not configured' };
     }
     sgMail.setApiKey(sendgridApiKey);
@@ -476,7 +548,7 @@ Ha nem te kérted ezt a meghívót, egyszerűen figyelmen kívül hagyhatod ezt 
         await sgMail.send({
             to,
             from: {
-                email: 'info@dma.hu',
+                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
                 name: 'DMA Masterclass',
             },
             subject,

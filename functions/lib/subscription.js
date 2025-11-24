@@ -191,6 +191,38 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                 }
             }
         }
+        // PRIORITY 4: Check company subscription status (B2B model)
+        const companyId = userData?.companyId;
+        if (companyId) {
+            const companyDoc = await firestore.collection('companies').doc(companyId).get();
+            if (companyDoc.exists) {
+                const companyData = companyDoc.data();
+                // Check company's subscription status (Stripe handles trial via 7-day trial period)
+                if (companyData?.subscriptionStatus === 'active' || companyData?.subscriptionStatus === 'trialing') {
+                    return {
+                        success: true,
+                        hasSubscription: true,
+                        isActive: true,
+                        hasActiveSubscription: true,
+                        viaCompany: true,
+                        subscription: {
+                            id: companyData.stripeSubscriptionId || companyId,
+                            subscriptionId: companyData.stripeSubscriptionId,
+                            status: companyData.subscriptionStatus,
+                            planName: companyData.plan || 'DMA Vállalati Előfizetés',
+                            currentPeriodStart: companyData.subscriptionStartDate?.toDate?.() || null,
+                            currentPeriodEnd: companyData.subscriptionEndDate?.toDate?.() || null,
+                            cancelAtPeriodEnd: false,
+                            createdAt: companyData.createdAt?.toDate?.() || null,
+                            trialEnd: companyData.trialEndDate?.toDate?.() || null,
+                            isTrialing: companyData.subscriptionStatus === 'trialing',
+                        }
+                    };
+                }
+                // No active subscription - company needs to complete Stripe checkout
+                // Stripe handles 7-day trial period, not the app
+            }
+        }
         // No active subscription
         return {
             success: true,

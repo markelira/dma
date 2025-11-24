@@ -38,6 +38,8 @@ const admin = __importStar(require("firebase-admin"));
 const firestore_1 = require("firebase-admin/firestore");
 const v2_1 = require("firebase-functions/v2");
 const https_1 = require("firebase-functions/v2/https");
+const crypto = __importStar(require("crypto"));
+const employeeInvite_1 = require("./employeeInvite");
 /**
  * Complete company onboarding - creates company, sets up admin, and invites employees
  * Called after Firebase Auth account creation
@@ -94,17 +96,16 @@ exports.completeCompanyOnboarding = v2_1.https.onCall({
             // Append timestamp to make unique
             finalSlug = `${slug}-${Date.now()}`;
         }
-        // Step 1: Create company document
+        // Step 1: Create company document (subscription required via Stripe checkout)
         const companyData = {
             name: companyName.trim(),
             slug: finalSlug,
             billingEmail: billingEmail.trim().toLowerCase(),
-            plan: 'trial',
+            plan: 'basic',
             status: 'active',
+            subscriptionStatus: 'none', // Will be set to 'active' or 'trialing' after Stripe checkout
             industry,
             companySize,
-            trialEndsAt: firestore_1.Timestamp.fromDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
-            ),
             createdAt: firestore_1.FieldValue.serverTimestamp(),
             updatedAt: firestore_1.FieldValue.serverTimestamp(),
         };
@@ -195,12 +196,14 @@ exports.completeCompanyOnboarding = v2_1.https.onCall({
                 if (!emailRegex.test(employee.email)) {
                     continue; // Skip invalid emails
                 }
-                // Generate invitation token
-                const inviteToken = `invite-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+                // Generate secure invitation token (same as addEmployee)
+                const inviteToken = crypto.randomBytes(32).toString('hex');
                 // Create employee document
+                const fullName = `${employee.firstName.trim()} ${employee.lastName.trim()}`;
                 const employeeData = {
                     firstName: employee.firstName.trim(),
                     lastName: employee.lastName.trim(),
+                    fullName,
                     email: employee.email.trim().toLowerCase(),
                     jobTitle: employee.jobTitle?.trim() || '',
                     status: 'invited',
@@ -208,6 +211,7 @@ exports.completeCompanyOnboarding = v2_1.https.onCall({
                     inviteExpiresAt: firestore_1.Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days to accept
                     ),
                     companyId,
+                    enrolledMasterclasses: [],
                     invitedBy: userId,
                     invitedAt: firestore_1.FieldValue.serverTimestamp(),
                 };
@@ -218,9 +222,20 @@ exports.completeCompanyOnboarding = v2_1.https.onCall({
                     .doc();
                 batch.set(employeeRef, employeeData);
                 employeesInvited++;
-                // TODO: Send invitation email
-                // In production, you would send an email here with the invite link
-                console.log(`Invitation sent to ${employee.email} with token: ${inviteToken}`);
+                // Send invitation email (non-blocking)
+                const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`;
+                try {
+                    await (0, employeeInvite_1.sendInvitationEmail)(employee.email.trim().toLowerCase(), {
+                        firstName: employee.firstName.trim(),
+                        companyName: companyName.trim(),
+                        inviteUrl,
+                    });
+                    console.log(`Invitation email sent to ${employee.email}`);
+                }
+                catch (emailError) {
+                    console.warn(`Failed to send invitation email to ${employee.email}:`, emailError.message);
+                    // Don't throw - employee was still added successfully
+                }
             }
             await batch.commit();
         }

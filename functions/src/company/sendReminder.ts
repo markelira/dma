@@ -265,7 +265,7 @@ ${data.companyName} & Az DMA csapata
     await sgMail.send({
       to,
       from: {
-        email: 'info@dma.hu',
+        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
         name: 'DMA Masterclass',
       },
       subject,

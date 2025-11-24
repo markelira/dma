@@ -137,11 +137,12 @@ export const addEmployee = https.onCall(
       const companyName = companyDoc.data()?.name || 'DMA';
 
       // 6. Send invitation email via SendGrid (non-blocking)
-      const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`;
+      // Link directly to registration with email prefilled - user gets auto-linked when registering
+      const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(email.toLowerCase())}`;
       console.log('📨 [addEmployee] Attempting to send email...', {
         to: email,
         companyName,
-        inviteUrl: inviteUrl.substring(0, 50) + '...',
+        inviteUrl: inviteUrl.substring(0, 80) + '...',
         hasSendgridKey: !!process.env.SENDGRID_API_KEY,
       });
 
@@ -556,7 +557,7 @@ export async function sendInvitationEmail(
                 <tr>
                   <td style="text-align: center;">
                     <a href="${data.inviteUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3); transition: transform 0.2s;">
-                      Meghívó elfogadása
+                      Regisztrálj és csatlakozz
                     </a>
                   </td>
                 </tr>
@@ -617,7 +618,7 @@ Mit kapsz:
 - Szakértői támogatás
 - Tanúsítvány a sikeres befejezés után
 
-A meghívó elfogadásához kattints az alábbi linkre:
+Regisztrálj és csatlakozz az alábbi linkre kattintva:
 ${data.inviteUrl}
 
 Ez a meghívó 7 napon belül jár le.
@@ -632,7 +633,7 @@ Ha nem te kérted ezt a meghívót, egyszerűen figyelmen kívül hagyhatod ezt 
     await sgMail.send({
       to,
       from: {
-        email: 'info@dma.hu',
+        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
         name: 'DMA Masterclass',
       },
       subject,

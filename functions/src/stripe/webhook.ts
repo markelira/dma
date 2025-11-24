@@ -261,8 +261,35 @@ async function handleSubscriptionCheckout(session: Stripe.Checkout.Session, stri
         customerId,
         subscriptionId,
       });
+    } else if (subscriptionType === 'company') {
+      // Company subscription - update existing company
+      const companyId = session.metadata?.companyId;
+
+      if (!companyId) {
+        throw new Error('Company ID not found in session metadata');
+      }
+
+      await handleCompanySubscription({
+        userId,
+        companyId,
+        customerId,
+        subscriptionId,
+        subscriptionStatus,
+        priceId,
+        subscriptionPlan,
+        startDate,
+        endDate,
+        trialEndDate,
+      });
+
+      logger.info('[handleSubscriptionCheckout] Company subscription activated successfully', {
+        userId,
+        companyId,
+        customerId,
+        subscriptionId,
+      });
     } else {
-      // Company subscription - create team
+      // Team subscription - create team (legacy)
       await createTeam({
         name: `${userName} csapata`,
         ownerId: userId,
@@ -356,6 +383,95 @@ async function handleIndividualSubscription(params: {
 }
 
 /**
+ * Handle company subscription
+ * Updates company document and user with subscription status
+ */
+async function handleCompanySubscription(params: {
+  userId: string;
+  companyId: string;
+  customerId: string;
+  subscriptionId: string;
+  subscriptionStatus: 'active' | 'trialing';
+  priceId: string;
+  subscriptionPlan: SubscriptionPlan;
+  startDate: Date;
+  endDate: Date;
+  trialEndDate: Date;
+}): Promise<void> {
+  const {
+    userId,
+    companyId,
+    customerId,
+    subscriptionId,
+    subscriptionStatus,
+    priceId,
+    subscriptionPlan,
+    startDate,
+    endDate,
+    trialEndDate,
+  } = params;
+
+  try {
+    // Verify company exists
+    const companyDoc = await firestore.collection('companies').doc(companyId).get();
+    if (!companyDoc.exists) {
+      throw new Error(`Company not found: ${companyId}`);
+    }
+
+    // Update company document with subscription info
+    await firestore.collection('companies').doc(companyId).update({
+      plan: subscriptionPlan,
+      subscriptionStatus,
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId,
+      stripePriceId: priceId,
+      subscriptionStartDate: admin.firestore.Timestamp.fromDate(startDate),
+      subscriptionEndDate: admin.firestore.Timestamp.fromDate(endDate),
+      trialEndDate: admin.firestore.Timestamp.fromDate(trialEndDate),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // Update user document with subscription status (for fast lookup)
+    await firestore.collection('users').doc(userId).update({
+      subscriptionStatus,
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId,
+      updatedAt: new Date().toISOString(),
+    });
+
+    // Also create a subscription document for fallback lookup
+    await firestore.collection('subscriptions').add({
+      userId,
+      companyId,
+      stripeCustomerId: customerId,
+      stripeSubscriptionId: subscriptionId,
+      stripePriceId: priceId,
+      status: subscriptionStatus,
+      planName: `DMA Company ${subscriptionPlan} Subscription`,
+      subscriptionPlan,
+      subscriptionType: 'company',
+      currentPeriodStart: startDate.toISOString(),
+      currentPeriodEnd: endDate.toISOString(),
+      trialEnd: trialEndDate.toISOString(),
+      cancelAtPeriodEnd: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    logger.info('[handleCompanySubscription] Company subscription created', {
+      userId,
+      companyId,
+      subscriptionId,
+      status: subscriptionStatus,
+    });
+
+  } catch (error: any) {
+    logger.error('[handleCompanySubscription] Error:', error);
+    throw error;
+  }
+}
+
+/**
  * Handle customer.subscription.created
  */
 async function handleSubscriptionCreated(subscription: Stripe.Subscription): Promise<void> {
@@ -374,7 +490,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription): Pro
 
 /**
  * Handle customer.subscription.updated
- * Updates team subscription status
+ * Updates team/company subscription status
  */
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Promise<void> {
   try {
@@ -413,10 +529,41 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
       ? new Date(subscription.current_period_end * 1000)
       : undefined;
 
-    // Update team subscription
+    // Try to update team subscription
     await updateTeamSubscription(subscription.id, status, endDate);
 
-    logger.info('[handleSubscriptionUpdated] Team subscription updated', {
+    // Also update company subscription if exists
+    await updateCompanySubscription(subscription.id, status, endDate);
+
+    // Also update subscription document in subscriptions collection
+    const subscriptionsSnapshot = await firestore
+      .collection('subscriptions')
+      .where('stripeSubscriptionId', '==', subscription.id)
+      .limit(1)
+      .get();
+
+    if (!subscriptionsSnapshot.empty) {
+      const subscriptionDoc = subscriptionsSnapshot.docs[0];
+      const updateData: any = {
+        status,
+        updatedAt: new Date().toISOString(),
+      };
+      if (endDate) {
+        updateData.currentPeriodEnd = endDate.toISOString();
+      }
+      await subscriptionDoc.ref.update(updateData);
+
+      // Also update the user's subscriptionStatus
+      const subscriptionData = subscriptionDoc.data();
+      if (subscriptionData.userId) {
+        await firestore.collection('users').doc(subscriptionData.userId).update({
+          subscriptionStatus: status,
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    logger.info('[handleSubscriptionUpdated] Subscription updated', {
       subscriptionId: subscription.id,
       newStatus: status,
     });
@@ -427,8 +574,60 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
 }
 
 /**
+ * Update company subscription status
+ */
+async function updateCompanySubscription(
+  stripeSubscriptionId: string,
+  status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'none',
+  endDate?: Date
+): Promise<void> {
+  try {
+    // Find company by stripe subscription id
+    const companiesSnapshot = await firestore
+      .collection('companies')
+      .where('stripeSubscriptionId', '==', stripeSubscriptionId)
+      .limit(1)
+      .get();
+
+    if (companiesSnapshot.empty) {
+      return; // No company with this subscription - might be a team subscription
+    }
+
+    const companyDoc = companiesSnapshot.docs[0];
+    const updateData: any = {
+      subscriptionStatus: status,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (endDate) {
+      updateData.subscriptionEndDate = admin.firestore.Timestamp.fromDate(endDate);
+    }
+
+    // Update plan based on status
+    if (status === 'active') {
+      updateData.plan = 'active';
+    } else if (status === 'trialing') {
+      updateData.plan = 'trialing';
+    } else if (status === 'canceled' || status === 'none') {
+      updateData.plan = 'canceled';
+    }
+
+    await companyDoc.ref.update(updateData);
+
+    logger.info('[updateCompanySubscription] Company subscription updated', {
+      companyId: companyDoc.id,
+      subscriptionId: stripeSubscriptionId,
+      newStatus: status,
+    });
+
+  } catch (error: any) {
+    logger.error('[updateCompanySubscription] Error:', error);
+  }
+}
+
+/**
  * Handle customer.subscription.deleted
- * Cancels team subscription
+ * Cancels team/company subscription
  */
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Promise<void> {
   try {
@@ -439,7 +638,35 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
     // Update team to canceled status
     await updateTeamSubscription(subscription.id, 'canceled');
 
-    logger.info('[handleSubscriptionDeleted] Team subscription canceled', {
+    // Update company to canceled status
+    await updateCompanySubscription(subscription.id, 'canceled');
+
+    // Update subscription document
+    const subscriptionsSnapshot = await firestore
+      .collection('subscriptions')
+      .where('stripeSubscriptionId', '==', subscription.id)
+      .limit(1)
+      .get();
+
+    if (!subscriptionsSnapshot.empty) {
+      const subscriptionDoc = subscriptionsSnapshot.docs[0];
+      await subscriptionDoc.ref.update({
+        status: 'canceled',
+        canceledAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Also update the user's subscriptionStatus
+      const subscriptionData = subscriptionDoc.data();
+      if (subscriptionData.userId) {
+        await firestore.collection('users').doc(subscriptionData.userId).update({
+          subscriptionStatus: 'canceled',
+          updatedAt: new Date().toISOString(),
+        });
+      }
+    }
+
+    logger.info('[handleSubscriptionDeleted] Subscription canceled', {
       subscriptionId: subscription.id,
     });
 

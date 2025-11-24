@@ -9,6 +9,15 @@ import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import Link from 'next/link';
+import { Building2 } from 'lucide-react';
+
+interface InviteData {
+  valid: boolean;
+  companyName: string;
+  employeeEmail: string;
+  employeeName: string;
+  expired?: boolean;
+}
 
 function RegisterPageContent() {
   const router = useRouter();
@@ -29,8 +38,15 @@ function RegisterPageContent() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
 
-  // Get redirect URL from query params or default to dashboard
+  // Employee invite handling
+  const [inviteData, setInviteData] = useState<InviteData | null>(null);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+
+  // Get params from URL
   const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
+  const inviteToken = searchParams?.get('invite');
+  const inviteEmail = searchParams?.get('email');
 
   // Set flag when company account type is selected
   useEffect(() => {
@@ -38,6 +54,57 @@ function RegisterPageContent() {
       setIsCompanyRegistering(true);
     }
   }, [accountType]);
+
+  // Verify invite token and prefill email when present
+  useEffect(() => {
+    const verifyInvite = async () => {
+      if (!inviteToken) return;
+
+      setInviteLoading(true);
+      setInviteError('');
+
+      try {
+        const verify = httpsCallable<{ token: string }, InviteData>(
+          functions,
+          'verifyEmployeeInvite'
+        );
+        const result = await verify({ token: inviteToken });
+
+        if (result.data.valid) {
+          setInviteData(result.data);
+          // Prefill email from invite data (more reliable than URL param)
+          setFormData(prev => ({
+            ...prev,
+            email: result.data.employeeEmail,
+            firstName: result.data.employeeName.split(' ')[0] || '',
+            lastName: result.data.employeeName.split(' ').slice(1).join(' ') || '',
+          }));
+          // Auto-select individual account type for employee invites
+          setAccountType('individual');
+          console.log('[Register] Valid invite for company:', result.data.companyName);
+        } else if (result.data.expired) {
+          setInviteError('Ez a meghívó lejárt. Kérj új meghívót a cég adminisztrátorától.');
+        } else {
+          setInviteError('Érvénytelen meghívó link');
+        }
+      } catch (err: any) {
+        console.error('[Register] Error verifying invite:', err);
+        if (err.code === 'not-found') {
+          setInviteError('Ez a meghívó nem található vagy már fel lett használva');
+        } else {
+          // If verification fails, still allow registration but don't show company info
+          // User can register normally and linkEmployeeByEmail will try to match by email
+          if (inviteEmail) {
+            setFormData(prev => ({ ...prev, email: decodeURIComponent(inviteEmail) }));
+          }
+        }
+      } finally {
+        setInviteLoading(false);
+      }
+    };
+
+    verifyInvite();
+  }, [inviteToken, inviteEmail]);
 
   useEffect(() => {
     // If user is already authenticated, redirect based on role
@@ -166,8 +233,17 @@ function RegisterPageContent() {
     // The modal will handle the flow
   };
 
-  if (authLoading) {
-    return null; // Auth layout will handle the loading state
+  if (authLoading || inviteLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900 mx-auto mb-4"></div>
+          <p className="text-sm text-gray-600">
+            {inviteLoading ? 'Meghívó ellenőrzése...' : 'Betöltés...'}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   // If user is authenticated, show nothing (will redirect)
@@ -205,13 +281,38 @@ function RegisterPageContent() {
     );
   }
 
-  // Show account type selector if no type selected
-  if (!accountType) {
+  // Show account type selector if no type selected (and no invite)
+  if (!accountType && !inviteToken) {
     return (
       <AccountTypeSelector
         onSelect={(type) => setAccountType(type)}
         onBack={() => router.push('/login')}
       />
+    );
+  }
+
+  // Show invite error if present
+  if (inviteError && !accountType) {
+    return (
+      <div className="text-center">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{inviteError}</p>
+        </div>
+        <p className="text-gray-600 mb-4">
+          Továbbra is regisztrálhatsz egyéni fiókkal:
+        </p>
+        <button
+          onClick={() => setAccountType('individual')}
+          className="btn bg-gray-900 text-white px-6 py-2"
+        >
+          Regisztráció folytatása
+        </button>
+        <div className="mt-4">
+          <Link href="/login" className="text-gray-600 hover:text-gray-900 text-sm">
+            Vissza a bejelentkezéshez
+          </Link>
+        </div>
+      </div>
     );
   }
 
@@ -252,19 +353,42 @@ function RegisterPageContent() {
   // Show individual registration form (accountType === 'individual')
   return (
     <>
-      {/* Back button */}
-      <div className="mb-6">
-        <button
-          onClick={() => setAccountType(null)}
-          className="text-sm text-gray-700 hover:text-gray-900 flex items-center"
-          type="button"
-        >
-          ← Vissza a fiók típushoz
-        </button>
-      </div>
+      {/* Back button - hide when invited */}
+      {!inviteData && (
+        <div className="mb-6">
+          <button
+            onClick={() => setAccountType(null)}
+            className="text-sm text-gray-700 hover:text-gray-900 flex items-center"
+            type="button"
+          >
+            ← Vissza a fiók típushoz
+          </button>
+        </div>
+      )}
+
+      {/* Company Invite Banner */}
+      {inviteData && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-full">
+              <Building2 className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-900">
+                Csatlakozás: {inviteData.companyName}
+              </p>
+              <p className="text-xs text-blue-700">
+                Regisztrálj, hogy hozzáférj a cég kurzusaihoz
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="mb-10">
-        <h1 className="text-4xl font-bold">Fiók létrehozása</h1>
+        <h1 className="text-4xl font-bold">
+          {inviteData ? 'Regisztráció és csatlakozás' : 'Fiók létrehozása'}
+        </h1>
       </div>
 
       {/* Form */}
@@ -324,14 +448,20 @@ function RegisterPageContent() {
             <input
               id="email"
               name="email"
-              className="form-input w-full py-2"
+              className={`form-input w-full py-2 ${inviteData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
               type="email"
               placeholder="pelda@email.com"
               value={formData.email}
               onChange={handleChange}
               required
-              disabled={loading}
+              disabled={loading || !!inviteData}
+              readOnly={!!inviteData}
             />
+            {inviteData && (
+              <p className="mt-1 text-xs text-gray-500">
+                A meghívóhoz tartozó email cím nem módosítható
+              </p>
+            )}
           </div>
           <div>
             <label

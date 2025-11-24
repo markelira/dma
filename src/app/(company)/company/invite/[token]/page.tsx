@@ -58,6 +58,15 @@ export default function InviteAcceptancePage() {
 
         if (result.data.valid) {
           setInviteData(result.data);
+
+          // 🔄 BACKWARDS COMPATIBILITY: If user is NOT logged in, redirect to registration
+          // This is the new flow - invite links now go to registration directly
+          if (!authLoading && !user) {
+            console.log('🔄 [INVITE PAGE] User not logged in, redirecting to registration...');
+            const email = result.data.employeeEmail;
+            router.push(`/register?invite=${token}&email=${encodeURIComponent(email)}`);
+            return;
+          }
         } else if (result.data.expired) {
           setError('Ez a meghívó lejárt. Kérj új meghívót a cég adminisztrátorától.');
         } else {
@@ -82,7 +91,7 @@ export default function InviteAcceptancePage() {
       setError('Hiányzó meghívó kód');
       setVerifying(false);
     }
-  }, [token]);
+  }, [token, authLoading, user, router]);
 
   // 🚀 AUTO-ACCEPT: When user is logged in and invite is valid, auto-accept
   useEffect(() => {
