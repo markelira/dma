@@ -33,6 +33,7 @@ export default function InviteAcceptancePage() {
   const [accepted, setAccepted] = useState(false);
 
   const token = params.token as string;
+  const [autoAcceptTriggered, setAutoAcceptTriggered] = useState(false);
 
   // 🔍 DIAGNOSTIC: Log page mount
   console.log('🎫 [INVITE PAGE] Mounted', {
@@ -82,6 +83,74 @@ export default function InviteAcceptancePage() {
       setVerifying(false);
     }
   }, [token]);
+
+  // 🚀 AUTO-ACCEPT: When user is logged in and invite is valid, auto-accept
+  useEffect(() => {
+    // Only auto-accept once, when conditions are met
+    if (
+      user &&
+      inviteData &&
+      !authLoading &&
+      !verifying &&
+      !accepting &&
+      !accepted &&
+      !error &&
+      !autoAcceptTriggered
+    ) {
+      console.log('🚀 [INVITE PAGE] AUTO-ACCEPT: User logged in with valid invite, auto-accepting...');
+      setAutoAcceptTriggered(true);
+
+      // Small delay to ensure UI shows the logged-in state briefly
+      setTimeout(() => {
+        handleAcceptInviteAuto();
+      }, 500);
+    }
+  }, [user, inviteData, authLoading, verifying, accepting, accepted, error, autoAcceptTriggered]);
+
+  // Auto-accept function (doesn't redirect to login)
+  const handleAcceptInviteAuto = async () => {
+    console.log('🎯 [INVITE PAGE] handleAcceptInviteAuto called', {
+      userEmail: user?.email,
+      userId: user?.uid,
+      token: token?.substring(0, 10) + '...',
+    });
+
+    setAccepting(true);
+    setError('');
+
+    console.log('📤 [INVITE PAGE] AUTO: Calling acceptEmployeeInvite Cloud Function...');
+    try {
+      const accept = httpsCallable<{ token: string }, AcceptInviteResponse>(
+        functions,
+        'acceptEmployeeInvite'
+      );
+
+      const result = await accept({ token });
+      console.log('✅ [INVITE PAGE] AUTO: acceptEmployeeInvite result:', result.data);
+
+      if (result.data.success) {
+        setAccepted(true);
+        console.log('🎉 [INVITE PAGE] AUTO: Invite accepted successfully, redirecting to dashboard...');
+
+        // Redirect employees to their personal dashboard
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 2000);
+      }
+    } catch (err: any) {
+      console.error('❌ [INVITE PAGE] AUTO: Error accepting invite:', err);
+
+      if (err.code === 'failed-precondition') {
+        setError('Ez a meghívó már fel lett használva');
+      } else if (err.code === 'not-found') {
+        setError('A meghívó nem található');
+      } else {
+        setError(err.message || 'Hiba történt a meghívó elfogadása során');
+      }
+    } finally {
+      setAccepting(false);
+    }
+  };
 
   const handleAcceptInvite = async () => {
     console.log('🎯 [INVITE PAGE] handleAcceptInvite called', {
@@ -145,6 +214,29 @@ export default function InviteAcceptancePage() {
           <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-gray-900 mx-auto mb-4"></div>
           <p className="text-sm text-gray-600">Meghívó ellenőrzése...</p>
         </div>
+      </div>
+    );
+  }
+
+  // Show auto-accept progress when user is logged in and we're auto-accepting
+  if (autoAcceptTriggered && accepting && !accepted && !error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center max-w-md"
+        >
+          <div className="mb-6">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+            Csatlakozás folyamatban...
+          </h2>
+          <p className="text-gray-600">
+            Hozzáadunk a <strong>{inviteData?.companyName}</strong> csapatához...
+          </p>
+        </motion.div>
       </div>
     );
   }
