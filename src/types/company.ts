@@ -93,9 +93,9 @@ export interface EmployeeProgress {
   jobTitle?: string;
   masterclassId: string;
   masterclassTitle: string;
-  currentModule: number;
-  completedModules: number[];
-  totalModules: number;
+  currentLesson: number;
+  completedLessons: number;
+  totalLessons: number;
   progressPercent: number;
   status: 'active' | 'completed' | 'at-risk' | 'not-started';
   lastActivityAt?: Date;

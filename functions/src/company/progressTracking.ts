@@ -51,9 +51,9 @@ interface EmployeeProgress {
   jobTitle?: string;
   masterclassId: string; // Keep for backwards compatibility with frontend
   masterclassTitle: string;
-  currentModule: number;
-  completedModules: number[]; // Actually completed lesson count for display
-  totalModules: number; // Actually total lessons
+  currentLesson: number;
+  completedLessons: number;
+  totalLessons: number;
   progressPercent: number;
   status: 'active' | 'completed' | 'at-risk' | 'not-started';
   lastActivityAt?: Date;
@@ -315,9 +315,9 @@ export const getCompanyDashboard = https.onCall(
           jobTitle: employee?.jobTitle,
           masterclassId: enrollmentCourseId, // Keep for backwards compatibility
           masterclassTitle: course.title,
-          currentModule: 1, // Not using modules anymore
-          completedModules: Array.from({ length: completedLessonsCount }, (_, i) => i + 1), // For display
-          totalModules: course.totalLessons,
+          currentLesson: completedLessonsCount + 1, // Next lesson to complete
+          completedLessons: completedLessonsCount,
+          totalLessons: course.totalLessons,
           progressPercent,
           status,
           lastActivityAt: toDate(enrollment.lastAccessedAt),

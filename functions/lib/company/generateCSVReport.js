@@ -54,11 +54,11 @@ function convertToCSV(data) {
         'Employee Name',
         'Email',
         'Job Title',
-        'Masterclass',
+        'Course',
         'Progress (%)',
-        'Current Module',
-        'Completed Modules',
-        'Total Modules',
+        'Current Lesson',
+        'Completed Lessons',
+        'Total Lessons',
         'Status',
         'Last Activity',
         'Days Active',
@@ -71,9 +71,9 @@ function convertToCSV(data) {
         `"${employee.jobTitle || 'N/A'}"`,
         `"${employee.masterclassTitle || ''}"`,
         employee.progressPercent || 0,
-        employee.currentModule || 0,
-        employee.completedModules?.length || 0,
-        employee.totalModules || 0,
+        employee.currentLesson || 0,
+        employee.completedLessons || 0,
+        employee.totalLessons || 0,
         `"${employee.status || 'not-started'}"`,
         employee.lastActivityAt
             ? `"${new Date(employee.lastActivityAt).toLocaleDateString('hu-HU')}"`
@@ -186,9 +186,10 @@ exports.generateCSVReport = v2_1.https.onCall({
                         progressPercent = progressData?.overallProgress || 0;
                     }
                 }
-                const completedLessons = progressData?.completedLessons || [];
-                const totalLessons = progressData?.totalLessons || 0;
-                const currentModule = progressData?.currentModule || 1;
+                const completedLessonsArr = progressData?.completedLessons || [];
+                const completedLessonsCount = Array.isArray(completedLessonsArr) ? completedLessonsArr.length : (progressData?.completedLessonsCount || 0);
+                const totalLessonsCount = progressData?.totalLessons || 0;
+                const currentLessonNum = completedLessonsCount + 1;
                 // Calculate status
                 let status = 'not-started';
                 if (progressData) {
@@ -217,9 +218,9 @@ exports.generateCSVReport = v2_1.https.onCall({
                     jobTitle: employeeData.jobTitle,
                     masterclassId: mcId,
                     masterclassTitle: masterclass.title,
-                    currentModule,
-                    completedModules: completedLessons,
-                    totalModules: totalLessons,
+                    currentLesson: currentLessonNum,
+                    completedLessons: completedLessonsCount,
+                    totalLessons: totalLessonsCount,
                     progressPercent,
                     status,
                     lastActivityAt: progressData?.lastAccessedAt?.toDate(),

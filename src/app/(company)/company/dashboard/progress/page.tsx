@@ -301,7 +301,7 @@ export default function CompanyProgressDashboard() {
                       Haladás
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Modulok
+                      Leckék
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Státusz
@@ -354,9 +354,9 @@ export default function CompanyProgressDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {emp.completedModules.length} / {emp.totalModules}
+                          {emp.completedLessons} / {emp.totalLessons}
                         </div>
-                        <div className="text-xs text-gray-500">Modul {emp.currentModule}</div>
+                        <div className="text-xs text-gray-500">Lecke {emp.currentLesson} / {emp.totalLessons}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {emp.status === 'completed' ? (

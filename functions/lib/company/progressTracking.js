@@ -275,9 +275,9 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 jobTitle: employee?.jobTitle,
                 masterclassId: enrollmentCourseId, // Keep for backwards compatibility
                 masterclassTitle: course.title,
-                currentModule: 1, // Not using modules anymore
-                completedModules: Array.from({ length: completedLessonsCount }, (_, i) => i + 1), // For display
-                totalModules: course.totalLessons,
+                currentLesson: completedLessonsCount + 1, // Next lesson to complete
+                completedLessons: completedLessonsCount,
+                totalLessons: course.totalLessons,
                 progressPercent,
                 status,
                 lastActivityAt: toDate(enrollment.lastAccessedAt),
