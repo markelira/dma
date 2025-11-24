@@ -14,6 +14,31 @@ import * as admin from 'firebase-admin';
 
 const db = admin.firestore();
 
+/**
+ * Safely convert a Firestore timestamp or date to a JavaScript Date
+ */
+function toDate(value: any): Date | undefined {
+  if (!value) return undefined;
+
+  // Firestore Timestamp
+  if (value.toDate && typeof value.toDate === 'function') {
+    return value.toDate();
+  }
+
+  // Already a Date
+  if (value instanceof Date) {
+    return value;
+  }
+
+  // ISO string or timestamp number
+  if (typeof value === 'string' || typeof value === 'number') {
+    const date = new Date(value);
+    return isNaN(date.getTime()) ? undefined : date;
+  }
+
+  return undefined;
+}
+
 interface GetCompanyDashboardInput {
   companyId: string;
   courseId?: string; // Optional: filter by specific course
@@ -255,17 +280,22 @@ export const getCompanyDashboard = https.onCall(
           status = 'completed';
           stats.completedCourses++;
         } else if (enrollment.lastAccessedAt) {
-          const lastActivity = enrollment.lastAccessedAt.toDate();
-          const daysSinceActivity = Math.floor(
-            (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)
-          );
+          const lastActivity = toDate(enrollment.lastAccessedAt);
+          if (lastActivity) {
+            const daysSinceActivity = Math.floor(
+              (Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)
+            );
 
-          if (daysSinceActivity > 7) {
-            status = 'at-risk';
-            stats.atRiskCount++;
+            if (daysSinceActivity > 7) {
+              status = 'at-risk';
+              stats.atRiskCount++;
+            } else {
+              status = 'active';
+              activeUserIds.add(enrollmentUserId);
+            }
           } else {
-            status = 'active';
-            activeUserIds.add(enrollmentUserId);
+            status = progressPercent > 0 ? 'active' : 'not-started';
+            if (progressPercent > 0) activeUserIds.add(enrollmentUserId);
           }
         } else if (progressPercent > 0) {
           status = 'active';
@@ -273,7 +303,7 @@ export const getCompanyDashboard = https.onCall(
         }
 
         // Calculate days since enrollment
-        const enrolledAt = enrollment.enrolledAt?.toDate() || new Date();
+        const enrolledAt = toDate(enrollment.enrolledAt) || new Date();
         const daysActive = Math.floor(
           (Date.now() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24)
         );
@@ -290,7 +320,7 @@ export const getCompanyDashboard = https.onCall(
           totalModules: course.totalLessons,
           progressPercent,
           status,
-          lastActivityAt: enrollment.lastAccessedAt?.toDate(),
+          lastActivityAt: toDate(enrollment.lastAccessedAt),
           enrolledAt,
           daysActive,
         });
@@ -407,8 +437,8 @@ export const getEmployeeProgressDetail = https.onCall(
           employee: {
             id: employeeDoc.id,
             ...employeeData,
-            inviteAcceptedAt: employeeData.inviteAcceptedAt?.toDate(),
-            invitedAt: employeeData.invitedAt?.toDate(),
+            inviteAcceptedAt: toDate(employeeData.inviteAcceptedAt),
+            invitedAt: toDate(employeeData.invitedAt),
           },
           courses: [],
         };
@@ -486,8 +516,8 @@ export const getEmployeeProgressDetail = https.onCall(
               totalLessons,
               progressPercent: Math.round(enrollment.progress || 0),
               status: enrollment.status,
-              enrolledAt: enrollment.enrolledAt?.toDate(),
-              lastActivityAt: enrollment.lastAccessedAt?.toDate(),
+              enrolledAt: toDate(enrollment.enrolledAt),
+              lastActivityAt: toDate(enrollment.lastAccessedAt),
             },
           };
         })
@@ -498,8 +528,8 @@ export const getEmployeeProgressDetail = https.onCall(
         employee: {
           id: employeeDoc.id,
           ...employeeData,
-          inviteAcceptedAt: employeeData.inviteAcceptedAt?.toDate(),
-          invitedAt: employeeData.invitedAt?.toDate(),
+          inviteAcceptedAt: toDate(employeeData.inviteAcceptedAt),
+          invitedAt: toDate(employeeData.invitedAt),
         },
         courses: progressDetails.filter(Boolean),
       };

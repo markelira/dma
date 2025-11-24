@@ -1,7 +1,12 @@
 "use strict";
 /**
  * Progress Tracking Functions for Company Admins
- * Track and analyze employee progress across purchased masterclasses
+ * Track and analyze employee progress across purchased courses
+ *
+ * Uses the same progress tracking system as individual users:
+ * - enrollments collection: enrollment status and progress percentage
+ * - lessonProgress collection: individual lesson completion
+ * - courses collection: course details with lessons subcollection
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -43,8 +48,29 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const db = admin.firestore();
 /**
+ * Safely convert a Firestore timestamp or date to a JavaScript Date
+ */
+function toDate(value) {
+    if (!value)
+        return undefined;
+    // Firestore Timestamp
+    if (value.toDate && typeof value.toDate === 'function') {
+        return value.toDate();
+    }
+    // Already a Date
+    if (value instanceof Date) {
+        return value;
+    }
+    // ISO string or timestamp number
+    if (typeof value === 'string' || typeof value === 'number') {
+        const date = new Date(value);
+        return isNaN(date.getTime()) ? undefined : date;
+    }
+    return undefined;
+}
+/**
  * Get Company Dashboard Data
- * Returns aggregated progress for all employees or specific masterclass
+ * Returns aggregated progress for all employees using enrollments and lessonProgress collections
  */
 exports.getCompanyDashboard = v2_1.https.onCall({
     region: 'us-central1',
@@ -54,7 +80,9 @@ exports.getCompanyDashboard = v2_1.https.onCall({
     if (!request.auth) {
         throw new https_1.HttpsError('unauthenticated', 'Must be logged in');
     }
-    const { companyId, masterclassId } = request.data;
+    const { companyId, courseId } = request.data;
+    // Support both 'courseId' and legacy 'masterclassId' parameter
+    const filterCourseId = courseId || request.data.masterclassId;
     const userId = request.auth.uid;
     if (!companyId) {
         throw new https_1.HttpsError('invalid-argument', 'Missing companyId');
@@ -76,34 +104,109 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             throw new https_1.HttpsError('not-found', 'Company not found');
         }
         const companyData = companyDoc.data();
-        const purchasedMasterclasses = companyData?.purchasedMasterclasses || [];
-        // Filter to specific masterclass if requested
-        const masterclassesToTrack = masterclassId
-            ? [masterclassId]
-            : purchasedMasterclasses;
-        // 3. Get all active employees
+        // 3. Get all company enrollments from enrollments collection
+        // These are enrollments where enrolledByCompany matches this company
+        let enrollmentsQuery = db
+            .collection('enrollments')
+            .where('enrolledByCompany', '==', companyId);
+        // Filter by specific course if requested
+        if (filterCourseId) {
+            enrollmentsQuery = enrollmentsQuery.where('courseId', '==', filterCourseId);
+        }
+        const enrollmentsSnapshot = await enrollmentsQuery.get();
+        console.log(`📊 Found ${enrollmentsSnapshot.size} company enrollments for ${companyId}`);
+        // 4. Get unique course IDs and fetch course details
+        const courseIds = new Set();
+        enrollmentsSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.courseId) {
+                courseIds.add(data.courseId);
+            }
+        });
+        // Fetch course details and lesson counts
+        const coursesData = new Map();
+        for (const cId of courseIds) {
+            const courseDoc = await db.collection('courses').doc(cId).get();
+            if (courseDoc.exists) {
+                const courseData = courseDoc.data();
+                const courseType = courseData?.courseType || courseData?.type;
+                // Get total lessons - check lessonCount field first, then query subcollection
+                let totalLessons = courseData?.lessonCount || 0;
+                if (totalLessons === 0) {
+                    // Query the flat lessons subcollection
+                    const lessonsSnapshot = await db
+                        .collection('courses')
+                        .doc(cId)
+                        .collection('lessons')
+                        .get();
+                    totalLessons = lessonsSnapshot.size;
+                }
+                // For ACADEMIA courses, also check modules subcollection
+                if (totalLessons === 0 && courseType === 'ACADEMIA') {
+                    const modulesSnapshot = await db
+                        .collection('courses')
+                        .doc(cId)
+                        .collection('modules')
+                        .get();
+                    for (const moduleDoc of modulesSnapshot.docs) {
+                        const moduleLessonsSnapshot = await db
+                            .collection('courses')
+                            .doc(cId)
+                            .collection('modules')
+                            .doc(moduleDoc.id)
+                            .collection('lessons')
+                            .get();
+                        totalLessons += moduleLessonsSnapshot.size;
+                    }
+                    console.log(`📊 Counted ${totalLessons} lessons from ACADEMIA modules for course ${cId}`);
+                }
+                coursesData.set(cId, {
+                    id: cId,
+                    title: courseData?.title || 'Unknown Course',
+                    totalLessons,
+                });
+            }
+        }
+        // 5. Get unique user IDs from enrollments and fetch user details
+        const userIds = new Set();
+        enrollmentsSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.userId) {
+                userIds.add(data.userId);
+            }
+        });
+        // Fetch user details
+        const usersData = new Map();
+        for (const uid of userIds) {
+            const userDoc = await db.collection('users').doc(uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                usersData.set(uid, {
+                    displayName: userData?.displayName || userData?.email || 'Unknown User',
+                    email: userData?.email || '',
+                });
+            }
+        }
+        // Also fetch employee data for job titles
         const employeesSnapshot = await db
             .collection('companies')
             .doc(companyId)
             .collection('employees')
-            .where('status', '==', 'active')
             .get();
-        // 4. Get masterclass details
-        const masterclassesData = new Map();
-        for (const id of masterclassesToTrack) {
-            const masterclassDoc = await db.collection('course-content').doc(id).get();
-            if (masterclassDoc.exists) {
-                masterclassesData.set(id, {
-                    id: masterclassDoc.id,
-                    title: masterclassDoc.data()?.title || 'Unknown Course',
-                    duration: masterclassDoc.data()?.duration || 10,
+        const employeesDataMap = new Map();
+        employeesSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.userId) {
+                employeesDataMap.set(data.userId, {
+                    jobTitle: data.jobTitle,
+                    employeeId: doc.id,
                 });
             }
-        }
-        // 5. Aggregate employee progress
+        });
+        // 6. Build employee progress list from enrollments
         const employeeProgressList = [];
         const stats = {
-            totalEmployees: employeesSnapshot.size,
+            totalEmployees: userIds.size,
             activeEmployees: 0,
             completedCourses: 0,
             averageProgress: 0,
@@ -111,92 +214,86 @@ exports.getCompanyDashboard = v2_1.https.onCall({
         };
         let totalProgress = 0;
         let progressCount = 0;
-        for (const employeeDoc of employeesSnapshot.docs) {
-            const employeeData = employeeDoc.data();
-            const enrolledMasterclasses = employeeData.enrolledMasterclasses || [];
-            // Skip if employee not enrolled in any tracked masterclasses
-            const relevantEnrollments = enrolledMasterclasses.filter((id) => masterclassesToTrack.includes(id));
-            if (relevantEnrollments.length === 0) {
+        const activeUserIds = new Set();
+        for (const enrollmentDoc of enrollmentsSnapshot.docs) {
+            const enrollment = enrollmentDoc.data();
+            const enrollmentUserId = enrollment.userId;
+            const enrollmentCourseId = enrollment.courseId;
+            if (!enrollmentUserId || !enrollmentCourseId)
                 continue;
+            const course = coursesData.get(enrollmentCourseId);
+            if (!course)
+                continue;
+            const user = usersData.get(enrollmentUserId);
+            const employee = employeesDataMap.get(enrollmentUserId);
+            // Get progress from enrollment document (same logic as frontend)
+            const progressPercent = Math.round(enrollment.progress || 0);
+            // Count completed lessons for this user in this course
+            const completedLessonsQuery = await db
+                .collection('lessonProgress')
+                .where('userId', '==', enrollmentUserId)
+                .where('courseId', '==', enrollmentCourseId)
+                .where('completed', '==', true)
+                .get();
+            const completedLessonsCount = completedLessonsQuery.size;
+            // Determine status based on enrollment status and activity
+            let status = 'not-started';
+            if (enrollment.status === 'completed' || progressPercent === 100) {
+                status = 'completed';
+                stats.completedCourses++;
             }
-            // Track if employee is active in any course
-            let isActive = false;
-            // Get progress for each enrolled masterclass
-            for (const mcId of relevantEnrollments) {
-                const masterclass = masterclassesData.get(mcId);
-                if (!masterclass)
-                    continue;
-                let progressData = null;
-                let progressPercent = 0;
-                // Get progress if employee has userId (accepted invite)
-                if (employeeData.userId) {
-                    // 🔴 CRITICAL FIX: Use correct flat collection structure
-                    // Format: userProgress/{userId}_{masterclassId}
-                    const progressId = `${employeeData.userId}_${mcId}`;
-                    const courseProgressDoc = await db
-                        .collection('userProgress')
-                        .doc(progressId)
-                        .get();
-                    if (courseProgressDoc.exists) {
-                        progressData = courseProgressDoc.data();
-                        progressPercent = progressData?.overallProgress || 0;
+            else if (enrollment.lastAccessedAt) {
+                const lastActivity = toDate(enrollment.lastAccessedAt);
+                if (lastActivity) {
+                    const daysSinceActivity = Math.floor((Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
+                    if (daysSinceActivity > 7) {
+                        status = 'at-risk';
+                        stats.atRiskCount++;
+                    }
+                    else {
+                        status = 'active';
+                        activeUserIds.add(enrollmentUserId);
                     }
                 }
-                // Fallback values for module-based display (if needed)
-                const completedLessons = progressData?.completedLessons || [];
-                const totalLessons = progressData?.totalLessons || 0;
-                const currentModule = progressData?.currentModule || 1;
-                // Calculate status
-                let status = 'not-started';
-                if (progressData) {
-                    if (progressPercent === 100) {
-                        status = 'completed';
-                        stats.completedCourses++;
-                    }
-                    else if (progressData.lastAccessedAt) {
-                        const lastActivity = progressData.lastAccessedAt.toDate();
-                        const daysSinceActivity = Math.floor((Date.now() - lastActivity.getTime()) / (1000 * 60 * 60 * 24));
-                        if (daysSinceActivity > 7) {
-                            status = 'at-risk';
-                            stats.atRiskCount++;
-                        }
-                        else {
-                            status = 'active';
-                            isActive = true;
-                        }
-                    }
+                else {
+                    status = progressPercent > 0 ? 'active' : 'not-started';
+                    if (progressPercent > 0)
+                        activeUserIds.add(enrollmentUserId);
                 }
-                // Calculate days active
-                const enrolledAt = employeeData.inviteAcceptedAt?.toDate() || new Date();
-                const daysActive = Math.floor((Date.now() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24));
-                employeeProgressList.push({
-                    employeeId: employeeDoc.id,
-                    employeeName: employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`,
-                    email: employeeData.email,
-                    jobTitle: employeeData.jobTitle,
-                    masterclassId: mcId,
-                    masterclassTitle: masterclass.title,
-                    currentModule,
-                    completedModules: completedLessons, // Use completedLessons from new data structure
-                    totalModules: totalLessons, // Use totalLessons from new data structure
-                    progressPercent,
-                    status,
-                    lastActivityAt: progressData?.lastAccessedAt?.toDate(),
-                    enrolledAt,
-                    daysActive,
-                });
-                totalProgress += progressPercent;
-                progressCount++;
             }
-            if (isActive) {
-                stats.activeEmployees++;
+            else if (progressPercent > 0) {
+                status = 'active';
+                activeUserIds.add(enrollmentUserId);
             }
+            // Calculate days since enrollment
+            const enrolledAt = toDate(enrollment.enrolledAt) || new Date();
+            const daysActive = Math.floor((Date.now() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24));
+            employeeProgressList.push({
+                employeeId: employee?.employeeId || enrollmentUserId,
+                employeeName: user?.displayName || 'Unknown User',
+                email: user?.email || '',
+                jobTitle: employee?.jobTitle,
+                masterclassId: enrollmentCourseId, // Keep for backwards compatibility
+                masterclassTitle: course.title,
+                currentModule: 1, // Not using modules anymore
+                completedModules: Array.from({ length: completedLessonsCount }, (_, i) => i + 1), // For display
+                totalModules: course.totalLessons,
+                progressPercent,
+                status,
+                lastActivityAt: toDate(enrollment.lastAccessedAt),
+                enrolledAt,
+                daysActive,
+            });
+            totalProgress += progressPercent;
+            progressCount++;
         }
+        // Set active employees count
+        stats.activeEmployees = activeUserIds.size;
         // Calculate average progress
         stats.averageProgress = progressCount > 0
             ? Math.round(totalProgress / progressCount)
             : 0;
-        // 6. Sort employees by progress (lowest first to highlight at-risk)
+        // 7. Sort employees by progress (lowest first to highlight at-risk)
         employeeProgressList.sort((a, b) => {
             // At-risk first
             if (a.status === 'at-risk' && b.status !== 'at-risk')
@@ -206,12 +303,17 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             // Then by progress percent
             return a.progressPercent - b.progressPercent;
         });
+        console.log(`📊 Company dashboard stats:`, stats);
         return {
             success: true,
             companyName: companyData?.name,
             stats,
             employees: employeeProgressList,
-            masterclasses: Array.from(masterclassesData.values()),
+            masterclasses: Array.from(coursesData.values()).map(c => ({
+                id: c.id,
+                title: c.title,
+                duration: c.totalLessons, // Use lesson count as duration indicator
+            })),
         };
     }
     catch (error) {
@@ -224,6 +326,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
 });
 /**
  * Get Individual Employee Progress Detail
+ * Uses enrollments and lessonProgress collections
  */
 exports.getEmployeeProgressDetail = v2_1.https.onCall({
     region: 'us-central1',
@@ -263,40 +366,85 @@ exports.getEmployeeProgressDetail = v2_1.https.onCall({
         if (!employeeData) {
             throw new https_1.HttpsError('not-found', 'Employee data not found');
         }
-        const enrolledMasterclasses = employeeData.enrolledMasterclasses || [];
-        // Get progress for each enrolled masterclass
-        const progressDetails = await Promise.all(enrolledMasterclasses.map(async (masterclassId) => {
-            const masterclassDoc = await db
-                .collection('course-content')
-                .doc(masterclassId)
-                .get();
-            if (!masterclassDoc.exists)
+        // Get all enrollments for this employee's userId (from enrollments collection)
+        if (!employeeData.userId) {
+            return {
+                success: true,
+                employee: {
+                    id: employeeDoc.id,
+                    ...employeeData,
+                    inviteAcceptedAt: toDate(employeeData.inviteAcceptedAt),
+                    invitedAt: toDate(employeeData.invitedAt),
+                },
+                courses: [],
+            };
+        }
+        // Query enrollments for this user that belong to this company
+        const enrollmentsSnapshot = await db
+            .collection('enrollments')
+            .where('userId', '==', employeeData.userId)
+            .where('enrolledByCompany', '==', companyId)
+            .get();
+        // Get progress for each enrollment
+        const progressDetails = await Promise.all(enrollmentsSnapshot.docs.map(async (enrollmentDoc) => {
+            const enrollment = enrollmentDoc.data();
+            const courseId = enrollment.courseId;
+            // Get course details
+            const courseDoc = await db.collection('courses').doc(courseId).get();
+            if (!courseDoc.exists)
                 return null;
-            let progressData = null;
-            if (employeeData.userId) {
-                const progressId = `${employeeData.userId}_${masterclassId}`;
-                const progressDoc = await db
-                    .collection('userProgress')
-                    .doc(progressId)
+            const courseData = courseDoc.data();
+            const courseType = courseData?.courseType || courseData?.type;
+            // Get total lessons
+            let totalLessons = courseData?.lessonCount || 0;
+            if (totalLessons === 0) {
+                const lessonsSnapshot = await db
+                    .collection('courses')
+                    .doc(courseId)
+                    .collection('lessons')
                     .get();
-                if (progressDoc.exists) {
-                    progressData = progressDoc.data();
+                totalLessons = lessonsSnapshot.size;
+            }
+            // For ACADEMIA courses, also check modules subcollection
+            if (totalLessons === 0 && courseType === 'ACADEMIA') {
+                const modulesSnapshot = await db
+                    .collection('courses')
+                    .doc(courseId)
+                    .collection('modules')
+                    .get();
+                for (const moduleDoc of modulesSnapshot.docs) {
+                    const moduleLessonsSnapshot = await db
+                        .collection('courses')
+                        .doc(courseId)
+                        .collection('modules')
+                        .doc(moduleDoc.id)
+                        .collection('lessons')
+                        .get();
+                    totalLessons += moduleLessonsSnapshot.size;
                 }
             }
+            // Count completed lessons
+            const completedLessonsSnapshot = await db
+                .collection('lessonProgress')
+                .where('userId', '==', employeeData.userId)
+                .where('courseId', '==', courseId)
+                .where('completed', '==', true)
+                .get();
+            const completedLessonsCount = completedLessonsSnapshot.size;
             return {
                 masterclass: {
-                    id: masterclassDoc.id,
-                    ...masterclassDoc.data(),
+                    id: courseId,
+                    title: courseData?.title || 'Unknown Course',
+                    totalLessons,
                 },
-                progress: progressData
-                    ? {
-                        currentModule: progressData.currentModule,
-                        completedModules: progressData.completedModules,
-                        status: progressData.status,
-                        enrolledAt: progressData.enrolledAt?.toDate(),
-                        lastActivityAt: progressData.lastActivityAt?.toDate(),
-                    }
-                    : null,
+                progress: {
+                    completedLessons: completedLessonsCount,
+                    totalLessons,
+                    progressPercent: Math.round(enrollment.progress || 0),
+                    status: enrollment.status,
+                    enrolledAt: toDate(enrollment.enrolledAt),
+                    lastActivityAt: toDate(enrollment.lastAccessedAt),
+                },
             };
         }));
         return {
@@ -304,8 +452,8 @@ exports.getEmployeeProgressDetail = v2_1.https.onCall({
             employee: {
                 id: employeeDoc.id,
                 ...employeeData,
-                inviteAcceptedAt: employeeData.inviteAcceptedAt?.toDate(),
-                invitedAt: employeeData.invitedAt?.toDate(),
+                inviteAcceptedAt: toDate(employeeData.inviteAcceptedAt),
+                invitedAt: toDate(employeeData.invitedAt),
             },
             courses: progressDetails.filter(Boolean),
         };

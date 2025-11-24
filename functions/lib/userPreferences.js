@@ -566,6 +566,7 @@ function checkStreakMilestones(currentStreak, existingMilestones) {
 }
 /**
  * Get dashboard analytics (pre-computed metrics)
+ * Also aggregates timeSpent from lessonProgress collection for accurate watch time
  */
 exports.getDashboardAnalytics = (0, https_1.onCall)({
     cors: true,
@@ -587,9 +588,36 @@ exports.getDashboardAnalytics = (0, https_1.onCall)({
                 data: newAnalyticsDoc.data(),
             };
         }
+        // Aggregate actual watch time from lessonProgress collection
+        const lessonProgressSnapshot = await firestore
+            .collection('lessonProgress')
+            .where('userId', '==', userId)
+            .get();
+        let totalTimeSpentSeconds = 0;
+        lessonProgressSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.timeSpent && typeof data.timeSpent === 'number') {
+                totalTimeSpentSeconds += data.timeSpent;
+            }
+        });
+        // Convert to minutes and hours
+        const totalLearningMinutesFromProgress = Math.round(totalTimeSpentSeconds / 60);
+        const totalLearningHoursFromProgress = Math.round((totalTimeSpentSeconds / 3600) * 10) / 10; // 1 decimal place
+        const analyticsData = analyticsDoc.data() || {};
+        // Use the higher value between sessions-based and progress-based tracking
+        const sessionMinutes = analyticsData.totalLearningMinutes || 0;
+        const actualTotalMinutes = Math.max(sessionMinutes, totalLearningMinutesFromProgress);
+        const actualTotalHours = Math.round((actualTotalMinutes / 60) * 10) / 10;
         return {
             success: true,
-            data: analyticsDoc.data(),
+            data: {
+                ...analyticsData,
+                totalLearningMinutes: actualTotalMinutes,
+                totalLearningHours: actualTotalHours,
+                // Include breakdown for debugging
+                _sessionBasedMinutes: sessionMinutes,
+                _progressBasedMinutes: totalLearningMinutesFromProgress,
+            },
         };
     }
     catch (error) {
