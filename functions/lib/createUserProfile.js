@@ -39,11 +39,14 @@ exports.createUserProfile = void 0;
  *
  * Creates a user document in Firestore with initial data including emailVerified: false
  * Called during registration to ensure user has a complete profile
+ *
+ * Also automatically links the user to a company if they have a pending invite
  */
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
+const linkEmployeeByEmail_1 = require("./company/linkEmployeeByEmail");
 const firestore = admin.firestore();
 // Input validation schema
 const CreateUserProfileSchema = z.object({
@@ -97,10 +100,23 @@ exports.createUserProfile = (0, https_1.onCall)({
         };
         await firestore.collection('users').doc(uid).set(userData);
         v2_1.logger.info(`User profile created successfully for uid: ${uid}`);
+        // 🔗 Check if this user has a pending company invite and auto-link
+        let companyLinkResult = null;
+        try {
+            companyLinkResult = await (0, linkEmployeeByEmail_1.linkEmployeeByEmail)(uid, email);
+            if (companyLinkResult.linked) {
+                v2_1.logger.info(`🎉 User ${uid} automatically linked to company ${companyLinkResult.companyId}`);
+            }
+        }
+        catch (linkError) {
+            v2_1.logger.error('Error checking/linking employee invite:', linkError);
+            // Don't throw - user profile was created successfully
+        }
         return {
             success: true,
             message: 'User profile created successfully',
-            user: userData
+            user: userData,
+            companyLink: companyLinkResult,
         };
     }
     catch (error) {
