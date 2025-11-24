@@ -1,10 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { useTeamDashboard, useIsTeamOwner } from '@/hooks/useTeamDashboard'
-import { useInviteTeamMember, useRemoveTeamMember, useResendTeamInvite } from '@/hooks/useTeamActions'
+import {
+  useInviteTeamMember,
+  useRemoveTeamMember,
+  useResendTeamInvite,
+  useEnrollTeamInCourse,
+  useTeamEnrolledCourses
+} from '@/hooks/useTeamActions'
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import {
   Users,
   UserCheck,
@@ -17,9 +25,12 @@ import {
   UserMinus,
   RefreshCw,
   Plus,
-  X
+  X,
+  BookOpen,
+  PlayCircle
 } from 'lucide-react'
 import { motion } from 'motion/react'
+import Link from 'next/link'
 
 // Stat Card Component
 function StatCard({
@@ -201,6 +212,172 @@ function InviteMemberModal({
   )
 }
 
+// Add Course Modal
+function AddCourseModal({
+  isOpen,
+  onClose,
+  teamId,
+  enrolledCourseIds,
+}: {
+  isOpen: boolean
+  onClose: () => void
+  teamId: string
+  enrolledCourseIds: string[]
+}) {
+  const [courses, setCourses] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [enrollingId, setEnrollingId] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+
+  const enrollMutation = useEnrollTeamInCourse()
+
+  useEffect(() => {
+    if (isOpen) {
+      loadCourses()
+    }
+  }, [isOpen])
+
+  const loadCourses = async () => {
+    setLoading(true)
+    try {
+      const coursesQuery = query(
+        collection(db, 'courses'),
+        where('status', '==', 'PUBLISHED')
+      )
+      const snapshot = await getDocs(coursesQuery)
+      const coursesData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setCourses(coursesData)
+    } catch (err) {
+      console.error('Error loading courses:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEnroll = async (courseId: string) => {
+    setEnrollingId(courseId)
+    setSuccess(null)
+    try {
+      const result = await enrollMutation.mutateAsync({ teamId, courseId })
+      setSuccess(result.message || 'Kurzus hozzáadva!')
+      setTimeout(() => {
+        setSuccess(null)
+      }, 3000)
+    } catch (err) {
+      console.error('Error enrolling team:', err)
+    } finally {
+      setEnrollingId(null)
+    }
+  }
+
+  if (!isOpen) return null
+
+  const availableCourses = courses.filter((c) => !enrolledCourseIds.includes(c.id))
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col"
+      >
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">Kurzus hozzáadása</h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+
+        {success && (
+          <div className="mx-6 mt-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center">
+            <CheckCircle2 className="w-5 h-5 text-green-600 mr-2" />
+            <span className="text-sm text-green-700">{success}</span>
+          </div>
+        )}
+
+        <div className="flex-1 overflow-y-auto p-6">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+          ) : availableCourses.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">
+                {courses.length === 0
+                  ? 'Nincsenek elérhető kurzusok'
+                  : 'Minden kurzus már hozzá van adva'}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {availableCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
+                >
+                  <div className="flex items-center space-x-4 flex-1 min-w-0">
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-16 h-12 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <PlayCircle className="w-6 h-6 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {course.title}
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {course.lessonCount || course.modules?.reduce(
+                          (acc: number, m: any) => acc + (m.lessons?.length || 0), 0
+                        ) || 0} lecke
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleEnroll(course.id)}
+                    disabled={enrollingId === course.id}
+                    className="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center"
+                  >
+                    {enrollingId === course.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4 mr-1" />
+                        Hozzáad
+                      </>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="p-6 border-t border-gray-200">
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+          >
+            Bezárás
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  )
+}
+
 export default function TeamDashboardPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
@@ -208,10 +385,17 @@ export default function TeamDashboardPage() {
   const { data: dashboardData, isLoading, error } = useTeamDashboard()
 
   const [showInviteModal, setShowInviteModal] = useState(false)
+  const [showAddCourseModal, setShowAddCourseModal] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
   const removeMutation = useRemoveTeamMember()
   const resendMutation = useResendTeamInvite()
+
+  // Get team ID for enrolled courses query
+  const teamId = dashboardData?.team?.id
+
+  // Fetch enrolled courses
+  const { data: enrolledCourses = [], isLoading: coursesLoading } = useTeamEnrolledCourses(teamId)
 
   // Redirect non-team-owners
   if (!authLoading && !isTeamOwner) {
@@ -369,6 +553,74 @@ export default function TeamDashboardPage() {
           </div>
         </div>
 
+        {/* Team Courses Section */}
+        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-8">
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Csapat kurzusok</h2>
+              <p className="text-sm text-gray-500 mt-1">Kurzusok, amikbe a csapat tagjai be vannak iratkozva</p>
+            </div>
+            <button
+              onClick={() => setShowAddCourseModal(true)}
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Kurzus hozzáadása
+            </button>
+          </div>
+
+          <div className="p-6">
+            {coursesLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+              </div>
+            ) : enrolledCourses.length === 0 ? (
+              <div className="text-center py-8">
+                <BookOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 mb-4">Még nincsenek kurzusok hozzáadva</p>
+                <button
+                  onClick={() => setShowAddCourseModal(true)}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Első kurzus hozzáadása
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {enrolledCourses.map((course) => (
+                  <Link
+                    key={course.id}
+                    href={`/courses/${course.id}`}
+                    className="block border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow"
+                  >
+                    {course.thumbnail ? (
+                      <img
+                        src={course.thumbnail}
+                        alt={course.title}
+                        className="w-full h-32 object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-32 bg-gray-100 flex items-center justify-center">
+                        <PlayCircle className="w-12 h-12 text-gray-400" />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">
+                        {course.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-sm text-gray-500">
+                        <span>{course.lessonCount} lecke</span>
+                        <span>{course.memberCount} beiratkozott</span>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Members Section */}
         <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
           <div className="p-6 border-b border-gray-200 flex items-center justify-between">
@@ -480,6 +732,14 @@ export default function TeamDashboardPage() {
         isOpen={showInviteModal}
         onClose={() => setShowInviteModal(false)}
         teamId={team.id}
+      />
+
+      {/* Add Course Modal */}
+      <AddCourseModal
+        isOpen={showAddCourseModal}
+        onClose={() => setShowAddCourseModal(false)}
+        teamId={team.id}
+        enrolledCourseIds={enrolledCourses.map((c) => c.id)}
       />
     </div>
   )

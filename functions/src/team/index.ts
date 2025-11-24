@@ -29,3 +29,9 @@ export {
   checkSubscriptionAccess,
   getTeamMembers,
 } from './getTeamDashboard';
+
+// Team course enrollment
+export {
+  enrollTeamInCourse,
+  getTeamEnrolledCourses,
+} from './enrollTeamInCourse';

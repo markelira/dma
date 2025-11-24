@@ -1901,6 +1901,8 @@ export {
   getTeamDashboard,
   checkSubscriptionAccess,
   getTeamMembers,
+  enrollTeamInCourse,
+  getTeamEnrolledCourses,
 } from './team';
 
 // ============================================
