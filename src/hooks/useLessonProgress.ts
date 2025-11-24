@@ -3,10 +3,8 @@ import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
 import {
-  ENROLLMENT_STATUS,
   LESSON_COMPLETION_THRESHOLD,
   calculateCourseProgress,
-  countTotalLessons,
   getStatusFromProgress,
 } from '@/lib/progress'
 
@@ -135,8 +133,16 @@ export const useLessonProgress = () => {
           if (courseDoc.exists()) {
             const courseData = courseDoc.data()
 
-            // Count total lessons using utility
-            const totalLessons = countTotalLessons(courseData.modules, courseData.lessonCount)
+            // Count total lessons - check lessonCount field first, then query subcollection
+            let totalLessons = courseData.lessonCount || 0
+
+            // If no lessonCount, query the lessons subcollection
+            if (totalLessons === 0) {
+              const lessonsRef = collection(db, 'courses', courseId, 'lessons')
+              const lessonsSnapshot = await getDocs(lessonsRef)
+              totalLessons = lessonsSnapshot.size
+              console.log('📊 Counted lessons from subcollection:', totalLessons)
+            }
 
             if (totalLessons > 0) {
               // Count completed lessons for this user in this course
