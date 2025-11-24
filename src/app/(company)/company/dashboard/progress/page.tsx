@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
-import Link from 'next/link';
 import {
-  ArrowLeft,
   TrendingUp,
   Users,
   Award,
@@ -16,9 +14,12 @@ import {
   CheckCircle2,
   Filter,
   Download,
-  Mail
+  Mail,
+  Loader2,
+  Target
 } from 'lucide-react';
 import { DashboardStats, EmployeeProgress, CompanyDashboardData } from '@/types/company';
+import { StatCard } from '@/components/dashboard/StatCard';
 
 export default function CompanyProgressDashboard() {
   const { user, isLoading: authLoading } = useAuthStore();
@@ -108,7 +109,7 @@ export default function CompanyProgressDashboard() {
 
       const data = result.data as any;
       if (data.success) {
-        alert('✓ ' + data.message);
+        alert('Emlékeztető sikeresen elküldve!');
       }
     } catch (err: any) {
       console.error('Error sending reminder:', err);
@@ -125,9 +126,9 @@ export default function CompanyProgressDashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -136,14 +137,14 @@ export default function CompanyProgressDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <div className="max-w-md bg-red-50 border border-red-200 rounded-lg p-8 text-center">
-          <AlertTriangle className="w-12 h-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-red-900 mb-2">Hiba</h2>
-          <p className="text-red-700 mb-6">{error}</p>
+      <div className="flex items-center justify-center py-20">
+        <div className="max-w-md bg-red-50 border border-red-200 rounded-xl p-8 text-center">
+          <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Hiba történt</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push('/company/dashboard')}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Vissza
           </button>
@@ -153,172 +154,167 @@ export default function CompanyProgressDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/company/dashboard"
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Haladás Követés</h1>
-                <p className="text-sm text-gray-600">{companyName}</p>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Haladás követés</h1>
+        <p className="text-gray-500">
+          Kövesd nyomon az alkalmazottak tanulási előrehaladását
+        </p>
+      </div>
+
+      {/* Stats Cards */}
+      {stats && (
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <StatCard
+            icon={Users}
+            label="Összes alkalmazott"
+            value={stats.totalEmployees}
+            isLoading={loading}
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="Aktív"
+            value={stats.activeEmployees}
+            isLoading={loading}
+          />
+          <StatCard
+            icon={AlertTriangle}
+            label="Lemaradásban"
+            value={stats.atRiskCount}
+            isLoading={loading}
+          />
+          <StatCard
+            icon={Award}
+            label="Befejezések"
+            value={stats.completedCourses}
+            isLoading={loading}
+          />
+          <StatCard
+            icon={Target}
+            label="Átlagos haladás"
+            value={stats.averageProgress}
+            suffix="%"
+            isLoading={loading}
+          />
         </div>
-      </header>
+      )}
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Cards */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-gray-600 text-sm font-medium">Összes Alkalmazott</div>
-                <Users className="w-5 h-5 text-blue-600" />
-              </div>
-              <div className="text-3xl font-bold text-gray-900">{stats.totalEmployees}</div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-gray-600 text-sm font-medium">Aktív</div>
-                <TrendingUp className="w-5 h-5 text-green-600" />
-              </div>
-              <div className="text-3xl font-bold text-green-900">{stats.activeEmployees}</div>
-              <div className="text-xs text-gray-500 mt-1">Utolsó 7 napban</div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-gray-600 text-sm font-medium">Lemaradásban</div>
-                <AlertTriangle className="w-5 h-5 text-red-600" />
-              </div>
-              <div className="text-3xl font-bold text-red-900">{stats.atRiskCount}</div>
-              <div className="text-xs text-gray-500 mt-1">&gt;7 nap inaktív</div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-gray-600 text-sm font-medium">Befejezések</div>
-                <Award className="w-5 h-5 text-yellow-600" />
-              </div>
-              <div className="text-3xl font-bold text-yellow-900">{stats.completedCourses}</div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-gray-600 text-sm font-medium">Átlagos Haladás</div>
-                <TrendingUp className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="text-3xl font-bold text-purple-900">{stats.averageProgress}%</div>
-            </div>
+      {/* Filters */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          <div className="flex items-center gap-2">
+            <Filter className="w-5 h-5 text-gray-400" />
+            <span className="text-sm font-medium text-gray-700">Szűrők:</span>
           </div>
-        )}
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex items-center space-x-4 flex-wrap gap-4">
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Szűrők:</span>
-            </div>
+          <select
+            value={selectedMasterclass}
+            onChange={(e) => setSelectedMasterclass(e.target.value)}
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          >
+            <option value="all">Minden képzés</option>
+            {masterclasses.map((mc) => (
+              <option key={mc.id} value={mc.id}>
+                {mc.title}
+              </option>
+            ))}
+          </select>
 
-            <select
-              value={selectedMasterclass}
-              onChange={(e) => setSelectedMasterclass(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">Minden képzés</option>
-              {masterclasses.map((mc) => (
-                <option key={mc.id} value={mc.id}>
-                  {mc.title}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">Minden státusz</option>
-              <option value="active">Aktív</option>
-              <option value="at-risk">Lemaradásban</option>
-              <option value="completed">Befejezett</option>
-              <option value="not-started">Nem kezdett</option>
-            </select>
-
-            <div className="ml-auto">
+          <div className="flex items-center gap-2">
+            {[
+              { value: 'all', label: 'Mind' },
+              { value: 'active', label: 'Aktív' },
+              { value: 'at-risk', label: 'Lemaradásban' },
+              { value: 'completed', label: 'Befejezett' },
+              { value: 'not-started', label: 'Nem kezdett' },
+            ].map((option) => (
               <button
-                onClick={handleExportCSV}
-                disabled={loading}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                key={option.value}
+                onClick={() => setStatusFilter(option.value)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === option.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
               >
-                <Download className="w-4 h-4" />
-                <span className="text-sm">Export CSV</span>
+                {option.label}
               </button>
-            </div>
+            ))}
+          </div>
+
+          <div className="sm:ml-auto">
+            <button
+              onClick={handleExportCSV}
+              disabled={loading}
+              className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Employee Progress Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Alkalmazotti Haladás ({filteredEmployees.length})
-            </h2>
-          </div>
+      {/* Employee Progress Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Alkalmazotti haladás ({filteredEmployees.length})
+          </h2>
+        </div>
 
-          {filteredEmployees.length === 0 ? (
-            <div className="p-12 text-center">
-              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Nincs találat
-              </h3>
-              <p className="text-gray-600">
-                Próbálj más szűrőket használni
-              </p>
+        {filteredEmployees.length === 0 ? (
+          <div className="p-12 text-center">
+            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <Users className="w-8 h-8 text-gray-400" />
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Alkalmazott
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Képzés
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Haladás
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Leckék
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Státusz
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Utolsó Aktivitás
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Műveletek
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredEmployees.map((emp) => (
-                    <tr key={`${emp.employeeId}-${emp.masterclassId}`} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Nincs találat
+            </h3>
+            <p className="text-gray-600">
+              Próbálj más szűrőket használni
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Alkalmazott
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Képzés
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Haladás
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Leckék
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Státusz
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Utolsó aktivitás
+                  </th>
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Műveletek
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {filteredEmployees.map((emp) => (
+                  <tr key={`${emp.employeeId}-${emp.masterclassId}`} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-600">
+                            {emp.employeeName.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          </span>
+                        </div>
+                        <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
                             {emp.employeeName}
                           </div>
@@ -327,88 +323,87 @@ export default function CompanyProgressDashboard() {
                             <div className="text-xs text-gray-400">{emp.jobTitle}</div>
                           )}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{emp.masterclassTitle}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-1">
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full ${
-                                  emp.progressPercent === 100
-                                    ? 'bg-green-600'
-                                    : emp.status === 'at-risk'
-                                    ? 'bg-red-600'
-                                    : 'bg-blue-600'
-                                }`}
-                                style={{ width: `${emp.progressPercent}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div className="text-sm font-medium text-gray-900 min-w-[3rem] text-right">
-                            {emp.progressPercent}%
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{emp.masterclassTitle}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center space-x-3">
+                        <div className="flex-1 w-24">
+                          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all ${
+                                emp.progressPercent === 100
+                                  ? 'bg-green-500'
+                                  : emp.status === 'at-risk'
+                                  ? 'bg-red-500'
+                                  : 'bg-blue-500'
+                              }`}
+                              style={{ width: `${emp.progressPercent}%` }}
+                            />
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {emp.completedLessons} / {emp.totalLessons}
+                        <div className="text-sm font-medium text-gray-900 min-w-[3rem] text-right">
+                          {emp.progressPercent}%
                         </div>
-                        <div className="text-xs text-gray-500">Lecke {emp.currentLesson} / {emp.totalLessons}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {emp.status === 'completed' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
-                            Befejezve
-                          </span>
-                        ) : emp.status === 'at-risk' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            Lemaradásban
-                          </span>
-                        ) : emp.status === 'active' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                            Aktív
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Nem kezdett
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {emp.lastActivityAt
-                          ? new Date(emp.lastActivityAt).toLocaleDateString('hu-HU')
-                          : 'Nincs'}
-                        {emp.daysActive > 0 && (
-                          <div className="text-xs text-gray-400">{emp.daysActive} napja</div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        {emp.status === 'at-risk' && (
-                          <button
-                            onClick={() => handleSendReminder(emp.employeeId, emp.masterclassId)}
-                            disabled={sendingReminder === `${emp.employeeId}-${emp.masterclassId}`}
-                            className="inline-flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 border border-blue-300 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Mail className="w-4 h-4 mr-1" />
-                            {sendingReminder === `${emp.employeeId}-${emp.masterclassId}` ? 'Küldés...' : 'Emlékeztető'}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {emp.completedLessons} / {emp.totalLessons}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {emp.status === 'completed' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          <CheckCircle2 className="w-3 h-3 mr-1" />
+                          Befejezve
+                        </span>
+                      ) : emp.status === 'at-risk' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                          <AlertTriangle className="w-3 h-3 mr-1" />
+                          Lemaradásban
+                        </span>
+                      ) : emp.status === 'active' ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          Aktív
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          <Clock className="w-3 h-3 mr-1" />
+                          Nem kezdett
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {emp.lastActivityAt
+                        ? new Date(emp.lastActivityAt).toLocaleDateString('hu-HU')
+                        : 'Nincs'}
+                      {emp.daysActive > 0 && (
+                        <div className="text-xs text-gray-400">{emp.daysActive} napja</div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      {emp.status === 'at-risk' && (
+                        <button
+                          onClick={() => handleSendReminder(emp.employeeId, emp.masterclassId)}
+                          disabled={sendingReminder === `${emp.employeeId}-${emp.masterclassId}`}
+                          className="inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Mail className="w-4 h-4 mr-1" />
+                          {sendingReminder === `${emp.employeeId}-${emp.masterclassId}` ? 'Küldés...' : 'Emlékeztető'}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

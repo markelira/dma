@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import {
-  Building2,
   Users,
   UserPlus,
   Mail,
@@ -16,17 +15,17 @@ import {
   Filter,
   Loader2,
   AlertCircle,
-  ArrowLeft,
-  Trash2,
-  UserMinus
+  UserMinus,
+  TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getFirestore, doc, getDoc, collection, getDocs, Timestamp, query, orderBy, limit, startAfter } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import Link from 'next/link';
 import { Company, CompanyEmployee, AddEmployeeInput } from '@/types/company';
 import { useRemoveEmployee } from '@/hooks/useCompanyActions';
+import { StatCard } from '@/components/dashboard/StatCard';
 
 export default function EmployeesPage() {
   const router = useRouter();
@@ -68,8 +67,6 @@ export default function EmployeesPage() {
 
       try {
         const db = getFirestore();
-
-        // Get companyId from user custom claims
         const companyId = user.companyId;
 
         if (!companyId) {
@@ -329,18 +326,21 @@ export default function EmployeesPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-blue-600"></div>
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <p className="text-gray-600">Betöltés...</p>
+        </div>
       </div>
     );
   }
 
   if (error && !company) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="flex items-center justify-center py-20">
         <div className="text-center max-w-md">
-          <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">{error}</h2>
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{error}</h2>
           <Link href="/company/dashboard" className="text-blue-600 hover:underline">
             Vissza a vezérlőpultra
           </Link>
@@ -356,275 +356,266 @@ export default function EmployeesPage() {
   };
 
   return (
-    <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-xl border-b border-white/20 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/company/dashboard" className="flex items-center text-gray-600 hover:text-blue-600 transition-colors">
-                <ArrowLeft className="w-5 h-5 mr-2" />
-                <span className="font-medium">Vissza</span>
-              </Link>
-              <div className="h-6 w-px bg-gray-300/50"></div>
-              <div className="flex items-center space-x-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <span className="font-semibold text-gray-900">{company?.name}</span>
-              </div>
-            </div>
-          </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Alkalmazottak</h1>
+          <p className="text-gray-500">Kezeld a vállalat alkalmazottait és küldj meghívókat</p>
         </div>
-      </nav>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
+        >
+          <UserPlus className="w-5 h-5 mr-2" />
+          Új alkalmazott
+        </button>
+      </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-semibold text-gray-900 flex items-center">
-                <Users className="w-8 h-8 mr-3 text-gray-600" />
-                Alkalmazottak
-              </h1>
-              <p className="mt-2 text-gray-600">
-                Kezeld a vállalat alkalmazottait és küldj meghívókat
-              </p>
-            </div>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="btn inline-flex items-center bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
-            >
-              <UserPlus className="w-5 h-5 mr-2" />
-              Új alkalmazott
-            </button>
-          </div>
-        </div>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <StatCard
+          icon={Users}
+          label="Összes alkalmazott"
+          value={stats.total}
+          isLoading={loading}
+        />
+        <StatCard
+          icon={TrendingUp}
+          label="Aktív"
+          value={stats.active}
+          isLoading={loading}
+        />
+        <StatCard
+          icon={Clock}
+          label="Meghívott"
+          value={stats.invited}
+          isLoading={loading}
+        />
+      </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <p className="text-sm text-gray-600 mb-1">Összes alkalmazott</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+      {/* Filters */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Keresés név, email vagy pozíció szerint..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
           </div>
-          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <p className="text-sm text-gray-600 mb-1">Aktív</p>
-            <p className="text-3xl font-bold text-green-600">{stats.active}</p>
-          </div>
-          <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-            <p className="text-sm text-gray-600 mb-1">Meghívott</p>
-            <p className="text-3xl font-bold text-amber-600">{stats.invited}</p>
-          </div>
-        </div>
 
-        {/* Filters */}
-        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Keresés név, email vagy pozíció szerint..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="form-input w-full pl-10 pr-3 py-2"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center space-x-2">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
-                className="form-input px-3 py-2"
+          {/* Status Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="w-5 h-5 text-gray-400" />
+            {[
+              { value: 'all', label: 'Mind' },
+              { value: 'active', label: 'Aktív' },
+              { value: 'invited', label: 'Meghívott' },
+              { value: 'left', label: 'Kilépett' },
+            ].map((option) => (
+              <button
+                key={option.value}
+                onClick={() => setStatusFilter(option.value as any)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  statusFilter === option.value
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+                }`}
               >
-                <option value="all">Minden státusz</option>
-                <option value="active">Aktív</option>
-                <option value="invited">Meghívott</option>
-                <option value="left">Kilépett</option>
-              </select>
-            </div>
+                {option.label}
+              </button>
+            ))}
           </div>
         </div>
+      </div>
 
-        {/* Employee Table */}
-        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200/50">
-              <thead className="bg-white/40">
+      {/* Employee Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Név
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Pozíció
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Státusz
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Képzések
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Műveletek
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-100">
+              {filteredEmployees.length === 0 ? (
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Név
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Pozíció
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Státusz
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Képzések
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Műveletek
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white/20 divide-y divide-gray-200/50">
-                {filteredEmployees.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={6} className="px-6 py-12 text-center">
+                    <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                      <Users className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-600 font-medium">
                       {searchTerm || statusFilter !== 'all'
                         ? 'Nincs találat a keresési feltételekkel'
-                        : 'Még nincs hozzáadott alkalmazott. Kezdd el az első meghívó küldésével!'}
+                        : 'Még nincs hozzáadott alkalmazott'}
+                    </p>
+                    {!searchTerm && statusFilter === 'all' && (
+                      <p className="text-sm text-gray-500 mt-1">Kezdd el az első meghívó küldésével!</p>
+                    )}
+                  </td>
+                </tr>
+              ) : (
+                filteredEmployees.map((employee) => (
+                  <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                          <span className="text-sm font-medium text-blue-600">
+                            {employee.firstName[0]}{employee.lastName[0]}
+                          </span>
+                        </div>
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">
+                            {employee.fullName}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{employee.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-600">{employee.jobTitle || '-'}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {getStatusBadge(employee.status)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {employee.enrolledMasterclasses?.length || 0}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex items-center justify-end space-x-2">
+                        {/* Copy invite link button - only for invited status */}
+                        {employee.status === 'invited' && employee.inviteToken && (
+                          <button
+                            onClick={() => copyInviteLink(employee)}
+                            className="inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                          >
+                            {copiedToken === employee.id ? (
+                              <>
+                                <CheckCircle2 className="w-4 h-4 mr-1" />
+                                Másolva!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-4 h-4 mr-1" />
+                                Meghívó link
+                              </>
+                            )}
+                          </button>
+                        )}
+
+                        {/* Remove button - for invited and active status */}
+                        {employee.status !== 'left' && (
+                          <button
+                            onClick={() => setShowRemoveConfirm(employee)}
+                            disabled={removingEmployeeId === employee.id}
+                            className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                            title={employee.status === 'invited' ? 'Meghívó visszavonása' : 'Eltávolítás'}
+                          >
+                            {removingEmployeeId === employee.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : employee.status === 'invited' ? (
+                              <>
+                                <X className="w-4 h-4 mr-1" />
+                                Visszavonás
+                              </>
+                            ) : (
+                              <>
+                                <UserMinus className="w-4 h-4 mr-1" />
+                                Eltávolítás
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
-                ) : (
-                  filteredEmployees.map((employee) => (
-                    <tr key={employee.id} className="hover:bg-white/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-600">
-                              {employee.firstName[0]}{employee.lastName[0]}
-                            </span>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {employee.fullName}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{employee.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-600">{employee.jobTitle || '-'}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(employee.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {employee.enrolledMasterclasses?.length || 0}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          {/* Copy invite link button - only for invited status */}
-                          {employee.status === 'invited' && employee.inviteToken && (
-                            <button
-                              onClick={() => copyInviteLink(employee)}
-                              className="inline-flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
-                            >
-                              {copiedToken === employee.id ? (
-                                <>
-                                  <CheckCircle2 className="w-4 h-4 mr-1" />
-                                  Másolva!
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="w-4 h-4 mr-1" />
-                                  Meghívó link
-                                </>
-                              )}
-                            </button>
-                          )}
-
-                          {/* Remove button - for invited and active status */}
-                          {employee.status !== 'left' && (
-                            <button
-                              onClick={() => setShowRemoveConfirm(employee)}
-                              disabled={removingEmployeeId === employee.id}
-                              className="inline-flex items-center px-3 py-1 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                              title={employee.status === 'invited' ? 'Meghívó visszavonása' : 'Eltávolítás'}
-                            >
-                              {removingEmployeeId === employee.id ? (
-                                <Loader2 className="w-4 h-4 animate-spin" />
-                              ) : employee.status === 'invited' ? (
-                                <>
-                                  <X className="w-4 h-4 mr-1" />
-                                  Visszavonás
-                                </>
-                              ) : (
-                                <>
-                                  <UserMinus className="w-4 h-4 mr-1" />
-                                  Eltávolítás
-                                </>
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Load More Button */}
-          {hasMore && filteredEmployees.length > 0 && (
-            <div className="px-6 py-4 border-t border-gray-200/50">
-              <button
-                onClick={loadMore}
-                disabled={loadingMore}
-                className="btn w-full bg-white/60 hover:bg-white/80 text-gray-900 border border-gray-200/50 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
-              >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Betöltés...
-                  </>
-                ) : (
-                  <>
-                    Több betöltése ({EMPLOYEES_PER_PAGE} alkalmazott)
-                  </>
-                )}
-              </button>
-            </div>
-          )}
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
+
+        {/* Load More Button */}
+        {hasMore && filteredEmployees.length > 0 && (
+          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center"
+            >
+              {loadingMore ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Betöltés...
+                </>
+              ) : (
+                <>Több betöltése ({EMPLOYEES_PER_PAGE} alkalmazott)</>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Add Employee Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+              className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden border border-gray-200"
             >
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-semibold text-gray-900">Új alkalmazott hozzáadása</h2>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold text-gray-900">Új alkalmazott hozzáadása</h2>
+                  <button
+                    onClick={() => setShowAddModal(false)}
+                    className="text-gray-400 hover:text-gray-600 rounded-lg p-1 hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
 
-              <form onSubmit={handleAddEmployee} className="space-y-4">
+              <form onSubmit={handleAddEmployee} className="p-6 space-y-4">
                 {/* First Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Keresztnév <span className="text-red-600">*</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Keresztnév <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={newEmployee.firstName}
                     onChange={(e) => setNewEmployee({ ...newEmployee, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="pl. János"
                     required
                     disabled={submitting}
@@ -633,14 +624,14 @@ export default function EmployeesPage() {
 
                 {/* Last Name */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Vezetéknév <span className="text-red-600">*</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Vezetéknév <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={newEmployee.lastName}
                     onChange={(e) => setNewEmployee({ ...newEmployee, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="pl. Kovács"
                     required
                     disabled={submitting}
@@ -649,14 +640,14 @@ export default function EmployeesPage() {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email cím <span className="text-red-600">*</span>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email cím <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
                     value={newEmployee.email}
                     onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="janos.kovacs@pelda.hu"
                     required
                     disabled={submitting}
@@ -665,14 +656,14 @@ export default function EmployeesPage() {
 
                 {/* Job Title */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Pozíció (opcionális)
                   </label>
                   <input
                     type="text"
                     value={newEmployee.jobTitle}
                     onChange={(e) => setNewEmployee({ ...newEmployee, jobTitle: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="pl. Marketing Manager"
                     disabled={submitting}
                   />
@@ -684,36 +675,35 @@ export default function EmployeesPage() {
                     {error}
                   </div>
                 )}
-
-                {/* Actions */}
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="btn flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
-                    disabled={submitting}
-                  >
-                    Mégse
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn flex-1 bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md disabled:opacity-50 inline-flex items-center justify-center"
-                    disabled={submitting}
-                  >
-                    {submitting ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Küldés...
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="w-5 h-5 mr-2" />
-                        Meghívó küldése
-                      </>
-                    )}
-                  </button>
-                </div>
               </form>
+
+              <div className="p-6 border-t border-gray-200 bg-gray-50 flex space-x-3">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  disabled={submitting}
+                >
+                  Mégse
+                </button>
+                <button
+                  onClick={handleAddEmployee}
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 inline-flex items-center justify-center"
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Küldés...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4 mr-2" />
+                      Meghívó küldése
+                    </>
+                  )}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -722,68 +712,70 @@ export default function EmployeesPage() {
       {/* Remove Employee Confirmation Modal */}
       <AnimatePresence>
         {showRemoveConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+              className="bg-white rounded-xl shadow-xl max-w-md w-full overflow-hidden border border-gray-200"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <AlertCircle className="w-6 h-6 text-red-600" />
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                    <AlertCircle className="w-6 h-6 text-red-600" />
+                  </div>
+                  <button
+                    onClick={() => setShowRemoveConfirm(null)}
+                    className="text-gray-400 hover:text-gray-600 rounded-lg p-1 hover:bg-gray-100 transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setShowRemoveConfirm(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
 
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {showRemoveConfirm.status === 'invited'
-                  ? 'Meghívó visszavonása'
-                  : 'Alkalmazott eltávolítása'}
-              </h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {showRemoveConfirm.status === 'invited'
+                    ? 'Meghívó visszavonása'
+                    : 'Alkalmazott eltávolítása'}
+                </h3>
 
-              <p className="text-gray-600 mb-6">
-                {showRemoveConfirm.status === 'invited' ? (
-                  <>
-                    Biztosan visszavonod <span className="font-medium">{showRemoveConfirm.fullName}</span> meghívóját?
-                    A meghívó link többé nem lesz érvényes.
-                  </>
-                ) : (
-                  <>
-                    Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> alkalmazottat a vállalatból?
-                    Az alkalmazott elveszíti hozzáférését a vállalati kurzusokhoz.
-                  </>
-                )}
-              </p>
-
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => setShowRemoveConfirm(null)}
-                  className="btn flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
-                >
-                  Mégse
-                </button>
-                <button
-                  onClick={() => handleRemoveEmployee(showRemoveConfirm)}
-                  className="btn flex-1 bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow-md inline-flex items-center justify-center"
-                >
+                <p className="text-gray-600 mb-6">
                   {showRemoveConfirm.status === 'invited' ? (
                     <>
-                      <X className="w-5 h-5 mr-2" />
-                      Visszavonás
+                      Biztosan visszavonod <span className="font-medium">{showRemoveConfirm.fullName}</span> meghívóját?
+                      A meghívó link többé nem lesz érvényes.
                     </>
                   ) : (
                     <>
-                      <UserMinus className="w-5 h-5 mr-2" />
-                      Eltávolítás
+                      Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> alkalmazottat a vállalatból?
+                      Az alkalmazott elveszíti hozzáférését a vállalati kurzusokhoz.
                     </>
                   )}
-                </button>
+                </p>
+
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowRemoveConfirm(null)}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Mégse
+                  </button>
+                  <button
+                    onClick={() => handleRemoveEmployee(showRemoveConfirm)}
+                    className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center justify-center"
+                  >
+                    {showRemoveConfirm.status === 'invited' ? (
+                      <>
+                        <X className="w-4 h-4 mr-2" />
+                        Visszavonás
+                      </>
+                    ) : (
+                      <>
+                        <UserMinus className="w-4 h-4 mr-2" />
+                        Eltávolítás
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </motion.div>
           </div>
