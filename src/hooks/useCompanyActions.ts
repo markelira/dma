@@ -25,7 +25,7 @@ interface CompanyDashboardData {
     name: string
     plan: string
     status: string
-    trialEndsAt?: string
+    subscriptionStatus?: string
   }
   stats: {
     totalEmployees: number

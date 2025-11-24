@@ -9,11 +9,12 @@ export interface Company {
   name: string;
   slug: string;
   billingEmail: string;
-  plan: 'trial' | 'basic' | 'premium' | 'enterprise';
+  plan: 'basic' | 'premium' | 'enterprise';
   status: 'active' | 'suspended' | 'cancelled';
   industry: string;
   companySize: string;
-  trialEndsAt?: Timestamp;
+  subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'none';
+  stripeSubscriptionId?: string;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }

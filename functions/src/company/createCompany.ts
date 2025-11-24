@@ -124,18 +124,14 @@ export const createCompany = https.onCall(
       const baseSlug = generateSlug(name);
       const slug = await ensureUniqueSlug(baseSlug);
 
-      // 3. Calculate trial end date (14 days)
-      const trialEndsAt = new Date();
-      trialEndsAt.setDate(trialEndsAt.getDate() + 14);
-
-      // 4. Create company document
+      // 3. Create company document (subscription required via Stripe checkout)
       const companyData: Omit<Company, 'id'> = {
         name: name.trim(),
         slug,
         billingEmail: billingEmail.toLowerCase(),
-        plan: 'trial',
+        plan: 'basic',
         status: 'active',
-        trialEndsAt: admin.firestore.Timestamp.fromDate(trialEndsAt),
+        subscriptionStatus: 'none', // Will be set to 'active' or 'trialing' after Stripe checkout
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         createdBy: userId,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -249,8 +245,8 @@ async function sendWelcomeEmail(
 
               <div style="background-color: #e8f5e9; border-left: 4px solid #4caf50; padding: 16px 20px; margin: 25px 0; border-radius: 4px;">
                 <p style="margin: 0; color: #1b5e20; font-size: 15px; line-height: 1.6;">
-                  <strong>✨ 14 napos próbaidőszak aktiválva!</strong><br>
-                  Minden funkcióhoz teljes hozzáférésed van - kezdj el alkalmazottakat hozzáadni és képzéseket rendelni még ma.
+                  <strong>✨ Céged sikeresen létrehozva!</strong><br>
+                  Kezdj el alkalmazottakat hozzáadni, majd aktiváld az előfizetést a teljes hozzáféréshez.
                 </p>
               </div>
 
@@ -314,8 +310,8 @@ async function sendWelcomeEmail(
 
 A ${data.companyName} sikeresen létrehozva az DMA platformon.
 
-✨ 14 napos próbaidőszak aktiválva!
-Minden funkcióhoz teljes hozzáférésed van.
+✨ Céged sikeresen létrehozva!
+Kezdj el alkalmazottakat hozzáadni, majd aktiváld az előfizetést a teljes hozzáféréshez.
 
 Most már tudsz:
 - Alkalmazottakat hozzáadni a csapatodhoz
@@ -325,7 +321,7 @@ Most már tudsz:
 
 Irány a Dashboard: ${data.dashboardUrl}
 
-💡 Tipp: Kezdd azzal, hogy meghívod az első alkalmazottaidat, majd rendeld meg számukra a megfelelő képzéseket.
+💡 Tipp: Kezdd azzal, hogy meghívod az első alkalmazottaidat, majd aktiváld az előfizetést.
 
 Készen állsz forradalmasítani a csapatod tudását? Kezdjük! 🚀
 

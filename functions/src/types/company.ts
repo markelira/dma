@@ -19,13 +19,17 @@ export interface Company {
   industry?: string;
   companySize?: string;
 
-  // MVP: Only trial plan
-  plan: 'trial';
+  // Subscription managed by Stripe (7-day trial handled by Stripe)
+  plan: 'basic' | 'premium' | 'enterprise';
   status: 'active' | 'suspended';
-  trialEndsAt: Timestamp;
+  subscriptionStatus: 'none' | 'active' | 'trialing' | 'past_due' | 'canceled';
 
-  // Stripe fields (for post-MVP)
+  // Stripe fields
   stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  subscriptionStartDate?: Timestamp;
+  subscriptionEndDate?: Timestamp;
+  trialEndDate?: Timestamp; // From Stripe, not our app
 
   createdAt: Timestamp | FieldValue;
   createdBy?: string;

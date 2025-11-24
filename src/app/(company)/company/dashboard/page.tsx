@@ -236,14 +236,6 @@ export default function CompanyDashboardPage() {
     }
   }, [user, authLoading, authReady, router]);
 
-  const getDaysRemaining = () => {
-    if (!company || !company.trialEndsAt) return 0;
-    const now = new Date();
-    const trialEnd = company.trialEndsAt.toDate();
-    const diff = trialEnd.getTime() - now.getTime();
-    return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
-  };
-
   const handleLogout = async () => {
     try {
       await logout();
@@ -329,8 +321,6 @@ export default function CompanyDashboardPage() {
       </div>
     );
   }
-
-  const daysRemaining = getDaysRemaining();
 
   return (
     <div className="min-h-screen">

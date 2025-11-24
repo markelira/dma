@@ -93,18 +93,16 @@ export const completeCompanyOnboarding = https.onCall(
         finalSlug = `${slug}-${Date.now()}`;
       }
 
-      // Step 1: Create company document
+      // Step 1: Create company document (subscription required via Stripe checkout)
       const companyData: Omit<Company, 'id'> = {
         name: companyName.trim(),
         slug: finalSlug,
         billingEmail: billingEmail.trim().toLowerCase(),
-        plan: 'trial',
+        plan: 'basic',
         status: 'active',
+        subscriptionStatus: 'none', // Will be set to 'active' or 'trialing' after Stripe checkout
         industry,
         companySize,
-        trialEndsAt: Timestamp.fromDate(
-          new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) // 14 days trial
-        ),
         createdAt: FieldValue.serverTimestamp() as admin.firestore.Timestamp,
         updatedAt: FieldValue.serverTimestamp() as admin.firestore.Timestamp,
       };

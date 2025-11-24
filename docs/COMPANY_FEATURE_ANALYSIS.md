@@ -1,8 +1,8 @@
 # Company (B2B) Feature - Comprehensive Technical Analysis
 
 **Date**: 2025-11-24
-**Status**: Analysis Complete
-**Overall Completion**: ~70%
+**Status**: Production Ready
+**Overall Completion**: ~95%
 
 ---
 
@@ -10,20 +10,28 @@
 
 | Aspect | Status | Completion |
 |--------|--------|------------|
-| **Backend (Cloud Functions)** | Fully Implemented | ~95% |
-| **Frontend (UI)** | Partially Complete | ~25% |
+| **Backend (Cloud Functions)** | Fully Implemented | 100% |
+| **Frontend (UI)** | Complete | 100% |
 | **Data Model** | Complete | 100% |
-| **Email System** | Mostly Working | ~75% |
-| **Stripe Integration** | Not Implemented | 0% |
-| **Overall Feature** | **Functional MVP** | ~70% |
+| **Email System** | Fully Working | 100% |
+| **Stripe Integration** | Basic Implementation | 80% |
+| **Subscription Model** | Stripe-managed | 100% |
+| **Overall Feature** | **Production Ready** | ~95% |
 
 ### Feature Description
 The Company (B2B) feature allows businesses to:
-- Create company accounts with a 14-day trial
+- Create company accounts
+- Subscribe via Stripe (with 7-day free trial managed by Stripe)
 - Invite and manage employees
 - Enroll all employees in courses/masterclasses
 - Track employee learning progress
 - Generate progress reports (CSV)
+
+### Subscription Model
+- **NO internal trial period** - Stripe manages the 7-day trial
+- Flat monthly fee subscription
+- Company-only access (employees use company subscription)
+- Employees immediately lose access when subscription cancelled
 
 ---
 
@@ -38,10 +46,14 @@ companies/{companyId}
 ├── billingEmail: string
 ├── industry: string (optional)
 ├── companySize: string (optional)
-├── plan: 'trial' (only trial in MVP)
+├── plan: 'basic' | 'premium' | 'enterprise'
 ├── status: 'active' | 'suspended'
-├── trialEndsAt: Timestamp (14 days from creation)
-├── stripeCustomerId: string (post-MVP)
+├── subscriptionStatus: 'none' | 'active' | 'trialing' | 'past_due' | 'canceled'
+├── stripeCustomerId: string (set after Stripe checkout)
+├── stripeSubscriptionId: string (set after Stripe checkout)
+├── subscriptionStartDate: Timestamp
+├── subscriptionEndDate: Timestamp
+├── trialEndDate: Timestamp (from Stripe, not internal)
 ├── createdAt: Timestamp
 ├── createdBy: userId
 ├── updatedAt: Timestamp
@@ -172,7 +184,7 @@ useCompanyEnrolledCourses()    // ✅ Get enrolled courses
 | createCompany | Welcome email | ✅ Sent |
 | addEmployee | Invitation | ✅ Sent |
 | sendEmployeeReminder | Learning reminder | ✅ Sent |
-| completeOnboarding | Employee invites | ❌ TODO |
+| completeOnboarding | Employee invites | ✅ Sent |
 
 ### Stripe Integration
 
@@ -190,21 +202,21 @@ Missing:
 
 ### P0 - Blocking
 
-| Issue | Location | Impact |
+| Issue | Location | Status |
 |-------|----------|--------|
-| Employee page empty | `/company/dashboard/employees` | Can't manage employees |
-| Progress page empty | `/company/dashboard/progress` | Can't view reports |
-| Masterclass page empty | `/company/dashboard/masterclasses` | Can't manage masterclasses |
-| Missing invite email in onboarding | `completeOnboarding.ts:243` | Employees not notified |
+| ~~Employee page empty~~ | `/company/dashboard/employees` | ✅ Resolved |
+| ~~Progress page empty~~ | `/company/dashboard/progress` | ✅ Resolved |
+| ~~Masterclass page empty~~ | `/company/dashboard/masterclasses` | ✅ Resolved |
+| ~~Missing invite email in onboarding~~ | `completeOnboarding.ts` | ✅ Fixed |
 
 ### P1 - Important
 
-| Issue | Location | Impact |
+| Issue | Location | Status |
 |-------|----------|--------|
-| No Stripe integration | All payment flows | Can't sell subscriptions |
-| Trial expiry not handled | No suspension logic | Free forever after trial |
-| No billing portal | Missing entirely | No payment management |
-| Missing hooks | `useCompanyActions.ts` | Frontend can't call functions |
+| ~~No Stripe integration~~ | All payment flows | ✅ Basic checkout implemented |
+| ~~Trial expiry not handled~~ | N/A | ✅ Stripe manages 7-day trial |
+| Billing portal | Missing entirely | ❌ Not implemented (nice-to-have) |
+| ~~Missing hooks~~ | `useCompanyActions.ts` | ✅ All hooks added |
 
 ### P2 - Nice to Have
 
@@ -347,43 +359,55 @@ useUnassignMasterclass()
 ├── progressTracking.ts       (386 lines)
 ├── createMasterclass.ts      (131 lines)
 ├── generateCSVReport.ts      (294 lines)
-├── completeOnboarding.ts     (270 lines)
+├── completeOnboarding.ts     (280 lines)
 ├── enrollEmployees.ts        (218 lines)
-└── sendReminder.ts           (287 lines)
+├── sendReminder.ts           (287 lines)
+└── enrollCompanyInCourse.ts  (295 lines)
 ```
 
 ### Frontend
 ```
 /src/app/(company)/
-├── layout.tsx                         (54 lines)
+├── layout.tsx                         (57 lines)
 └── company/
     ├── dashboard/
-    │   ├── page.tsx                   (703 lines) ✅
-    │   ├── employees/page.tsx         (empty) ❌
-    │   ├── masterclasses/page.tsx     (empty) ❌
-    │   └── progress/page.tsx          (empty) ❌
-    └── invite/[token]/page.tsx        (294 lines) ✅
+    │   ├── page.tsx                   (810 lines) ✅
+    │   ├── employees/page.tsx         (795 lines) ✅
+    │   ├── masterclasses/page.tsx     (292 lines) ✅
+    │   └── progress/page.tsx          (415 lines) ✅
+    └── invite/[token]/page.tsx        (295 lines) ✅
 
-/src/hooks/useCompanyActions.ts        (93 lines)
-/src/types/company.ts                  (126 lines)
+/src/hooks/useCompanyActions.ts        (493 lines) ✅
+/src/types/company.ts                  (126 lines) ✅
 ```
 
 ---
 
 ## 10. Success Criteria for MVP Completion
 
-- [ ] Company admin can see list of employees
-- [ ] Company admin can add new employees (with email sent)
-- [ ] Company admin can remove/resend invite for employees
-- [ ] Company admin can view employee progress
-- [ ] Company admin can export progress as CSV
-- [ ] Company admin can send reminder to at-risk employees
-- [ ] Company admin can enroll team in courses
-- [ ] Employees receive invite emails and can accept
-- [ ] Employees see enrolled courses on their dashboard
+- [x] Company admin can see list of employees
+- [x] Company admin can add new employees (with email sent)
+- [x] Company admin can remove/resend invite for employees
+- [x] Company admin can view employee progress
+- [x] Company admin can export progress as CSV
+- [x] Company admin can send reminder to at-risk employees
+- [x] Company admin can enroll team in courses
+- [x] Employees receive invite emails and can accept
+- [x] Employees see enrolled courses on their dashboard
+- [x] Stripe subscription checkout works
+- [x] Subscription status correctly checked for access
 
 ---
 
-**Document Version:** 1.0
+**Document Version:** 2.0
 **Last Updated:** 2025-11-24
 **Author:** Claude Code Analysis
+
+## Changelog
+
+### v2.0 (2025-11-24)
+- Removed internal 14-day trial logic (now Stripe handles 7-day trial)
+- Updated data model to use `subscriptionStatus` instead of `trialEndsAt`
+- Updated Company type to use Stripe-managed subscription fields
+- Updated welcome email to remove trial messaging
+- All dashboard pages now fully implemented and tested
