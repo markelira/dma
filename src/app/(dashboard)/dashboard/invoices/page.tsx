@@ -56,19 +56,19 @@ export default function InvoicesPage() {
       <div className="space-y-6">
         {/* Header Skeleton */}
         <div>
-          <div className="h-8 w-48 bg-gray-800 rounded animate-pulse mb-2" />
-          <div className="h-5 w-64 bg-gray-800 rounded animate-pulse" />
+          <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="h-5 w-64 bg-gray-200 rounded animate-pulse" />
         </div>
 
         {/* Stats Skeleton */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-gray-800 rounded-lg animate-pulse" />
+            <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse" />
           ))}
         </div>
 
         {/* Table Skeleton */}
-        <div className="h-96 bg-gray-800 rounded-lg animate-pulse" />
+        <div className="h-96 bg-gray-100 rounded-lg animate-pulse" />
       </div>
     )
   }
@@ -77,8 +77,8 @@ export default function InvoicesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Számlák és fizetések</h1>
-        <p className="text-gray-400">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Számlák és fizetések</h1>
+        <p className="text-gray-500">
           Itt láthatod az összes korábbi fizetésed és számládat
         </p>
       </div>
@@ -110,15 +110,15 @@ export default function InvoicesPage() {
 
       {/* Empty State */}
       {invoices.length === 0 ? (
-        <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 p-12 text-center">
+        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
           <div className="flex flex-col items-center justify-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-900/30">
-              <FileText className="h-8 w-8 text-blue-400" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
+              <FileText className="h-8 w-8 text-blue-600" />
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
               Még nincsenek fizetéseid
             </h2>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-500 mb-6">
               Amikor vásárolsz egy kurzust, itt fogod látni a fizetési előzményeidet
             </p>
             <Link
@@ -132,47 +132,47 @@ export default function InvoicesPage() {
       ) : (
         <>
           {/* Payments Table */}
-          <div className="bg-[#1a1a1a] rounded-xl border border-gray-800 overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-900 border-b border-gray-800">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Dátum
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Kurzus
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Összeg
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Státusz
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Fizetési mód
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Műveletek
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-800">
+                <tbody className="divide-y divide-gray-100">
                   {invoices.map((invoice) => (
                     <tr
                       key={invoice.id}
-                      className="hover:bg-gray-800/50 transition-colors"
+                      className="hover:bg-gray-50 transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-gray-500 mr-2" />
-                          <span className="text-sm text-white">
+                          <Calendar className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm text-gray-900">
                             {format(new Date(invoice.createdAt), 'yyyy. MMMM dd.', { locale: hu })}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-white font-medium">
+                        <div className="text-sm text-gray-900 font-medium">
                           {invoice.courseName || 'Kurzus'}
                         </div>
                         {invoice.number && (
@@ -182,22 +182,22 @@ export default function InvoicesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-semibold text-gray-900">
                           {formatAmount(invoice.amount, invoice.currency)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           {getStatusIcon(invoice.status)}
-                          <span className="ml-2 text-sm text-gray-300">
+                          <span className="ml-2 text-sm text-gray-700">
                             {getStatusText(invoice.status)}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <CreditCard className="h-4 w-4 text-gray-500 mr-2" />
-                          <span className="text-sm text-gray-400">
+                          <CreditCard className="h-4 w-4 text-gray-400 mr-2" />
+                          <span className="text-sm text-gray-500">
                             {invoice.paymentMethod || 'Bankkártya'}
                           </span>
                         </div>
@@ -206,13 +206,13 @@ export default function InvoicesPage() {
                         {invoice.invoicePdfUrl ? (
                           <button
                             onClick={() => window.open(invoice.invoicePdfUrl, '_blank')}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-700 text-sm rounded-lg text-gray-300 bg-gray-800 hover:bg-blue-900/30 hover:text-blue-400 hover:border-blue-700 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm rounded-lg text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-colors"
                           >
                             <Download className="h-4 w-4 mr-1" />
                             Számla
                           </button>
                         ) : (
-                          <span className="text-xs text-gray-500">Nem elérhető</span>
+                          <span className="text-xs text-gray-400">Nem elérhető</span>
                         )}
                       </td>
                     </tr>
@@ -223,16 +223,16 @@ export default function InvoicesPage() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <FileText className="h-5 w-5 text-blue-400" />
+                <FileText className="h-5 w-5 text-blue-600" />
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-white mb-1">
+                <h3 className="text-sm font-medium text-gray-900 mb-1">
                   Számla letöltése
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-600">
                   A sikeres fizetésekről automatikusan számlát állítunk ki. A számlákat PDF formátumban töltheted le a "Számla" gombra kattintva.
                 </p>
               </div>

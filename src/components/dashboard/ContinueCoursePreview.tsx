@@ -90,10 +90,10 @@ export function ContinueCoursePreview() {
 
   if (isLoading) {
     return (
-      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
-        <div className="h-6 w-48 bg-gray-700 rounded animate-pulse mb-4" />
-        <div className="h-52 bg-gray-800 rounded-xl animate-pulse mb-4" />
-        <div className="h-24 bg-gray-800 rounded animate-pulse" />
+      <div className="rounded-xl bg-white p-6 border border-gray-200 shadow-sm">
+        <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-4" />
+        <div className="h-52 bg-gray-100 rounded-xl animate-pulse mb-4" />
+        <div className="h-24 bg-gray-100 rounded animate-pulse" />
       </div>
     )
   }
@@ -107,18 +107,18 @@ export function ContinueCoursePreview() {
   // If no in-progress courses, show empty state
   if (!currentCourse) {
     return (
-      <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
-        <h2 className="mb-4 text-lg font-bold text-white">
+      <div className="rounded-xl bg-white p-6 border border-gray-200 shadow-sm">
+        <h2 className="mb-4 text-lg font-bold text-gray-900">
           Tanulás folytatása
         </h2>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600/20">
-            <BookOpen className="h-8 w-8 text-blue-400" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
+            <BookOpen className="h-8 w-8 text-blue-600" />
           </div>
-          <p className="mb-2 text-sm font-semibold text-white">
+          <p className="mb-2 text-sm font-semibold text-gray-900">
             Nincs folyamatban lévő kurzusod
           </p>
-          <p className="mb-6 text-sm text-gray-400">
+          <p className="mb-6 text-sm text-gray-500">
             Kezdj el egy új kurzust vagy folytasd, ahol abbahagytad
           </p>
           <Link
@@ -134,16 +134,16 @@ export function ContinueCoursePreview() {
   }
 
   return (
-    <div className="rounded-xl bg-[#1a1a1a] border border-gray-800 overflow-hidden hover:border-gray-700 transition-all duration-300">
+    <div className="rounded-xl bg-white border border-gray-200 overflow-hidden hover:border-gray-300 transition-all duration-300 shadow-sm hover:shadow-md">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-gray-800">
+      <div className="px-6 py-5 border-b border-gray-100">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">
+          <h2 className="text-lg font-bold text-gray-900">
             Tanulás folytatása
           </h2>
           <Link
             href="/dashboard/courses"
-            className="text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors"
+            className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
           >
             Összes →
           </Link>
@@ -155,7 +155,7 @@ export function ContinueCoursePreview() {
         <div className="flex flex-col gap-6">
           {/* Course Image/Thumbnail */}
           <Link href={playerUrl} className="block">
-            <div className="relative w-full aspect-video overflow-hidden rounded-xl bg-gray-800 cursor-pointer">
+            <div className="relative w-full aspect-video overflow-hidden rounded-xl bg-gray-100 cursor-pointer">
             {currentCourse.thumbnailUrl ? (
               <Image
                 src={currentCourse.thumbnailUrl}
@@ -184,7 +184,7 @@ export function ContinueCoursePreview() {
 
             {/* Netflix-style progress bar */}
             <div className="absolute bottom-0 left-0 right-0">
-              <div className="w-full bg-gray-800/80 h-1">
+              <div className="w-full bg-gray-200/80 h-1">
                 <div
                   className="bg-blue-500 h-1 transition-all duration-300"
                   style={{ width: `${currentCourse.progress}%` }}
@@ -198,10 +198,10 @@ export function ContinueCoursePreview() {
           <div className="space-y-5">
             <div className="space-y-4">
               <div>
-                <h3 className="text-xl font-bold text-white mb-2 leading-tight">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight">
                   {currentCourse.courseName}
                 </h3>
-                <p className="text-sm font-medium text-gray-400">
+                <p className="text-sm font-medium text-gray-500">
                   {currentCourse.courseInstructor}
                 </p>
               </div>
@@ -209,12 +209,12 @@ export function ContinueCoursePreview() {
               {/* Progress */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-400">Haladás</span>
-                  <span className="font-bold text-white">
+                  <span className="font-medium text-gray-500">Haladás</span>
+                  <span className="font-bold text-gray-900">
                     {currentCourse.progress}% befejezve
                   </span>
                 </div>
-                <div className="w-full bg-gray-800 rounded-full h-2">
+                <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${currentCourse.progress}%` }}
@@ -223,7 +223,7 @@ export function ContinueCoursePreview() {
               </div>
 
               {/* Stats Row */}
-              <div className="flex items-center gap-4 text-sm font-medium text-gray-500">
+              <div className="flex items-center gap-4 text-sm font-medium text-gray-400">
                 {currentCourse.lastAccessedAt && (
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />

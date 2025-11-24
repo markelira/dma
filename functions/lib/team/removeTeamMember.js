@@ -43,6 +43,7 @@ exports.resendTeamInvite = exports.removeTeamMember = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
+const nodemailer = __importStar(require("nodemailer"));
 const team_1 = require("../types/team");
 const firestore = admin.firestore();
 /**
@@ -180,8 +181,22 @@ exports.resendTeamInvite = (0, https_1.onCall)({
         await memberDoc.ref.update({
             inviteExpiresAt: admin.firestore.Timestamp.fromDate(newExpiryDate),
         });
-        // 7. TODO: Resend invitation email
-        // Implementation depends on email service setup
+        // 7. Get inviter details for email
+        const inviterDoc = await firestore.collection('users').doc(userId).get();
+        const inviterData = inviterDoc.data();
+        const inviterName = inviterData
+            ? `${inviterData.firstName || ''} ${inviterData.lastName || ''}`.trim()
+            : 'A csapat tulajdonosa';
+        // 8. Resend invitation email
+        const appUrl = process.env.APP_URL || 'https://academion.hu';
+        const inviteLink = `${appUrl}/invite/${member.inviteToken}`;
+        await sendInvitationEmail({
+            to: member.email,
+            teamName: team.name,
+            inviterName,
+            inviteLink,
+            expiryDays: 7,
+        });
         v2_1.logger.info('[resendTeamInvite] Invite resent successfully', {
             teamId,
             memberId,
@@ -203,4 +218,129 @@ exports.resendTeamInvite = (0, https_1.onCall)({
         };
     }
 });
+/**
+ * Send team invitation email
+ */
+async function sendInvitationEmail(data) {
+    try {
+        const transporter = await createEmailTransporter();
+        const htmlContent = `
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Csapat meghívó - DMA</title>
+</head>
+<body style="font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="background-color: #2C3E54; padding: 40px 30px; text-align: center;">
+              <h1 style="color: #ffffff; font-size: 28px; margin: 0; font-weight: 700;">
+                Meghívó emlékeztető
+              </h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px 30px;">
+              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                Szia!
+              </p>
+              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
+                <strong>${data.inviterName}</strong> újra meghívott a(z) <strong>"${data.teamName}"</strong> csapatához.
+              </p>
+              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 30px;">
+                Csapattagként <strong>korlátlan hozzáférést</strong> kapsz az összes kurzushoz.
+              </p>
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding: 20px 0;">
+                    <a href="${data.inviteLink}" style="background-color: #2C3E54; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; display: inline-block;">
+                      Meghívás elfogadása
+                    </a>
+                  </td>
+                </tr>
+              </table>
+              <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 30px 0 0; text-align: center;">
+                Ez a meghívó <strong>${data.expiryDays} napig</strong> érvényes.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #f8f9fa; padding: 30px; text-align: center;">
+              <p style="color: #666666; font-size: 14px; margin: 0 0 10px;">
+                Üdvözlettel,<br>
+                <strong>DMA csapata</strong>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+        const textContent = `
+Szia!
+
+${data.inviterName} újra meghívott a(z) "${data.teamName}" csapatához.
+
+Csapattagként korlátlan hozzáférést kapsz az összes kurzushoz.
+
+Kattints az alábbi linkre a meghívás elfogadásához:
+${data.inviteLink}
+
+Ez a meghívó ${data.expiryDays} napig érvényes.
+
+Üdvözlettel,
+DMA csapata
+    `;
+        await transporter.sendMail({
+            from: process.env.FROM_EMAIL || 'noreply@academion.hu',
+            to: data.to,
+            subject: `Emlékeztető: Csatlakozz a(z) "${data.teamName}" csapatához`,
+            text: textContent,
+            html: htmlContent,
+        });
+        v2_1.logger.info('[sendInvitationEmail] Resend email sent successfully', { to: data.to });
+    }
+    catch (error) {
+        v2_1.logger.error('[sendInvitationEmail] Error sending email:', error);
+        throw new Error(`Failed to send invitation email: ${error.message}`);
+    }
+}
+/**
+ * Create email transporter
+ */
+async function createEmailTransporter() {
+    const brevoUser = process.env.BREVO_SMTP_USER;
+    const brevoKey = process.env.BREVO_SMTP_KEY;
+    if (brevoUser && brevoKey) {
+        return nodemailer.createTransport({
+            host: 'smtp-relay.brevo.com',
+            port: 587,
+            secure: false,
+            auth: {
+                user: brevoUser,
+                pass: brevoKey,
+            },
+        });
+    }
+    const gmailUser = process.env.GMAIL_USER;
+    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
+    if (gmailUser && gmailAppPassword) {
+        return nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: gmailUser,
+                pass: gmailAppPassword,
+            },
+        });
+    }
+    throw new Error('No email service configured');
+}
 //# sourceMappingURL=removeTeamMember.js.map

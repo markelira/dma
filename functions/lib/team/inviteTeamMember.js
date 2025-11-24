@@ -85,7 +85,18 @@ exports.inviteTeamMember = (0, https_1.onCall)({
         if (!(0, team_1.hasActiveSubscription)(team.subscriptionStatus)) {
             throw new https_1.HttpsError('failed-precondition', 'Az előfizetés nem aktív. Kérjük, frissítse az előfizetését.');
         }
-        // 4. Check if email already invited or is a member
+        // 4. Check member limit (max 10 members)
+        const MAX_TEAM_MEMBERS = 10;
+        const activeMembersSnapshot = await firestore
+            .collection('teams')
+            .doc(teamId)
+            .collection('members')
+            .where('status', 'in', ['invited', 'active'])
+            .get();
+        if (activeMembersSnapshot.size >= MAX_TEAM_MEMBERS) {
+            throw new https_1.HttpsError('resource-exhausted', `Elérted a maximális taglétszámot (${MAX_TEAM_MEMBERS} fő). Távolíts el meglévő tagokat új meghívásokhoz.`);
+        }
+        // 5. Check if email already invited or is a member
         const existingMemberSnapshot = await firestore
             .collection('teams')
             .doc(teamId)
@@ -93,6 +104,7 @@ exports.inviteTeamMember = (0, https_1.onCall)({
             .where('email', '==', email.toLowerCase())
             .limit(1)
             .get();
+        let existingMemberRef = null;
         if (!existingMemberSnapshot.empty) {
             const existingMember = existingMemberSnapshot.docs[0].data();
             if (existingMember.status === 'active') {
@@ -101,41 +113,93 @@ exports.inviteTeamMember = (0, https_1.onCall)({
             else if (existingMember.status === 'invited') {
                 throw new https_1.HttpsError('already-exists', 'Már kiküldtünk meghívót erre az email címre');
             }
+            else if (existingMember.status === 'removed') {
+                // Re-invite removed member - we'll update the existing document
+                existingMemberRef = existingMemberSnapshot.docs[0].ref;
+                v2_1.logger.info('[inviteTeamMember] Re-inviting previously removed member', { email });
+            }
         }
-        // 5. Get inviter details for email
+        // 5b. Check if this email belongs to an existing user (for logging purposes)
+        const existingUserSnapshot = await firestore
+            .collection('users')
+            .where('email', '==', email.toLowerCase())
+            .limit(1)
+            .get();
+        if (!existingUserSnapshot.empty) {
+            const existingUserData = existingUserSnapshot.docs[0].data();
+            // Check if user is already in another team
+            if (existingUserData.teamId && existingUserData.teamId !== teamId) {
+                v2_1.logger.info('[inviteTeamMember] User is in another team, but invite will still be sent', {
+                    email,
+                    existingTeamId: existingUserData.teamId,
+                });
+                // Note: We still send the invite - user will see error when trying to accept
+            }
+        }
+        // 6. Get inviter details for email
         const inviterDoc = await firestore.collection('users').doc(userId).get();
         const inviterData = inviterDoc.data();
         const inviterName = inviterData
             ? `${inviterData.firstName || ''} ${inviterData.lastName || ''}`.trim()
             : 'A csapat tulajdonosa';
-        // 6. Create invitation
+        // 7. Create or update invitation
         const inviteToken = (0, team_1.generateInviteToken)();
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 7); // 7 days
-        const memberRef = firestore
-            .collection('teams')
-            .doc(teamId)
-            .collection('members')
-            .doc();
-        const memberData = {
-            id: memberRef.id,
-            teamId,
-            email: email.toLowerCase(),
-            status: 'invited',
-            inviteToken,
-            inviteExpiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
-            invitedAt: admin.firestore.FieldValue.serverTimestamp(),
-            invitedBy: userId,
-            hasSubscriptionAccess: false,
-        };
-        await memberRef.set(memberData);
-        // 7. Update team member count
-        await firestore.collection('teams').doc(teamId).update({
-            memberCount: admin.firestore.FieldValue.increment(1),
-            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        // 8. Send invitation email
-        const inviteLink = `https://dma.hu/invite/${inviteToken}`;
+        let memberRef;
+        let isReInvite = false;
+        if (existingMemberRef) {
+            // Re-invite: update existing member document
+            memberRef = existingMemberRef;
+            isReInvite = true;
+            await memberRef.update({
+                status: 'invited',
+                inviteToken,
+                inviteExpiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+                invitedAt: admin.firestore.FieldValue.serverTimestamp(),
+                invitedBy: userId,
+                hasSubscriptionAccess: false,
+                // Clear any previous removal data
+                removedAt: admin.firestore.FieldValue.delete(),
+                userId: admin.firestore.FieldValue.delete(),
+                joinedAt: admin.firestore.FieldValue.delete(),
+            });
+        }
+        else {
+            // New invite: create new member document
+            memberRef = firestore
+                .collection('teams')
+                .doc(teamId)
+                .collection('members')
+                .doc();
+            const memberData = {
+                id: memberRef.id,
+                teamId,
+                email: email.toLowerCase(),
+                status: 'invited',
+                inviteToken,
+                inviteExpiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+                invitedAt: admin.firestore.FieldValue.serverTimestamp(),
+                invitedBy: userId,
+                hasSubscriptionAccess: false,
+            };
+            await memberRef.set(memberData);
+        }
+        // 8. Update team member count (only for new invites, not re-invites)
+        if (!isReInvite) {
+            await firestore.collection('teams').doc(teamId).update({
+                memberCount: admin.firestore.FieldValue.increment(1),
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+        }
+        else {
+            await firestore.collection('teams').doc(teamId).update({
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            });
+        }
+        // 9. Send invitation email
+        const appUrl = process.env.APP_URL || 'https://academion.hu';
+        const inviteLink = `${appUrl}/invite/${inviteToken}`;
         await sendInvitationEmail({
             to: email,
             teamName: team.name,
@@ -147,11 +211,14 @@ exports.inviteTeamMember = (0, https_1.onCall)({
             teamId,
             memberId: memberRef.id,
             email,
+            isReInvite,
         });
         return {
             success: true,
             memberId: memberRef.id,
-            message: `Meghívó elküldve: ${email}`,
+            message: isReInvite
+                ? `Újra meghívó elküldve: ${email}`
+                : `Meghívó elküldve: ${email}`,
         };
     }
     catch (error) {

@@ -177,29 +177,8 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
   const userRole = user?.role ?? 'STUDENT'
   const baseSections = navigationSections[userRole] || navigationSections.STUDENT
 
-  // Dynamically add Team section if user is a team owner
-  const sections = React.useMemo(() => {
-    // Check if user is a team owner (has teamId and isTeamOwner from AuthContext)
-    const isTeamOwner = (user as any)?.isTeamOwner === true && (user as any)?.teamId
-
-    if (!isTeamOwner) {
-      return baseSections
-    }
-
-    // Insert Team section after the first section (Fő navigáció)
-    const teamSection = {
-      title: 'Csapat',
-      items: [
-        { title: 'Tim kezelése', href: '/dashboard/team', icon: Users },
-      ]
-    }
-
-    // Clone sections and insert team section
-    const sectionsWithTeam = [...baseSections]
-    sectionsWithTeam.splice(1, 0, teamSection)
-
-    return sectionsWithTeam
-  }, [baseSections, user])
+  // Use base sections (Team feature removed - using Company model instead)
+  const sections = baseSections
 
   return (
     <div className="h-full flex flex-col bg-white">

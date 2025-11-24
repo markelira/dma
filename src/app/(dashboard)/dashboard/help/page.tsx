@@ -66,12 +66,12 @@ export default function HelpPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <HelpCircle className="w-6 h-6 text-blue-400" />
-          <h1 className="text-3xl font-bold text-white">
+          <HelpCircle className="w-6 h-6 text-blue-600" />
+          <h1 className="text-3xl font-bold text-gray-900">
             Segítség
           </h1>
         </div>
-        <p className="text-gray-400">
+        <p className="text-gray-500">
           Gyakran ismételt kérdések és támogatás
         </p>
       </div>
@@ -81,29 +81,29 @@ export default function HelpPage() {
 
         {/* Contact Support Cards */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
-          <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6">
-            <Mail className="w-8 h-8 text-blue-400 mb-3" />
-            <h3 className="text-lg font-semibold text-white mb-2">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <Mail className="w-8 h-8 text-blue-600 mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               E-mail támogatás
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               Írjon nekünk, és 24 órán belül válaszolunk
             </p>
             <Button
               variant="outline"
-              className="w-full border-gray-700 text-gray-300 hover:bg-gray-800 hover:text-white"
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
               onClick={() => window.location.href = 'mailto:support@dma.hu'}
             >
               support@dma.hu
             </Button>
           </div>
 
-          <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6">
-            <MessageCircle className="w-8 h-8 text-blue-400 mb-3" />
-            <h3 className="text-lg font-semibold text-white mb-2">
+          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+            <MessageCircle className="w-8 h-8 text-blue-600 mb-3" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Élő chat
             </h3>
-            <p className="text-sm text-gray-400 mb-4">
+            <p className="text-sm text-gray-500 mb-4">
               Beszéljen egy támogatási munkatárssal
             </p>
             <Button className="w-full bg-blue-600 hover:bg-blue-700">
@@ -113,8 +113,8 @@ export default function HelpPage() {
         </div>
 
         {/* FAQ Section */}
-        <div className="bg-[#1a1a1a] border border-gray-800 rounded-xl p-6">
-          <h2 className="text-2xl font-bold text-white mb-6">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             Gyakran ismételt kérdések
           </h2>
 
@@ -122,24 +122,24 @@ export default function HelpPage() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="border border-gray-700 rounded-lg overflow-hidden"
+                className="border border-gray-200 rounded-lg overflow-hidden"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-800/50 transition-colors"
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-medium text-white pr-4">
+                  <span className="font-medium text-gray-900 pr-4">
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform ${
+                    className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform ${
                       openIndex === index ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
                 {openIndex === index && (
                   <div className="px-4 pb-4 pt-0">
-                    <p className="text-gray-400 leading-relaxed">
+                    <p className="text-gray-600 leading-relaxed">
                       {faq.answer}
                     </p>
                   </div>
@@ -150,15 +150,15 @@ export default function HelpPage() {
         </div>
 
         {/* Additional Resources */}
-        <div className="bg-blue-900/20 border border-blue-800/50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-white mb-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-3">
             Nem találja amit keres?
           </h3>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-600 mb-4">
             Látogasson el a teljes tudásbázisunkba, ahol részletes útmutatókat és videókat talál
             a platform használatához.
           </p>
-          <Button variant="outline" className="border-blue-700 text-blue-400 hover:bg-blue-900/30">
+          <Button variant="outline" className="border-blue-300 text-blue-600 hover:bg-blue-100">
             Tudásbázis megtekintése
           </Button>
         </div>

@@ -1,32 +1,20 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import AOS from "aos";
-import "aos/dist/aos.css";
-import "@/styles/framer.css";
+import dynamic from 'next/dynamic';
 
-import CustomHero from "@/components/landing-home/CustomHero";
-import { FramerNavbarWrapper } from "@/components/navigation/framer-navbar-wrapper";
-import Footer from "@/components/landing-home/ui/footer";
+// Dynamically import TaskFlowHome with SSR disabled to prevent next/document errors
+const TaskFlowHome = dynamic(
+  () => import('@/components/framer-home/TaskFlowHome'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="min-h-screen bg-gray-100 animate-pulse flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    )
+  }
+);
 
 export default function Home() {
-  useEffect(() => {
-    AOS.init({
-      once: true,
-      disable: "phone",
-      duration: 700,
-      easing: "ease-out-cubic",
-    });
-  });
-
-  return (
-    <div className="flex min-h-screen flex-col overflow-hidden supports-[overflow:clip]:overflow-clip">
-      <FramerNavbarWrapper />
-      <main className="grow">
-        {/* Hero - Framer Design */}
-        <CustomHero />
-      </main>
-      <Footer border={true} />
-    </div>
-  );
+  return <TaskFlowHome />;
 }

@@ -5,7 +5,7 @@
  * Export all team-related functions
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteTeam = exports.updateTeamSubscription = exports.createTeam = void 0;
+exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteTeam = exports.updateTeamSubscription = exports.createTeam = void 0;
 // Team creation and subscription management
 var createTeam_1 = require("./createTeam");
 Object.defineProperty(exports, "createTeam", { enumerable: true, get: function () { return createTeam_1.createTeam; } });
@@ -28,4 +28,8 @@ var getTeamDashboard_1 = require("./getTeamDashboard");
 Object.defineProperty(exports, "getTeamDashboard", { enumerable: true, get: function () { return getTeamDashboard_1.getTeamDashboard; } });
 Object.defineProperty(exports, "checkSubscriptionAccess", { enumerable: true, get: function () { return getTeamDashboard_1.checkSubscriptionAccess; } });
 Object.defineProperty(exports, "getTeamMembers", { enumerable: true, get: function () { return getTeamDashboard_1.getTeamMembers; } });
+// Team course enrollment
+var enrollTeamInCourse_1 = require("./enrollTeamInCourse");
+Object.defineProperty(exports, "enrollTeamInCourse", { enumerable: true, get: function () { return enrollTeamInCourse_1.enrollTeamInCourse; } });
+Object.defineProperty(exports, "getTeamEnrolledCourses", { enumerable: true, get: function () { return enrollTeamInCourse_1.getTeamEnrolledCourses; } });
 //# sourceMappingURL=index.js.map

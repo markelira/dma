@@ -48,8 +48,8 @@ export default function DashboardCoursesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white mb-2">Kurzusaim</h1>
-        <p className="text-gray-400">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Kurzusaim</h1>
+        <p className="text-gray-500">
           Kezeld és folytasd a kurzusaidat egy helyen
         </p>
       </div>
@@ -67,7 +67,7 @@ export default function DashboardCoursesPage() {
                 ${
                   filter === f.value
                     ? 'bg-blue-600 text-white'
-                    : 'bg-gray-800 text-gray-400 border border-gray-700 hover:bg-gray-700 hover:text-white'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900'
                 }
               `}
             >
@@ -80,12 +80,12 @@ export default function DashboardCoursesPage() {
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex gap-1 border border-gray-700 rounded-lg p-1 bg-gray-800">
+        <div className="flex gap-1 border border-gray-200 rounded-lg p-1 bg-white shadow-sm">
           <button
             onClick={() => setViewMode('grid')}
             className={`
-              p-2 rounded transition-colors text-gray-400
-              ${viewMode === 'grid' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}
+              p-2 rounded transition-colors text-gray-500
+              ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 hover:text-gray-900'}
             `}
           >
             <Grid className="h-4 w-4" />
@@ -93,8 +93,8 @@ export default function DashboardCoursesPage() {
           <button
             onClick={() => setViewMode('list')}
             className={`
-              p-2 rounded transition-colors text-gray-400
-              ${viewMode === 'list' ? 'bg-gray-700 text-white' : 'hover:bg-gray-700 hover:text-white'}
+              p-2 rounded transition-colors text-gray-500
+              ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 hover:text-gray-900'}
             `}
           >
             <List className="h-4 w-4" />
@@ -108,7 +108,7 @@ export default function DashboardCoursesPage() {
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="h-64 rounded-lg bg-gray-800 animate-pulse"
+              className="h-64 rounded-lg bg-gray-100 animate-pulse"
             />
           ))}
         </div>
@@ -117,13 +117,13 @@ export default function DashboardCoursesPage() {
       {/* Empty State */}
       {!isLoading && filteredEnrollments.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-900/30">
-            <BookOpen className="h-10 w-10 text-blue-400" />
+          <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
+            <BookOpen className="h-10 w-10 text-blue-600" />
           </div>
-          <h3 className="mb-2 text-lg font-semibold text-white">
+          <h3 className="mb-2 text-lg font-semibold text-gray-900">
             {filter === 'all' ? 'Még nincs kurzusod' : 'Nincs találat'}
           </h3>
-          <p className="mb-6 text-sm text-gray-400">
+          <p className="mb-6 text-sm text-gray-500">
             {filter === 'all'
               ? 'Kezdj el egy új kurzust a böngészés gombra kattintva'
               : 'Próbálj meg egy másik szűrőt'}
@@ -153,13 +153,13 @@ export default function DashboardCoursesPage() {
               key={enrollment.id}
               href={`/courses/${enrollment.courseId}/learn`}
               className={`
-                block rounded-xl border border-gray-800 bg-[#1a1a1a] p-6 transition-all hover:border-gray-700
+                block rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-md shadow-sm
                 ${viewMode === 'list' ? 'flex items-center gap-6' : ''}
               `}
             >
               {/* Course Info */}
               <div className={viewMode === 'list' ? 'flex-1' : ''}>
-                <h3 className="font-semibold text-white mb-1">
+                <h3 className="font-semibold text-gray-900 mb-1">
                   {enrollment.courseName}
                 </h3>
                 <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
@@ -183,7 +183,7 @@ export default function DashboardCoursesPage() {
                 {/* Progress Bar */}
                 {enrollment.status === 'in_progress' && (
                   <div className="space-y-1.5">
-                    <div className="w-full bg-gray-800 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${enrollment.progress}%` }}
@@ -197,13 +197,13 @@ export default function DashboardCoursesPage() {
 
                 {/* Status Badge */}
                 {enrollment.status === 'completed' && (
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-900/50 text-green-400">
+                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                     Befejezve
                   </span>
                 )}
 
                 {enrollment.status === 'not_started' && (
-                  <span className="px-2 py-1 rounded-full text-xs font-medium border border-gray-700 text-gray-400">
+                  <span className="px-2 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-500">
                     Még nem kezdett
                   </span>
                 )}

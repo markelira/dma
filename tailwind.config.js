@@ -91,18 +91,41 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // DMA.hu Brand Colors (from logo)
+        // DMA Brand Colors (Official)
+        brand: {
+          primary: '#252F5B', // Main brand color (dark navy blue)
+          'primary-hover': '#1a2142', // Darker on hover
+          'primary-light': '#3a4a7a', // Lighter variant
+          secondary: '#E72B36', // Secondary brand color (red)
+          'secondary-hover': '#c9232d', // Darker on hover
+          'secondary-light': '#ff4d58', // Lighter variant
+        },
+        // DMA.hu Brand Colors (legacy from logo)
         dma: {
-          red: '#E62935', // Primary brand red (logo "M")
-          'red-hover': '#C63D2B', // Red hover state
-          navy: '#2C3E54', // Brand navy blue (logo "D" and "A")
-          'navy-hover': '#1e2a37', // Navy hover state
-          'navy-light': '#3d5266', // Lighter navy
+          red: '#E72B36', // Updated to match brand secondary
+          'red-hover': '#c9232d', // Red hover state
+          navy: '#252F5B', // Updated to match brand primary
+          'navy-hover': '#1a2142', // Navy hover state
+          'navy-light': '#3a4a7a', // Lighter navy
           dark: '#25282B', // Dark background
           'dark-alt': '#363B3F', // Alternative dark
           gold: '#DD9933', // Gold accent
           'gray-link': '#AAAAAA', // Secondary links
           'gray-dark': '#333333', // Dark gray
+        },
+        // Coursera Brand Colors (for homepage replication)
+        coursera: {
+          blue: '#0056D2', // Primary Coursera blue
+          'blue-hover': '#004494', // Darker blue on hover
+          'blue-light': '#E3F2FD', // Light blue background
+          text: {
+            primary: '#1C1C1C', // Primary text color
+            secondary: '#6A6F73', // Secondary text color
+          },
+          bg: {
+            light: '#F7F9FA', // Light background
+          },
+          border: '#E0E0E0', // Border color
         },
         blue: {
           DEFAULT: '#16222F', // DMA primary blue-gray

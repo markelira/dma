@@ -229,7 +229,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
         {quickActions.map((action, index) => (
           <Link key={index} href={action.href}>
             <motion.div
-              className="rounded-xl bg-[#1a1a1a] border border-gray-800 p-6 cursor-pointer group hover:border-gray-700 transition-all"
+              className="rounded-xl bg-white border border-gray-200 p-6 cursor-pointer group hover:border-gray-300 transition-all shadow-sm hover:shadow-md"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
@@ -240,18 +240,18 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                   {action?.icon}
                 </div>
                 {action?.badge && (
-                  <span className="text-xs px-2 py-1 bg-blue-900/30 text-blue-400 rounded-full">
+                  <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
                     {action.badge}
                   </span>
                 )}
               </div>
-              <h3 className="font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
+              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                 {action?.title}
               </h3>
-              <p className="text-gray-400 text-sm mb-4">
+              <p className="text-gray-500 text-sm mb-4">
                 {action?.description}
               </p>
-              <div className="flex items-center text-blue-400 text-sm font-medium group-hover:text-blue-300 transition-colors">
+              <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors">
                 Kezdés
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -264,10 +264,10 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">Kiemelt Kurzusok</h2>
-            <p className="text-gray-400 mt-1">A legkeresettebb tanulási lehetőségek</p>
+            <h2 className="text-2xl font-bold text-gray-900">Kiemelt Kurzusok</h2>
+            <p className="text-gray-500 mt-1">A legkeresettebb tanulási lehetőségek</p>
           </div>
-          <Link href="/dashboard/browse" className="text-blue-400 hover:text-blue-300 font-medium flex items-center">
+          <Link href="/dashboard/browse" className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
             Összes megtekintése
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
@@ -277,38 +277,38 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
           // Loading skeleton for trending courses
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="rounded-xl bg-[#1a1a1a] border border-gray-800 overflow-hidden animate-pulse">
-                <div className="aspect-video bg-gray-800" />
+              <div key={i} className="rounded-xl bg-white border border-gray-200 overflow-hidden animate-pulse shadow-sm">
+                <div className="aspect-video bg-gray-100" />
                 <div className="p-5 space-y-3">
                   <div className="flex gap-2">
-                    <div className="h-5 bg-gray-700 rounded-full w-16" />
-                    <div className="h-5 bg-gray-700 rounded-full w-20" />
+                    <div className="h-5 bg-gray-200 rounded-full w-16" />
+                    <div className="h-5 bg-gray-200 rounded-full w-20" />
                   </div>
-                  <div className="h-5 bg-gray-700 rounded w-full" />
-                  <div className="h-4 bg-gray-700 rounded w-3/4" />
-                  <div className="h-4 bg-gray-700 rounded w-1/2" />
-                  <div className="h-10 bg-gray-700 rounded mt-4" />
+                  <div className="h-5 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
+                  <div className="h-10 bg-gray-200 rounded mt-4" />
                 </div>
               </div>
             ))}
           </div>
         ) : featuredCourses.length === 0 ? (
           // Empty state when no courses available
-          <div className="rounded-xl bg-[#1a1a1a] border border-gray-800 p-8 text-center">
+          <div className="rounded-xl bg-white border border-gray-200 p-8 text-center shadow-sm">
             <div className="flex flex-col items-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-gray-500" />
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-gray-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-2">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   Nincsenek elérhető kurzusok
                 </h3>
-                <p className="text-gray-400 text-sm">
+                <p className="text-gray-500 text-sm">
                   Jelenleg nincs megjeleníthető kurzus. Kérjük, látogasson vissza később.
                 </p>
               </div>
               <Link href="/dashboard/browse">
-                <button className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg hover:bg-gray-800 transition-colors">
+                <button className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                   Kurzusok böngészése
                 </button>
               </Link>
@@ -357,14 +357,14 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
               return (
                 <Link key={courseData.id} href={`/courses/${courseData.slug || courseData.id}`}>
                   <motion.div
-                    className="rounded-xl bg-[#1a1a1a] border border-gray-800 cursor-pointer group overflow-hidden hover:border-gray-700 hover:shadow-xl hover:shadow-black/20 transition-all h-full flex flex-col"
+                    className="rounded-xl bg-white border border-gray-200 cursor-pointer group overflow-hidden hover:border-gray-300 hover:shadow-lg transition-all h-full flex flex-col shadow-sm"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     whileHover={{ y: -4 }}
                   >
                     {/* Thumbnail */}
-                    <div className="aspect-video relative bg-gradient-to-br from-blue-600 to-blue-800 overflow-hidden">
+                    <div className="aspect-video relative bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
                       {courseData.thumbnail ? (
                         <img
                           src={courseData.thumbnail}
@@ -373,43 +373,43 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                         />
                       ) : (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <BookOpen className="w-12 h-12 text-white/30" />
+                          <BookOpen className="w-12 h-12 text-white/50" />
                         </div>
                       )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                     </div>
 
                     {/* Content */}
                     <div className="p-5 flex-1 flex flex-col">
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="px-2 py-0.5 bg-blue-900/40 text-blue-400 text-xs font-medium rounded">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded">
                           {typeof courseData.category === 'string' ? courseData.category : 'Kurzus'}
                         </span>
-                        <span className="px-2 py-0.5 bg-gray-800 text-gray-400 text-xs rounded">
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
                           {getLevelText(courseData.level)}
                         </span>
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-semibold text-white text-lg leading-tight line-clamp-2 group-hover:text-blue-400 transition-colors mb-2">
+                      <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
                         {courseData.title}
                       </h3>
 
                       {/* Description */}
                       {courseData.description && (
-                        <p className="text-sm text-gray-400 line-clamp-2 mb-3">
+                        <p className="text-sm text-gray-500 line-clamp-2 mb-3">
                           {courseData.description}
                         </p>
                       )}
 
                       {/* Instructor */}
-                      <p className="text-sm text-gray-500 mb-4">
+                      <p className="text-sm text-gray-400 mb-4">
                         {courseData.instructor}
                       </p>
 
                       {/* Stats */}
-                      <div className="flex items-center gap-4 text-xs text-gray-500 mt-auto mb-4">
+                      <div className="flex items-center gap-4 text-xs text-gray-400 mt-auto mb-4">
                         {courseData.duration > 0 && (
                           <div className="flex items-center gap-1">
                             <Clock className="w-3.5 h-3.5" />

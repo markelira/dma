@@ -75,7 +75,7 @@ export default function DashboardPage() {
   // Don't render for admin users
   if (user?.role === 'ADMIN' || user?.role === 'COMPANY_ADMIN') {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#000]">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <Loader2 className="h-16 w-16 animate-spin text-blue-500" />
       </div>
     );
@@ -140,8 +140,8 @@ export default function DashboardPage() {
 
         {/* Error states */}
         {statsError && (
-          <div className="rounded-lg bg-red-900/30 border border-red-800 p-4">
-            <p className="text-sm text-red-400">
+          <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+            <p className="text-sm text-red-600">
               Hiba a statisztikák betöltésekor. Kérjük, próbálja újra később.
             </p>
           </div>

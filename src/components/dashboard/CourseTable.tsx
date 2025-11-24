@@ -32,17 +32,17 @@ export function CourseTable() {
 
   if (isLoading) {
     return (
-      <div className="rounded-xl bg-[#1a1a1a] border border-gray-800">
-        <div className="border-b border-gray-800 p-4">
-          <div className="h-6 w-32 bg-gray-700 rounded animate-pulse mb-3" />
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+        <div className="border-b border-gray-100 p-4">
+          <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-3" />
           <div className="flex gap-4">
-            <div className="h-8 w-24 bg-gray-700 rounded animate-pulse" />
-            <div className="h-8 w-24 bg-gray-700 rounded animate-pulse" />
+            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse" />
+            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse" />
           </div>
         </div>
         <div className="p-6 space-y-4">
           {[1, 2, 3].map((item) => (
-            <div key={item} className="h-16 bg-gray-800 rounded animate-pulse" />
+            <div key={item} className="h-16 bg-gray-100 rounded animate-pulse" />
           ))}
         </div>
       </div>
@@ -50,10 +50,10 @@ export function CourseTable() {
   }
 
   return (
-    <div className="rounded-xl bg-[#1a1a1a] border border-gray-800">
+    <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
       {/* Header with Tabs */}
-      <div className="border-b border-gray-800 p-4">
-        <h2 className="text-lg font-semibold text-white mb-3">Kurzusaim</h2>
+      <div className="border-b border-gray-100 p-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-3">Kurzusaim</h2>
 
         {/* Tabs */}
         <div className="flex gap-1">
@@ -63,13 +63,13 @@ export function CourseTable() {
               px-4 py-2 text-sm font-medium rounded-lg transition-colors
               ${
                 activeTab === 'in_progress'
-                  ? 'bg-blue-600/20 text-blue-400 border-b-2 border-blue-500'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }
             `}
           >
             Folyamatban
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-800 text-xs">
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-xs">
               {inProgressCount}
             </span>
           </button>
@@ -79,13 +79,13 @@ export function CourseTable() {
               px-4 py-2 text-sm font-medium rounded-lg transition-colors
               ${
                 activeTab === 'completed'
-                  ? 'bg-blue-600/20 text-blue-400 border-b-2 border-blue-500'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
+                  : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }
             `}
           >
             Befejezett
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-800 text-xs">
+            <span className="ml-2 px-2 py-0.5 rounded-full bg-gray-100 text-xs">
               {completedCount}
             </span>
           </button>
@@ -103,7 +103,7 @@ export function CourseTable() {
             </p>
             <Link
               href="/courses"
-              className="mt-4 text-sm font-medium text-blue-400 hover:text-blue-300"
+              className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700"
             >
               Böngészd a kurzusokat →
             </Link>
@@ -114,12 +114,12 @@ export function CourseTable() {
               <Link
                 key={enrollment.id}
                 href={`/courses/${enrollment.courseId}`}
-                className="block rounded-lg border border-gray-800 p-4 transition-all hover:border-gray-700 hover:bg-gray-800/50"
+                className="block rounded-lg border border-gray-200 p-4 transition-all hover:border-gray-300 hover:bg-gray-50"
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Course Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-white truncate mb-1">
+                    <h3 className="font-semibold text-gray-900 truncate mb-1">
                       {enrollment.courseName}
                     </h3>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
@@ -143,7 +143,7 @@ export function CourseTable() {
                     {/* Progress Bar */}
                     {activeTab === 'in_progress' && (
                       <div className="space-y-1">
-                        <div className="w-full bg-gray-800 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-blue-500 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${enrollment.progress}%` }}
@@ -156,7 +156,7 @@ export function CourseTable() {
                     )}
 
                     {activeTab === 'completed' && (
-                      <Badge variant="default" className="bg-green-900/50 text-green-400 border-green-800">
+                      <Badge variant="default" className="bg-green-50 text-green-700 border-green-200">
                         Befejezve
                       </Badge>
                     )}
