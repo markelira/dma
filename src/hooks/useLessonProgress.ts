@@ -132,6 +132,7 @@ export const useLessonProgress = () => {
 
           if (courseDoc.exists()) {
             const courseData = courseDoc.data()
+            const courseType = courseData.courseType || courseData.type
 
             // Count total lessons - check lessonCount field first, then query subcollection
             let totalLessons = courseData.lessonCount || 0
@@ -141,7 +142,20 @@ export const useLessonProgress = () => {
               const lessonsRef = collection(db, 'courses', courseId, 'lessons')
               const lessonsSnapshot = await getDocs(lessonsRef)
               totalLessons = lessonsSnapshot.size
-              console.log('📊 Counted lessons from subcollection:', totalLessons)
+              console.log('📊 Counted lessons from flat subcollection:', totalLessons)
+            }
+
+            // For ACADEMIA courses, also check modules subcollection
+            if (totalLessons === 0 && courseType === 'ACADEMIA') {
+              const modulesRef = collection(db, 'courses', courseId, 'modules')
+              const modulesSnapshot = await getDocs(modulesRef)
+
+              for (const moduleDoc of modulesSnapshot.docs) {
+                const moduleLessonsRef = collection(db, 'courses', courseId, 'modules', moduleDoc.id, 'lessons')
+                const moduleLessonsSnapshot = await getDocs(moduleLessonsRef)
+                totalLessons += moduleLessonsSnapshot.size
+              }
+              console.log('📊 Counted lessons from ACADEMIA modules:', totalLessons)
             }
 
             if (totalLessons > 0) {
