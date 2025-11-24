@@ -96,12 +96,22 @@ export function usePaymentActions() {
   const createCheckoutSession = useMutation({
     mutationFn: async (data: CheckoutSessionData) => {
       const result = await createCheckoutSessionFn(data);
-      return result.data as { 
-        success: boolean; 
-        sessionId?: string; 
-        url?: string; 
+      // The Cloud Function returns { success: true, data: { sessionId, url } }
+      const response = result.data as {
+        success: boolean;
+        data?: { sessionId?: string; url?: string };
+        sessionId?: string;
+        url?: string;
         error?: string;
         details?: any[];
+      };
+      // Flatten the response - support both nested and flat structure
+      return {
+        success: response.success,
+        sessionId: response.data?.sessionId || response.sessionId,
+        url: response.data?.url || response.url,
+        error: response.error,
+        details: response.details
       };
     },
     onSuccess: (result) => {
