@@ -44,7 +44,13 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
   return useQuery({
     queryKey: ['enrollments', user?.uid, status],
     queryFn: async (): Promise<EnrollmentWithCourse[]> => {
+      console.log('🔍 [useEnrollments] Starting query...', {
+        userId: user?.uid,
+        statusFilter: status || 'ALL'
+      });
+
       if (!user?.uid) {
+        console.error('❌ [useEnrollments] No user UID!');
         throw new Error('User not authenticated')
       }
 
@@ -52,6 +58,13 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
       const userRef = doc(db, 'users', user.uid)
       const userSnap = await getDoc(userRef)
       const userData = userSnap.exists() ? userSnap.data() : null
+
+      console.log('👤 [useEnrollments] User data:', {
+        hasUserDoc: userSnap.exists(),
+        subscriptionStatus: userData?.subscriptionStatus,
+        companyId: userData?.companyId,
+        role: userData?.role
+      });
 
       // User has active subscription if subscriptionStatus is 'active' or 'trialing'
       const hasActiveSubscription =
@@ -68,9 +81,17 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
           ? ['in_progress', 'ACTIVE', 'active']
           : [status]
         q = query(q, where('status', 'in', statusValues))
+        console.log('🔎 [useEnrollments] Added status filter:', statusValues);
       }
 
       const enrollmentsSnap = await getDocs(q)
+      console.log('📊 [useEnrollments] Raw Firestore result:', enrollmentsSnap.size, 'documents');
+
+      // Log each enrollment found
+      enrollmentsSnap.docs.forEach((doc, i) => {
+        const data = doc.data();
+        console.log(`  [${i}] ${doc.id}: status=${data.status}, courseId=${data.courseId}`);
+      });
 
       // Track enrolled course IDs to avoid duplicates
       const enrolledCourseIds = new Set<string>()
@@ -170,6 +191,17 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         const dateB = b.lastAccessedAt || b.enrolledAt
         return dateB.getTime() - dateA.getTime()
       })
+
+      console.log('✅ [useEnrollments] Final result:', {
+        totalEnrollments: enrollmentsWithCourses.length,
+        hasActiveSubscription,
+        courses: enrollmentsWithCourses.map(e => ({
+          id: e.id,
+          courseId: e.courseId,
+          courseName: e.courseName,
+          status: e.status
+        }))
+      });
 
       return enrollmentsWithCourses
     },
