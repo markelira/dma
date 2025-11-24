@@ -269,8 +269,12 @@ export default function CompanyDashboardPage() {
   };
 
   const handleSubscribe = async () => {
+    console.log('[Subscription] handleSubscribe called');
+    console.log('[Subscription] Price ID:', COMPANY_SUBSCRIPTION_PRICE_ID);
+    console.log('[Subscription] Company ID:', company?.id);
+
     try {
-      await subscribeToPlan(
+      const result = await subscribeToPlan(
         COMPANY_SUBSCRIPTION_PRICE_ID,
         `${window.location.origin}/company/dashboard?subscription=success`,
         `${window.location.origin}/company/dashboard?subscription=cancelled`,
@@ -279,8 +283,15 @@ export default function CompanyDashboardPage() {
           subscriptionType: 'company'
         }
       );
+      console.log('[Subscription] Result:', result);
+
+      // If redirect didn't happen automatically, try manual redirect
+      if (result?.url) {
+        console.log('[Subscription] Manually redirecting to:', result.url);
+        window.location.href = result.url;
+      }
     } catch (err) {
-      console.error('Error creating checkout session:', err);
+      console.error('[Subscription] Error creating checkout session:', err);
     }
   };
 
