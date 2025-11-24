@@ -35,8 +35,8 @@ import { Company, CompanyAdmin, DashboardStats } from '@/types/company';
 import { useEnrollCompanyInCourse, useCompanyEnrolledCourses } from '@/hooks/useCompanyActions';
 import { usePaymentActions } from '@/hooks/usePaymentActions';
 
-// Stripe Price ID for company subscription (from .env)
-const COMPANY_SUBSCRIPTION_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1QWPDjRvOWrujGVHxdaSOcJZ';
+// Stripe Price ID for company subscription
+const COMPANY_SUBSCRIPTION_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1SNAlsGe8tBqGEXM8vEOVhgY';
 
 export default function CompanyDashboardPage() {
   const router = useRouter();
