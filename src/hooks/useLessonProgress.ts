@@ -2,6 +2,13 @@ import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
+import {
+  ENROLLMENT_STATUS,
+  LESSON_COMPLETION_THRESHOLD,
+  calculateCourseProgress,
+  countTotalLessons,
+  getStatusFromProgress,
+} from '@/lib/progress'
 
 interface ProgressPayload {
   lessonId: string
@@ -89,8 +96,8 @@ export const useLessonProgress = () => {
       if (body.watchPercentage !== undefined) {
         progressData.watchPercentage = body.watchPercentage
 
-        // Mark as completed if >= 90%
-        if (body.watchPercentage >= 90) {
+        // Mark as completed if >= threshold (90%)
+        if (body.watchPercentage >= LESSON_COMPLETION_THRESHOLD) {
           progressData.completed = true
           progressData.completedAt = serverTimestamp()
         }
@@ -116,6 +123,64 @@ export const useLessonProgress = () => {
 
       console.log('✅ Progress saved to Firestore:', progressId)
 
+      // Update enrollment progress if courseId is provided
+      if (courseId) {
+        try {
+          const { collection, query, where, getDocs, getDoc, updateDoc } = await import('firebase/firestore')
+
+          // Get course to count total lessons
+          const courseRef = doc(db, 'courses', courseId)
+          const courseDoc = await getDoc(courseRef)
+
+          if (courseDoc.exists()) {
+            const courseData = courseDoc.data()
+
+            // Count total lessons using utility
+            const totalLessons = countTotalLessons(courseData.modules, courseData.lessonCount)
+
+            if (totalLessons > 0) {
+              // Count completed lessons for this user in this course
+              const progressQuery = query(
+                collection(db, 'lessonProgress'),
+                where('userId', '==', user.uid),
+                where('courseId', '==', courseId),
+                where('completed', '==', true)
+              )
+              const completedSnapshot = await getDocs(progressQuery)
+              const completedCount = completedSnapshot.size
+
+              // Calculate progress percentage using utility
+              const progressPercentage = calculateCourseProgress(completedCount, totalLessons)
+              const enrollmentStatus = getStatusFromProgress(progressPercentage)
+
+              // Update enrollment document
+              const enrollmentId = `${user.uid}_${courseId}`
+              const enrollmentRef = doc(db, 'enrollments', enrollmentId)
+
+              await updateDoc(enrollmentRef, {
+                progress: progressPercentage,
+                lastAccessedAt: serverTimestamp(),
+                status: enrollmentStatus
+              }).catch(() => {
+                // Enrollment might not exist yet, that's okay
+                console.log('📝 Enrollment not found, skipping progress update')
+              })
+
+              console.log('📈 Enrollment progress updated:', {
+                courseId,
+                completedLessons: completedCount,
+                totalLessons,
+                progressPercentage,
+                status: enrollmentStatus
+              })
+            }
+          }
+        } catch (enrollmentError) {
+          // Don't fail the main progress save if enrollment update fails
+          console.warn('⚠️ Failed to update enrollment progress:', enrollmentError)
+        }
+      }
+
       return {
         success: true,
         progressId,
@@ -140,8 +205,13 @@ export const useLessonProgress = () => {
         syncVersion: data.syncVersion
       })
     },
-    onSettled: () => {
+    onSettled: (data, error, variables) => {
       qc.invalidateQueries({ queryKey: ['player-data'] })
+      // Invalidate enrollments to refresh progress display
+      if (variables.courseId) {
+        qc.invalidateQueries({ queryKey: ['enrollments'] })
+        qc.invalidateQueries({ queryKey: ['course-progress', variables.courseId] })
+      }
     },
   })
 }

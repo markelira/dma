@@ -84,7 +84,7 @@
     "@types/katex": "^0.16.7",
     "@types/sharp": "^0.32.0",
     "aos": "^2.3.4",
-    "canvas-confetti": "^1.9.3",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^0.2.1",

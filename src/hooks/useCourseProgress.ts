@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
+import { isLessonComplete } from '@/lib/progress';
 
 /**
  * Hook to fetch all completed lesson IDs for a specific course
@@ -16,10 +17,12 @@ export const useCourseProgress = (courseId: string) => {
       const { collection, query, where, getDocs } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase');
 
-      // Query all lessonProgress documents for this user
+      // Query lessonProgress documents for this user AND specific course
+      // This is more efficient than fetching all progress and filtering client-side
       const progressQuery = query(
         collection(db, 'lessonProgress'),
-        where('userId', '==', user.uid)
+        where('userId', '==', user.uid),
+        where('courseId', '==', courseId)
       );
 
       const snapshot = await getDocs(progressQuery);
@@ -38,8 +41,8 @@ export const useCourseProgress = (courseId: string) => {
           resumePosition: data.resumePosition || 0,
         };
 
-        // Add to completed list if >= 90% watched or explicitly marked as completed
-        if (data.completed || (data.watchPercentage && data.watchPercentage >= 90)) {
+        // Add to completed list using consistent utility function
+        if (isLessonComplete(data.watchPercentage || 0, data.completed)) {
           completedLessonIds.push(lessonId);
         }
       });

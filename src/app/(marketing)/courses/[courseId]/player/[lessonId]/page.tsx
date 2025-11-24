@@ -17,6 +17,8 @@ import { useCourseProgress, useResumePosition } from '@/hooks/useCourseProgress'
 import { useLessonProgress } from '@/hooks/useLessonProgress';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { useEnrollmentTracking } from '@/hooks/useEnrollmentTracking';
+import { useCourseCompletion } from '@/hooks/useCourseCompletion';
+import { CourseCompletionModal } from '@/components/course-player/CourseCompletionModal';
 import { useAuthStore } from '@/stores/authStore';
 import { fetchLesson } from '@/hooks/useLessonQueries';
 import { Module, Lesson, CourseType } from '@/types';
@@ -116,6 +118,9 @@ export default function CoursePlayerPage() {
     if (totalLessons === 0) return 0;
     return (completedLessonIds.size / totalLessons) * 100;
   }, [modules, completedLessonIds]);
+
+  // Course completion detection
+  const { justCompleted, dismissCompletion } = useCourseCompletion(courseId, courseProgress);
 
   // Find previous/next lessons
   const { previousLesson, nextLesson } = useMemo(() => {
@@ -311,31 +316,40 @@ export default function CoursePlayerPage() {
     const lessonsForPlayer = flatLessons.length > 0 ? flatLessons : modules.flatMap(m => m.lessons || []);
 
     return (
-      <NetflixPlayerLayout
-        course={{
-          id: course.id,
-          title: course.title,
-          type: courseType,
-          description: course.description,
-        }}
-        lessons={lessonsForPlayer}
-        modules={modules}
-        currentLesson={currentLesson}
-        currentLessonId={currentLessonId}
-        completedLessonIds={completedLessonIds}
-        progress={courseProgress}
-        videoSource={videoSource}
-        resumePosition={resumePosition || 0}
-        onLessonClick={handleLessonClick}
-        onProgress={handleProgress}
-        onVideoEnded={handleVideoEnded}
-        previousLesson={previousLesson}
-        nextLesson={nextLesson}
-        onPreviousLesson={handlePreviousLesson}
-        onNextLesson={handleNextLesson}
-        instructor={playerData?.instructor}
-        instructors={playerData?.instructors || []}
-      />
+      <>
+        <NetflixPlayerLayout
+          course={{
+            id: course.id,
+            title: course.title,
+            type: courseType,
+            description: course.description,
+          }}
+          lessons={lessonsForPlayer}
+          modules={modules}
+          currentLesson={currentLesson}
+          currentLessonId={currentLessonId}
+          completedLessonIds={completedLessonIds}
+          progress={courseProgress}
+          videoSource={videoSource}
+          resumePosition={resumePosition || 0}
+          onLessonClick={handleLessonClick}
+          onProgress={handleProgress}
+          onVideoEnded={handleVideoEnded}
+          previousLesson={previousLesson}
+          nextLesson={nextLesson}
+          onPreviousLesson={handlePreviousLesson}
+          onNextLesson={handleNextLesson}
+          instructor={playerData?.instructor}
+          instructors={playerData?.instructors || []}
+        />
+        {/* Course Completion Celebration Modal */}
+        <CourseCompletionModal
+          isOpen={justCompleted}
+          courseTitle={course?.title || ''}
+          courseId={courseId}
+          onDismiss={dismissCompletion}
+        />
+      </>
     );
   }
 
@@ -534,6 +548,14 @@ export default function CoursePlayerPage() {
           onTabChange={setMobileTab}
         />
       </div>
+
+      {/* Course Completion Celebration Modal */}
+      <CourseCompletionModal
+        isOpen={justCompleted}
+        courseTitle={course?.title || ''}
+        courseId={courseId}
+        onDismiss={dismissCompletion}
+      />
     </>
   );
 }
