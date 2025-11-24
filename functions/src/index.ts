@@ -1945,6 +1945,10 @@ export {
 } from './payment/createCheckoutSession';
 
 export {
+  getPaymentHistory,
+} from './payment/getPaymentHistory';
+
+export {
   createCustomer,
 } from './payment/createCustomer';
 
