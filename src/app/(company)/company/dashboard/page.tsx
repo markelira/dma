@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Building2,
   Users,
@@ -20,14 +21,18 @@ import {
   Target,
   ShoppingCart,
   Star,
-  ArrowRight
+  ArrowRight,
+  Plus,
+  BookOpen,
+  Loader2,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getFirestore, doc, getDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import { colors, cardStyles } from '@/lib/design-tokens-premium';
 import { Company, CompanyAdmin, DashboardStats } from '@/types/company';
+import { useEnrollCompanyInCourse, useCompanyEnrolledCourses } from '@/hooks/useCompanyActions';
 
 export default function CompanyDashboardPage() {
   const router = useRouter();
@@ -58,6 +63,12 @@ export default function CompanyDashboardPage() {
   });
   const [availableCourses, setAvailableCourses] = useState<any[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(true);
+  const [showAddCourseModal, setShowAddCourseModal] = useState(false);
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+
+  // Company course enrollment hooks
+  const enrollCompanyMutation = useEnrollCompanyInCourse();
+  const { data: enrolledCourses = [], isLoading: enrolledCoursesLoading } = useCompanyEnrolledCourses(company?.id);
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -225,6 +236,26 @@ export default function CompanyDashboardPage() {
       console.error('Logout error:', err);
     }
   };
+
+  const handleEnrollCourse = async () => {
+    if (!selectedCourseId || !company?.id) return;
+
+    try {
+      await enrollCompanyMutation.mutateAsync({
+        companyId: company.id,
+        courseId: selectedCourseId,
+      });
+      setShowAddCourseModal(false);
+      setSelectedCourseId(null);
+    } catch (err) {
+      console.error('Error enrolling company in course:', err);
+    }
+  };
+
+  // Get courses not yet enrolled
+  const availableCoursesForEnrollment = availableCourses.filter(
+    course => !enrolledCourses.some(ec => ec.id === course.id)
+  );
 
   if (authLoading || loading) {
     return (
@@ -503,7 +534,170 @@ export default function CompanyDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Company Courses Section */}
+        <div className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+              <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+              Vállalati kurzusok
+            </h2>
+            <button
+              onClick={() => setShowAddCourseModal(true)}
+              className="inline-flex items-center px-3 py-1.5 text-sm bg-gradient-to-t from-blue-600 to-blue-500 text-white rounded-lg shadow-sm hover:shadow-md transition-all"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Kurzus hozzáadása
+            </button>
+          </div>
+
+          {enrolledCoursesLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            </div>
+          ) : enrolledCourses.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p>Még nincs kurzus hozzáadva</p>
+              <p className="text-sm mt-1">Adj hozzá kurzusokat, hogy az alkalmazottak elkezdhenek tanulni.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {enrolledCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="bg-white/50 border border-gray-200/50 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  {course.thumbnail ? (
+                    <div className="aspect-video relative">
+                      <Image
+                        src={course.thumbnail}
+                        alt={course.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                      <BookOpen className="w-12 h-12 text-blue-400" />
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-medium text-gray-900 line-clamp-1">{course.title}</h3>
+                    <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
+                      <span>{course.lessonCount || 0} lecke</span>
+                      <span>{course.employeeCount || 0} beiratkozott</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Add Course Modal */}
+      <AnimatePresence>
+        {showAddCourseModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowAddCourseModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="relative bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden"
+            >
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">Kurzus hozzáadása</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Válassz ki egy kurzust, amelyre be szeretnéd iratkoztatni az alkalmazottakat.
+                </p>
+              </div>
+              <div className="p-6 max-h-[50vh] overflow-y-auto">
+                {coursesLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                  </div>
+                ) : availableCoursesForEnrollment.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Nincs elérhető kurzus</p>
+                    <p className="text-sm mt-1">Minden kurzust már hozzáadtál.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {availableCoursesForEnrollment.map((course) => (
+                      <button
+                        key={course.id}
+                        onClick={() => setSelectedCourseId(course.id)}
+                        className={`w-full flex items-center p-3 rounded-lg border transition-all text-left ${
+                          selectedCourseId === course.id
+                            ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-500/20'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {course.thumbnail ? (
+                          <div className="w-16 h-12 relative rounded overflow-hidden flex-shrink-0">
+                            <Image
+                              src={course.thumbnail}
+                              alt={course.title}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-16 h-12 rounded bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="w-6 h-6 text-blue-400" />
+                          </div>
+                        )}
+                        <div className="ml-3 flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{course.title}</p>
+                          <p className="text-sm text-gray-500">
+                            {course.modules?.reduce((acc: number, m: any) => acc + (m.lessons?.length || 0), 0) || course.lessonCount || 0} lecke
+                          </p>
+                        </div>
+                        {selectedCourseId === course.id && (
+                          <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="p-6 border-t border-gray-200 flex justify-end space-x-3">
+                <button
+                  onClick={() => {
+                    setShowAddCourseModal(false);
+                    setSelectedCourseId(null);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  Mégse
+                </button>
+                <button
+                  onClick={handleEnrollCourse}
+                  disabled={!selectedCourseId || enrollCompanyMutation.isPending}
+                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-t from-blue-600 to-blue-500 rounded-lg shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+                >
+                  {enrollCompanyMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Beiratkoztatás...
+                    </>
+                  ) : (
+                    'Alkalmazottak beiratkoztatása'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

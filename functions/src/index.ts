@@ -1442,6 +1442,10 @@ export {
 } from './company/progressTracking';
 export { generateCSVReport } from './company/generateCSVReport';
 export { sendEmployeeReminder } from './company/sendReminder';
+export {
+  enrollCompanyInCourse,
+  getCompanyEnrolledCourses,
+} from './company/enrollCompanyInCourse';
 
 // Export Mux video functions
 export { getMuxUploadUrl, getMuxAssetStatus, testVideoUpload, migrateVideoToMux } from './muxActions';
