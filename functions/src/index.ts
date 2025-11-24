@@ -1442,6 +1442,7 @@ export {
 } from './company/progressTracking';
 export { generateCSVReport } from './company/generateCSVReport';
 export { sendEmployeeReminder } from './company/sendReminder';
+export { removeEmployee } from './company/removeEmployee';
 export {
   enrollCompanyInCourse,
   getCompanyEnrolledCourses,

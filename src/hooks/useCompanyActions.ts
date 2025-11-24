@@ -108,6 +108,49 @@ export function useAddEmployee() {
   })
 }
 
+// ============================================
+// Employee Removal
+// ============================================
+
+interface RemoveEmployeeInput {
+  companyId: string
+  employeeId: string
+}
+
+interface RemoveEmployeeResponse {
+  success: boolean
+  message?: string
+  error?: string
+}
+
+/**
+ * Hook for removing an employee or canceling an invitation
+ */
+export function useRemoveEmployee() {
+  const queryClient = useQueryClient()
+
+  return useMutation<RemoveEmployeeResponse, Error, RemoveEmployeeInput>({
+    mutationFn: async (data) => {
+      const removeEmployee = httpsCallable<RemoveEmployeeInput, RemoveEmployeeResponse>(
+        functions,
+        'removeEmployee'
+      )
+
+      const result = await removeEmployee(data)
+
+      if (!result.data.success) {
+        throw new Error(result.data.error || 'Nem sikerült eltávolítani az alkalmazottat')
+      }
+
+      return result.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['company-employees'] })
+    },
+  })
+}
+
 /**
  * Hook for getting company dashboard data (includes employees)
  */

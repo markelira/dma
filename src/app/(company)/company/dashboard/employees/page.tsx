@@ -16,7 +16,9 @@ import {
   Filter,
   Loader2,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Trash2,
+  UserMinus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getFirestore, doc, getDoc, collection, getDocs, Timestamp, query, orderBy, limit, startAfter } from 'firebase/firestore';
@@ -24,6 +26,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import Link from 'next/link';
 import { Company, CompanyEmployee, AddEmployeeInput } from '@/types/company';
+import { useRemoveEmployee } from '@/hooks/useCompanyActions';
 
 export default function EmployeesPage() {
   const router = useRouter();
@@ -37,6 +40,11 @@ export default function EmployeesPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'invited' | 'left'>('all');
   const [submitting, setSubmitting] = useState(false);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
+  const [removingEmployeeId, setRemovingEmployeeId] = useState<string | null>(null);
+  const [showRemoveConfirm, setShowRemoveConfirm] = useState<CompanyEmployee | null>(null);
+
+  // Remove employee mutation
+  const removeEmployeeMutation = useRemoveEmployee();
 
   // Pagination state
   const [lastDoc, setLastDoc] = useState<any>(null);
@@ -248,6 +256,28 @@ export default function EmployeesPage() {
       setTimeout(() => setCopiedToken(null), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleRemoveEmployee = async (employee: CompanyEmployee) => {
+    if (!company?.id || !employee.id) return;
+
+    setRemovingEmployeeId(employee.id);
+    setShowRemoveConfirm(null);
+
+    try {
+      await removeEmployeeMutation.mutateAsync({
+        companyId: company.id,
+        employeeId: employee.id,
+      });
+
+      // Remove from local state
+      setEmployees(prev => prev.filter(e => e.id !== employee.id));
+    } catch (err: any) {
+      console.error('Error removing employee:', err);
+      setError(err.message || 'Hiba történt az alkalmazott eltávolítása során');
+    } finally {
+      setRemovingEmployeeId(null);
     }
   };
 
@@ -487,24 +517,51 @@ export default function EmployeesPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        {employee.status === 'invited' && employee.inviteToken && (
-                          <button
-                            onClick={() => copyInviteLink(employee)}
-                            className="inline-flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
-                          >
-                            {copiedToken === employee.id ? (
-                              <>
-                                <CheckCircle2 className="w-4 h-4 mr-1" />
-                                Másolva!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4 mr-1" />
-                                Meghívó link
-                              </>
-                            )}
-                          </button>
-                        )}
+                        <div className="flex items-center justify-end space-x-2">
+                          {/* Copy invite link button - only for invited status */}
+                          {employee.status === 'invited' && employee.inviteToken && (
+                            <button
+                              onClick={() => copyInviteLink(employee)}
+                              className="inline-flex items-center px-3 py-1 text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                              {copiedToken === employee.id ? (
+                                <>
+                                  <CheckCircle2 className="w-4 h-4 mr-1" />
+                                  Másolva!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-4 h-4 mr-1" />
+                                  Meghívó link
+                                </>
+                              )}
+                            </button>
+                          )}
+
+                          {/* Remove button - for invited and active status */}
+                          {employee.status !== 'left' && (
+                            <button
+                              onClick={() => setShowRemoveConfirm(employee)}
+                              disabled={removingEmployeeId === employee.id}
+                              className="inline-flex items-center px-3 py-1 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
+                              title={employee.status === 'invited' ? 'Meghívó visszavonása' : 'Eltávolítás'}
+                            >
+                              {removingEmployeeId === employee.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : employee.status === 'invited' ? (
+                                <>
+                                  <X className="w-4 h-4 mr-1" />
+                                  Visszavonás
+                                </>
+                              ) : (
+                                <>
+                                  <UserMinus className="w-4 h-4 mr-1" />
+                                  Eltávolítás
+                                </>
+                              )}
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -657,6 +714,77 @@ export default function EmployeesPage() {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Remove Employee Confirmation Modal */}
+      <AnimatePresence>
+        {showRemoveConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                </div>
+                <button
+                  onClick={() => setShowRemoveConfirm(null)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {showRemoveConfirm.status === 'invited'
+                  ? 'Meghívó visszavonása'
+                  : 'Alkalmazott eltávolítása'}
+              </h3>
+
+              <p className="text-gray-600 mb-6">
+                {showRemoveConfirm.status === 'invited' ? (
+                  <>
+                    Biztosan visszavonod <span className="font-medium">{showRemoveConfirm.fullName}</span> meghívóját?
+                    A meghívó link többé nem lesz érvényes.
+                  </>
+                ) : (
+                  <>
+                    Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> alkalmazottat a vállalatból?
+                    Az alkalmazott elveszíti hozzáférését a vállalati kurzusokhoz.
+                  </>
+                )}
+              </p>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowRemoveConfirm(null)}
+                  className="btn flex-1 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 shadow-sm"
+                >
+                  Mégse
+                </button>
+                <button
+                  onClick={() => handleRemoveEmployee(showRemoveConfirm)}
+                  className="btn flex-1 bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow-md inline-flex items-center justify-center"
+                >
+                  {showRemoveConfirm.status === 'invited' ? (
+                    <>
+                      <X className="w-5 h-5 mr-2" />
+                      Visszavonás
+                    </>
+                  ) : (
+                    <>
+                      <UserMinus className="w-5 h-5 mr-2" />
+                      Eltávolítás
+                    </>
+                  )}
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
