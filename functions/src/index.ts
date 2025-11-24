@@ -1446,6 +1446,7 @@ export {
   enrollCompanyInCourse,
   getCompanyEnrolledCourses,
 } from './company/enrollCompanyInCourse';
+// Note: Trial expiry is handled by Stripe, not custom functions
 
 // Export Mux video functions
 export { getMuxUploadUrl, getMuxAssetStatus, testVideoUpload, migrateVideoToMux } from './muxActions';

@@ -445,3 +445,5 @@ export function useCompanyEnrolledCourses(companyId: string | undefined) {
     staleTime: 2 * 60 * 1000, // 2 minutes
   })
 }
+
+// Note: Trial management is handled by Stripe, not custom functions

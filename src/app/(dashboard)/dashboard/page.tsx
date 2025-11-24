@@ -12,6 +12,8 @@ import { WelcomeHero } from '@/components/dashboard/WelcomeHero';
 import { RecentActivitySection } from '@/components/dashboard/RecentActivitySection';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useGamificationData, useSaveUserPreferences } from '@/hooks/useGamification';
+import { Building2, Star } from 'lucide-react';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import type { UserPreferences } from '@/types';
 
 /**
@@ -39,6 +41,32 @@ export default function DashboardPage() {
   const savePreferences = useSaveUserPreferences();
 
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState<{ name: string; id: string } | null>(null);
+
+  // Check if user is company employee
+  const isCompanyEmployee = user?.companyId && user?.companyRole === 'employee';
+
+  // Fetch company info for employees
+  useEffect(() => {
+    const fetchCompanyInfo = async () => {
+      if (!isCompanyEmployee || !user?.companyId) return;
+
+      try {
+        const db = getFirestore();
+        const companyDoc = await getDoc(doc(db, 'companies', user.companyId));
+        if (companyDoc.exists()) {
+          setCompanyInfo({
+            id: companyDoc.id,
+            name: companyDoc.data().name || 'Vállalat'
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching company info:', err);
+      }
+    };
+
+    fetchCompanyInfo();
+  }, [user?.companyId, isCompanyEmployee]);
 
   // Check if onboarding is needed
   useEffect(() => {
@@ -96,6 +124,29 @@ export default function DashboardPage() {
       )}
 
       <div className="space-y-8">
+        {/* Company Employee Banner */}
+        {isCompanyEmployee && companyInfo && (
+          <div className="rounded-xl bg-gradient-to-r from-blue-50/80 to-purple-50/80 border border-blue-200/50 p-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                <Building2 className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900">
+                  Vállalati fiók
+                </p>
+                <p className="text-sm text-gray-600">
+                  A(z) <span className="font-medium text-blue-600">{companyInfo.name}</span> tagjaként hozzáférsz az összes kurzushoz
+                </p>
+              </div>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                <Star className="w-3 h-3 mr-1" />
+                Prémium
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Hero for New Users */}
         {isNewUser && (
           <WelcomeHero

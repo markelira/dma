@@ -2,7 +2,9 @@ import * as admin from 'firebase-admin';
 import { Timestamp, FieldValue } from 'firebase-admin/firestore';
 import { https } from 'firebase-functions/v2';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import * as crypto from 'crypto';
 import { Company, CompanyAdmin, CompanyEmployee } from '../types/company';
+import { sendInvitationEmail } from './employeeInvite';
 
 interface OnboardingInput {
   companyName: string;
@@ -212,13 +214,15 @@ export const completeCompanyOnboarding = https.onCall(
             continue; // Skip invalid emails
           }
 
-          // Generate invitation token
-          const inviteToken = `invite-${Date.now()}-${Math.random().toString(36).substring(7)}`;
+          // Generate secure invitation token (same as addEmployee)
+          const inviteToken = crypto.randomBytes(32).toString('hex');
 
           // Create employee document
+          const fullName = `${employee.firstName.trim()} ${employee.lastName.trim()}`;
           const employeeData: Omit<CompanyEmployee, 'id'> = {
             firstName: employee.firstName.trim(),
             lastName: employee.lastName.trim(),
+            fullName,
             email: employee.email.trim().toLowerCase(),
             jobTitle: employee.jobTitle?.trim() || '',
             status: 'invited',
@@ -227,6 +231,7 @@ export const completeCompanyOnboarding = https.onCall(
               new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days to accept
             ),
             companyId,
+            enrolledMasterclasses: [],
             invitedBy: userId,
             invitedAt: FieldValue.serverTimestamp() as admin.firestore.Timestamp,
           };
@@ -240,9 +245,19 @@ export const completeCompanyOnboarding = https.onCall(
           batch.set(employeeRef, employeeData);
           employeesInvited++;
 
-          // TODO: Send invitation email
-          // In production, you would send an email here with the invite link
-          console.log(`Invitation sent to ${employee.email} with token: ${inviteToken}`);
+          // Send invitation email (non-blocking)
+          const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`;
+          try {
+            await sendInvitationEmail(employee.email.trim().toLowerCase(), {
+              firstName: employee.firstName.trim(),
+              companyName: companyName.trim(),
+              inviteUrl,
+            });
+            console.log(`Invitation email sent to ${employee.email}`);
+          } catch (emailError: any) {
+            console.warn(`Failed to send invitation email to ${employee.email}:`, emailError.message);
+            // Don't throw - employee was still added successfully
+          }
         }
 
         await batch.commit();

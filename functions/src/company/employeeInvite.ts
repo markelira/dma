@@ -130,7 +130,7 @@ export const addEmployee = https.onCall(
         await sendInvitationEmail(email, {
           firstName,
           companyName,
-          inviteUrl: `${process.env.APP_URL || 'https://localhost:3000'}/company/invite/${inviteToken}`,
+          inviteUrl: `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`,
         });
         console.log(`Invitation email sent to ${email}`);
       } catch (emailError: any) {
@@ -212,14 +212,12 @@ export const verifyEmployeeInvite = https.onCall(
         .doc(employeeData.companyId)
         .get();
 
+      // Return format expected by frontend invite page
       return {
-        success: true,
-        employee: {
-          firstName: employeeData.firstName,
-          lastName: employeeData.lastName,
-          email: employeeData.email,
-          companyName: companyDoc.data()?.name || 'Unknown Company',
-        },
+        valid: true,
+        companyName: companyDoc.data()?.name || 'Unknown Company',
+        employeeEmail: employeeData.email,
+        employeeName: `${employeeData.firstName} ${employeeData.lastName}`,
       };
     } catch (error: any) {
       console.error('Error verifying invite:', error);
@@ -287,15 +285,12 @@ export const acceptEmployeeInvite = https.onCall(
         );
       }
 
-      // 3. Verify email matches (security check)
-      if (
-        userEmail &&
-        employeeData.email.toLowerCase() !== userEmail.toLowerCase()
-      ) {
-        throw new HttpsError(
-          'permission-denied',
-          'Email does not match the invited email'
-        );
+      // 3. Email matching is now optional - allow existing users with different email
+      // This enables "merge accounts" flow where existing users can join companies
+      // The invite token itself is the security measure
+      const emailMatches = userEmail && employeeData.email.toLowerCase() === userEmail.toLowerCase();
+      if (!emailMatches) {
+        console.log(`Employee ${userId} accepting invite with different email. Invited: ${employeeData.email}, Logged in: ${userEmail}`);
       }
 
       // 4. Check if token has expired
@@ -337,7 +332,41 @@ export const acceptEmployeeInvite = https.onCall(
       // Don't throw - invite was already accepted successfully
     }
 
-    // 7. Auto-enroll employee in all company-purchased masterclasses
+    // 7. Update user document with company info (for dashboard display)
+    try {
+      const userRef = db.collection('users').doc(userId);
+      const userDoc = await userRef.get();
+
+      if (userDoc.exists) {
+        // Update existing user - merge accounts
+        await userRef.update({
+          companyId: result.companyId,
+          companyRole: 'employee',
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        console.log(`Updated existing user ${userId} with company ${result.companyId}`);
+      } else {
+        // Create user document if doesn't exist (shouldn't happen normally)
+        const authUser = await admin.auth().getUser(userId);
+        await userRef.set({
+          id: userId,
+          email: authUser.email || '',
+          firstName: authUser.displayName?.split(' ')[0] || '',
+          lastName: authUser.displayName?.split(' ').slice(1).join(' ') || '',
+          role: 'STUDENT', // Keep as student for course access
+          companyId: result.companyId,
+          companyRole: 'employee',
+          createdAt: FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        console.log(`Created user document for ${userId} with company ${result.companyId}`);
+      }
+    } catch (userError: any) {
+      console.error('Error updating user document:', userError);
+      // Don't throw - invite was already accepted successfully
+    }
+
+    // 8. Auto-enroll employee in all company-purchased masterclasses
     try {
       const companyDoc = await db.collection('companies').doc(result.companyId).get();
       const companyData = companyDoc.data();
@@ -394,8 +423,9 @@ export const acceptEmployeeInvite = https.onCall(
 
 /**
  * Send Invitation Email via SendGrid
+ * Exported for use in completeOnboarding
  */
-async function sendInvitationEmail(
+export async function sendInvitationEmail(
   to: string,
   data: {
     firstName: string;

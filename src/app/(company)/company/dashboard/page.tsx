@@ -33,6 +33,10 @@ import { functions } from '@/lib/firebase';
 import { colors, cardStyles } from '@/lib/design-tokens-premium';
 import { Company, CompanyAdmin, DashboardStats } from '@/types/company';
 import { useEnrollCompanyInCourse, useCompanyEnrolledCourses } from '@/hooks/useCompanyActions';
+import { usePaymentActions } from '@/hooks/usePaymentActions';
+
+// Stripe Price ID for company subscription (from .env)
+const COMPANY_SUBSCRIPTION_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID || 'price_1QWPDjRvOWrujGVHxdaSOcJZ';
 
 export default function CompanyDashboardPage() {
   const router = useRouter();
@@ -69,6 +73,18 @@ export default function CompanyDashboardPage() {
   // Company course enrollment hooks
   const enrollCompanyMutation = useEnrollCompanyInCourse();
   const { data: enrolledCourses = [], isLoading: enrolledCoursesLoading } = useCompanyEnrolledCourses(company?.id);
+
+  // Subscription hooks
+  const {
+    subscriptionStatus,
+    subscriptionStatusLoading,
+    subscribeToPlan,
+    isCreatingCheckout
+  } = usePaymentActions();
+
+  // Check if company has active subscription
+  const hasActiveSubscription = subscriptionStatus?.hasSubscription && subscriptionStatus?.isActive;
+  const isTrialing = subscriptionStatus?.subscription?.status === 'trialing';
 
   useEffect(() => {
     const fetchCompanyData = async () => {
@@ -252,6 +268,22 @@ export default function CompanyDashboardPage() {
     }
   };
 
+  const handleSubscribe = async () => {
+    try {
+      await subscribeToPlan(
+        COMPANY_SUBSCRIPTION_PRICE_ID,
+        `${window.location.origin}/company/dashboard?subscription=success`,
+        `${window.location.origin}/company/dashboard?subscription=cancelled`,
+        {
+          companyId: company?.id || '',
+          subscriptionType: 'company'
+        }
+      );
+    } catch (err) {
+      console.error('Error creating checkout session:', err);
+    }
+  };
+
   // Get courses not yet enrolled
   const availableCoursesForEnrollment = availableCourses.filter(
     course => !enrolledCourses.some(ec => ec.id === course.id)
@@ -403,22 +435,90 @@ export default function CompanyDashboardPage() {
           </p>
         </div>
 
-        {/* Trial Banner */}
-        {company.plan === 'trial' && daysRemaining > 0 && (
+        {/* Subscription Banner */}
+        {!hasActiveSubscription && !subscriptionStatusLoading && (
+          <div className="mb-8 bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm border border-blue-200/50 rounded-xl p-6 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+                  <Star className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-lg">Aktiváld az előfizetésedet</h3>
+                  <p className="text-gray-600 mt-1">
+                    Az előfizetéssel korlátlan hozzáférést biztosíthatsz az összes kurzushoz minden alkalmazottad számára.
+                  </p>
+                  <ul className="mt-2 text-sm text-gray-600 space-y-1">
+                    <li className="flex items-center">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      Korlátlan hozzáférés minden kurzushoz
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      7 napos ingyenes próbaidőszak
+                    </li>
+                    <li className="flex items-center">
+                      <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
+                      Bármikor lemondható
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <button
+                onClick={handleSubscribe}
+                disabled={isCreatingCheckout}
+                className="btn bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-lg hover:shadow-xl transition-all inline-flex items-center justify-center whitespace-nowrap disabled:opacity-50"
+              >
+                {isCreatingCheckout ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Betöltés...
+                  </>
+                ) : (
+                  <>
+                    Előfizetés indítása
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Trial/Active Subscription Banner */}
+        {hasActiveSubscription && isTrialing && (
           <div className="mb-8 bg-amber-50/80 backdrop-blur-sm border border-amber-200/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
             <div className="flex items-center space-x-3">
               <Clock className="w-5 h-5 text-amber-600" />
               <div>
-                <p className="font-medium text-amber-900">Próbaidőszak</p>
-                <p className="text-sm text-amber-700">Még {daysRemaining} nap van hátra a próbaidőszakból</p>
+                <p className="font-medium text-amber-900">Próbaidőszak aktív</p>
+                <p className="text-sm text-amber-700">
+                  {subscriptionStatus?.subscription?.trialEnd
+                    ? `A próbaidőszak lejár: ${new Date(subscriptionStatus.subscription.trialEnd).toLocaleDateString('hu-HU')}`
+                    : 'A próbaidőszak hamarosan lejár'}
+                </p>
               </div>
             </div>
-            <Link
-              href="/company/dashboard/billing"
-              className="btn-sm bg-gradient-to-t from-amber-600 to-amber-500 text-white shadow-sm hover:shadow-md transition-all"
-            >
-              Frissítés
-            </Link>
+            <span className="px-3 py-1 bg-amber-100 text-amber-800 text-sm font-medium rounded-full">
+              Próba
+            </span>
+          </div>
+        )}
+
+        {hasActiveSubscription && !isTrialing && (
+          <div className="mb-8 bg-green-50/80 backdrop-blur-sm border border-green-200/50 rounded-xl p-4 flex items-center justify-between shadow-sm">
+            <div className="flex items-center space-x-3">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="font-medium text-green-900">Aktív előfizetés</p>
+                <p className="text-sm text-green-700">
+                  {subscriptionStatus?.subscription?.planName || 'DMA Vállalati előfizetés'}
+                </p>
+              </div>
+            </div>
+            <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+              Aktív
+            </span>
           </div>
         )}
 

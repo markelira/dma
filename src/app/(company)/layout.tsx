@@ -13,19 +13,22 @@ export default function CompanyLayout({
   const { user, isLoading, authReady } = useAuthStore()
   const router = useRouter()
 
+  // Company admin is determined by companyId + companyRole === 'owner'
+  const isCompanyAdmin = user?.companyId && user?.companyRole === 'owner'
+
   useEffect(() => {
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [CompanyLayout] No user found, redirecting to login')
         router.replace('/login?redirect_to=/company/dashboard')
-      } else if (user.role !== 'COMPANY_ADMIN') {
-        console.log('❌ [CompanyLayout] User is not COMPANY_ADMIN, redirecting. User role:', user.role)
+      } else if (!isCompanyAdmin) {
+        console.log('❌ [CompanyLayout] User is not company owner, redirecting. companyId:', user.companyId, 'companyRole:', user.companyRole)
         router.replace('/dashboard')
       }
     }
-  }, [user, isLoading, authReady, router])
+  }, [user, isLoading, authReady, router, isCompanyAdmin])
 
-  if (!authReady || isLoading || !user || user.role !== 'COMPANY_ADMIN') {
+  if (!authReady || isLoading || !user || !isCompanyAdmin) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
         <div className="text-center">

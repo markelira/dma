@@ -167,7 +167,7 @@ export const createCompany = https.onCall(
       // 6. Send welcome email (plain text for MVP)
       await sendWelcomeEmail(billingEmail, {
         companyName: name,
-        dashboardUrl: `${process.env.APP_URL || 'https://localhost:3000'}/company/${companyId}/dashboard`,
+        dashboardUrl: `${process.env.APP_URL || 'https://academion.hu'}/company/dashboard`,
       });
 
       return {

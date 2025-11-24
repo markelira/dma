@@ -103,7 +103,7 @@ export const sendEmployeeReminder = https.onCall(
         firstName: employeeData.firstName,
         companyName,
         masterclassTitle,
-        dashboardUrl: `${process.env.APP_URL || 'https://localhost:3000'}/dashboard`,
+        dashboardUrl: `${process.env.APP_URL || 'https://academion.hu'}/dashboard`,
       });
 
       // 6. Log activity
