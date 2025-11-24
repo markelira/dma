@@ -32,6 +32,8 @@ interface AuthUser extends User {
   universityId?: string;
   companyId?: string;
   companyRole?: string;
+  teamId?: string;
+  isTeamOwner?: boolean;
 }
 
 interface AuthContextType {
@@ -110,7 +112,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: userData.role || customClaims.role,
           universityId: userData.universityId,
           companyId: userData.companyId || (customClaims.companyId as string | undefined),
-          companyRole: userData.companyRole || (customClaims.companyRole as string | undefined)
+          companyRole: userData.companyRole || (customClaims.companyRole as string | undefined),
+          teamId: userData.teamId,
+          isTeamOwner: userData.isTeamOwner ?? false
         };
       } else {
         // If no Firestore document, fall back to custom claims
@@ -118,7 +122,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ...firebaseUser,
           role: customClaims.role as UserRole | undefined,
           companyId: customClaims.companyId as string | undefined,
-          companyRole: customClaims.companyRole as string | undefined
+          companyRole: customClaims.companyRole as string | undefined,
+          teamId: undefined,
+          isTeamOwner: false
         };
       }
     } catch (error) {

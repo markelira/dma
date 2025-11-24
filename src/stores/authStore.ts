@@ -15,6 +15,9 @@ export interface User {
   companyId?: string
   companyRole?: string
   universityId?: string
+  // Team subscription fields
+  teamId?: string
+  isTeamOwner?: boolean
 }
 
 export interface AuthResponse {
@@ -35,6 +38,7 @@ interface AuthState {
   clearAuth: () => void
   logout: () => Promise<void>
   updateSubscriptionStatus: (subscriptionActive: boolean) => void
+  updateTeamInfo: (teamId: string | null, isTeamOwner: boolean) => void
   setAuthReady: (ready: boolean) => void
 }
 
@@ -63,6 +67,9 @@ export const useAuthStore = create<AuthState>()(
       }),
       updateSubscriptionStatus: (subscriptionActive) => set((state) => ({
         user: state.user ? { ...state.user, subscriptionActive } : null
+      })),
+      updateTeamInfo: (teamId, isTeamOwner) => set((state) => ({
+        user: state.user ? { ...state.user, teamId: teamId ?? undefined, isTeamOwner } : null
       })),
       logout: async () => {
         try {

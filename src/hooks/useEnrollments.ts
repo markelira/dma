@@ -48,12 +48,15 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         throw new Error('User not authenticated')
       }
 
-      // 1. Check if user has active team subscription
+      // 1. Check if user has active subscription (via team or direct)
       const userRef = doc(db, 'users', user.uid)
       const userSnap = await getDoc(userRef)
       const userData = userSnap.exists() ? userSnap.data() : null
 
-      const hasActiveSubscription = userData?.subscriptionStatus === 'active' && userData?.teamId
+      // User has active subscription if subscriptionStatus is 'active' or 'trialing'
+      const hasActiveSubscription =
+        userData?.subscriptionStatus === 'active' ||
+        userData?.subscriptionStatus === 'trialing'
 
       // 2. Fetch actual enrollments
       const enrollmentsRef = collection(db, 'enrollments')

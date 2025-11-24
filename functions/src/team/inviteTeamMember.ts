@@ -73,7 +73,23 @@ export const inviteTeamMember = onCall({
       );
     }
 
-    // 4. Check if email already invited or is a member
+    // 4. Check member limit (max 10 members)
+    const MAX_TEAM_MEMBERS = 10;
+    const activeMembersSnapshot = await firestore
+      .collection('teams')
+      .doc(teamId)
+      .collection('members')
+      .where('status', 'in', ['invited', 'active'])
+      .get();
+
+    if (activeMembersSnapshot.size >= MAX_TEAM_MEMBERS) {
+      throw new HttpsError(
+        'resource-exhausted',
+        `Elérted a maximális taglétszámot (${MAX_TEAM_MEMBERS} fő). Távolíts el meglévő tagokat új meghívásokhoz.`
+      );
+    }
+
+    // 5. Check if email already invited or is a member
     const existingMemberSnapshot = await firestore
       .collection('teams')
       .doc(teamId)
@@ -131,7 +147,8 @@ export const inviteTeamMember = onCall({
     });
 
     // 8. Send invitation email
-    const inviteLink = `https://dma.hu/invite/${inviteToken}`;
+    const appUrl = process.env.APP_URL || 'https://academion.hu';
+    const inviteLink = `${appUrl}/invite/${inviteToken}`;
 
     await sendInvitationEmail({
       to: email,

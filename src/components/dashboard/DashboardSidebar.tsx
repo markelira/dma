@@ -31,7 +31,7 @@ import { brandGradient } from '@/lib/design-tokens'
  * - Clean, professional design
  */
 
-// Navigation items based on user role and learning focus
+// Base navigation items - Team section is added dynamically based on user's team ownership
 const navigationSections = {
   STUDENT: [
     {
@@ -124,20 +124,20 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
         className={cn(
           'flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all group',
           isActive
-            ? 'bg-blue-600/20 text-blue-400 border-l-2 border-blue-500'
-            : 'text-gray-300 hover:bg-gray-800/50 border-l-2 border-transparent'
+            ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500'
+            : 'text-gray-700 hover:bg-gray-100 border-l-2 border-transparent'
         )}
       >
         <div className="flex items-center">
           <Icon className={cn(
             'w-4 h-4 mr-3',
-            isActive ? 'text-blue-400' : 'text-gray-500'
+            isActive ? 'text-blue-600' : 'text-gray-500'
           )} />
           {item.title}
         </div>
         <ChevronRight className={cn(
           'w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity',
-          isActive ? 'opacity-100 text-blue-400' : 'text-gray-500'
+          isActive ? 'opacity-100 text-blue-600' : 'text-gray-400'
         )} />
       </Link>
     </motion.div>
@@ -161,13 +161,13 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
   // Loading state
   if (loading) {
     return (
-      <div className="h-full flex flex-col bg-[#1a1a1a]">
-        <div className="p-6 border-b border-gray-800">
-          <div className="h-6 w-24 bg-gray-700 rounded animate-pulse" />
+      <div className="h-full flex flex-col bg-white">
+        <div className="p-6 border-b border-gray-200">
+          <div className="h-6 w-24 bg-gray-200 rounded animate-pulse" />
         </div>
         <div className="flex-1 p-4 space-y-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-10 w-full bg-gray-700 rounded animate-pulse" />
+            <div key={i} className="h-10 w-full bg-gray-200 rounded animate-pulse" />
           ))}
         </div>
       </div>
@@ -175,12 +175,36 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
   }
 
   const userRole = user?.role ?? 'STUDENT'
-  const sections = navigationSections[userRole] || navigationSections.STUDENT
+  const baseSections = navigationSections[userRole] || navigationSections.STUDENT
+
+  // Dynamically add Team section if user is a team owner
+  const sections = React.useMemo(() => {
+    // Check if user is a team owner (has teamId and isTeamOwner from AuthContext)
+    const isTeamOwner = (user as any)?.isTeamOwner === true && (user as any)?.teamId
+
+    if (!isTeamOwner) {
+      return baseSections
+    }
+
+    // Insert Team section after the first section (Fő navigáció)
+    const teamSection = {
+      title: 'Csapat',
+      items: [
+        { title: 'Tim kezelése', href: '/dashboard/team', icon: Users },
+      ]
+    }
+
+    // Clone sections and insert team section
+    const sectionsWithTeam = [...baseSections]
+    sectionsWithTeam.splice(1, 0, teamSection)
+
+    return sectionsWithTeam
+  }, [baseSections, user])
 
   return (
-    <div className="h-full flex flex-col bg-[#1a1a1a]">
+    <div className="h-full flex flex-col bg-white">
       {/* Header with DMA branding */}
-      <div className="px-6 py-5 border-b border-gray-800">
+      <div className="px-6 py-5 border-b border-gray-200">
         <Link href="/dashboard" className="flex items-center space-x-3 group">
           <motion.div
             className="relative w-10 h-10 flex-shrink-0"
@@ -196,7 +220,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
               priority
             />
           </motion.div>
-          <span className="text-xl font-bold text-white tracking-tight group-hover:text-blue-400 transition-colors">
+          <span className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
             DMA
           </span>
         </Link>
@@ -226,7 +250,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
       </div>
 
       {/* User Profile Section */}
-      <div className="border-t border-gray-800 p-4">
+      <div className="border-t border-gray-200 p-4">
         <div className="flex items-center space-x-3 mb-4">
           <motion.div
             className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-600"
@@ -236,7 +260,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
             <User className="w-4 h-4 text-white" />
           </motion.div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">
+            <p className="text-sm font-medium text-gray-900 truncate">
               {user?.firstName} {user?.lastName}
             </p>
             <p className="text-xs text-gray-500 truncate">
@@ -251,7 +275,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
             <Link
               href="/dashboard/settings"
               onClick={onNavigate}
-              className="flex items-center px-3 py-2 text-sm text-gray-300 hover:bg-gray-800/50 rounded-lg transition-colors"
+              className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Settings className="w-4 h-4 mr-3" />
               Profil beállítások
@@ -261,7 +285,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
           <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
             <button
               onClick={handleLogout}
-              className="flex items-center w-full px-3 py-2 text-sm text-red-400 hover:bg-red-900/30 rounded-lg transition-colors"
+              className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4 mr-3" />
               Kijelentkezés
