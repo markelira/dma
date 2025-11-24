@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   // Example features based on mode
   const features = mode === 'subscription' 
     ? [
-        'Hozzáférés minden kurzushoz',
+        'Hozzáférés minden tartalomhoz',
         'Korlátlan videó megtekintés',
         'Letölthető anyagok',
         'Prioritás támogatás',
@@ -32,7 +32,7 @@ export default function CheckoutPage() {
         'Tanúsítványok'
       ]
     : [
-        'Teljes kurzus hozzáférés',
+        'Teljes tartalom hozzáférés',
         'Minden lecke és anyag',
         'Letölthető tartalmak',
         'Tanúsítvány a befejezéskor',

@@ -7,8 +7,8 @@ const steps = [
   {
     id: 1,
     icon: Search,
-    title: 'Válasszon kurzust',
-    description: 'Böngésszen több száz kurzus között, vagy használja a keresőt a tökéletes találat érdekében.',
+    title: 'Válasszon tartalmat',
+    description: 'Böngésszen több száz tartalom között, vagy használja a keresőt a tökéletes találat érdekében.',
     color: 'from-primary to-primary',
     bgColor: 'bg-blue-50',
     textColor: 'text-blue-700'
@@ -26,7 +26,7 @@ const steps = [
     id: 3,
     icon: Award,
     title: 'Szerezzen tanúsítványt',
-    description: 'Teljesítse a kurzust és kapjon elismert tanúsítványt, amelyet megoszthat a LinkedIn profilján.',
+    description: 'Teljesítse a tartalmat és kapjon elismert tanúsítványt, amelyet megoszthat a LinkedIn profilján.',
     color: 'from-purple-500 to-purple-600',
     bgColor: 'bg-purple-50',
     textColor: 'text-purple-700'
@@ -124,7 +124,7 @@ export const HowItWorks: React.FC = () => {
                 Ingyenes regisztráció
               </button>
               <button className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
-                Kurzusok böngészése
+                Tartalmak böngészése
               </button>
             </div>
           </div>

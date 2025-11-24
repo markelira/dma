@@ -100,7 +100,7 @@ export function DashboardHeader() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <Input
                 type="search"
-                placeholder="Kurzusok keresése..."
+                placeholder="Tartalmak keresése..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 w-80 bg-gray-50 border-gray-200"
@@ -115,7 +115,7 @@ export function DashboardHeader() {
               <div className="hidden lg:flex items-center gap-6 mr-4">
                 <Link href="/dashboard/my-learning" className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900">
                   <BookOpen className="h-4 w-4" />
-                  <span>3 aktív kurzus</span>
+                  <span>3 aktív tartalom</span>
                 </Link>
               </div>
             )}

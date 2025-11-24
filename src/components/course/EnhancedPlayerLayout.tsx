@@ -259,8 +259,8 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                         },
                         {
                           id: '2',
-                          title: 'Kurzus felét',
-                          description: 'Fejezd be a kurzus felét',
+                          title: 'Tartalom felét',
+                          description: 'Fejezd be a tartalom felét',
                           targetValue: Math.floor(flatLessons.length / 2),
                           currentValue: courseStats.completedLessons,
                           completed: courseStats.completedLessons >= Math.floor(flatLessons.length / 2)

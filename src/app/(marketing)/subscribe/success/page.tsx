@@ -162,7 +162,7 @@ function SubscribeSuccessContent() {
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Azonnali hozzáférés</p>
-                    <p className="text-sm text-gray-600">Minden prémium kurzus és funkció elérhető</p>
+                    <p className="text-sm text-gray-600">Minden prémium tartalom és funkció elérhető</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -190,7 +190,7 @@ function SubscribeSuccessContent() {
               <Link href="/courses" className="flex-1">
                 <Button className="w-full" size="lg">
                   <BookOpen className="w-4 h-4 mr-2" />
-                  Kurzusok böngészése
+                  Tartalmak böngészése
                 </Button>
               </Link>
               <Link href="/dashboard" className="flex-1">

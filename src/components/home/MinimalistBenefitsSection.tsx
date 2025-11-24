@@ -23,7 +23,7 @@ export function MinimalistBenefitsSection() {
     {
       icon: TrendingUp,
       title: 'Csapathaladás követés',
-      description: 'Lásd, ki melyik kurzuson dolgozik, és mennyit haladt előre a csapatod.',
+      description: 'Lásd, ki melyik tartalmon dolgozik, és mennyit haladt előre a csapatod.',
     },
     {
       icon: BarChart,
@@ -33,7 +33,7 @@ export function MinimalistBenefitsSection() {
     {
       icon: MessageCircle,
       title: 'Csapat kommunikáció',
-      description: 'Megbeszélések, kérdések és válaszok egy helyen, kurzusonként.',
+      description: 'Megbeszélések, kérdések és válaszok egy helyen, tartalmanként.',
     },
     {
       icon: Shield,

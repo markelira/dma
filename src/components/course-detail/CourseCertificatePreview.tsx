@@ -69,7 +69,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Ez a tanúsítvány igazolja, hogy</p>
                   <p className="font-semibold text-gray-900 mb-4">[Hallgató Neve]</p>
-                  <p className="text-sm text-gray-600 mb-2">sikeresen elvégezte a kurzust</p>
+                  <p className="text-sm text-gray-600 mb-2">sikeresen elvégezte a tartalmat</p>
                   <h4 className="font-bold text-lg text-[#0f766e] mb-4">{courseData.title}</h4>
                   <p className="text-xs text-gray-500">Kiadás dátuma: {new Date().toLocaleDateString('hu-HU')}</p>
                 </div>
@@ -110,7 +110,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
               <div className="mt-6 p-4 bg-[#0f766e]/5 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5 text-[#0f766e]" />
-                  <span className="font-semibold text-gray-900">Kurzus statisztikák</span>
+                  <span className="font-semibold text-gray-900">Tartalom statisztikák</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -155,7 +155,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
                   Kezdje el a tanulást most
                 </Button>
                 <p className="text-xs text-gray-500 text-center mt-2">
-                  Tanúsítvány automatikusan elérhető a kurzus befejezése után
+                  Tanúsítvány automatikusan elérhető a tartalom befejezése után
                 </p>
               </div>
             </div>

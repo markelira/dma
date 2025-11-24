@@ -50,11 +50,11 @@ export function BrowseCoursesSection() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">Kurzusok felfedezése</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Tartalmak felfedezése</h2>
         <Link href="/courses">
           <Button variant="outline">
             <Search className="w-4 h-4 mr-2" />
-            Összes kurzus
+            Összes tartalom
           </Button>
         </Link>
       </div>
@@ -135,9 +135,9 @@ export function BrowseCoursesSection() {
                       <SelectValue placeholder="Válasszon típust" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Minden kurzus</SelectItem>
+                      <SelectItem value="">Minden tartalom</SelectItem>
                       <SelectItem value="plus">DMA Plus</SelectItem>
-                      <SelectItem value="paid">Fizetős kurzusok</SelectItem>
+                      <SelectItem value="paid">Fizetős tartalmak</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -189,13 +189,13 @@ export function BrowseCoursesSection() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <TrendingUp className="w-5 h-5 text-green-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Felkapott kurzusok</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Felkapott tartalmak</h3>
             <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
               Trending
             </Badge>
           </div>
           <Link href="/courses?sort=trending" className="text-sm text-gray-900 hover:text-[#466C95] transition-colors">
-            Összes trending kurzus →
+            Összes trending tartalom →
           </Link>
         </div>
 
@@ -223,12 +223,12 @@ export function BrowseCoursesSection() {
           <div className="flex items-center">
             <BookOpen className="w-5 h-5 text-gray-600 mr-2" />
             <h3 className="text-lg font-semibold text-gray-900">
-              {catalogFilters.search ? `Keresési eredmények: "${catalogFilters.search}"` : 'Népszerű kurzusok'}
+              {catalogFilters.search ? `Keresési eredmények: "${catalogFilters.search}"` : 'Népszerű tartalmak'}
             </h3>
           </div>
           {catalogData?.total && (
             <p className="text-sm text-gray-600">
-              {catalogData.total} kurzus található
+              {catalogData.total} tartalom található
             </p>
           )}
         </div>
@@ -262,7 +262,7 @@ export function BrowseCoursesSection() {
               onClick={() => handleFilterChange('limit', (catalogFilters.limit || 6) + 6)}
               disabled={catalogLoading}
             >
-              További kurzusok betöltése ({catalogData.total - catalogData.courses.length} maradt)
+              További tartalmak betöltése ({catalogData.total - catalogData.courses.length} maradt)
             </Button>
           </div>
         )}
@@ -425,19 +425,19 @@ function EmptySearchResults({ searchQuery }: { searchQuery?: string }) {
         <Search className="w-8 h-8 text-gray-400" />
       </div>
       <h3 className="text-lg font-semibold text-gray-900 mb-2">
-        {searchQuery ? `Nincs találat: "${searchQuery}"` : 'Nincsenek kurzusok'}
+        {searchQuery ? `Nincs találat: "${searchQuery}"` : 'Nincsenek tartalmak'}
       </h3>
       <p className="text-gray-600 mb-6 max-w-md mx-auto">
         {searchQuery 
           ? 'Próbáljon meg más kulcsszavakat vagy szűrőket használni.'
-          : 'Jelenleg nincsenek elérhető kurzusok ezekkel a szűrőkkel.'
+          : 'Jelenleg nincsenek elérhető tartalmak ezekkel a szűrőkkel.'
         }
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Link href="/courses">
           <Button variant="outline">
             <BookOpen className="w-4 h-4 mr-2" />
-            Összes kurzus böngészése
+            Összes tartalom böngészése
           </Button>
         </Link>
         {searchQuery && (

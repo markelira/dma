@@ -26,7 +26,7 @@ export const ExploreCategoriesSectionPlaceholder = () => {
       <section id="kategoriak-felfedezese" className="py-24 bg-white">
         <Container>
           <Heading>Kategóriák felfedezése</Heading>
-          <p className="text-muted mb-6 max-w-2xl">Böngéssz az DMA főbb témakörei között, és találd meg a hozzád illő kurzust.</p>
+          <p className="text-muted mb-6 max-w-2xl">Böngéssz az DMA főbb témakörei között, és találd meg a hozzád illő tartalmat.</p>
           <div className="flex flex-wrap gap-3">
             {['Művészet', 'Üzlet', 'Informatika', 'Adattudomány', 'Egészség', 'Nyelvek', 'Matematika'].map(tag => (
               <span key={tag} className="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-700">{tag}</span>
@@ -41,7 +41,7 @@ export const ExploreCategoriesSectionPlaceholder = () => {
     <section id="kategoriak-felfedezese" className="py-24 bg-white">
       <Container>
         <Heading>Kategóriák felfedezése</Heading>
-        <p className="text-muted mb-6 max-w-2xl">Böngéssz az DMA főbb témakörei között, és találd meg a hozzád illő kurzust.</p>
+        <p className="text-muted mb-6 max-w-2xl">Böngéssz az DMA főbb témakörei között, és találd meg a hozzád illő tartalmat.</p>
         <div className="flex flex-wrap gap-3">
           {categories?.map(category => (
             <Link key={category.id} href={`/courses?category=${category.id}`}>
@@ -66,7 +66,7 @@ export const CareersSectionPlaceholder = () => {
           <div className="lg:w-1/3 flex flex-col gap-6">
             <div>
               <h2 className="heading-2 text-primary mb-4">Karrierek</h2>
-              <p className="text-muted">Növekedj karrieredben és szerezz új készségeket prémium kurzusainkkal.</p>
+              <p className="text-muted">Növekedj karrieredben és szerezz új készségeket prémium tartalmainkkal.</p>
             </div>
             <div>
               <button className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition">Az összes megtekintése</button>
@@ -112,9 +112,9 @@ export const PopularCoursesSectionPlaceholder = () => {
 
   if (isLoading) {
     return (
-      <section id="nepszeru-kurzusok" className="py-24 bg-white">
+      <section id="nepszeru-tartalmak" className="py-24 bg-white">
         <Container>
-          <Heading>Legnépszerűbb kurzusok</Heading>
+          <Heading>Legnépszerűbb tartalmak</Heading>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[1,2,3,4].map(i => (
               <div key={i} className="h-56 bg-gray-100 rounded-lg" />
@@ -126,9 +126,9 @@ export const PopularCoursesSectionPlaceholder = () => {
   }
 
   return (
-    <section id="nepszeru-kurzusok" className="py-24 bg-white">
+    <section id="nepszeru-tartalmak" className="py-24 bg-white">
       <Container>
-        <Heading>Legnépszerűbb kurzusok</Heading>
+        <Heading>Legnépszerűbb tartalmak</Heading>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {courses.map(course => (
             <CourseCard key={course.id} course={course} />
@@ -253,7 +253,7 @@ export const TestimonialsSectionPlaceholder = () => {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[
             { id: 'sample1', comment: 'Az ELIRA segítségével rövid idő alatt új készségeket sajátítottam el.', user: { firstName: 'Anna', lastName: 'P.' } },
-            { id: 'sample2', comment: 'Kiváló kurzusok és professzionális oktatók!', user: { firstName: 'Béla', lastName: 'K.' } },
+            { id: 'sample2', comment: 'Kiváló tartalmak és professzionális oktatók!', user: { firstName: 'Béla', lastName: 'K.' } },
             { id: 'sample3', comment: 'A gyakorlati példák segítettek megérteni az anyagot.', user: { firstName: 'Csilla', lastName: 'M.' } }
           ].map(r => (
               <div key={r.id} className="bg-gray-50 p-6 rounded-xl shadow-sm flex flex-col h-full">

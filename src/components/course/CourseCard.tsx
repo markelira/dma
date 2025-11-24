@@ -93,13 +93,13 @@ export const CourseCard: React.FC<Props> = ({
     if (!isAuthenticated) {
       toast.error('Bejelentkezés szükséges')
       // For MVP, we'll use a simple alert instead of navigation
-      alert('Bejelentkezés szükséges a kurzusra való feliratkozáshoz')
+      alert('Bejelentkezés szükséges a tartalomra való feliratkozáshoz')
       return
     }
 
     try {
       await enrollmentMutation.mutateAsync(course.id)
-      toast.success('Sikeresen feliratkozott a kurzusra!')
+      toast.success('Sikeresen feliratkozott a tartalomra!')
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Beiratkozás sikertelen'
       toast.error(errorMessage)

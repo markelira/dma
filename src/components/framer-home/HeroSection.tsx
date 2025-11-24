@@ -21,7 +21,7 @@ export default function HeroSection() {
             style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}
           >
             <span className="text-sm font-medium" style={{ color: "rgb(18, 17, 17)" }}>
-              Professzionális online kurzusok
+              Professzionális online tartalmak
             </span>
           </motion.div>
 
@@ -48,7 +48,7 @@ export default function HeroSection() {
             className="text-lg md:text-xl max-w-2xl mx-auto mb-10"
             style={{ color: "rgba(18, 17, 17, 0.7)" }}
           >
-            Tanulj a legjobbaktól. Szakértők által vezetett kurzusok marketing,
+            Tanulj a legjobbaktól. Szakértők által vezetett tartalmak marketing,
             technológia és üzleti területeken.
           </motion.p>
 
@@ -64,7 +64,7 @@ export default function HeroSection() {
               className="px-8 py-4 rounded-full font-semibold text-white transition-all hover:scale-105"
               style={{ backgroundColor: "rgb(18, 17, 17)" }}
             >
-              Kurzusok felfedezése
+              Tartalmak felfedezése
             </Link>
             <Link
               href="/pricing"

@@ -149,13 +149,13 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     }
 
     if (enrollmentData?.enrolled) {
-      onPurchaseError?.('Már beiratkoztál erre a kurzusra');
+      onPurchaseError?.('Már beiratkoztál erre a tartalomra');
       return;
     }
 
     // Check if course is free
     if (course?.isFree) {
-      onPurchaseError?.('Ez a kurzus ingyenes, nincs szükség fizetésre');
+      onPurchaseError?.('Ez a tartalom ingyenes, nincs szükség fizetésre');
       return;
     }
 

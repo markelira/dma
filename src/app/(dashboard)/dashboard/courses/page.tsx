@@ -48,9 +48,9 @@ export default function DashboardCoursesPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Kurzusaim</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Beiratkozásaim</h1>
         <p className="text-gray-500">
-          Kezeld és folytasd a kurzusaidat egy helyen
+          Kezeld és folytasd a tartalmaidat egy helyen
         </p>
       </div>
 
@@ -121,11 +121,11 @@ export default function DashboardCoursesPage() {
             <BookOpen className="h-10 w-10 text-blue-600" />
           </div>
           <h3 className="mb-2 text-lg font-semibold text-gray-900">
-            {filter === 'all' ? 'Még nincs kurzusod' : 'Nincs találat'}
+            {filter === 'all' ? 'Még nincs tartalmad' : 'Nincs találat'}
           </h3>
           <p className="mb-6 text-sm text-gray-500">
             {filter === 'all'
-              ? 'Kezdj el egy új kurzust a böngészés gombra kattintva'
+              ? 'Kezdj el egy új tartalmat a böngészés gombra kattintva'
               : 'Próbálj meg egy másik szűrőt'}
           </p>
           {filter === 'all' && (
@@ -133,7 +133,7 @@ export default function DashboardCoursesPage() {
               href="/courses"
               className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
             >
-              Kurzusok böngészése
+              Tartalmak böngészése
             </Link>
           )}
         </div>

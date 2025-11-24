@@ -76,9 +76,9 @@ export function FramerNavbarWrapper() {
 
               {/* Navigation Links */}
               <nav className="flex flex-col items-center space-y-6 mb-12">
-                {/* Kurzusok Links */}
+                {/* Tartalmak Links */}
                 <div className="text-center space-y-3">
-                  <p className="text-white/60 text-sm uppercase tracking-wider mb-2">Kurzusok</p>
+                  <p className="text-white/60 text-sm uppercase tracking-wider mb-2">Tartalmak</p>
                   <Link
                     href="/webinar"
                     onClick={closeMobileMenu}

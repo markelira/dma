@@ -82,7 +82,7 @@ export function Hero3CleanEfficient({
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <a href="/" className="hover:text-gray-700">Főoldal</a>
             <span>/</span>
-            <a href="/courses" className="hover:text-gray-700">Kurzusok</a>
+            <a href="/courses" className="hover:text-gray-700">Tartalmak</a>
             {categories[0] && (
               <>
                 <span>/</span>

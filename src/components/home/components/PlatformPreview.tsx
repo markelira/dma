@@ -23,7 +23,7 @@ export function PlatformPreview() {
               <div className="text-white text-center p-8">
                 <div className="text-6xl mb-4">📚</div>
                 <h3 className="text-xl font-semibold mb-2">DMA Platform</h3>
-                <p className="text-sm opacity-80">Kurzus előnézet</p>
+                <p className="text-sm opacity-80">Tartalom előnézet</p>
               </div>
             </div>
           </div>

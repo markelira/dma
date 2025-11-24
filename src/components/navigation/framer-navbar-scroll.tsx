@@ -45,7 +45,7 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
                 href="/courses"
                 className="text-gray-700 hover:text-gray-900 text-sm font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 hover:border hover:border-gray-300/20"
               >
-                Kurzusok
+                Tartalmak
               </Link>
               <Link
                 href="/pricing"

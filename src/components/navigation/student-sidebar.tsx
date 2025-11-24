@@ -24,7 +24,7 @@ const studentNavItems = [
     icon: Home
   },
   {
-    title: 'Kurzusaim',
+    title: 'Beiratkozásaim',
     href: '/dashboard/my-learning',
     icon: BookOpen
   },

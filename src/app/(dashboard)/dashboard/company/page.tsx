@@ -82,7 +82,7 @@ export default function CompanyPage() {
                 </h1>
               </div>
               <p className="text-gray-600">
-                Hívjon meg csapattagokat, akik automatikusan hozzáférést kapnak az összes kurzushoz
+                Hívjon meg csapattagokat, akik automatikusan hozzáférést kapnak az összes tartalomhoz
               </p>
             </div>
             <Button
@@ -109,7 +109,7 @@ export default function CompanyPage() {
                   Automatikus hozzáférés
                 </h3>
                 <p className="text-blue-800">
-                  Az Ön előfizetésével minden meghívott csapattag automatikusan hozzáfér az összes kurzushoz.
+                  Az Ön előfizetésével minden meghívott csapattag automatikusan hozzáfér az összes tartalomhoz.
                   Nincs további díj vagy korlátozás a csapattagok számára.
                 </p>
               </div>

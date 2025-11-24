@@ -188,7 +188,7 @@ export const COURSE_TYPE_LABELS: Record<CourseType, string> = {
 export const COURSE_TYPE_DESCRIPTIONS: Record<CourseType, string> = {
   ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
   WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
-  MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+  MASTERCLASS: 'Átfogó, több modulból álló mestertartalom',
   PODCAST: 'Egyszeri podcast epizód audio- vagy videótartalommal',
 };
 

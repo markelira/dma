@@ -194,7 +194,7 @@ export default function InstructorsPage() {
         <div>
           <h1 className="text-3xl font-bold">Oktatók kezelése</h1>
           <p className="text-gray-600 mt-1">
-            Oktatók létrehozása és kezelése kurzusokhoz
+            Oktatók létrehozása és kezelése tartalmakhoz
           </p>
         </div>
         <Button onClick={openForCreate} className="flex items-center gap-2">
@@ -297,7 +297,7 @@ export default function InstructorsPage() {
                             </AlertDialogTitle>
                             <p className="text-sm text-gray-600 mt-2">
                               Ez a művelet nem vonható vissza. Az oktató törlése
-                              csak akkor lehetséges, ha nincs egyetlen kurzushoz
+                              csak akkor lehetséges, ha nincs egyetlen tartalomhoz
                               sem hozzárendelve.
                             </p>
                           </AlertDialogHeader>

@@ -44,7 +44,7 @@ export default function PurchaseCoursePage() {
             const mockCourse: Course = {
               id: params.courseId as string,
               title: `Test Course ${params.courseId}`,
-              description: 'Ez egy teszt kurzus fejlesztési célokra.',
+              description: 'Ez egy teszt tartalom fejlesztési célokra.',
               price: 45000,
               thumbnailUrl: 'https://via.placeholder.com/400x300',
               instructor: {
@@ -121,13 +121,13 @@ export default function PurchaseCoursePage() {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-4">Már jelentkezett erre a kurzusra!</h1>
+          <h1 className="text-2xl font-bold mb-4">Már jelentkezett erre a tartalomra!</h1>
           <p className="text-gray-600 mb-8">
-            Hozzáférése van a kurzus összes tartalmához.
+            Hozzáférése van az összes tartalomhoz.
           </p>
           <Button asChild>
             <Link href={`/courses/${course.id}/learn`}>
-              Kurzus folytatása
+              Tartalom folytatása
             </Link>
           </Button>
         </div>
@@ -172,7 +172,7 @@ export default function PurchaseCoursePage() {
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Vissza a kurzus oldalra
+          Vissza a tartalom oldalra
         </Link>
 
         <div className="grid lg:grid-cols-3 gap-8">
@@ -256,7 +256,7 @@ export default function PurchaseCoursePage() {
             {(course.sections && course.sections.length > 0) || (course.modules && course.modules.length > 0) ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>Kurzus tartalma</CardTitle>
+                  <CardTitle>Tananyag felépítése</CardTitle>
                   <CardDescription>
                     {course.totalLessons || course.modules?.reduce((total, module) => total + (module.lessons?.length || 0), 0) || 0} lecke • {course.duration || '10+ óra'} tartalom
                   </CardDescription>
@@ -404,7 +404,7 @@ export default function PurchaseCoursePage() {
               {/* Course Includes */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">A kurzus tartalmazza</CardTitle>
+                  <CardTitle className="text-lg">A tananyag tartalmazza</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
@@ -436,7 +436,7 @@ export default function PurchaseCoursePage() {
               <Card>
                 <CardContent className="p-4 text-center">
                   <p className="text-sm text-muted-foreground mb-2">
-                    Kérdése van a kurzussal kapcsolatban?
+                    Kérdése van a tartalommal kapcsolatban?
                   </p>
                   <Button variant="outline" size="sm" asChild>
                     <Link href="/support">

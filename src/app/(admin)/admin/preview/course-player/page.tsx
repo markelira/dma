@@ -179,7 +179,7 @@ export default function CoursePlayerPreviewPage() {
           <p className="text-gray-600 mb-6">
             {USE_MOCK_DATA
               ? 'Mock adatok nem érhetők el. Ellenőrizd a mockCourses.ts fájlt.'
-              : 'Kérjük, frissítsd a course ID-t és lesson ID-t a page.tsx fájlban egy létező kurzusra, vagy kapcsold be a USE_MOCK_DATA opciót.'
+              : 'Kérjük, frissítsd a course ID-t és lesson ID-t a page.tsx fájlban egy létező tartalomra, vagy kapcsold be a USE_MOCK_DATA opciót.'
             }
           </p>
           <Link
@@ -217,7 +217,7 @@ export default function CoursePlayerPreviewPage() {
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
               <ArrowLeftIcon size={20} />
-              Vissza a kurzusokhoz
+              Vissza a tartalmakhoz
             </Link>
 
             {/* Video Player */}
@@ -258,7 +258,7 @@ export default function CoursePlayerPreviewPage() {
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             <ArrowLeftIcon size={20} />
-            Vissza a kurzusokhoz
+            Vissza a tartalmakhoz
           </Link>
         </div>
 

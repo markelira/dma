@@ -191,7 +191,7 @@ export function AchievementUnlockModal({
                     >
                       {achievement.metadata.courseName && (
                         <div className="text-sm">
-                          <span className="text-gray-400">Kurzus: </span>
+                          <span className="text-gray-400">Tartalom: </span>
                           <span className="font-medium text-white">{achievement.metadata.courseName}</span>
                         </div>
                       )}

@@ -200,7 +200,7 @@ export default function AdminEnrollmentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.averageProgress}%</div>
-            <p className="text-xs text-muted-foreground">Kurzusonként</p>
+            <p className="text-xs text-muted-foreground">Tartalmanként</p>
           </CardContent>
         </Card>
 
@@ -227,7 +227,7 @@ export default function AdminEnrollmentsPage() {
               <div className="relative">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Keresés név, email vagy kurzus alapján..."
+                  placeholder="Keresés név, email vagy tartalom alapján..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-8"
@@ -268,7 +268,7 @@ export default function AdminEnrollmentsPage() {
                 <thead>
                   <tr className="border-b">
                     <th className="text-left p-2">Hallgató</th>
-                    <th className="text-left p-2">Kurzus</th>
+                    <th className="text-left p-2">Tartalom</th>
                     <th className="text-left p-2">Egyetem</th>
                     <th className="text-left p-2">Beiratkozás</th>
                     <th className="text-left p-2">Haladás</th>

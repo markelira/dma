@@ -94,7 +94,7 @@ export const DynamicMetrics: React.FC = () => {
     },
     {
       icon: BookOpen,
-      label: 'Kurzus',
+      label: 'Tartalom',
       value: metrics?.totalCourses || 0,
       suffix: '+',
       color: 'text-green-600',

@@ -77,10 +77,10 @@ export function CategoriesSection() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            Fedezd fel a kurzus kategóriákat
+            Fedezd fel a tartalom kategóriákat
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-            12+ kategória, 500+ kurzus. Minden témában megtalálod, amit keresel.
+            12+ kategória, 500+ tartalom. Minden témában megtalálod, amit keresel.
           </p>
         </motion.div>
 

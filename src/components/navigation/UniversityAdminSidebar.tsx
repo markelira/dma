@@ -32,7 +32,7 @@ const menuItems = [
     badge: null,
   },
   {
-    title: 'Kurzusok',
+    title: 'Tartalmak',
     href: '/university-admin/courses',
     icon: BookOpen,
     badge: null,

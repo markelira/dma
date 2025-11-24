@@ -131,13 +131,13 @@ class DemoDataManager {
       {
         id: 'milestone_25',
         name: 'Negyedrész mester',
-        description: '25% befejezve a kurzusból',
+        description: '25% befejezve a tartalomból',
         category: 'progress',
         points: 100,
         earned: true,
         earnedAt: new Date(Date.now() - 86400000 * 4),
         rarity: 'common',
-        requirement: '25% kurzus befejezése'
+        requirement: '25% tartalom befejezése'
       },
       {
         id: 'perfectionist',

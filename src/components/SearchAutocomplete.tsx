@@ -63,7 +63,7 @@ export const SearchAutocomplete: React.FC<Props> = ({ value, onChange, categorie
       <input
         type="text"
         value={value}
-        placeholder="Keresés kurzusok között..."
+        placeholder="Keresés tartalmak között..."
         onFocus={() => setFocused(true)}
         onChange={(e) => {
           e.preventDefault()
@@ -85,7 +85,7 @@ export const SearchAutocomplete: React.FC<Props> = ({ value, onChange, categorie
               className="px-4 py-2 cursor-pointer hover:bg-primary/10 flex justify-between text-sm"
             >
               <span>{s.label}</span>
-              <span className="text-gray-400">{s.type === 'category' ? 'Kategória' : s.type === 'university' ? 'Egyetem' : 'Kurzus'}</span>
+              <span className="text-gray-400">{s.type === 'category' ? 'Kategória' : s.type === 'university' ? 'Egyetem' : 'Tartalom'}</span>
             </li>
           ))}
         </ul>

@@ -125,11 +125,11 @@ export default function UniversityAdminCreateCoursePage() {
 
   const validateForm = () => {
     if (!formData.title.trim()) {
-      toast.error('A kurzus címe kötelező');
+      toast.error('A tartalom címe kötelező');
       return false;
     }
     if (!formData.description.trim()) {
-      toast.error('A kurzus leírása kötelező');
+      toast.error('A tartalom leírása kötelező');
       return false;
     }
     if (!formData.category) {
@@ -137,7 +137,7 @@ export default function UniversityAdminCreateCoursePage() {
       return false;
     }
     if (!formData.duration.trim()) {
-      toast.error('Adja meg a kurzus időtartamát');
+      toast.error('Adja meg a tartalom időtartamát');
       return false;
     }
     if (!formData.isFree && formData.price <= 0) {
@@ -220,11 +220,11 @@ export default function UniversityAdminCreateCoursePage() {
         createdAt: new Date()
       });
 
-      toast.success('Kurzus sikeresen létrehozva');
+      toast.success('Tartalom sikeresen létrehozva');
       router.push('/university-admin/courses');
     } catch (error) {
       console.error('Error creating course:', error);
-      toast.error('Hiba történt a kurzus létrehozásakor');
+      toast.error('Hiba történt a tartalom létrehozásakor');
     } finally {
       setLoading(false);
     }
@@ -243,9 +243,9 @@ export default function UniversityAdminCreateCoursePage() {
           Vissza
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Új kurzus létrehozása</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Új tartalom létrehozása</h1>
           <p className="text-muted-foreground">
-            Hozzon létre új kurzust az egyetem számára
+            Hozzon létre új tartalmat az egyetem számára
           </p>
         </div>
       </div>
@@ -255,11 +255,11 @@ export default function UniversityAdminCreateCoursePage() {
         <Card>
           <CardHeader>
             <CardTitle>Alapinformációk</CardTitle>
-            <CardDescription>A kurzus alapvető adatai</CardDescription>
+            <CardDescription>A tartalom alapvető adatai</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Kurzus címe*</Label>
+              <Label htmlFor="title">Tartalom címe*</Label>
               <Input
                 id="title"
                 placeholder="pl. Bevezetés a programozásba"
@@ -273,7 +273,7 @@ export default function UniversityAdminCreateCoursePage() {
               <Label htmlFor="description">Leírás*</Label>
               <Textarea
                 id="description"
-                placeholder="Részletes leírás a kurzusról..."
+                placeholder="Részletes leírás a tartalomról..."
                 rows={5}
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
@@ -367,14 +367,14 @@ export default function UniversityAdminCreateCoursePage() {
         <Card>
           <CardHeader>
             <CardTitle>Árazás</CardTitle>
-            <CardDescription>A kurzus díjazása</CardDescription>
+            <CardDescription>A tartalom díjazása</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label htmlFor="isFree">Ingyenes kurzus</Label>
+                <Label htmlFor="isFree">Ingyenes tartalom</Label>
                 <p className="text-sm text-muted-foreground">
-                  Az ingyenes kurzusokhoz bárki hozzáférhet
+                  Az ingyenes tartalmakhoz bárki hozzáférhet
                 </p>
               </div>
               <Switch
@@ -408,7 +408,7 @@ export default function UniversityAdminCreateCoursePage() {
         <Card>
           <CardHeader>
             <CardTitle>Előfeltételek</CardTitle>
-            <CardDescription>Mit kell tudnia a hallgatóknak a kurzus megkezdése előtt</CardDescription>
+            <CardDescription>Mit kell tudnia a hallgatóknak a tartalom megkezdése előtt</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {formData.prerequisites.map((prereq, index) => (
@@ -447,7 +447,7 @@ export default function UniversityAdminCreateCoursePage() {
         <Card>
           <CardHeader>
             <CardTitle>Tanulási eredmények</CardTitle>
-            <CardDescription>Mit fognak tudni a hallgatók a kurzus elvégzése után</CardDescription>
+            <CardDescription>Mit fognak tudni a hallgatók a tartalom elvégzése után</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {formData.learningOutcomes.map((outcome, index) => (
@@ -486,7 +486,7 @@ export default function UniversityAdminCreateCoursePage() {
         <Card>
           <CardHeader>
             <CardTitle>További beállítások</CardTitle>
-            <CardDescription>Extra opciók a kurzushoz</CardDescription>
+            <CardDescription>Extra opciók a tartalomhoz</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -508,7 +508,7 @@ export default function UniversityAdminCreateCoursePage() {
               <div>
                 <Label htmlFor="certificateAvailable">Tanúsítvány elérhető</Label>
                 <p className="text-sm text-muted-foreground">
-                  A hallgatók tanúsítványt kapnak a kurzus sikeres elvégzése után
+                  A hallgatók tanúsítványt kapnak a tartalom sikeres elvégzése után
                 </p>
               </div>
               <Switch
@@ -545,7 +545,7 @@ export default function UniversityAdminCreateCoursePage() {
           </Button>
           <Button type="submit" disabled={loading} className="gap-2">
             <Save className="h-4 w-4" />
-            {loading ? 'Mentés...' : 'Kurzus létrehozása'}
+            {loading ? 'Mentés...' : 'Tartalom létrehozása'}
           </Button>
         </div>
       </form>

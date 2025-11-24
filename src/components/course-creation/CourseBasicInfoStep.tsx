@@ -272,7 +272,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       <div className="grid md:grid-cols-2 gap-6">
         {/* Title */}
         <div className="space-y-2">
-          <Label htmlFor="title" required>Kurzus címe</Label>
+          <Label htmlFor="title" required>Tartalom címe</Label>
           <Input
             id="title"
             {...register("title")}
@@ -384,7 +384,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
           id="description"
           {...register("description")}
           rows={4}
-          placeholder="Írd le, miről szól a kurzus és mit fognak tanulni a résztvevők..."
+          placeholder="Írd le, miről szól a tartalom és mit fognak tanulni a résztvevők..."
           className={errors.description ? "border-red-500" : ""}
         />
         {errors.description && (
@@ -434,7 +434,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
 
       {/* Thumbnail Upload */}
       <div className="space-y-2">
-        <Label>Kurzus borítókép</Label>
+        <Label>Tartalom borítókép</Label>
         {!thumbnailUrl ? (
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6">
             <input
@@ -482,7 +482,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
           <div className="relative inline-block">
             <Image
               src={thumbnailUrl}
-              alt="Kurzus borítókép"
+              alt="Tartalom borítókép"
               width={300}
               height={169}
               className="rounded-lg border"

@@ -162,8 +162,8 @@ export function CoursePurchaseButton({
       mode="payment"
       amount={price}
       currency={currency}
-      title="Kurzus vásárlása"
-      description={`${courseTitle} kurzus megvásárlása és azonnali hozzáférés`}
+      title="Tartalom vásárlása"
+      description={`${courseTitle} tartalom megvásárlása és azonnali hozzáférés`}
       className={className}
       size="lg"
       metadata={{

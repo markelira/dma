@@ -37,7 +37,7 @@ export default function NotificationsPage() {
       id: '1',
       type: 'course',
       title: 'Új lecke elérhető',
-      message: 'A "Modern React fejlesztés" kurzusban új lecke lett közzétéve: "Advanced Hooks"',
+      message: 'A "Modern React fejlesztés" tartalomban új lecke lett közzétéve: "Advanced Hooks"',
       createdAt: '2024-01-15T10:30:00Z',
       isRead: false,
       actionUrl: '/courses/react-advanced/lessons/hooks',
@@ -55,8 +55,8 @@ export default function NotificationsPage() {
     {
       id: '3',
       type: 'course',
-      title: 'Kurzus befejezés közelében',
-      message: 'Már csak 2 lecke van hátra a "Digital Marketing alapok" kurzus befejezéséhez!',
+      title: 'Tartalom befejezés közelében',
+      message: 'Már csak 2 lecke van hátra a "Digital Marketing alapok" tartalom befejezéséhez!',
       createdAt: '2024-01-14T09:15:00Z',
       isRead: true,
       actionUrl: '/dashboard/my-learning',
@@ -217,7 +217,7 @@ export default function NotificationsPage() {
           {[
             { key: 'all', label: 'Összes', count: notifications.length },
             { key: 'unread', label: 'Olvasatlan', count: unreadCount },
-            { key: 'course', label: 'Kurzusok', count: notifications.filter(n => n.type === 'course').length },
+            { key: 'course', label: 'Tartalmak', count: notifications.filter(n => n.type === 'course').length },
             { key: 'achievement', label: 'Eredmények', count: notifications.filter(n => n.type === 'achievement').length },
             { key: 'system', label: 'Rendszer', count: notifications.filter(n => n.type === 'system').length }
           ].map(({ key, label, count }) => (
@@ -301,7 +301,7 @@ export default function NotificationsPage() {
                             })}
                           </span>
                           <Badge variant="outline" className="text-xs">
-                            {notification.type === 'course' ? 'Kurzus' :
+                            {notification.type === 'course' ? 'Tartalom' :
                              notification.type === 'achievement' ? 'Eredmény' :
                              notification.type === 'system' ? 'Rendszer' : 'Közösségi'}
                           </Badge>

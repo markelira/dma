@@ -31,7 +31,7 @@ export const mockCourses: Course[] = [
       id: 'cat-1',
       name: 'Programozás',
       slug: 'programozas',
-      description: 'Programozási kurzusok'
+      description: 'Programozási tartalmak'
     },
     modules: [
       {
@@ -132,7 +132,7 @@ export const mockCourses: Course[] = [
       id: 'cat-2',
       name: 'Marketing',
       slug: 'marketing',
-      description: 'Marketing kurzusok'
+      description: 'Marketing tartalmak'
     },
     modules: [
       {
@@ -205,7 +205,7 @@ export const mockCourses: Course[] = [
       id: 'cat-3',
       name: 'Adattudomány',
       slug: 'adattudomany',
-      description: 'Data Science kurzusok'
+      description: 'Data Science tartalmak'
     },
     modules: [
       {
@@ -306,7 +306,7 @@ export const mockCourses: Course[] = [
       id: 'cat-4',
       name: 'Design',
       slug: 'design',
-      description: 'Design kurzusok'
+      description: 'Design tartalmak'
     },
     modules: [
       {
@@ -407,7 +407,7 @@ export const mockCourses: Course[] = [
       id: 'cat-5',
       name: 'Vezetés',
       slug: 'vezetes',
-      description: 'Vezetési kurzusok'
+      description: 'Vezetési tartalmak'
     },
     modules: [
       {
@@ -508,7 +508,7 @@ export const mockCourses: Course[] = [
       id: 'cat-6',
       name: 'IT Biztonság',
       slug: 'it-biztonsag',
-      description: 'IT biztonsági kurzusok'
+      description: 'IT biztonsági tartalmak'
     },
     modules: [
       {

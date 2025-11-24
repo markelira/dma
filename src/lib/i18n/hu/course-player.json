@@ -1,10 +1,10 @@
 {
   "navigation": {
-    "backToCourse": "Vissza a kurzushoz",
+    "backToCourse": "Vissza a tartalomhoz",
     "previous": "Előző",
     "next": "Következő",
     "lessonCounter": "{current}. lecke / {total}",
-    "openCourseMenu": "Kurzus menü megnyitása",
+    "openCourseMenu": "Tartalom menü megnyitása",
     "closeSidebar": "Oldalsáv bezárása"
   },
   "subscription": {
@@ -15,16 +15,16 @@
   "header": {
     "settings": "Beállítások",
     "closePlayer": "Lejátszó bezárása",
-    "overallProgress": "Teljes kurzus előrehaladás",
+    "overallProgress": "Teljes tartalom előrehaladás",
     "complete": "{progress}% teljesítve"
   },
   "sidebar": {
-    "courseNavigation": "Kurzus navigáció",
-    "course": "Kurzus",
+    "courseNavigation": "Tartalom navigáció",
+    "course": "Tartalom",
     "by": "Oktató:",
     "overallProgress": "Teljes előrehaladás",
     "lessonsCompleted": "{completed} / {total} lecke",
-    "courseContent": "Kurzus tartalma"
+    "courseContent": "Tartalom szerkezete"
   },
   "tabs": {
     "overview": "Áttekintés",
@@ -55,10 +55,10 @@
     "markComplete": "Megjelölés befejezettként",
     "downloadResources": "Források letöltése",
     "reportIssue": "Probléma jelentése",
-    "courseProgress": "Kurzus előrehaladása",
+    "courseProgress": "Tartalom előrehaladása",
     "completedLessons": "Befejezett leckék",
     "remainingLessons": "{count} lecke van hátra",
-    "courseComplete": "Kurzus teljesítve!"
+    "courseComplete": "Tartalom teljesítve!"
   },
   "lessonTypes": {
     "VIDEO": "Videó",

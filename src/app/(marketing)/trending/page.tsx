@@ -149,7 +149,7 @@ export default function TrendingPage() {
         <div className="container">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Kurzusok betöltése...</p>
+            <p className="text-gray-600">Tartalmak betöltése...</p>
           </div>
         </div>
       </div>
@@ -167,10 +167,10 @@ export default function TrendingPage() {
               <span className="font-bold text-gray-900">TRENDING NOW</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Legnépszerűbb Kurzusok
+              Legnépszerűbb Tartalmak
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Fedezd fel a legtöbbet választott kurzusainkat, amelyek már több ezer diák sikeréhez járultak hozzá
+              Fedezd fel a legtöbbet választott tartalmainkat, amelyek már több ezer diák sikeréhez járultak hozzá
             </p>
           </div>
         </div>

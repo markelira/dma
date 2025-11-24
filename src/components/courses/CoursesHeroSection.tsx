@@ -77,10 +77,10 @@ export function CoursesHeroSection({
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-8">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-4">
-            Fedezd fel a kurzusainkat
+            Fedezd fel a tartalmainkat
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            {totalCourses} professzionális kurzus közül választhatsz
+            {totalCourses} professzionális tartalom közül választhatsz
           </p>
         </div>
 
@@ -90,7 +90,7 @@ export function CoursesHeroSection({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 z-10" />
             <input
               type="text"
-              placeholder="Keress kurzusokat..."
+              placeholder="Keress tartalmakat..."
               value={searchInput}
               onChange={(e) => onSearchChange(e.target.value)}
               onFocus={() => matchingCourses.length > 0 && setShowSuggestions(true)}

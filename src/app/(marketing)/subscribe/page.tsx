@@ -31,16 +31,16 @@ export default function SubscribePage() {
             id: 'basic',
             name: 'Alap',
             price: '0',
-            description: 'Ingyenes hozzáférés korlátozott kurzusokhoz',
-            features: ['Korlátozott kurzusok', 'Alapvető tananyagok'],
+            description: 'Ingyenes hozzáférés korlátozott tartalmakhoz',
+            features: ['Korlátozott tartalmak', 'Alapvető tananyagok'],
             priceId: 'price_basic'
           },
           {
             id: 'premium',
             name: 'Prémium',
             price: '2990',
-            description: 'Teljes hozzáférés minden kurzushoz',
-            features: ['Minden kurzus', 'Tanúsítványok', 'Szakértő támogatás'],
+            description: 'Teljes hozzáférés minden tartalomhoz',
+            features: ['Minden tartalom', 'Tanúsítványok', 'Szakértő támogatás'],
             popular: true,
             priceId: 'price_premium'
           }
@@ -92,7 +92,7 @@ export default function SubscribePage() {
             Válassz előfizetési tervet
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Kapj hozzáférést Magyarország legjobb egyetemi kurzusaihoz és szerezz elismert bizonyítványokat
+            Kapj hozzáférést Magyarország legjobb egyetemi tartalmaihoz és szerezz elismert bizonyítványokat
           </p>
         </div>
 

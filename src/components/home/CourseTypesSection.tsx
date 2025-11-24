@@ -9,7 +9,7 @@ export function CourseTypesSection() {
     {
       type: 'ACADEMIA',
       icon: '📚',
-      title: 'Akadémiai kurzusok',
+      title: 'Akadémiai képzések',
       description: 'Strukturált leckék, kvízek, tanúsítványok. Minden, amire szükséged van a professzionális fejlődéshez.',
       features: [
         'Oldalsáv navigáció',
@@ -34,7 +34,7 @@ export function CourseTypesSection() {
       type: 'MASTERCLASS',
       icon: '⭐',
       title: 'Masterclass',
-      description: 'Prémium tartalom több kurzusból. A legjobb tananyagok egy helyen.',
+      description: 'Prémium tartalom több tartalomból. A legjobb tananyagok egy helyen.',
       gradient: 'linear-gradient(135deg, #DD9933 0%, #C6891F 100%)',
       size: 'medium' as const,
       delay: 0.2,
@@ -62,13 +62,13 @@ export function CourseTypesSection() {
           transition={{ duration: 0.6 }}
         >
           <div className="inline-flex items-center space-x-2 bg-dma-red/10 text-dma-red px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <span>Kurzus típusok</span>
+            <span>Tartalom típusok</span>
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
             Válassz a formátumodnak megfelelőt
           </h2>
           <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">
-            Strukturált kurzusoktól a podcast epizódokig,
+            Strukturált tartalmaktól a podcast epizódokig,
             minden tanulási stílushoz van tartalom.
           </p>
         </motion.div>

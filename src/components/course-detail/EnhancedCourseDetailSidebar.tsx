@@ -122,7 +122,7 @@ export function EnhancedCourseDetailSidebar({
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <BookOpen className="w-5 h-5" />
-              <span>Kurzus adatok</span>
+              <span>Tartalom adatok</span>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -290,7 +290,7 @@ export function EnhancedCourseDetailSidebar({
             <CardHeader>
               <CardTitle>Előfeltételek</CardTitle>
               <CardDescription>
-                Mi szükséges a kurzus megkezdéséhez
+                Mi szükséges a tartalom megkezdéséhez
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -312,7 +312,7 @@ export function EnhancedCourseDetailSidebar({
             <CardHeader>
               <CardTitle>Kinek ajánljuk</CardTitle>
               <CardDescription>
-                Ez a kurzus ideális az alábbi személyek számára
+                Ez a tartalom ideális az alábbi személyek számára
               </CardDescription>
             </CardHeader>
             <CardContent>

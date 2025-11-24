@@ -15,7 +15,7 @@ export const CourseUSPSection: React.FC<Props> = ({ universities = [] }) => {
 
   const benefits: { icon: JSX.Element; label: string; hint: string; bgColor: string }[] = [
     { icon: <Rocket className="w-8 h-8 text-primary" />, label: 'Gyakorlati Eredmények', hint: 'Valós projektek, azonnali haszon', bgColor: 'bg-blue-50 bg-opacity-40' },
-    { icon: <TrendingUp className="w-8 h-8 text-primary" />, label: 'Karrierváltás', hint: 'Kurzusok keresett szerepekhez', bgColor: 'bg-green-50 bg-opacity-40' },
+    { icon: <TrendingUp className="w-8 h-8 text-primary" />, label: 'Karrierváltás', hint: 'Tartalmak keresett szerepekhez', bgColor: 'bg-green-50 bg-opacity-40' },
     { icon: <Clock className="w-8 h-8 text-primary" />, label: 'Rugalmas Hozzáférés', hint: 'Tanulj a saját tempódban', bgColor: 'bg-yellow-50 bg-opacity-40' },
     { icon: <GraduationCap className="w-8 h-8 text-primary" />, label: 'Vezető Egyetemek', hint: 'Top magyar partnerek', bgColor: 'bg-pink-50 bg-opacity-40' },
   ]

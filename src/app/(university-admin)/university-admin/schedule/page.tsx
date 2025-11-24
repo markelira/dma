@@ -106,7 +106,7 @@ export default function UniversityAdminSchedulePage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Ütemezés</h1>
           <p className="text-muted-foreground">
-            Kurzusok és események ütemezése
+            Tartalmak és események ütemezése
           </p>
         </div>
         <div className="flex gap-3">
@@ -148,7 +148,7 @@ export default function UniversityAdminSchedulePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">168</div>
-            <p className="text-xs text-muted-foreground">42 kurzus összesen</p>
+            <p className="text-xs text-muted-foreground">42 tartalom összesen</p>
           </CardContent>
         </Card>
         <Card>

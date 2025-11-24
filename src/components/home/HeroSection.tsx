@@ -89,7 +89,7 @@ export function HeroSection() {
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-bold text-gray-900">500+</span>
-                <span className="text-gray-600">kurzus</span>
+                <span className="text-gray-600">tartalom</span>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-2xl font-bold text-gray-900">4.8/5</span>

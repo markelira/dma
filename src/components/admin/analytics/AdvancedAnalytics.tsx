@@ -44,7 +44,7 @@ export const AdvancedAnalytics = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Kurzus Teljesítmény</CardTitle>
+          <CardTitle>Tartalom Teljesítmény</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">85%</div>

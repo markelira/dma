@@ -88,7 +88,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               </button>
             </div>
 
-            {/* Új kurzusok */}
+            {/* Új tartalmak */}
             <div className="space-y-1">
               <button
                 onMouseEnter={() => setHoveredSection('new')}
@@ -98,7 +98,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                     <Play className="w-4 h-4" />
                   </div>
-                  <span className="font-medium">Új kurzusok</span>
+                  <span className="font-medium">Új tartalmak</span>
                 </div>
                 <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                   {hoveredSection === 'new' ? (
@@ -110,7 +110,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               </button>
             </div>
 
-            {/* Népszerű kurzusok */}
+            {/* Népszerű tartalmak */}
             <div className="space-y-1">
               <button
                 onMouseEnter={() => setHoveredSection('popular')}
@@ -120,7 +120,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-4 h-4" />
                   </div>
-                  <span className="font-medium">Népszerű kurzusok</span>
+                  <span className="font-medium">Népszerű tartalmak</span>
                 </div>
                 <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                   {hoveredSection === 'popular' ? (
@@ -297,7 +297,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold mb-6 flex items-center space-x-3">
                   <Play className="w-6 h-6" />
-                  <span>Új kurzusok</span>
+                  <span>Új tartalmak</span>
                 </h3>
                 <div className="space-y-3">
                   {newLoading
@@ -305,7 +305,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                         <div key={i} className="h-4 bg-white/20 rounded animate-pulse w-3/4" />
                       ))
                     : newError
-                    ? <div className="text-red-300">Hiba az új kurzusok betöltésekor</div>
+                    ? <div className="text-red-300">Hiba az új tartalmak betöltésekor</div>
                     : newCourses.map((course: any) => (
                         <Link
                           key={course.id}
@@ -320,7 +320,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/courses?sort=new"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes új kurzus</span>
+                    <span className="font-semibold">Az összes új tartalom</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -331,7 +331,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold mb-6 flex items-center space-x-3">
                   <TrendingUp className="w-6 h-6" />
-                  <span>Népszerű kurzusok</span>
+                  <span>Népszerű tartalmak</span>
                 </h3>
                 <div className="space-y-3">
                   {popularLoading
@@ -339,7 +339,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                         <div key={i} className="h-4 bg-white/20 rounded animate-pulse w-3/4" />
                       ))
                     : popularError
-                    ? <div className="text-red-300">Hiba a népszerű kurzusok betöltésekor</div>
+                    ? <div className="text-red-300">Hiba a népszerű tartalmak betöltésekor</div>
                     : popularCourses.map((course: any) => (
                         <Link
                           key={course.id}
@@ -354,7 +354,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/courses?sort=popular"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes népszerű kurzus</span>
+                    <span className="font-semibold">Az összes népszerű tartalom</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -397,7 +397,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/universities"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/10 transition-all duration-200 hover:scale-[1.01] group"
                   >
-                    <span className="font-medium">Egyetemi kurzusok</span>
+                    <span className="font-medium">Egyetemi tartalmak</span>
                     <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                   <Link
@@ -458,7 +458,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                           href="/courses"
                           className="flex items-center justify-between p-4 rounded-lg hover:bg-white/10 transition-all duration-200 hover:scale-[1.01] group"
                         >
-                          <span className="font-medium">Böngésszen kurzusok között</span>
+                          <span className="font-medium">Böngésszen tartalmak között</span>
                           <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                         </Link>
                       )}

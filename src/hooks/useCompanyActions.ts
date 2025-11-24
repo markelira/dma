@@ -479,7 +479,7 @@ export function useCompanyEnrolledCourses(companyId: string | undefined) {
       const result = await getCompanyEnrolledCourses({ companyId })
 
       if (!result.data.success) {
-        throw new Error(result.data.error || 'Nem sikerült lekérni a kurzusokat')
+        throw new Error(result.data.error || 'Nem sikerült lekérni a tartalmakat')
       }
 
       return result.data.courses || []

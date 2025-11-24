@@ -87,7 +87,7 @@ export default function AuthLayout({
                   <br />
                   <br />
                   <span className="animate-[code-5_10s_infinite] text-gray-200">
-                    Kurzusok betöltése
+                    Tartalmak betöltése
                   </span>
                   <br />
                   <span className="animate-[code-6_10s_infinite]">

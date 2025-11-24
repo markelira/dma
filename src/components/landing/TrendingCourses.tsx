@@ -106,7 +106,7 @@ export function TrendingCourses() {
               TRENDING MOST
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Népszerű Kurzusok
+              Népszerű Tartalmak
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Betöltés...
@@ -126,10 +126,10 @@ export function TrendingCourses() {
             TRENDING MOST
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Népszerű Kurzusok
+            Népszerű Tartalmak
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            A legtöbbet választott kurzusaink, amelyekkel garantáltan fejlődhetsz
+            A legtöbbet választott tartalmaink, amelyekkel garantáltan fejlődhetsz
           </p>
         </div>
 
@@ -137,7 +137,7 @@ export function TrendingCourses() {
           <div className="text-center py-12">
             <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600">
-              Még nincsenek kurzusok. Az adminok hamarosan létrehoznak párat!
+              Még nincsenek tartalmak. Az adminok hamarosan létrehoznak párat!
             </p>
           </div>
         ) : (
@@ -232,7 +232,7 @@ export function TrendingCourses() {
             <div className="text-center">
               <Button size="lg" className="gap-2" asChild>
                 <Link href="/courses">
-                  Összes kurzus megtekintése
+                  Összes tartalom megtekintése
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </Button>

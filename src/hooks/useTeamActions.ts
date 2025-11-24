@@ -199,7 +199,7 @@ export function useTeamEnrolledCourses(teamId: string | undefined) {
       const result = await getTeamEnrolledCourses({ teamId })
 
       if (!result.data.success) {
-        throw new Error(result.data.error || 'Nem sikerült lekérni a kurzusokat')
+        throw new Error(result.data.error || 'Nem sikerült lekérni a tartalmakat')
       }
 
       return result.data.courses || []

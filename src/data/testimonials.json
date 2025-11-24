@@ -6,7 +6,7 @@
     "company": "Acme Kft.",
     "salaryIncrease": "+300 000 HUF fizetés 3 hónap alatt",
     "quote": "Az DMA segítségével új karrierutat építettem.",
-    "courseCompleted": "Online Marketing Kurzus"
+    "courseCompleted": "Online Marketing Képzés"
   },
   {
     "id": "2",
@@ -23,7 +23,7 @@
     "role": "Projekt Manager",
     "company": "TechSolutions",
     "salaryIncrease": "+200 000 HUF fizetés 1 hónap alatt",
-    "quote": "A kurzusok interaktívak és motiválóak voltak.",
+    "quote": "A tartalmak interaktívak és motiválóak voltak.",
     "courseCompleted": "Agilis Projektmenedzsment"
   }
-] 
+]

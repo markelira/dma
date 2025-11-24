@@ -160,10 +160,10 @@ export default function AdminAnalyticsPage() {
           <Card className="hover:shadow-md transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>Top kurzus beiratkozások</span>
+                <span>Top tartalom beiratkozások</span>
                 <Badge className="bg-green-100 text-green-700">
                   <BookOpen className="w-3 h-3 mr-1" />
-                  Kurzusok
+                  Tartalmak
                 </Badge>
               </CardTitle>
             </CardHeader>

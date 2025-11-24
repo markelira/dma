@@ -31,13 +31,13 @@ const navItems: NavItem[] = [
     roles: [UserRole.STUDENT, UserRole.INSTRUCTOR, UserRole.ADMIN, UserRole.UNIVERSITY_ADMIN]
   },
   {
-    label: 'Kurzusaim',
+    label: 'Beiratkozásaim',
     href: '/dashboard/courses',
     icon: BookOpen,
     roles: [UserRole.STUDENT]
   },
   {
-    label: 'Kurzus kezelés',
+    label: 'Tartalom kezelés',
     href: '/instructor/courses',
     icon: BookOpen,
     roles: [UserRole.INSTRUCTOR]
@@ -61,7 +61,7 @@ const navItems: NavItem[] = [
     roles: [UserRole.ADMIN]
   },
   {
-    label: 'Kurzusok',
+    label: 'Tartalmak',
     href: '/admin/courses',
     icon: BookOpen,
     roles: [UserRole.ADMIN]

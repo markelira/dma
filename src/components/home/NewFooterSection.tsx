@@ -51,7 +51,7 @@ export function NewFooterSection() {
               Iratkozz fel hírlevelünkre
             </h3>
             <p className="text-white/70 text-sm mb-6">
-              Kapj értesítéseket az új kurzusokról, exkluzív ajánlatokról és
+              Kapj értesítéseket az új tartalmakról, exkluzív ajánlatokról és
               tanulási tippekről.
             </p>
             <form onSubmit={handleNewsletterSubmit} className="flex gap-2">
@@ -82,7 +82,7 @@ export function NewFooterSection() {
             <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <Link href="/courses" className="hover:text-white transition-colors">
-                  Kurzusok
+                  Tartalmak
                 </Link>
               </li>
               <li>

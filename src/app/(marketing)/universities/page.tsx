@@ -130,7 +130,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="text-lg font-semibold text-gray-900">
               {university.courseCount}
             </div>
-            <div className="text-xs text-gray-500">Kurzus</div>
+            <div className="text-xs text-gray-500">Tartalom</div>
           </div>
           <div>
             <div className="flex items-center justify-center mb-1">
@@ -182,7 +182,7 @@ export default async function UniversitiesPage() {
               Magyar Egyetemek
             </h1>
             <p className="text-xl opacity-90 mb-8">
-              Fedezze fel Magyarország vezető felsőoktatási intézményeit és kurzusaikat
+              Fedezze fel Magyarország vezető felsőoktatási intézményeit és tartalmaikat
             </p>
             <div className="flex items-center justify-center text-lg font-medium">
               <Building2 className="w-5 h-5 mr-2" />
@@ -206,7 +206,7 @@ export default async function UniversitiesPage() {
               <div className="text-3xl font-bold text-primary mb-2">
                 {universities.reduce((sum, uni) => sum + uni.courseCount, 0)}
               </div>
-              <div className="text-gray-600 font-medium">Elérhető Kurzus</div>
+              <div className="text-gray-600 font-medium">Elérhető Tartalom</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-primary mb-2">
@@ -270,7 +270,7 @@ export default async function UniversitiesPage() {
               href="/courses"
               className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              Kurzusok böngészése
+              Tartalmak böngészése
             </a>
             <a
               href="/register"

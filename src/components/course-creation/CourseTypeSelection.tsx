@@ -26,7 +26,7 @@ const courseTypeConfig: Record<CourseType, {
     borderColor: 'border-blue-200 hover:border-blue-400',
     examples: [
       'Többhetes képzések videókkal',
-      '5-50 leckéből álló kurzusok',
+      '5-50 leckéből álló tartalmak',
       'Strukturált tananyag modulokkal',
     ],
   },
@@ -47,7 +47,7 @@ const courseTypeConfig: Record<CourseType, {
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-200 hover:border-amber-400',
     examples: [
-      'Átfogó mesterkurzusok',
+      'Átfogó mestertartalmak',
       'Több modul és lecke',
       'Komplex témakörök',
     ],
@@ -83,10 +83,10 @@ export default function CourseTypeSelection({ onSelect, initialSelection }: Cour
     <div className="w-full max-w-5xl mx-auto py-8 px-4">
       <div className="text-center mb-10">
         <h2 className="text-3xl font-bold text-gray-900 mb-3">
-          Milyen típusú kurzust szeretnél létrehozni?
+          Milyen típusú tartalmat szeretnél létrehozni?
         </h2>
         <p className="text-gray-600 text-lg">
-          Válaszd ki a kurzus típusát az induláshoz
+          Válaszd ki a tartalom típusát az induláshoz
         </p>
       </div>
 
@@ -162,7 +162,7 @@ export default function CourseTypeSelection({ onSelect, initialSelection }: Cour
       {selectedType && (
         <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
           <p className="text-sm text-blue-800">
-            <span className="font-semibold">{COURSE_TYPE_LABELS[selectedType]}</span> típusú kurzust választottál.
+            <span className="font-semibold">{COURSE_TYPE_LABELS[selectedType]}</span> típusú tartalmat választottál.
             Kattints a "Tovább" gombra a folytatáshoz.
           </p>
         </div>

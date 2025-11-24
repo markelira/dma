@@ -308,7 +308,7 @@ export default function AdminDashboardPage() {
         // Return sample data if function doesn't exist yet
         return [
           { id: '1', type: 'user_registered', message: 'Új felhasználó regisztrált: János Kovács', timestamp: new Date().toISOString() },
-          { id: '2', type: 'course_created', message: 'Új kurzus létrehozva: Python Programozás', timestamp: new Date(Date.now() - 3600000).toISOString() },
+          { id: '2', type: 'course_created', message: 'Új tartalom létrehozva: Python Programozás', timestamp: new Date(Date.now() - 3600000).toISOString() },
           { id: '3', type: 'enrollment', message: 'Hallgató beiratkozott: Anna Nagy - React Fejlesztés', timestamp: new Date(Date.now() - 7200000).toISOString() },
         ] as Activity[]
       }
@@ -403,7 +403,7 @@ export default function AdminDashboardPage() {
           trend={12}
         />
         <StatCard
-          title="Aktív Kurzusok"
+          title="Aktív Tartalmak"
           value={stats?.courses?.published || 0}
           subtitle={`${stats?.courses?.total || 0} összesen`}
           icon={BookOpen}
@@ -441,8 +441,8 @@ export default function AdminDashboardPage() {
             color="blue"
           />
           <QuickAction
-            title="Kurzus Jóváhagyása"
-            description="Függőben lévő kurzusok áttekintése"
+            title="Tartalom Jóváhagyása"
+            description="Függőben lévő tartalmak áttekintése"
             icon={BookOpen}
             href="/admin/courses?filter=pending"
             color="purple"
@@ -618,10 +618,10 @@ export default function AdminDashboardPage() {
             </span>
           </div>
           <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-            Kurzusok Kezelése
+            Tartalmak Kezelése
           </h3>
           <p className="text-sm text-gray-600 mt-1">
-            Kurzusok létrehozása, szerkesztése és jóváhagyása
+            Tartalmak létrehozása, szerkesztése és jóváhagyása
           </p>
         </Link>
 

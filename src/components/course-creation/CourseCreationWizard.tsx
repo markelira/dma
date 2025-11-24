@@ -146,7 +146,7 @@ export default function CourseCreationWizard() {
     setIsSaving(true);
     try {
       if (!courseType) {
-        toast.error('Válassz kurzus típust először');
+        toast.error('Válassz tartalom típust először');
         setCurrentStep(0);
         setIsSaving(false);
         return;
@@ -177,7 +177,7 @@ export default function CourseCreationWizard() {
             throw new Error(errorMsg);
           }
 
-          throw new Error(res.data?.error || 'Kurzus létrehozása sikertelen');
+          throw new Error(res.data?.error || 'Tartalom létrehozása sikertelen');
         }
 
         const newCourseId = res.data.courseId;
@@ -207,7 +207,7 @@ export default function CourseCreationWizard() {
           console.error('Failed to create audit log:', logError);
         }
 
-        toast.success('Kurzus sikeresen létrehozva');
+        toast.success('Tartalom sikeresen létrehozva');
       } else {
         // Update existing course
         const updateFn = httpsCallable(fbFunctions, 'updateCourse');
@@ -217,10 +217,10 @@ export default function CourseCreationWizard() {
         });
 
         if (!res.data?.success) {
-          throw new Error(res.data?.error || 'Kurzus frissítése sikertelen');
+          throw new Error(res.data?.error || 'Tartalom frissítése sikertelen');
         }
 
-        toast.success('Kurzus adatok frissítve');
+        toast.success('Tartalom adatok frissítve');
       }
       
       // Batch state updates to avoid race conditions
@@ -451,7 +451,7 @@ export default function CourseCreationWizard() {
         console.error('Failed to create audit log:', logError);
       }
 
-      toast.success('Kurzus sikeresen publikálva!');
+      toast.success('Tartalom sikeresen publikálva!');
 
       // Clear wizard state and redirect
       resetWizard();
@@ -482,7 +482,7 @@ export default function CourseCreationWizard() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold">Új kurzus létrehozása</h1>
+          <h1 className="text-3xl font-bold">Új tartalom létrehozása</h1>
           <Button 
             variant="outline" 
             onClick={handleExit}
@@ -569,9 +569,9 @@ export default function CourseCreationWizard() {
           {currentStep === 1 && (
             <div>
               <CardHeader className="px-0 pt-0">
-                <CardTitle>Kurzus alapadatok</CardTitle>
+                <CardTitle>Tartalom alapadatok</CardTitle>
                 <CardDescription>
-                  Add meg a kurzus alapvető információit. Ezek később módosíthatók.
+                  Add meg a tartalom alapvető információit. Ezek később módosíthatók.
                 </CardDescription>
               </CardHeader>
               <CourseBasicInfoStep
@@ -588,7 +588,7 @@ export default function CourseCreationWizard() {
                 <CardTitle>Leckék hozzáadása</CardTitle>
                 <CardDescription>
                   Add hozzá a leckéket. A sorrend húzással módosítható.
-                  {courseType === 'MASTERCLASS' && ' Masterclass esetén importálhatsz leckéket más kurzusokból.'}
+                  {courseType === 'MASTERCLASS' && ' Masterclass esetén importálhatsz leckéket más tartalmakból.'}
                 </CardDescription>
               </CardHeader>
               <CourseLessonsStep courseId={courseId} />
@@ -600,7 +600,7 @@ export default function CourseCreationWizard() {
               <CardHeader className="px-0 pt-0">
                 <CardTitle>Áttekintés és publikálás</CardTitle>
                 <CardDescription>
-                  Tekintsd át a kurzust és publikáld, hogy elérhető legyen a diákok számára.
+                  Tekintsd át a tartalmat és publikáld, hogy elérhető legyen a diákok számára.
                 </CardDescription>
               </CardHeader>
               <CoursePublishStep 
@@ -658,7 +658,7 @@ export default function CourseCreationWizard() {
           <AlertDialogHeader>
             <AlertDialogTitle>Biztosan ki akarsz lépni?</AlertDialogTitle>
             <AlertDialogDescription>
-              A kurzus létrehozása folyamatban van. Ha kilépsz, a piszkozat mentésre kerül és később folytathatod.
+              A tartalom létrehozása folyamatban van. Ha kilépsz, a piszkozat mentésre kerül és később folytathatod.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -24,7 +24,7 @@ export function SecuritySection() {
     {
       icon: CheckCircle2,
       title: 'Minőségi tartalom',
-      description: 'Minden kurzust szakértők ellenőriznek',
+      description: 'Minden tartalmat szakértők ellenőriznek',
     },
   ];
 

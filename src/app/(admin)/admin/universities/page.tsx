@@ -99,7 +99,7 @@ export default function AdminUniversitiesPage() {
               <TableRow>
                 <TableHead>Név</TableHead>
                 <TableHead>Slug</TableHead>
-                <TableHead>Kurzusok</TableHead>
+                <TableHead>Tartalmak</TableHead>
                 <TableHead>Felhasználók</TableHead>
                 <TableHead>Revenue Share %</TableHead>
               </TableRow>

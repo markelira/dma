@@ -116,7 +116,7 @@ export function SubscriptionManager() {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            Az előfizetéssel korlátlan hozzáférést kaphat a platformon található összes kurzushoz.
+            Az előfizetéssel korlátlan hozzáférést kaphat a platformon található összes tartalomhoz.
           </p>
           <Button className="mt-4" asChild>
             <a href="/subscribe">Előfizetés választása</a>

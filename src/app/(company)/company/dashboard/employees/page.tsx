@@ -747,7 +747,7 @@ export default function EmployeesPage() {
                   ) : (
                     <>
                       Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> alkalmazottat a vállalatból?
-                      Az alkalmazott elveszíti hozzáférését a vállalati kurzusokhoz.
+                      Az alkalmazott elveszíti hozzáférését a vállalati tartalmakhoz.
                     </>
                   )}
                 </p>

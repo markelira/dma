@@ -96,7 +96,7 @@ export const ContinueSection: React.FC = () => {
             href="/dashboard"
             className="text-primary hover:text-primary-dark font-medium text-sm"
           >
-            Összes kurzus megtekintése →
+            Összes tartalom megtekintése →
           </Link>
         </div>
 
@@ -112,7 +112,7 @@ export const ContinueSection: React.FC = () => {
               href="/dashboard"
               className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary bg-primary/10 hover:bg-primary/20 transition-colors"
             >
-              További {inProgressCourses.length - 3} kurzus megtekintése
+              További {inProgressCourses.length - 3} tartalom megtekintése
             </Link>
           </div>
         )}

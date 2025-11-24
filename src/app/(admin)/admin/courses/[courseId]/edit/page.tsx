@@ -125,12 +125,12 @@ export default function EditCoursePage() {
           lessons
         })
       } else {
-        toast.error('Kurzus nem található')
+        toast.error('Tartalom nem található')
         router.push('/admin/courses')
       }
     } catch (error) {
       console.error('Error loading course:', error)
-      toast.error('Hiba a kurzus betöltésekor')
+      toast.error('Hiba a tartalom betöltésekor')
     } finally {
       setLoading(false)
     }
@@ -154,7 +154,7 @@ export default function EditCoursePage() {
       
       if (courseId === 'new') {
         await setDoc(courseRef, dataToSave)
-        toast.success('Kurzus sikeresen létrehozva!')
+        toast.success('Tartalom sikeresen létrehozva!')
         router.push(`/admin/courses/${courseRef.id}/edit`)
       } else {
         await updateDoc(courseRef, dataToSave)
@@ -183,7 +183,7 @@ export default function EditCoursePage() {
           }
         }
         
-        toast.success('Kurzus sikeresen mentve!')
+        toast.success('Tartalom sikeresen mentve!')
       }
     } catch (error) {
       console.error('Error saving course:', error)
@@ -270,7 +270,7 @@ export default function EditCoursePage() {
             Vissza
           </Button>
           <h1 className="text-2xl font-bold">
-            {courseId === 'new' ? 'Új kurzus létrehozása' : 'Kurzus szerkesztése'}
+            {courseId === 'new' ? 'Új tartalom létrehozása' : 'Tartalom szerkesztése'}
           </h1>
         </div>
         <div className="flex gap-2">
@@ -298,12 +298,12 @@ export default function EditCoursePage() {
         <TabsContent value="details" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Kurzus információk</CardTitle>
+              <CardTitle>Tartalom információk</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Kurzus címe</Label>
+                  <Label htmlFor="title">Tartalom címe</Label>
                   <Input
                     id="title"
                     value={courseData.title}
@@ -328,7 +328,7 @@ export default function EditCoursePage() {
                   id="description"
                   value={courseData.description}
                   onChange={(e) => setCourseData({ ...courseData, description: e.target.value })}
-                  placeholder="Kurzus részletes leírása..."
+                  placeholder="Tartalom részletes leírása..."
                   rows={4}
                 />
               </div>
@@ -454,7 +454,7 @@ export default function EditCoursePage() {
             <CardContent>
               {!courseData.lessons || courseData.lessons.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">
-                  Még nincs lecke hozzáadva a kurzushoz
+                  Még nincs lecke hozzáadva a tartalomhoz
                 </p>
               ) : (
                 <div className="space-y-4">
@@ -592,9 +592,9 @@ export default function EditCoursePage() {
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Kurzus státusza</Label>
+                  <Label>Tartalom státusza</Label>
                   <p className="text-sm text-muted-foreground">
-                    A publikált kurzusok megjelennek a nyilvános listában
+                    A publikált tartalmak megjelennek a nyilvános listában
                   </p>
                 </div>
                 <Select
@@ -616,7 +616,7 @@ export default function EditCoursePage() {
               {courseData.status === 'PUBLISHED' && (!courseData.lessons || courseData.lessons.length === 0) && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-yellow-800">
-                    ⚠️ Figyelem: A kurzusnak legalább egy leckét kell tartalmaznia a publikáláshoz.
+                    ⚠️ Figyelem: A tartalomnak legalább egy leckét kell tartalmaznia a publikáláshoz.
                   </p>
                 </div>
               )}

@@ -36,7 +36,7 @@ export default function PaymentCancelPage() {
             <Button asChild variant="outline" className="w-full">
               <Link href="/courses">
                 <ArrowLeft className="mr-2 h-5 w-5" />
-                Vissza a kurzusokhoz
+                Vissza a tartalmakhoz
               </Link>
             </Button>
 

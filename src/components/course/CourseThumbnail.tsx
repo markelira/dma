@@ -21,7 +21,7 @@ const sizeClasses = {
 
 export function CourseThumbnail({ 
   src, 
-  alt = "Kurzus kép", 
+  alt = "Tartalom kép", 
   className,
   size = "md",
   fallback = true 

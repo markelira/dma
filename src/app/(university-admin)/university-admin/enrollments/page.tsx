@@ -411,7 +411,7 @@ export default function UniversityAdminEnrollmentsPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Keresés hallgató vagy kurzus alapján..."
+                placeholder="Keresés hallgató vagy tartalom alapján..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -431,10 +431,10 @@ export default function UniversityAdminEnrollmentsPage() {
             </Select>
             <Select value={courseFilter} onValueChange={setCourseFilter}>
               <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder="Kurzus" />
+                <SelectValue placeholder="Tartalom" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Minden kurzus</SelectItem>
+                <SelectItem value="all">Minden tartalom</SelectItem>
                 {courses.map(course => (
                   <SelectItem key={course.id} value={course.id}>{course.title}</SelectItem>
                 ))}
@@ -451,7 +451,7 @@ export default function UniversityAdminEnrollmentsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Hallgató</TableHead>
-                <TableHead>Kurzus</TableHead>
+                <TableHead>Tartalom</TableHead>
                 <TableHead>Oktató</TableHead>
                 <TableHead>Haladás</TableHead>
                 <TableHead>Beiratkozás</TableHead>
@@ -528,7 +528,7 @@ export default function UniversityAdminEnrollmentsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <BookOpen className="mr-2 h-4 w-4" />
-                          Kurzus megtekintése
+                          Tartalom megtekintése
                         </DropdownMenuItem>
                         {enrollment.status === 'COMPLETED' && !enrollment.certificateIssued && (
                           <DropdownMenuItem onClick={() => handleIssueCertificate(enrollment.id)}>

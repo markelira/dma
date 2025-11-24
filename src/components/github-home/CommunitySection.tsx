@@ -48,7 +48,7 @@ export function CommunitySection() {
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-8"
           >
             {[
-              { icon: Users, value: '200+', label: 'Aktív kurzus' },
+              { icon: Users, value: '200+', label: 'Aktív tartalom' },
               { icon: TrendingUp, value: '95%', label: 'Sikeres végzés' },
               { icon: Star, value: '4.9/5', label: 'Értékelés' },
               { icon: Award, value: '50+', label: 'Szakértő oktató' },

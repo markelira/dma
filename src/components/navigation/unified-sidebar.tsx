@@ -60,7 +60,7 @@ const allNavItems: NavItem[] = [
   
   // University Admin specific
   {
-    title: 'Kurzusok',
+    title: 'Tartalmak',
     href: '/university-admin/courses',
     icon: BookOpen,
     roles: ['UNIVERSITY_ADMIN', 'university_admin']
@@ -110,7 +110,7 @@ const allNavItems: NavItem[] = [
   
   // Student specific
   {
-    title: 'Kurzusaim',
+    title: 'Beiratkozásaim',
     href: '/dashboard/my-learning',
     icon: BookOpen,
     roles: ['STUDENT']
@@ -136,13 +136,13 @@ const allNavItems: NavItem[] = [
   
   // Instructor specific
   {
-    title: 'Kurzusaim',
+    title: 'Tartalmaim',
     href: '/instructor/courses',
     icon: BookOpen,
     roles: ['INSTRUCTOR']
   },
   {
-    title: 'Új kurzus',
+    title: 'Új tartalom',
     href: '/instructor/courses/create',
     icon: Video,
     roles: ['INSTRUCTOR']
@@ -180,7 +180,7 @@ const allNavItems: NavItem[] = [
     roles: ['ADMIN'] // CSAK admin
   },
   {
-    title: 'Kurzus kezelés',
+    title: 'Tartalom kezelés',
     href: '/admin/courses',
     icon: BookOpen,
     roles: ['ADMIN'] // CSAK admin

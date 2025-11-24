@@ -19,7 +19,7 @@ export default function HeroesPreviewPage() {
   // Mock Course Data (realistic for DMA platform)
   const mockCourseData = {
     title: 'Vezetői készségfejlesztés a modern munkahelyeken',
-    description: 'Tanulj meg hatékonyan vezetni, motiválni és építeni egy magas teljesítményű csapatot. Ez a gyakorlatorientált kurzus segít elsajátítani a vezetői készségeket, amelyekkel valódi változást érhetsz el a szervezetedben.',
+    description: 'Tanulj meg hatékonyan vezetni, motiválni és építeni egy magas teljesítményű csapatot. Ez a gyakorlatorientált tartalom segít elsajátítani a vezetői készségeket, amelyekkel valódi változást érhetsz el a szervezetedben.',
     transformationStatement: 'Válj magabiztos vezetővé 12 hét alatt',
     categories: ['Vezetés', 'Soft Skills'],
     level: 'Középhaladó',

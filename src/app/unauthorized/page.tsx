@@ -164,7 +164,7 @@ export default function UnauthorizedPage() {
                   <div>
                     <p><strong>Hallgatói jogosultságok:</strong></p>
                     <ul className="list-disc list-inside ml-2 space-y-1">
-                      <li>Kurzusok megtekintése és jelentkezés</li>
+                      <li>Tartalmak megtekintése és jelentkezés</li>
                       <li>Leckék tanulmányozása</li>
                       <li>Kvízek kitöltése</li>
                       <li>Profil kezelése</li>
@@ -176,7 +176,7 @@ export default function UnauthorizedPage() {
                   <div>
                     <p><strong>Oktatói jogosultságok:</strong></p>
                     <ul className="list-disc list-inside ml-2 space-y-1">
-                      <li>Kurzusok létrehozása és szerkesztése</li>
+                      <li>Tartalmak létrehozása és szerkesztése</li>
                       <li>Hallgatói eredmények megtekintése</li>
                       <li>Tananyagok feltöltése</li>
                       <li>Analitikák megtekintése</li>
@@ -189,7 +189,7 @@ export default function UnauthorizedPage() {
                     <p><strong>Egyetemi adminisztrátori jogosultságok:</strong></p>
                     <ul className="list-disc list-inside ml-2 space-y-1">
                       <li>Egyetemen belüli felhasználók kezelése</li>
-                      <li>Kurzusok jóváhagyása</li>
+                      <li>Tartalmak jóváhagyása</li>
                       <li>Tanszékek kezelése</li>
                       <li>Jelentések generálása</li>
                     </ul>

@@ -268,7 +268,7 @@ export default function InviteAcceptancePage() {
             Mostantól a <strong>{inviteData?.companyName}</strong> vállalat tagja vagy.
           </p>
           <p className="text-sm text-gray-500">
-            Átirányítás a kurzusaidhoz...
+            Átirányítás a tartalmaidhoz...
           </p>
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900 mx-auto mt-4"></div>
         </motion.div>

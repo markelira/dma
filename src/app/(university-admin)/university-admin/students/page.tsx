@@ -315,7 +315,7 @@ export default function UniversityAdminStudentsPage() {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Befejezett kurzusok</CardTitle>
+            <CardTitle className="text-sm font-medium">Befejezett tartalmak</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
@@ -460,7 +460,7 @@ export default function UniversityAdminStudentsPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <BookOpen className="mr-2 h-4 w-4" />
-                          Kurzusok megtekintése
+                          Tartalmak megtekintése
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Mail className="mr-2 h-4 w-4" />

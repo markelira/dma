@@ -129,7 +129,7 @@ export default function MasterclassPage() {
         <div className="min-h-screen bg-gradient-to-br from-amber-50 via-yellow-50/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-amber-600" />
-            <p className="text-lg text-gray-600">Masterclass kurzusok betöltése...</p>
+            <p className="text-lg text-gray-600">Masterclass tartalmak betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -162,7 +162,7 @@ export default function MasterclassPage() {
                 Masterclass
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-                Átfogó, több modulból álló mesterkurzusok. Komplex témakörök professzionális szinten, szakértői oktatással.
+                Átfogó, több modulból álló mestertartalmak. Komplex témakörök professzionális szinten, szakértői oktatással.
               </p>
             </motion.div>
 
@@ -176,7 +176,7 @@ export default function MasterclassPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Keress masterclass kurzusok között..."
+                  placeholder="Keress masterclass tartalmak között..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-amber-500 transition-all text-gray-900 placeholder-gray-500"

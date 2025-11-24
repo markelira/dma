@@ -31,11 +31,11 @@ export default function CoursePreviewPage({ params }: { params: { courseId: stri
         if (data.success) {
           setCourse(data.course);
         } else {
-          setError(data.message || 'Hiba a kurzus betöltésekor');
+          setError(data.message || 'Hiba a tartalom betöltésekor');
         }
       } catch (err: any) {
         console.error('Error loading course:', err);
-        setError(err.message || 'Hiba a kurzus betöltésekor');
+        setError(err.message || 'Hiba a tartalom betöltésekor');
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,7 @@ export default function CoursePreviewPage({ params }: { params: { courseId: stri
         <Card>
           <CardContent className="p-6 text-center">
             <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-            <p>Kurzus betöltése...</p>
+            <p>Tartalom betöltése...</p>
           </CardContent>
         </Card>
       </div>
@@ -66,7 +66,7 @@ export default function CoursePreviewPage({ params }: { params: { courseId: stri
       <div className="min-h-screen flex items-center justify-center">
         <Card>
           <CardContent className="p-6 text-center">
-            <p className="text-red-600 mb-4">{error || 'Kurzus nem található'}</p>
+            <p className="text-red-600 mb-4">{error || 'Tartalom nem található'}</p>
             <button 
               onClick={() => router.back()}
               className="text-blue-600 hover:underline"

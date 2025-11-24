@@ -109,7 +109,7 @@ export function HeroSection() {
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">200+</div>
-                <div className="text-sm text-gray-500">Kurzus</div>
+                <div className="text-sm text-gray-500">Tartalom</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-white">4.9/5</div>
@@ -153,7 +153,7 @@ export function HeroSection() {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500" />
                 <div>
                   <div className="text-xs text-gray-400">Ma befejezett</div>
-                  <div className="text-sm font-semibold text-white">892 kurzus</div>
+                  <div className="text-sm font-semibold text-white">892 tartalom</div>
                 </div>
               </div>
             </motion.div>

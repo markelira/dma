@@ -52,12 +52,12 @@ export default function PaymentSuccessPage() {
                 <Button asChild className="w-full" size="lg">
                   <Link href={`/courses/${courseId}/learn`}>
                     <ArrowRight className="mr-2 h-5 w-5" />
-                    Kurzus megkezdése
+                    Tartalom megkezdése
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="w-full">
                   <Link href="/dashboard/my-learning">
-                    Ugrás a kurzusaimhoz
+                    Ugrás a beiratkozásaimhoz
                   </Link>
                 </Button>
               </>

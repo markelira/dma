@@ -70,7 +70,7 @@ export function CurriculumTab({ courseData }: CurriculumTabProps) {
       <section className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4">
           <Book className="w-5 h-5 text-[#0f766e]" />
-          <h2 className="text-xl font-semibold">A kurzus tartalma</h2>
+          <h2 className="text-xl font-semibold">A tartalom felépítése</h2>
         </div>
         <p className="text-gray-600 mb-6">{totalLessons} lecke • {formatDuration(totalDuration)}</p>
         

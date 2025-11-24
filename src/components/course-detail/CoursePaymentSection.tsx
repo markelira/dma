@@ -84,7 +84,7 @@ export function CoursePaymentSection({
 
   const courseFeatures = [
     ...(features.length > 0 ? features : [
-      'Teljes kurzus hozzáférés',
+      'Teljes tartalom hozzáférés',
       'Strukturált tananyag',
       'Gyakorlati feladatok',
       'Közösségi támogatás'
@@ -105,7 +105,7 @@ export function CoursePaymentSection({
             <span>Beiratkozva</span>
           </CardTitle>
           <CardDescription>
-            Már hozzáfér ehhez a kurzushoz
+            Már hozzáfér ehhez a tartalomhoz
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -116,7 +116,7 @@ export function CoursePaymentSection({
           </Button>
           
           <div className="text-center text-sm text-muted-foreground">
-            <p>Kurzus megkezdése vagy folytatása</p>
+            <p>Tartalom megkezdése vagy folytatása</p>
           </div>
         </CardContent>
       </Card>
@@ -133,7 +133,7 @@ export function CoursePaymentSection({
             <span>Előfizetés előny</span>
           </CardTitle>
           <CardDescription>
-            Ez a kurzus része az aktív előfizetésének
+            Ez a tartalom része az aktív előfizetésének
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -201,7 +201,7 @@ export function CoursePaymentSection({
       <CardContent className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="purchase">Kurzus vásárlás</TabsTrigger>
+            <TabsTrigger value="purchase">Tartalom vásárlás</TabsTrigger>
             <TabsTrigger value="subscription">Előfizetés</TabsTrigger>
           </TabsList>
 
@@ -209,7 +209,7 @@ export function CoursePaymentSection({
             <EnhancedCheckoutButton
               courseId={courseId}
               mode="payment"
-              title="Kurzus vásárlása"
+              title="Tartalom vásárlása"
               discountedPrice={price}
               originalPrice={originalPrice}
               currency={currency}
@@ -266,7 +266,7 @@ export function CoursePaymentSection({
               <div className="text-center space-y-2">
                 <h3 className="font-semibold">Korlátlan hozzáférés</h3>
                 <p className="text-sm text-muted-foreground">
-                  Hozzáférés az összes kurzushoz és prémium tartalmakhoz
+                  Hozzáférés az összes tartalomhoz és prémium funkciókhoz
                 </p>
               </div>
 
@@ -297,11 +297,11 @@ export function CoursePaymentSection({
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start space-x-2">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Korlátlan kurzus hozzáférés</span>
+                    <span>Korlátlan tartalom hozzáférés</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Új kurzusok automatikusan</span>
+                    <span>Új tartalmak automatikusan</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -321,9 +321,9 @@ export function CoursePaymentSection({
                   <span>Előfizetés vs. Egyszeri vásárlás</span>
                 </div>
                 <div className="text-xs text-purple-700 space-y-1">
-                  <p>• Csak 2 kurzus vásárlása = 1 havi előfizetés ára</p>
-                  <p>• 50+ kurzus azonnal elérhető</p>
-                  <p>• Új kurzusok havonta</p>
+                  <p>• Csak 2 tartalom vásárlása = 1 havi előfizetés ára</p>
+                  <p>• 50+ tartalom azonnal elérhető</p>
+                  <p>• Új tartalmak havonta</p>
                 </div>
               </div>
             </div>

@@ -11,7 +11,7 @@ interface CourseFeaturesSectionProps {
 export function CourseFeaturesSection({ features }: CourseFeaturesSectionProps) {
   // Default features if none provided
   const defaultFeatures = [
-    { icon: Infinity, title: 'Korlátlan hozzáférés', description: 'Élethosszig tartó hozzáférés a kurzushoz' },
+    { icon: Infinity, title: 'Korlátlan hozzáférés', description: 'Élethosszig tartó hozzáférés a tartalomhoz' },
     { icon: Smartphone, title: 'Mobilon is elérhető', description: 'Tanulj bárhol, bármikor, bármilyen eszközön' },
     { icon: Download, title: 'Letölthető anyagok', description: 'Gyakorlati feladatok és segédletek' },
     { icon: MessageSquare, title: 'Közösségi hozzáférés', description: 'Csatlakozz más tanulókhoz és oszd meg tapasztalataidat' },
@@ -27,7 +27,7 @@ export function CourseFeaturesSection({ features }: CourseFeaturesSectionProps) 
       transition={{ duration: 0.5, delay: 0.1 }}
     >
       <h2 className="text-2xl font-bold text-gray-900 mb-6">
-        Mit kapsz a kurzussal?
+        Mit kapsz a tartalommal?
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

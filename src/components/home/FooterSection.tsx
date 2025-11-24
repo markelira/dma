@@ -4,11 +4,11 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 
 const footerLinks = {
-  kurzusok: [
+  tartalmak: [
     { label: 'Webinárok', href: '/webinar' },
     { label: 'Akadémia', href: '/akadémia' },
     { label: 'Masterclass', href: '/masterclass' },
-    { label: 'Összes kurzus', href: '/courses' },
+    { label: 'Összes tartalom', href: '/courses' },
   ],
   ceg: [
     { label: 'Rólunk', href: '/about' },
@@ -153,10 +153,10 @@ export function FooterSection() {
           {/* Link columns */}
           <motion.div variants={itemVariants}>
             <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
-              Kurzusok
+              Tartalmak
             </h3>
             <ul className="space-y-3">
-              {footerLinks.kurzusok.map((link) => (
+              {footerLinks.tartalmak.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -238,7 +238,7 @@ export function FooterSection() {
                 Iratkozz fel hírlevelünkre
               </h3>
               <p className="text-white/50 text-sm">
-                Kapj értesítést új kurzusokról és exkluzív kedvezményekről.
+                Kapj értesítést új tartalmakról és exkluzív kedvezményekről.
               </p>
             </div>
 

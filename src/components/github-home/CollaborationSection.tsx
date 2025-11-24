@@ -57,7 +57,7 @@ export function CollaborationSection() {
               </div>
 
               <p className="text-gray-400 mb-6">
-                Valós idejű chat, fórumok és Q&A minden kurzushoz. Oszd meg
+                Valós idejű chat, fórumok és Q&A minden tartalomhoz. Oszd meg
                 gondolataidat és tanulj másoktól.
               </p>
 

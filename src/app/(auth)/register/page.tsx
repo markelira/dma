@@ -378,7 +378,7 @@ function RegisterPageContent() {
                 Csatlakozás: {inviteData.companyName}
               </p>
               <p className="text-xs text-blue-700">
-                Regisztrálj, hogy hozzáférj a cég kurzusaihoz
+                Regisztrálj, hogy hozzáférj a cég tartalmaihoz
               </p>
             </div>
           </div>

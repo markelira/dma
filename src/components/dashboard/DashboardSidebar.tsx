@@ -38,7 +38,7 @@ const navigationSections = {
       title: 'Fő navigáció',
       items: [
         { title: 'Kezdőlap', href: '/dashboard', icon: Home },
-        { title: 'Kurzusaim', href: '/dashboard/courses', icon: BookOpen },
+        { title: 'Beiratkozásaim', href: '/dashboard/courses', icon: BookOpen },
         { title: 'Böngészés', href: '/courses', icon: GraduationCap },
       ]
     },
@@ -55,7 +55,7 @@ const navigationSections = {
       title: 'Oktatás',
       items: [
         { title: 'Oktató Dashboard', href: '/instructor/dashboard', icon: Home },
-        { title: 'Kurzusaim', href: '/instructor/courses', icon: BookOpen },
+        { title: 'Tartalmaim', href: '/instructor/courses', icon: BookOpen },
         { title: 'Tanulóim', href: '/instructor/students', icon: User },
         { title: 'Tartalom', href: '/instructor/content', icon: FolderOpen },
         { title: 'Elemzések', href: '/instructor/analytics', icon: TrendingUp },
@@ -80,7 +80,7 @@ const navigationSections = {
       items: [
         { title: 'Admin Dashboard', href: '/admin/dashboard', icon: Home },
         { title: 'Felhasználók', href: '/admin/users', icon: User },
-        { title: 'Kurzusok', href: '/admin/courses', icon: BookOpen },
+        { title: 'Tartalmak', href: '/admin/courses', icon: BookOpen },
         { title: 'Elemzések', href: '/admin/analytics', icon: TrendingUp },
         { title: 'Beállítások', href: '/admin/settings', icon: Settings },
       ]

@@ -164,7 +164,7 @@ export default function UniversityDetailPage() {
       const result: any = await getCoursesCallableFn({})
       
       if (!result.data.success) {
-        throw new Error(result.data.error || 'Hiba a kurzusok betöltésekor')
+        throw new Error(result.data.error || 'Hiba a tartalmak betöltésekor')
       }
       
       return result.data.courses || []
@@ -264,13 +264,13 @@ export default function UniversityDetailPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Kurzusok</CardTitle>
+              <CardTitle className="text-sm font-medium">Tartalmak</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.courseCount ?? 0}</div>
               <p className="text-xs text-muted-foreground">
-                {stats?.activeCoursesCount ?? 0} aktív kurzus
+                {stats?.activeCoursesCount ?? 0} aktív tartalom
               </p>
             </CardContent>
           </Card>
@@ -485,14 +485,14 @@ export default function UniversityDetailPage() {
 
       {/* Courses management */}
       <div className="flex items-center justify-between mt-8">
-        <h2 className="text-2xl font-semibold">Kurzusok Kezelése</h2>
+        <h2 className="text-2xl font-semibold">Tartalmak Kezelése</h2>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button>Kurzusok Hozzárendelése</Button>
+            <Button>Tartalmak Hozzárendelése</Button>
           </AlertDialogTrigger>
           <AlertDialogContent className="max-w-xl">
             <AlertDialogHeader>
-              <AlertDialogTitle>Kurzusok kiválasztása</AlertDialogTitle>
+              <AlertDialogTitle>Tartalmak kiválasztása</AlertDialogTitle>
             </AlertDialogHeader>
             <div className="max-h-64 overflow-y-auto space-y-2">
               {availableCourses?.map(c => (
@@ -511,7 +511,7 @@ export default function UniversityDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Kurzusok ({uniCourses?.length ?? 0})</CardTitle>
+          <CardTitle>Tartalmak ({uniCourses?.length ?? 0})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>

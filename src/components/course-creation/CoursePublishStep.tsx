@@ -73,7 +73,7 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
         const result: any = await getCourseFn({ courseId });
         
         if (!result.data.success) {
-          throw new Error(result.data.error || 'Hiba a kurzus betöltésekor');
+          throw new Error(result.data.error || 'Hiba a tartalom betöltésekor');
         }
         
         console.log('📦 Course data received from Firestore:', result.data.course);
@@ -100,7 +100,7 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
   }
 
   if (error || !course) {
-    return <p className="text-red-600">Hiba a kurzus betöltésekor: {error}</p>;
+    return <p className="text-red-600">Hiba a tartalom betöltésekor: {error}</p>;
   }
 
 
@@ -112,7 +112,7 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
       {/* Course Overview */}
       <Card className="lg:col-span-2">
         <CardHeader>
-          <CardTitle>Kurzus áttekintés</CardTitle>
+          <CardTitle>Tartalom áttekintés</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -169,9 +169,9 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
         <CardContent className="pt-6">
           <div className="text-center space-y-4">
             <div>
-              <h2 className="text-2xl font-bold">Kurzus publikálása</h2>
+              <h2 className="text-2xl font-bold">Tartalom publikálása</h2>
               <p className="text-muted-foreground">
-                A kurzus publikálása után az elérhető lesz a felhasználók számára
+                A tartalom publikálása után az elérhető lesz a felhasználók számára
               </p>
             </div>
 
@@ -182,7 +182,7 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
               size="xl"
               className="px-8 py-3 text-lg font-semibold"
             >
-              {isPublishing ? "Publikálás..." : isPublished ? "Publikálva" : "KURZUS PUBLIKÁLÁSA"}
+              {isPublishing ? "Publikálás..." : isPublished ? "Publikálva" : "TARTALOM PUBLIKÁLÁSA"}
             </Button>
           </div>
         </CardContent>

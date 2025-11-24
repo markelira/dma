@@ -71,7 +71,7 @@ export const useAddToWishlist = () => {
       return result.data
     },
     onSuccess: (data, courseId) => {
-      toast.success('Kurzus hozzáadva a kívánságlistához')
+      toast.success('Tartalom hozzáadva a kívánságlistához')
       
       // Update wishlist status
       queryClient.setQueryData(['wishlist-status', courseId], { isInWishlist: true })
@@ -96,7 +96,7 @@ export const useRemoveFromWishlist = () => {
       return result.data
     },
     onSuccess: (data, courseId) => {
-      toast.success('Kurzus eltávolítva a kívánságlistából')
+      toast.success('Tartalom eltávolítva a kívánságlistából')
       
       // Update wishlist status
       queryClient.setQueryData(['wishlist-status', courseId], { isInWishlist: false })

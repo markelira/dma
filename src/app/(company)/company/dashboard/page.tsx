@@ -284,12 +284,12 @@ export default function CompanyDashboardPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 text-lg">Aktiváld az előfizetésedet</h3>
                 <p className="text-gray-600 mt-1">
-                  Az előfizetéssel korlátlan hozzáférést biztosíthatsz az összes kurzushoz minden alkalmazottad számára.
+                  Az előfizetéssel korlátlan hozzáférést biztosíthatsz az összes tartalomhoz minden alkalmazottad számára.
                 </p>
                 <ul className="mt-2 text-sm text-gray-600 space-y-1">
                   <li className="flex items-center">
                     <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
-                    Korlátlan hozzáférés minden kurzushoz
+                    Korlátlan hozzáférés minden tartalomhoz
                   </li>
                   <li className="flex items-center">
                     <CheckCircle2 className="w-4 h-4 text-green-500 mr-2" />
@@ -416,8 +416,8 @@ export default function CompanyDashboardPage() {
               <BookOpen className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="font-medium text-gray-900">Kurzusok böngészése</p>
-              <p className="text-xs text-gray-500">Minden elérhető kurzus</p>
+              <p className="font-medium text-gray-900">Tartalmak böngészése</p>
+              <p className="text-xs text-gray-500">Minden elérhető tartalom</p>
             </div>
           </Link>
 
@@ -441,14 +441,14 @@ export default function CompanyDashboardPage() {
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900 flex items-center">
             <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
-            Vállalati kurzusok
+            Vállalati tartalmak
           </h2>
           <button
             onClick={() => setShowAddCourseModal(true)}
             className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4 mr-1" />
-            Kurzus hozzáadása
+            Tartalom hozzáadása
           </button>
         </div>
 
@@ -461,8 +461,8 @@ export default function CompanyDashboardPage() {
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <BookOpen className="w-8 h-8 text-gray-400" />
             </div>
-            <p className="text-gray-600 font-medium">Még nincs kurzus hozzáadva</p>
-            <p className="text-sm text-gray-500 mt-1">Adj hozzá kurzusokat, hogy az alkalmazottak elkezdhenek tanulni.</p>
+            <p className="text-gray-600 font-medium">Még nincs tartalom hozzáadva</p>
+            <p className="text-sm text-gray-500 mt-1">Adj hozzá tartalmakat, hogy az alkalmazottak elkezdhenek tanulni.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -516,9 +516,9 @@ export default function CompanyDashboardPage() {
               className="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[80vh] overflow-hidden border border-gray-200"
             >
               <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Kurzus hozzáadása</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Tartalom hozzáadása</h3>
                 <p className="text-sm text-gray-500 mt-1">
-                  Válassz ki egy kurzust, amelyre be szeretnéd iratkoztatni az alkalmazottakat.
+                  Válassz ki egy tartalmat, amelyre be szeretnéd iratkoztatni az alkalmazottakat.
                 </p>
               </div>
               <div className="p-6 max-h-[50vh] overflow-y-auto">
@@ -528,8 +528,8 @@ export default function CompanyDashboardPage() {
                   </div>
                 ) : availableCoursesForEnrollment.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
-                    <p>Nincs elérhető kurzus</p>
-                    <p className="text-sm mt-1">Minden kurzust már hozzáadtál.</p>
+                    <p>Nincs elérhető tartalom</p>
+                    <p className="text-sm mt-1">Minden tartalmat már hozzáadtál.</p>
                   </div>
                 ) : (
                   <div className="space-y-3">

@@ -238,7 +238,7 @@ export const HeroSection: React.FC = () => {
                 className="flex-1 font-semibold text-base sm:text-lg bg-white/80 dark:bg-gray-800/80 text-primary dark:text-teal-400 border border-primary dark:border-teal-400 hover:bg-white dark:hover:bg-gray-700"
                 onClick={() => router.push('/courses')}
               >
-                Fedezze fel a kurzusokat
+                Fedezze fel a tartalmakat
               </Button>
             </div>
           </motion.div>
@@ -277,7 +277,7 @@ export const HeroSection: React.FC = () => {
               >
                 <div className="text-center mb-4">
                   <h3 className="text-gray-900 font-semibold mb-2">Egyetemi partnereink</h3>
-                  <p className="text-gray-600 text-sm">Elismert intézmények által készített kurzusok</p>
+                  <p className="text-gray-600 text-sm">Elismert intézmények által készített tartalmak</p>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4">
@@ -317,7 +317,7 @@ export const HeroSection: React.FC = () => {
               >
                 <div className="text-center">
                   <h3 className="text-gray-900 font-semibold mb-2">Egyetemi partnereink</h3>
-                  <p className="text-gray-600 text-sm">Elismert intézmények által támogatott kurzusok</p>
+                  <p className="text-gray-600 text-sm">Elismert intézmények által támogatott tartalmak</p>
                   <div className="mt-4 grid grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (
                       <div key={i} className="flex items-center justify-center p-3 bg-white/60 rounded-lg shadow-sm">

@@ -88,7 +88,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
         }
       } catch (error) {
         console.error("Error fetching courses:", error);
-        toast.error("Nem sikerült betölteni a kurzusokat");
+        toast.error("Nem sikerült betölteni a tartalmakat");
       } finally {
         setLoading(false);
       }
@@ -184,7 +184,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Keresés kurzusok és leckék között..."
+              placeholder="Keresés tartalmak és leckék között..."
               className="pl-9"
             />
           </div>
@@ -205,7 +205,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
             ) : filteredCourses.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <FileText className="h-12 w-12 mb-4 opacity-50" />
-                <p>Nincs elérhető kurzus importáláshoz</p>
+                <p>Nincs elérhető tartalom importáláshoz</p>
               </div>
             ) : (
               <Accordion type="multiple" className="w-full">

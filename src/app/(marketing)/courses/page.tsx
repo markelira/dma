@@ -29,7 +29,7 @@ const COURSE_TYPE_LABELS: Record<string, string> = {
 const COURSE_TYPE_DESCRIPTIONS: Record<string, string> = {
   ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
   WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
-  MASTERCLASS: 'Átfogó, több modulból álló mesterkurzus',
+  MASTERCLASS: 'Átfogó, több modulból álló mestertartalom',
   PODCAST: 'Egyszeri podcast epizód audio- vagy videótartalommal',
 }
 
@@ -307,7 +307,7 @@ export default function CoursesPage() {
                 Fedezd fel tartalmainkat
               </h1>
               <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-                Akadémiák, webinárok, mesterkurzusok és podcastok szakértő mentoroktól.
+                Akadémiák, webinárok, mestertartalmak és podcastok szakértő mentoroktól.
                 Válaszd ki a számodra legmegfelelőbb tanulási formát.
               </p>
             </motion.div>

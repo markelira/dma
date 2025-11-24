@@ -222,7 +222,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                       <div>
                         <h3 className="text-xl font-semibold">Mi a szerepköröd?</h3>
                         <p className="text-sm text-muted-foreground">
-                          Ez segít nekünk releváns kurzusokat ajánlani
+                          Ez segít nekünk releváns tartalmakat ajánlani
                         </p>
                       </div>
                     </div>

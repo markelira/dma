@@ -24,7 +24,7 @@ export function CourseOutcomesSection({ outcomes }: CourseOutcomesSectionProps) 
           <Target className="w-5 h-5 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900">
-          Mit érsz el a kurzus végére?
+          Mit érsz el a tartalom végére?
         </h2>
       </div>
 

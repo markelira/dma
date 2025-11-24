@@ -145,7 +145,7 @@ export default function AdminReportsPage() {
       case 'payment': return 'Számlázás'
       case 'certificate': return 'Tanúsítvány'
       case 'account': return 'Fiók'
-      case 'course': return 'Kurzus'
+      case 'course': return 'Tartalom'
       case 'general': return 'Általános'
       default: return 'Egyéb'
     }

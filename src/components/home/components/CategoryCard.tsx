@@ -73,7 +73,7 @@ export function CategoryCard({
           <p className="text-sm text-gray-600">{description}</p>
           {courseCount !== undefined && (
             <p className="text-xs text-dma-red mt-2 font-medium">
-              {courseCount} kurzus
+              {courseCount} tartalom
             </p>
           )}
         </div>

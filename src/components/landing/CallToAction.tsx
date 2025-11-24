@@ -178,7 +178,7 @@ export const CallToAction: React.FC = () => {
                 onClick={() => router.push('/courses')}
                 className="group border-2 border-white text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white hover:text-primary transition-all duration-300 flex items-center justify-center"
               >
-                Kurzusok megtekintése
+                Tartalmak megtekintése
               </button>
             </div>
 
@@ -202,7 +202,7 @@ export const CallToAction: React.FC = () => {
                 <div className="text-3xl font-bold text-white mb-2">
                   {statsLoading ? '...' : `${stats?.courseCount || 0}+`}
                 </div>
-                <div className="text-white/80 text-sm">Kurzus</div>
+                <div className="text-white/80 text-sm">Tartalom</div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center">
                 <div className="text-3xl font-bold text-white mb-2">

@@ -251,7 +251,7 @@ export const InstructorShowcase: React.FC = () => {
                         {Number(instructor?.courseCount ?? 0)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">Kurzus</p>
+                    <p className="text-xs text-gray-500">Tartalom</p>
                   </div>
                 </div>
 
@@ -319,7 +319,7 @@ export const InstructorShowcase: React.FC = () => {
                 Ingyenes próba
               </button>
               <button className="border border-primary text-primary px-8 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
-                Kurzusok megtekintése
+                Tartalmak megtekintése
               </button>
             </div>
           </div>

@@ -185,10 +185,10 @@ export function SubscriptionRequiredModal({
           <DialogDescription className="text-center text-base">
             {courseName ? (
               <>
-                A <span className="font-semibold text-foreground">{courseName}</span> kurzushoz való hozzáféréshez aktív előfizetés szükséges.
+                A <span className="font-semibold text-foreground">{courseName}</span> tartalomhoz való hozzáféréshez aktív előfizetés szükséges.
               </>
             ) : (
-              'A kurzusokhoz való hozzáféréshez aktív előfizetés szükséges.'
+              'A tartalmakhoz való hozzáféréshez aktív előfizetés szükséges.'
             )}
           </DialogDescription>
         </DialogHeader>
@@ -201,10 +201,10 @@ export function SubscriptionRequiredModal({
               <div className="space-y-2">
                 <h3 className="font-semibold text-blue-900">Miért érdemes előfizetni?</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• Korlátlan hozzáférés <strong>MINDEN</strong> kurzushoz</li>
+                  <li>• Korlátlan hozzáférés <strong>MINDEN</strong> tartalomhoz</li>
                   <li>• 7 napos ingyenes próbaidőszak</li>
                   <li>• Bármikor lemondható</li>
-                  <li>• Tanúsítványok minden elvégzett kurzushoz</li>
+                  <li>• Tanúsítványok minden elvégzett tartalomhoz</li>
                 </ul>
               </div>
             </div>
@@ -335,7 +335,7 @@ export function SubscriptionRequiredModal({
             </div>
             <div className="flex items-center space-x-1.5">
               <Award className="w-3.5 h-3.5" />
-              <span>Tanúsított kurzusok</span>
+              <span>Tanúsított tartalmak</span>
             </div>
           </div>
         </div>

@@ -292,7 +292,7 @@ export function SubscriptionPlans({
                     <div className="font-semibold">
                       {plan.limits.courses === 'unlimited' ? '∞' : plan.limits.courses}
                     </div>
-                    <div className="text-muted-foreground text-xs">Kurzus</div>
+                    <div className="text-muted-foreground text-xs">Tartalom</div>
                   </div>
                   <div className="border-l h-8"></div>
                   <div>
@@ -395,7 +395,7 @@ export function SubscriptionPlans({
         </div>
         <div className="flex items-center space-x-2">
           <Award className="w-4 h-4" />
-          <span>Tanúsított kurzusok</span>
+          <span>Tanúsított tartalmak</span>
         </div>
       </div>
     </div>

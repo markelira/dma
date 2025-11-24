@@ -100,7 +100,7 @@ export default function IntegrationsSection() {
             style={{ color: "rgba(18, 17, 17, 0.7)" }}
           >
             Csatlakozz több ezer tanulóhoz, akik már elkezdték építeni jövőjüket.
-            Kezdd el még ma az első kurzusodat!
+            Kezdd el még ma az első tartalmadat!
           </p>
 
           {/* CTA Buttons */}
@@ -113,7 +113,7 @@ export default function IntegrationsSection() {
                 boxShadow: "0 4px 20px rgba(231, 43, 54, 0.3)",
               }}
             >
-              Böngészd a kurzusokat
+              Böngészd a tartalmakat
             </Link>
             <Link
               href="/pricing"
@@ -160,7 +160,7 @@ export default function IntegrationsSection() {
             {/* Links */}
             <div className="flex flex-wrap justify-center gap-6">
               {[
-                { label: "Kurzusok", href: "/courses" },
+                { label: "Tartalmak", href: "/courses" },
                 { label: "Árak", href: "/pricing" },
                 { label: "GYIK", href: "/faq" },
                 { label: "Kapcsolat", href: "/contact" },

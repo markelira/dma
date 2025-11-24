@@ -117,7 +117,7 @@ async function fetchCourses(): Promise<Course[]> {
     const result: any = await getCoursesCallableFn({})
     
     if (!result.data.success) {
-      throw new Error(result.data.error || 'Hiba a kurzusok betöltésekor')
+      throw new Error(result.data.error || 'Hiba a tartalmak betöltésekor')
     }
     
     return result.data.courses || []
@@ -237,10 +237,10 @@ export const CourseCategories: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Fedezze fel kurzusainkat kategóriák szerint
+            Fedezze fel tartalmainkat kategóriák szerint
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Válassza ki az érdeklődési körét és találja meg a tökéletes kurzust karrierfejlesztéséhez
+            Válassza ki az érdeklődési körét és találja meg a tökéletes tartalmat karrierfejlesztéséhez
           </p>
         </motion.div>
 
@@ -268,7 +268,7 @@ export const CourseCategories: React.FC = () => {
                           {category.name}
                         </h3>
                         <p className="text-sm text-gray-600">
-                          {stats.courseCount} kurzus
+                          {stats.courseCount} tartalom
                         </p>
                       </div>
                     </div>
@@ -287,7 +287,7 @@ export const CourseCategories: React.FC = () => {
                     {popularCourses.length > 0 && (
                       <div className="mb-6">
                         <h4 className="text-sm font-medium text-gray-900 mb-3">
-                          Népszerű kurzusok
+                          Népszerű tartalmak
                         </h4>
                         <div className="space-y-2">
                           {popularCourses.map((course) => (
@@ -317,7 +317,7 @@ export const CourseCategories: React.FC = () => {
                         }
                       }}
                     >
-                      <span className="text-sm font-medium">Böngésszen kurzusokat</span>
+                      <span className="text-sm font-medium">Böngésszen tartalmakat</span>
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Link>
                   </div>

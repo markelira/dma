@@ -154,7 +154,7 @@ export function CourseDetailHero({
               <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl ring-1 ring-gray-200/50 bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
                 <div className="text-gray-400 text-center">
                   <div className="text-6xl mb-2">📚</div>
-                  <p className="text-sm font-medium">Kurzus kép</p>
+                  <p className="text-sm font-medium">Tartalom kép</p>
                 </div>
               </div>
             )}

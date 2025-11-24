@@ -32,7 +32,7 @@ const navigationSections = [
     items: [
       { title: 'Vezérlőpult', href: '/company/dashboard', icon: Home },
       { title: 'Alkalmazottak', href: '/company/dashboard/employees', icon: Users },
-      { title: 'Kurzusok', href: '/company/dashboard/courses', icon: BookOpen },
+      { title: 'Tartalmak', href: '/company/dashboard/courses', icon: BookOpen },
       { title: 'Haladás', href: '/company/dashboard/progress', icon: TrendingUp },
     ]
   },

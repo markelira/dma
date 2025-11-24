@@ -30,7 +30,7 @@ export function useAddCoursesToUniversity(universityId: string) {
       await addCoursesToUniversity({ universityId, courseIds })
     },
     onSuccess: () => {
-      toast.success('Kurzusok hozzárendelve')
+      toast.success('Tartalmak hozzárendelve')
       qc.invalidateQueries({ queryKey: ['universityCourses', universityId] })
     },
     onError: (err: any) => {
@@ -47,9 +47,9 @@ export function useRemoveCourseFromUniversity(universityId: string) {
       await removeCourseFromUniversity({ universityId, courseId })
     },
     onSuccess: () => {
-      toast.success('Kurzus eltávolítva')
+      toast.success('Tartalom eltávolítva')
       qc.invalidateQueries({ queryKey: ['universityCourses', universityId] })
     },
-    onError: () => toast.error('Hiba a kurzus eltávolításakor'),
+    onError: () => toast.error('Hiba a tartalom eltávolításakor'),
   })
 } 

@@ -77,7 +77,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
               <div>
                 <h1 className="text-xl font-bold">Oktató előnézet mód</h1>
                 <p className="text-blue-100 text-sm">
-                  {course.title} - Így látják a diákok a kurzust
+                  {course.title} - Így látják a diákok a tartalmat
                 </p>
               </div>
             </div>
@@ -123,7 +123,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5" />
-                  Kurzus statisztikák
+                  Tartalom statisztikák
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -223,7 +223,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
           <TabsContent value="overview" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Kurzus szerkezet előnézet</CardTitle>
+                <CardTitle>Tartalom szerkezet előnézet</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">

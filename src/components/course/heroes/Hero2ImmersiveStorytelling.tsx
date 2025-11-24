@@ -48,7 +48,7 @@ export function Hero2ImmersiveStorytelling({
       case 'WEBINAR': return 'Webinár';
       case 'MASTERCLASS': return 'Masterclass';
       case 'PODCAST': return 'Podcast';
-      default: return 'Kurzus';
+      default: return 'Tartalom';
     }
   };
 

@@ -279,7 +279,7 @@ export default function UniversityAdminFinancePage() {
   };
 
   const exportFinancialReport = () => {
-    const headers = ['Dátum', 'Hallgató', 'Email', 'Kurzus', 'Összeg', 'Státusz', 'Fizetési mód'];
+    const headers = ['Dátum', 'Hallgató', 'Email', 'Tartalom', 'Összeg', 'Státusz', 'Fizetési mód'];
     const rows = filteredTransactions.map(t => [
       new Date(t.transactionDate).toLocaleDateString('hu-HU'),
       t.studentName,
@@ -425,13 +425,13 @@ export default function UniversityAdminFinancePage() {
       {stats.topCourse && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-medium">Legnépszerűbb kurzus</CardTitle>
+            <CardTitle className="text-sm font-medium">Legnépszerűbb tartalom</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-semibold">{stats.topCourse.title}</p>
-                <p className="text-sm text-muted-foreground">Legtöbb bevételt hozó kurzus</p>
+                <p className="text-sm text-muted-foreground">Legtöbb bevételt hozó tartalom</p>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-green-600">
@@ -487,7 +487,7 @@ export default function UniversityAdminFinancePage() {
               <TableRow>
                 <TableHead>Dátum</TableHead>
                 <TableHead>Hallgató</TableHead>
-                <TableHead>Kurzus</TableHead>
+                <TableHead>Tartalom</TableHead>
                 <TableHead>Összeg</TableHead>
                 <TableHead>Fizetési mód</TableHead>
                 <TableHead>Státusz</TableHead>

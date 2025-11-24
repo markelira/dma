@@ -176,14 +176,14 @@ export default function EnhancedDashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             icon={BookOpen}
-            label="Összes kurzus"
+            label="Összes tartalom"
             value={dashboardData?.stats.totalEnrolled ?? 0}
             trend={dashboardData?.trends.totalEnrolledTrend}
             isLoading={statsLoading}
           />
           <StatCard
             icon={Play}
-            label="Aktív kurzusok"
+            label="Aktív tartalmak"
             value={dashboardData?.stats.activeInProgress ?? 0}
             trend={dashboardData?.trends.activeInProgressTrend}
             isLoading={statsLoading}

@@ -14,7 +14,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     quote:
-      'A csapatfunkciók miatt választottuk a DMA.hu-t. Most már minden kollégánk hozzáfér a kurzusokhoz, anélkül hogy extra költséget kellene fizetnünk.',
+      'A csapatfunkciók miatt választottuk a DMA.hu-t. Most már minden kollégánk hozzáfér a tartalmakhoz, anélkül hogy extra költséget kellene fizetnünk.',
     author: 'Kovács Péter',
     role: 'Marketing vezető',
     company: 'TechStart Kft.',
@@ -22,7 +22,7 @@ const testimonials: Testimonial[] = [
   },
   {
     quote:
-      'A kurzusok minősége kiváló, és a platform használata nagyon egyszerű. A csapatom gyorsan megtanulta a használatát.',
+      'A tartalmak minősége kiváló, és a platform használata nagyon egyszerű. A csapatom gyorsan megtanulta a használatát.',
     author: 'Nagy Anna',
     role: 'HR Manager',
     company: 'Innovate Ltd.',
@@ -40,7 +40,7 @@ const testimonials: Testimonial[] = [
 
 const stats = [
   { number: '10,000+', label: 'Felhasználó' },
-  { number: '500+', label: 'Kurzus' },
+  { number: '500+', label: 'Tartalom' },
   { number: '4.8/5', label: 'Értékelés' },
   { number: '95%', label: 'Ajánlási arány' },
 ];

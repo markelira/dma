@@ -149,7 +149,7 @@ export function IntegrationsSection() {
             <span className="text-[rgb(231,43,54)]">profik használnak</span>
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
-            Kurzusaink a legfontosabb digitális marketing eszközökkel és platformokkal
+            Tartalmaink a legfontosabb digitális marketing eszközökkel és platformokkal
             foglalkoznak, hogy azonnal alkalmazni tudd a tudásodat.
           </p>
         </motion.div>

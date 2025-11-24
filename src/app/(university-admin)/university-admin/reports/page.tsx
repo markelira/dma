@@ -137,15 +137,15 @@ export default function UniversityAdminReportsPage() {
                 <Download className="h-4 w-4" />
               </Button>
             </div>
-            <CardTitle>Kurzus jelentés</CardTitle>
+            <CardTitle>Tartalom jelentés</CardTitle>
             <CardDescription>
-              Kurzus teljesítmény és befejezési arányok
+              Tartalom teljesítmény és befejezési arányok
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <BookOpen className="h-4 w-4" />
-              <span>89 aktív kurzus</span>
+              <span>89 aktív tartalom</span>
             </div>
           </CardContent>
         </Card>

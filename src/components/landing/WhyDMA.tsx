@@ -121,7 +121,7 @@ export const WhyDMA: React.FC = () => {
             </div>
             <div>
               <div className="text-3xl font-bold text-primary mb-2">200+</div>
-              <div className="text-gray-600">Kurzus</div>
+              <div className="text-gray-600">Tartalom</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-primary mb-2">50+</div>

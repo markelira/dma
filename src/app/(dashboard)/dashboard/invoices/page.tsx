@@ -119,13 +119,13 @@ export default function InvoicesPage() {
               Még nincsenek fizetéseid
             </h2>
             <p className="text-gray-500 mb-6">
-              Amikor vásárolsz egy kurzust, itt fogod látni a fizetési előzményeidet
+              Amikor vásárolsz egy tartalmat, itt fogod látni a fizetési előzményeidet
             </p>
             <Link
               href="/courses"
               className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
             >
-              Kurzusok böngészése
+              Tartalmak böngészése
             </Link>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function InvoicesPage() {
                       Dátum
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Kurzus
+                      Tartalom
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Összeg
@@ -173,7 +173,7 @@ export default function InvoicesPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="text-sm text-gray-900 font-medium">
-                          {invoice.courseName || 'Kurzus'}
+                          {invoice.courseName || 'Tartalom'}
                         </div>
                         {invoice.number && (
                           <div className="text-xs text-gray-500 mt-0.5">

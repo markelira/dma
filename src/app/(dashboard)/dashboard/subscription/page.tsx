@@ -163,7 +163,7 @@ export default function SubscriptionPage() {
                 Nincs aktív előfizetés
               </h3>
               <p className="text-gray-600 mb-6">
-                Indítson el egy előfizetést az összes kurzushoz való hozzáféréshez
+                Indítson el egy előfizetést az összes tartalomhoz való hozzáféréshez
               </p>
               <Button
                 onClick={() => router.push('/pricing')}
@@ -186,7 +186,7 @@ export default function SubscriptionPage() {
                       <span className="text-sm font-medium text-green-600">Aktív előfizetés</span>
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900">DMA Havi Előfizetés</h2>
-                    <p className="text-gray-600 mt-1">Korlátlan hozzáférés az összes kurzushoz</p>
+                    <p className="text-gray-600 mt-1">Korlátlan hozzáférés az összes tartalomhoz</p>
                   </div>
                   <div className="text-right">
                     <p className="text-3xl font-bold text-gray-900">15 000 Ft</p>
@@ -296,15 +296,15 @@ export default function SubscriptionPage() {
                 <div className="space-y-3">
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-gray-700">Korlátlan hozzáférés az összes kurzushoz</p>
+                    <p className="text-gray-700">Korlátlan hozzáférés az összes tartalomhoz</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-gray-700">Új kurzusok automatikusan hozzáférhetők</p>
+                    <p className="text-gray-700">Új tartalmak automatikusan hozzáférhetők</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-gray-700">Tanúsítványok minden befejezett kurzushoz</p>
+                    <p className="text-gray-700">Tanúsítványok minden befejezett tartalomhoz</p>
                   </div>
                   <div className="flex items-start gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -380,7 +380,7 @@ export default function SubscriptionPage() {
                   Biztosan lemondja az előfizetést?
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Elveszíti a hozzáférést az összes kurzushoz. Az előfizetés a jelenlegi számlázási időszak végéig aktív marad.
+                  Elveszíti a hozzáférést az összes tartalomhoz. Az előfizetés a jelenlegi számlázási időszak végéig aktív marad.
                 </p>
                 <div className="flex gap-3">
                   <Button

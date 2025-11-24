@@ -258,13 +258,13 @@ export default function UniversityAdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Kurzusok</CardTitle>
+            <CardTitle className="text-sm font-medium">Tartalmak</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalCourses}</div>
             <p className="text-xs text-muted-foreground">
-              Összes kurzus
+              Összes tartalom
             </p>
           </CardContent>
         </Card>
@@ -309,7 +309,7 @@ export default function UniversityAdminDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.completionRate}%</div>
             <p className="text-xs text-muted-foreground">
-              Átlagos kurzus befejezési arány
+              Átlagos tartalom befejezési arány
             </p>
           </CardContent>
         </Card>
@@ -322,7 +322,7 @@ export default function UniversityAdminDashboard() {
           <CardContent>
             <div className="text-2xl font-bold">{stats.averageRating.toFixed(1)}/5</div>
             <p className="text-xs text-muted-foreground">
-              Kurzusok átlagos értékelése
+              Tartalmak átlagos értékelése
             </p>
           </CardContent>
         </Card>
@@ -364,7 +364,7 @@ export default function UniversityAdminDashboard() {
             <Link href="/university-admin/courses/create">
               <Button className="w-full justify-start gap-2" variant="outline">
                 <BookOpen className="h-4 w-4" />
-                Új kurzus létrehozása
+                Új tartalom létrehozása
               </Button>
             </Link>
             <Link href="/university-admin/instructors/invite">

@@ -23,7 +23,7 @@ export function MinimalistHeroSection() {
           <div className="space-y-8">
             {/* Simple Badge */}
             <div className="inline-flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-lg">
-              <span className="text-sm font-medium text-gray-600">DMA.hu Videókurzus Platform</span>
+              <span className="text-sm font-medium text-gray-600">DMA.hu Videótartalom Platform</span>
             </div>
 
             {/* Clean Headline */}
@@ -48,7 +48,7 @@ export function MinimalistHeroSection() {
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-gray-700">Prémium videókurzusok streaming</span>
+                <span className="text-gray-700">Prémium videótartalmak streaming</span>
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
@@ -84,7 +84,7 @@ export function MinimalistHeroSection() {
               </div>
               <div>
                 <span className="block text-2xl font-bold text-gray-900">500+</span>
-                <span>videókurzus</span>
+                <span>videótartalom</span>
               </div>
               <div>
                 <span className="block text-2xl font-bold text-gray-900">4.8/5</span>

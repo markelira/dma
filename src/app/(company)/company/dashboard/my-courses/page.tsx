@@ -59,7 +59,7 @@ export default function CompanyMyCourses() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Beiratkozásaim</h1>
         <p className="text-gray-500">
-          A saját kurzusaid és tanulási előrehaladásod
+          A saját tartalmaid és tanulási előrehaladásod
         </p>
       </div>
 
@@ -119,11 +119,11 @@ export default function CompanyMyCourses() {
               <BookOpen className="h-10 w-10 text-blue-600" />
             </div>
             <h3 className="mb-2 text-lg font-semibold text-gray-900">
-              {filter === 'all' ? 'Még nincs kurzusod' : 'Nincs találat'}
+              {filter === 'all' ? 'Még nincs tartalmad' : 'Nincs találat'}
             </h3>
             <p className="mb-6 text-sm text-gray-500 max-w-md">
               {filter === 'all'
-                ? 'Kezdj el egy új kurzust a kurzusok böngészése gombra kattintva'
+                ? 'Kezdj el egy új tartalmat a tartalmak böngészése gombra kattintva'
                 : 'Próbálj meg egy másik szűrőt'}
             </p>
             {filter === 'all' && (
@@ -131,7 +131,7 @@ export default function CompanyMyCourses() {
                 href="/company/dashboard/courses"
                 className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
               >
-                Kurzusok böngészése
+                Tartalmak böngészése
               </Link>
             )}
           </div>

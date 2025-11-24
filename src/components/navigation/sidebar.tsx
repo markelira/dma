@@ -46,7 +46,7 @@ async function handleLogout() {
 const sidebarNavItems = {
   STUDENT: [
     { title: 'Vezérlőpult', href: '/dashboard', icon: LayoutDashboard },
-    { title: 'Kurzusaim', href: '/dashboard/my-courses', icon: BookOpen },
+    { title: 'Beiratkozásaim', href: '/dashboard/my-courses', icon: BookOpen },
     { title: 'Bizonyítványaim', href: '/dashboard/certificates', icon: Award },
     { title: 'Vásárlásaim', href: '/dashboard/orders', icon: History },
     { title: 'Profilom', href: '/dashboard/profile', icon: UserCircle },
@@ -56,8 +56,8 @@ const sidebarNavItems = {
     { title: 'Analitika', href: '/admin/analytics', icon: BarChart3 },
     { title: 'Felhasználók Kezelése', href: '/admin/users', icon: Users },
     { title: 'Szerepkörök Kezelése', href: '/admin/roles', icon: UserCheck },
-    { title: 'Kurzusok Kezelése', href: '/admin/courses', icon: FolderKanban },
-    { title: 'Új kurzus', href: '/admin/courses/create', icon: BookOpen },
+    { title: 'Tartalmak Kezelése', href: '/admin/courses', icon: FolderKanban },
+    { title: 'Új tartalom', href: '/admin/courses/create', icon: BookOpen },
     { title: 'Kategóriák Kezelése', href: '/admin/categories', icon: Tags },
     { title: 'Beiratkozások', href: '/admin/enrollments', icon: GraduationCap },
     { title: 'Fizetések', href: '/admin/payments', icon: CreditCard },
@@ -70,7 +70,7 @@ const sidebarNavItems = {
   ],
   INSTRUCTOR: [
     { title: 'Oktatói Vezérlőpult', href: '/instructor/dashboard', icon: LayoutDashboard },
-    { title: 'Kurzusaim', href: '/instructor/courses', icon: BookOpen },
+    { title: 'Tartalmaim', href: '/instructor/courses', icon: BookOpen },
     { title: 'Hallgatóim', href: '/instructor/students', icon: Users },
     { title: 'Analitika', href: '/instructor/analytics', icon: BarChart3 },
     { title: 'Beiratkozások', href: '/instructor/enrollments', icon: GraduationCap },

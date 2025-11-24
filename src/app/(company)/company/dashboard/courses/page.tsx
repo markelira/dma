@@ -189,9 +189,9 @@ export default function CompanyCoursesPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Kurzusok böngészése</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Tartalmak böngészése</h1>
         <p className="text-gray-500">
-          Fedezd fel az elérhető kurzusokat és képzéseket
+          Fedezd fel az elérhető tartalmakat és képzéseket
         </p>
       </div>
 
@@ -203,7 +203,7 @@ export default function CompanyCoursesPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Kurzus keresése..."
+              placeholder="Tartalom keresése..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -244,7 +244,7 @@ export default function CompanyCoursesPage() {
 
       {/* Results Count */}
       <div className="text-sm text-gray-500">
-        {filteredCourses.length} kurzus található
+        {filteredCourses.length} tartalom található
         {searchInput && ` "${searchInput}" kifejezésre`}
         {selectedType !== 'ALL' && ` - ${COURSE_TYPE_LABELS[selectedType]}`}
       </div>
@@ -254,7 +254,7 @@ export default function CompanyCoursesPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <Loader2 className="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4" />
-            <p className="text-gray-600">Kurzusok betöltése...</p>
+            <p className="text-gray-600">Tartalmak betöltése...</p>
           </div>
         </div>
       ) : filteredCourses.length === 0 ? (
@@ -268,7 +268,7 @@ export default function CompanyCoursesPage() {
           <p className="text-gray-600 mb-4">
             {searchInput
               ? 'Próbálj más keresési kifejezést használni.'
-              : 'Jelenleg nincs elérhető kurzus ebben a kategóriában.'}
+              : 'Jelenleg nincs elérhető tartalom ebben a kategóriában.'}
           </p>
           {(searchInput || selectedType !== 'ALL') && (
             <button

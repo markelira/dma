@@ -18,7 +18,7 @@ const features: Feature[] = [
   {
     icon: '📊',
     title: 'Közös haladás követése',
-    description: 'Láthatod, ki melyik kurzust csinálja, és hol tart a csapat.',
+    description: 'Láthatod, ki melyik tartalmat csinálja, és hol tart a csapat.',
   },
   {
     icon: '💬',
@@ -127,7 +127,7 @@ export function TeamBenefitsSection() {
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
-                      <span>Kurzusok</span>
+                      <span>Tartalmak</span>
                       <span>85%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">

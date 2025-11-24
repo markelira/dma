@@ -104,7 +104,7 @@ async function fetchTestimonials(): Promise<Testimonial[]> {
       },
       rating: review.rating,
       comment: review.comment,
-      courseName: review.course?.title || 'Kurzus',
+      courseName: review.course?.title || 'Tartalom',
       completedAt: review.createdAt,
     })) || []
   } catch (error) {
@@ -136,7 +136,7 @@ const stats = [
     label: 'Befejezési arány',
     value: 'averageCompletionRate',
     suffix: '%',
-    description: 'átlagos kurzusbefejezési arány'
+    description: 'átlagos tartalombefejezési arány'
   },
   {
     icon: Clock,
@@ -150,7 +150,7 @@ const stats = [
     label: 'Összes beiratkozás',
     value: 'totalEnrollments',
     suffix: '+',
-    description: 'kurzusokra történt beiratkozások'
+    description: 'tartalmakra történt beiratkozások'
   }
 ]
 
@@ -503,7 +503,7 @@ export const SocialProof: React.FC = () => {
                   </div>
                   
                   <div className="text-xs text-gray-500">
-                    Kurzus: {story.courseName}
+                    Tartalom: {story.courseName}
                   </div>
                 </motion.div>
               ))}

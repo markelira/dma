@@ -181,7 +181,7 @@ export const TestimonialsCarousel: React.FC = () => {
             Mit mondanak diákjaink?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Valós tapasztalatok és eredmények azoktól, akik már sikeresen befejezték kurzusainkat
+            Valós tapasztalatok és eredmények azoktól, akik már sikeresen befejezték tartalmainkat
           </p>
         </motion.div>
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 const features = [
   {
     title: "Rugalmas tanulás",
-    description: "Tanulj saját tempódban, bárhonnan. A kurzusok 24/7 elérhetők minden eszközön.",
+    description: "Tanulj saját tempódban, bárhonnan. A tartalmak 24/7 elérhetők minden eszközön.",
     icon: "🎯",
     color: "#E72B36",
   },

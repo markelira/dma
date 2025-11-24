@@ -51,8 +51,8 @@ const mockNotifications: Notification[] = [
   },
   {
     id: '2',
-    title: 'Új kurzus: AI alapok',
-    message: 'Megnyílt a jelentkezés az "AI alapok" kurzusra. Korlátozott helyek!',
+    title: 'Új tartalom: AI alapok',
+    message: 'Megnyílt a jelentkezés az "AI alapok" tartalomra. Korlátozott helyek!',
     type: 'course',
     priority: 'medium',
     recipientType: 'all',
@@ -102,7 +102,7 @@ export default function AdminNotificationsPage() {
   const getTypeBadge = (type: string) => {
     const typeConfig = {
       system: { label: 'Rendszer', className: 'bg-gray-100 text-gray-800' },
-      course: { label: 'Kurzus', className: 'bg-blue-100 text-blue-800' },
+      course: { label: 'Tartalom', className: 'bg-blue-100 text-blue-800' },
       enrollment: { label: 'Beiratkozás', className: 'bg-green-100 text-green-800' },
       announcement: { label: 'Közlemény', className: 'bg-purple-100 text-purple-800' }
     }
@@ -213,12 +213,12 @@ export default function AdminNotificationsPage() {
                 >
                   <option value="announcement">Közlemény</option>
                   <option value="system">Rendszer</option>
-                  <option value="course">Kurzus</option>
+                  <option value="course">Tartalom</option>
                   <option value="enrollment">Beiratkozás</option>
                 </select>
               </div>
             </div>
-            
+
             <div>
               <label className="text-sm font-medium">Üzenet</label>
               <Textarea
@@ -294,7 +294,7 @@ export default function AdminNotificationsPage() {
             >
               <option value="all">Minden típus</option>
               <option value="system">Rendszer</option>
-              <option value="course">Kurzus</option>
+              <option value="course">Tartalom</option>
               <option value="enrollment">Beiratkozás</option>
               <option value="announcement">Közlemény</option>
             </select>

@@ -136,7 +136,7 @@ export default function DashboardPage() {
                   Vállalati fiók
                 </p>
                 <p className="text-sm text-gray-600">
-                  A(z) <span className="font-medium text-blue-600">{companyInfo.name}</span> tagjaként hozzáférsz az összes kurzushoz
+                  A(z) <span className="font-medium text-blue-600">{companyInfo.name}</span> tagjaként hozzáférsz az összes tartalomhoz
                 </p>
               </div>
               <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
@@ -160,14 +160,14 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
             icon={BookOpen}
-            label="Összes kurzus"
+            label="Összes tartalom"
             value={dashboardData?.stats.totalEnrolled ?? 0}
             trend={dashboardData?.trends.totalEnrolledTrend}
             isLoading={statsLoading}
           />
           <StatCard
             icon={Play}
-            label="Aktív kurzusok"
+            label="Aktív tartalmak"
             value={dashboardData?.stats.activeInProgress ?? 0}
             trend={dashboardData?.trends.activeInProgressTrend}
             isLoading={statsLoading}

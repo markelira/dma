@@ -9,7 +9,7 @@ interface FooterProps {
 
 const navigation = {
   platform: [
-    { name: "Kurzusok", href: "/courses" },
+    { name: "Tartalmak", href: "/courses" },
     { name: "Karrierutak", href: "/career-paths" },
     { name: "Trending", href: "/trending" },
     { name: "Egyetemek", href: "/universities" },
@@ -77,7 +77,7 @@ export function Footer({ className }: FooterProps) {
               <span className="text-xl font-bold text-gray-900">DMA</span>
             </div>
             <p className="text-sm text-gray-600 max-w-md">
-              Magyarország legjobb oktatási platformja. Fedezzen fel hiteles magyarországi egyetemi kurzusokat és szerezzen elismert bizonyítványokat.
+              Magyarország legjobb oktatási platformja. Fedezzen fel hiteles magyarországi egyetemi tartalmakat és szerezzen elismert bizonyítványokat.
             </p>
             <div className="flex space-x-4">
               {navigation.social.map((item) => (

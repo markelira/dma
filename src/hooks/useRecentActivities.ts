@@ -40,13 +40,13 @@ export function useRecentActivities(maxItems: number = 5) {
           seenCourses.add(courseId);
 
           // Get course info for context
-          let courseName = 'Kurzus';
+          let courseName = 'Tartalom';
           let lessonTitle = 'Lecke';
 
           try {
             const courseDoc = await getDoc(doc(db, 'courses', courseId));
             if (courseDoc.exists()) {
-              courseName = courseDoc.data().title || 'Kurzus';
+              courseName = courseDoc.data().title || 'Tartalom';
             }
           } catch (e) {
             // Ignore course fetch errors

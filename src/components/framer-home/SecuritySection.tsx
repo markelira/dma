@@ -10,7 +10,7 @@ const benefits = [
       </svg>
     ),
     title: "Minőséggarancia",
-    description: "Minden kurzusunkat szakértők validálják, hogy a legmagasabb színvonalat biztosítsuk.",
+    description: "Minden tartalmunkat szakértők validálják, hogy a legmagasabb színvonalat biztosítsuk.",
   },
   {
     icon: (
@@ -19,7 +19,7 @@ const benefits = [
       </svg>
     ),
     title: "Élethosszig tartó hozzáférés",
-    description: "Egyszer vásárolj, örökre tanulj. Kurzusaink korlátlanul elérhetők maradnak.",
+    description: "Egyszer vásárolj, örökre tanulj. Tartalmaink korlátlanul elérhetők maradnak.",
   },
   {
     icon: (
@@ -170,7 +170,7 @@ export default function SecuritySection() {
           className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
           {[
-            { value: "50+", label: "Kurzus" },
+            { value: "50+", label: "Tartalom" },
             { value: "1000+", label: "Hallgató" },
             { value: "4.9", label: "Értékelés" },
             { value: "98%", label: "Elégedettség" },

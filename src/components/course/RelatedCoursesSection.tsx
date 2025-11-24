@@ -45,7 +45,7 @@ export function RelatedCoursesSection({
   courses,
   categories,
   instructors,
-  title = "Kapcsolódó kurzusok"
+  title = "Kapcsolódó tartalmak"
 }: RelatedCoursesSectionProps) {
   if (!courses || courses.length === 0) return null;
 
@@ -65,7 +65,7 @@ export function RelatedCoursesSection({
           className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors"
           onClick={() => window.location.href = '/courses'}
         >
-          Összes kurzus
+          Összes tartalom
           <ArrowRight className="w-4 h-4" />
         </button>
       </div>

@@ -35,7 +35,7 @@ export function FramerNavbarInitial({ onMobileMenuToggle }: FramerNavbarInitialP
               href="/courses"
               className="text-gray-700 hover:text-gray-900 text-base font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
             >
-              Kurzusok
+              Tartalmak
             </Link>
             <Link
               href="/pricing"

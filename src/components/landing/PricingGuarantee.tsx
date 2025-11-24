@@ -18,7 +18,7 @@ export const PricingGuarantee: React.FC = () => {
     {
       icon: Award,
       title: 'Szakmai tanúsítvány',
-      description: 'Elismert tanúsítvány minden kurzus után'
+      description: 'Elismert tanúsítvány minden tartalom után'
     },
     {
       icon: Users,
@@ -94,7 +94,7 @@ export const PricingGuarantee: React.FC = () => {
               <div className="text-4xl font-bold mb-4">30 nap</div>
               <div className="text-xl mb-6">Visszatérítési garancia</div>
               <p className="text-white/90 mb-6">
-                Ha bármilyen okból nem elégedett a kurzusokkal, 30 napon belül kérdés nélkül visszatérítjük a teljes befizetett összeget.
+                Ha bármilyen okból nem elégedett a tartalmakkal, 30 napon belül kérdés nélkül visszatérítjük a teljes befizetett összeget.
               </p>
               <div className="text-sm text-white/70">
                 * Minden visszatérítés automatikusan történik

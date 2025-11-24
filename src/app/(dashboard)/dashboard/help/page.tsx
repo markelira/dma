@@ -17,12 +17,12 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'Hogyan kezdjem el az első kurzusomat?',
-    answer: 'Miután bejelentkezett, látogasson el a "Kurzusaim" vagy "Böngészés" oldalra. Válassza ki a kívánt kurzust, és kattintson a "Beiratkozás" gombra. A kurzus azonnal elérhető lesz az Ön számára.'
+    question: 'Hogyan kezdjem el az első tartalmamat?',
+    answer: 'Miután bejelentkezett, látogasson el a "Beiratkozásaim" vagy "Böngészés" oldalra. Válassza ki a kívánt tartalmat, és kattintson a "Beiratkozás" gombra. A tartalom azonnal elérhető lesz az Ön számára.'
   },
   {
     question: 'Mit tartalmaz az előfizetésem?',
-    answer: 'Az előfizetés korlátlan hozzáférést biztosít az összes kurzushoz, beleértve az új kurzusokat is. Csapattagokat korlátlanul hívhat meg, és minden befejezett kurzushoz tanúsítványt kap.'
+    answer: 'Az előfizetés korlátlan hozzáférést biztosít az összes tartalomhoz, beleértve az új tartalmakat is. Csapattagokat korlátlanul hívhat meg, és minden befejezett tartalomhoz tanúsítványt kap.'
   },
   {
     question: 'Hogyan működik a 7 napos ingyenes próbaidőszak?',
@@ -30,7 +30,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Hogyan adhatok hozzá csapattagokat?',
-    answer: 'Látogasson el a "Vállalat" menüpontra, ahol meghívhat csapattagokat e-mail címük megadásával. Ők automatikusan hozzáférést kapnak az összes kurzushoz, amíg az Ön előfizetése aktív.'
+    answer: 'Látogasson el a "Vállalat" menüpontra, ahol meghívhat csapattagokat e-mail címük megadásával. Ők automatikusan hozzáférést kapnak az összes tartalomhoz, amíg az Ön előfizetése aktív.'
   },
   {
     question: 'Milyen fizetési módokat fogadnak el?',
@@ -38,7 +38,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Hogyan tudom lemondani az előfizetésemet?',
-    answer: 'Az "Előfizetés" menüpontban bármikor lemondhatja előfizetését. A lemondás után a következő fizetési ciklusig még hozzáférhet a kurzusokhoz.'
+    answer: 'Az "Előfizetés" menüpontban bármikor lemondhatja előfizetését. A lemondás után a következő fizetési ciklusig még hozzáférhet a tartalmakhoz.'
   },
   {
     question: 'Kaphatok számlát?',
@@ -50,11 +50,11 @@ const faqs: FAQItem[] = [
   },
   {
     question: 'Hogyan érem el a tanúsítványaimat?',
-    answer: 'Miután befejez egy kurzust (az összes leckét megtekinti és a vizsgát sikeresen teljesíti), a tanúsítvány automatikusan elérhető lesz a kurzus oldalán.'
+    answer: 'Miután befejez egy tartalmat (az összes leckét megtekinti és a vizsgát sikeresen teljesíti), a tanúsítvány automatikusan elérhető lesz a tartalom oldalán.'
   },
   {
     question: 'Mi történik, ha lejár az előfizetésem?',
-    answer: 'Az előfizetés lejárta után elveszíti a hozzáférést a kurzusokhoz. Azonban a tanulási előrehaladása és a megszerzett tanúsítványai megmaradnak, és újra hozzáférhet hozzájuk, ha megújítja az előfizetést.'
+    answer: 'Az előfizetés lejárta után elveszíti a hozzáférést a tartalmakhoz. Azonban a tanulási előrehaladása és a megszerzett tanúsítványai megmaradnak, és újra hozzáférhet hozzájuk, ha megújítja az előfizetést.'
   }
 ]
 

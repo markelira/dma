@@ -55,7 +55,7 @@ export function ConsumerHeroSection() {
               transition={{ duration: 0.6, delay: 0.2 }}
             >
               <span className="animate-pulse w-2 h-2 bg-primary rounded-full"></span>
-              <span>DMA.hu - Videókurzus Platform</span>
+              <span>DMA.hu - Videótartalom Platform</span>
             </motion.div>
 
             {/* Main Headline */}
@@ -119,7 +119,7 @@ export function ConsumerHeroSection() {
                 </div>
                 <div>
                   <span className="text-gray-900 font-semibold">Netflix-stílusú platform</span>
-                  <p className="text-gray-600 text-sm">Prémium videókurzusok streaming, bármikor, bárhol</p>
+                  <p className="text-gray-600 text-sm">Prémium videótartalmak streaming, bármikor, bárhol</p>
                 </div>
               </li>
               <li className="flex items-start gap-3">
@@ -173,7 +173,7 @@ export function ConsumerHeroSection() {
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" />
                 <span className="font-semibold text-gray-900">500+</span>
-                <span>videókurzus</span>
+                <span>videótartalom</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
@@ -202,7 +202,7 @@ export function ConsumerHeroSection() {
               >
                 <Image
                   src="/images/dmahero.png"
-                  alt="DMA.hu Videókurzus Platform"
+                  alt="DMA.hu Videótartalom Platform"
                   width={600}
                   height={400}
                   className="w-full h-auto"

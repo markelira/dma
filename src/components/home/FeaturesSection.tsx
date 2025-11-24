@@ -196,7 +196,7 @@ export function FeaturesSection() {
           viewport={{ once: true, margin: '-100px' }}
         >
           <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Fedezd fel kurzusainkat
+            Fedezd fel tartalmainkat
           </h3>
           <p className="text-white/50 max-w-xl mx-auto">
             Különböző szintű képzések kezdőktől a haladókig
@@ -218,7 +218,7 @@ export function FeaturesSection() {
             delay={0}
           />
           <FeatureCardTilted
-            title="Google Ads Mesterkurzus"
+            title="Google Ads Mestertartalom"
             description="Haladó stratégiák a Google hirdetési platformon"
             rotation={0.5}
             delay={0.15}
@@ -243,7 +243,7 @@ export function FeaturesSection() {
             href="/courses"
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-[rgb(18,17,17)] font-semibold text-base transition-all duration-300 hover:bg-[rgb(242,239,235)] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            Összes kurzus megtekintése
+            Összes tartalom megtekintése
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

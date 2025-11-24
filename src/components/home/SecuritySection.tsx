@@ -56,12 +56,12 @@ const features = [
   {
     icon: <LockIcon />,
     title: 'Élethosszig tartó hozzáférés',
-    description: 'Megvásárolt kurzusaidhoz korlátlan ideig hozzáférsz, bármikor visszanézheted.',
+    description: 'Megvásárolt tartalmaidhoz korlátlan ideig hozzáférsz, bármikor visszanézheted.',
   },
   {
     icon: <CheckCircleIcon />,
     title: 'Minőségi garancia',
-    description: '30 napos pénzvisszafizetési garancia, ha nem vagy elégedett a kurzussal.',
+    description: '30 napos pénzvisszafizetési garancia, ha nem vagy elégedett a tartalommal.',
   },
   {
     icon: <HeartIcon />,
@@ -138,7 +138,7 @@ export function SecuritySection() {
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
             Garantált minőség, biztonságos fizetés és élethosszig tartó hozzáférés
-            minden kurzusunkhoz.
+            minden tartalmunkhoz.
           </p>
         </motion.div>
 

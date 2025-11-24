@@ -55,7 +55,7 @@ export default function CoursesPage() {
       const result: any = await getCoursesCallableFn({});
 
       if (!result.data.success) {
-        throw new Error(result.data.error || 'Hiba a kurzusok betöltésekor');
+        throw new Error(result.data.error || 'Hiba a tartalmak betöltésekor');
       }
 
       // Filter out soft-deleted courses (those with deletedAt field)
@@ -121,7 +121,7 @@ export default function CoursesPage() {
         <Link href="/admin/courses/new/edit">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Új kurzus
+            Új tartalom
           </Button>
         </Link>
       </div>
@@ -215,10 +215,10 @@ export default function CoursesPage() {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Kurzus törlése</AlertDialogTitle>
+                        <AlertDialogTitle>Tartalom törlése</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Biztosan törölni szeretnéd a "{course.title}" kurzust? 
-                          Ez a művelet törli a kurzust és minden kapcsolódó adatot (feliratkozások, értékelések, modulok, leckék).
+                          Biztosan törölni szeretnéd a "{course.title}" tartalmat?
+                          Ez a művelet törli a tartalmat és minden kapcsolódó adatot (feliratkozások, értékelések, modulok, leckék).
                           Ez a művelet nem vonható vissza.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
@@ -230,7 +230,7 @@ export default function CoursesPage() {
                               console.log('🗑️ Deleting course:', course.id, course.title);
                               await deleteCourseMutation.mutateAsync(course.id);
                               console.log('✅ Course deleted successfully');
-                              toast.success("Kurzus sikeresen törölve");
+                              toast.success("Tartalom sikeresen törölve");
                               // Refetch courses to update the list
                               refetch();
                             } catch (error: any) {

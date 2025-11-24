@@ -63,7 +63,7 @@ const mockPayments: PaymentRecord[] = [
     amount: 15990,
     currency: 'HUF',
     status: 'completed',
-    description: 'React fejlesztés kezdőknek kurzus',
+    description: 'React fejlesztés kezdőknek képzés',
     courseTitle: 'React fejlesztés kezdőknek',
     courseId: 'react-basics-2024',
     invoiceNumber: 'INV-2024-001',
@@ -95,8 +95,8 @@ const mockPayments: PaymentRecord[] = [
     amount: 8990,
     currency: 'HUF',
     status: 'refunded',
-    description: 'Python programozás kurzus',
-    courseTitle: 'Python programozás kurzus',
+    description: 'Python programozás képzés',
+    courseTitle: 'Python programozás képzés',
     courseId: 'python-intro-2024',
     invoiceNumber: 'INV-2024-003',
     paymentMethod: {
@@ -111,8 +111,8 @@ const mockPayments: PaymentRecord[] = [
     amount: 12990,
     currency: 'HUF',
     status: 'pending',
-    description: 'JavaScript fejlesztés kurzus',
-    courseTitle: 'JavaScript fejlesztés kurzus',
+    description: 'JavaScript fejlesztés képzés',
+    courseTitle: 'JavaScript fejlesztés képzés',
     courseId: 'js-advanced-2024',
     invoiceNumber: 'INV-2023-045',
     paymentMethod: {
@@ -319,7 +319,7 @@ export function PaymentHistory({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 id="search"
-                placeholder="Keresés számla vagy kurzus szerint..."
+                placeholder="Keresés számla vagy tartalom szerint..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -412,7 +412,7 @@ export function PaymentHistory({
                       
                       {payment.courseTitle && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Kurzus: </span>
+                          <span className="text-muted-foreground">Tartalom: </span>
                           <a 
                             href={`/courses/${payment.courseId}`}
                             className="text-blue-600 hover:underline"

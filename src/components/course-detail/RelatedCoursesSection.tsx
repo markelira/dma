@@ -38,17 +38,17 @@ export function RelatedCoursesSection({
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Kapcsolódó kurzusok
+              Kapcsolódó tartalmak
             </h2>
             <p className="text-gray-600">
-              Folytassa a tanulást hasonló kurzusokkal
+              Folytassa a tanulást hasonló tartalmakkal
             </p>
           </div>
           <Link 
             href="/courses"
             className="flex items-center gap-2 text-[#0f766e] hover:text-[#0f766e]/80 transition-colors font-medium"
           >
-            <span>Összes kurzus</span>
+            <span>Összes tartalom</span>
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
@@ -98,7 +98,7 @@ export function RelatedCoursesSection({
         {/* Empty State */}
         {!isLoading && filteredRelatedCourses.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500">Nincs elérhető kapcsolódó kurzus</p>
+            <p className="text-gray-500">Nincs elérhető kapcsolódó tartalom</p>
           </div>
         )}
       </div>

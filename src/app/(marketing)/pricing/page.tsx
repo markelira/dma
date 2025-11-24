@@ -104,7 +104,7 @@ export default function PricingPage() {
                     <div className="text-4xl mb-3">🎯</div>
                     <h3 className="font-semibold text-gray-900 mb-2">Gyakorlati tudás</h3>
                     <p className="text-gray-600 text-sm">
-                      Videókurzusok szakértőktől, valós projektekkel és azonnali alkalmazhatósággal.
+                      Videótartalmak szakértőktől, valós projektekkel és azonnali alkalmazhatósággal.
                     </p>
                   </div>
                   <div className="bg-white rounded-xl p-6 shadow-sm">

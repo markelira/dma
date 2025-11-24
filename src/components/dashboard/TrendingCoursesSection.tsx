@@ -112,7 +112,7 @@ export function TrendingCoursesSection() {
   const fallbackPopularCourses = [
     {
       id: '5',
-      title: 'Photoshop és Canva Design Kurzus',
+      title: 'Photoshop és Canva Design Képzés',
       instructor: 'Varga Tamás',
       category: 'Design',
       level: 'Kezdő',
@@ -199,7 +199,7 @@ export function TrendingCoursesSection() {
   const tabs = [
     { key: 'trending', label: 'Felkapott', icon: Flame, count: trendingCourses.length },
     { key: 'popular', label: 'Népszerű', icon: Star, count: popularCourses.length },
-    { key: 'new', label: 'Új kurzusok', icon: Zap, count: newCourses.length }
+    { key: 'new', label: 'Új tartalmak', icon: Zap, count: newCourses.length }
   ]
 
   const getCurrentCourses = () => {
@@ -231,11 +231,11 @@ export function TrendingCoursesSection() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Trending a Platformon</h2>
           <p className="text-gray-600 mt-1">
-            A legkeresettebb kurzusok és legújabb trendek
+            A legkeresettebb tartalmak és legújabb trendek
           </p>
         </div>
         <Link href="/dashboard/browse" className="text-gray-900 hover:text-[#466C95] font-medium flex items-center transition-colors">
-          Összes kurzus
+          Összes tartalom
           <ArrowRight className="w-4 h-4 ml-1" />
         </Link>
       </div>

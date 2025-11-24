@@ -40,7 +40,7 @@ export default function CourseLearnPage() {
   // Show loading state while redirecting
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <p className="text-xl text-primary">Kurzus betöltése...</p>
+      <p className="text-xl text-primary">Tartalom betöltése...</p>
     </div>
   )
 } 

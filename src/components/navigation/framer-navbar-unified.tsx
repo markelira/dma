@@ -78,7 +78,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                 transform: scrolled ? 'none' : 'translateX(-50%)',
               }}
             >
-              {/* Kurzusok Dropdown */}
+              {/* Tartalmak Dropdown */}
               <div
                 className="relative"
                 onMouseEnter={() => setCoursesDropdownOpen(true)}
@@ -90,7 +90,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                     fontSize: scrolled ? '14px' : '16px',
                   }}
                 >
-                  Kurzusok
+                  Tartalmak
                   <svg
                     className={`w-4 h-4 transition-transform duration-200 ${coursesDropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"

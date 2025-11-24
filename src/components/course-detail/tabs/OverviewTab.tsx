@@ -53,13 +53,13 @@ export function OverviewTab({ courseData }: OverviewTabProps) {
       name: "Kovács Péter",
       role: "Marketing menedzser",
       rating: 5,
-      quote: "Ez a kurzus teljesen átalakította a szakmai megközelítésemet. A gyakorlati feladatok és valós példák rendkívül hasznosak voltak. Már az első hét után tudtam alkalmazni a tanultakat a munkámban."
+      quote: "Ez a tartalom teljesen átalakította a szakmai megközelítésemet. A gyakorlati feladatok és valós példák rendkívül hasznosak voltak. Már az első hét után tudtam alkalmazni a tanultakat a munkámban."
     },
     {
       name: "Szabó Anna",
       role: "Projekt koordinátor",
       rating: 5,
-      quote: "Kiváló oktatók, kiváló tartalom. A kurzus tökéletes egyensúlyt teremt az elméleti alapok és a gyakorlati alkalmazások között. Minden forintot megért, sőt többet is!"
+      quote: "Kiváló oktatók, kiváló tartalom. A képzés tökéletes egyensúlyt teremt az elméleti alapok és a gyakorlati alkalmazások között. Minden forintot megért, sőt többet is!"
     }
   ]
 
@@ -85,7 +85,7 @@ export function OverviewTab({ courseData }: OverviewTabProps) {
       <section className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-2 mb-6">
           <BarChart3 className="w-5 h-5 text-[#0f766e]" />
-          <h2 className="text-xl font-semibold">Kurzus statisztikák</h2>
+          <h2 className="text-xl font-semibold">Tartalom statisztikák</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat, index) => (

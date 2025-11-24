@@ -167,10 +167,10 @@ export default function UniversityAdminCoursesPage() {
         createdAt: new Date()
       });
 
-      toast.success('Kurzus sikeresen törölve');
+      toast.success('Tartalom sikeresen törölve');
     } catch (error) {
       console.error('Error deleting course:', error);
-      toast.error('Hiba történt a kurzus törlésekor');
+      toast.error('Hiba történt a tartalom törlésekor');
     }
   };
 
@@ -196,10 +196,10 @@ export default function UniversityAdminCoursesPage() {
         createdAt: new Date()
       });
 
-      toast.success('Kurzus sikeresen publikálva');
+      toast.success('Tartalom sikeresen publikálva');
     } catch (error) {
       console.error('Error publishing course:', error);
-      toast.error('Hiba történt a kurzus publikálásakor');
+      toast.error('Hiba történt a tartalom publikálásakor');
     }
   };
 
@@ -210,10 +210,10 @@ export default function UniversityAdminCoursesPage() {
         archivedAt: new Date()
       });
 
-      toast.success('Kurzus archiválva');
+      toast.success('Tartalom archiválva');
     } catch (error) {
       console.error('Error archiving course:', error);
-      toast.error('Hiba történt a kurzus archiválásakor');
+      toast.error('Hiba történt a tartalom archiválásakor');
     }
   };
 
@@ -258,15 +258,15 @@ export default function UniversityAdminCoursesPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Kurzusok kezelése</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Tartalmak kezelése</h1>
           <p className="text-muted-foreground">
-            Az egyetem összes kurzusának kezelése
+            Az egyetem összes tartalmának kezelése
           </p>
         </div>
         <Link href="/university-admin/courses/create">
           <Button className="gap-2">
             <Plus className="h-4 w-4" />
-            Új kurzus
+            Új tartalom
           </Button>
         </Link>
       </div>
@@ -275,7 +275,7 @@ export default function UniversityAdminCoursesPage() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Összes kurzus</CardTitle>
+            <CardTitle className="text-sm font-medium">Összes tartalom</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{courses.length}</div>
@@ -320,7 +320,7 @@ export default function UniversityAdminCoursesPage() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="Keresés kurzus neve vagy oktató alapján..."
+                placeholder="Keresés tartalom neve vagy oktató alapján..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -358,7 +358,7 @@ export default function UniversityAdminCoursesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Kurzus neve</TableHead>
+                <TableHead>Tartalom neve</TableHead>
                 <TableHead>Oktató</TableHead>
                 <TableHead>Kategória</TableHead>
                 <TableHead>Szint</TableHead>

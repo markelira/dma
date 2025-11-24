@@ -16,7 +16,7 @@ export default function CourseEnrollPage() {
   }
 
   if (error || !course) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500">Kurzus nem található.</div>
+    return <div className="min-h-screen flex items-center justify-center text-red-500">Tartalom nem található.</div>
   }
 
   const handleMockPay = () => {

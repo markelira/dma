@@ -33,13 +33,13 @@ export const TopInfoBar: React.FC = () => {
         const result: any = await getStatsFn({})
         
         if (!result.data.success) {
-          throw new Error(result.data.error || 'Hiba a kurzus statisztikák betöltésekor')
+          throw new Error(result.data.error || 'Hiba a tartalom statisztikák betöltésekor')
         }
         
         return result.data
       } catch (error) {
         console.error('Error fetching stats:', error)
-        throw new Error('Hiba a kurzus statisztikák betöltésekor')
+        throw new Error('Hiba a tartalom statisztikák betöltésekor')
       }
     },
     retry: 2,
@@ -116,7 +116,7 @@ export const TopInfoBar: React.FC = () => {
       <div className="bg-white rounded-full shadow-lg flex items-center px-6 py-2 space-x-4">
         <div className="flex items-center space-x-2">
           <Sparkles className="w-5 h-5 text-yellow-400" />
-          <span className="text-gray-800 font-medium">{courseCount.toLocaleString()} Kurzus</span>
+          <span className="text-gray-800 font-medium">{courseCount.toLocaleString()} Tartalom</span>
           <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">Új</span>
         </div>
         <div className="flex items-center space-x-2">
@@ -133,7 +133,7 @@ export const TopInfoBar: React.FC = () => {
           href="#"
           className="ml-2 bg-gradient-to-r from-primary-light to-primary-dark text-white px-4 py-1.5 rounded-full text-sm font-semibold hover:opacity-90 transition-all"
         >
-          Infó: első 2 modul ingyenesen kipróbálható az összes kurzusnál!
+          Infó: első 2 modul ingyenesen kipróbálható az összes tartalomnál!
         </a>
       </div>
     </div>

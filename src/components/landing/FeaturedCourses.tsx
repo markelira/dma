@@ -34,7 +34,7 @@ async function fetchFeaturedCourses(): Promise<Course[]> {
     const result: any = await getCoursesCallableFn({})
     
     if (!result.data.success) {
-      throw new Error(result.data.error || 'Hiba a kiemelt kurzusok betöltésekor')
+      throw new Error(result.data.error || 'Hiba a kiemelt tartalmak betöltésekor')
     }
     
     // Limit to 6 courses and sort by popularity (for now, just take first 6)
@@ -60,7 +60,7 @@ async function fetchPersonalizedCourses(userId: string): Promise<Course[]> {
     const result: any = await getCoursesCallableFn({})
     
     if (!result.data.success) {
-      throw new Error(result.data.error || 'Hiba a személyre szabott kurzusok betöltésekor')
+      throw new Error(result.data.error || 'Hiba a személyre szabott tartalmak betöltésekor')
     }
     
     return result.data.courses.slice(0, 6) || []
@@ -119,7 +119,7 @@ async function fetchRecommendedCourses(categoryIds: string[]): Promise<Course[]>
     const result: any = await getCoursesCallableFn({})
     
     if (!result.data.success) {
-      throw new Error(result.data.error || 'Hiba az ajánlott kurzusok betöltésekor')
+      throw new Error(result.data.error || 'Hiba az ajánlott tartalmak betöltésekor')
     }
     
     // Filter by categories if provided
@@ -224,12 +224,12 @@ export const FeaturedCourses: React.FC = () => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            {isAuthenticated ? 'Személyre szabott ajánlatok' : 'Kiemelt kurzusok'}
+            {isAuthenticated ? 'Személyre szabott ajánlatok' : 'Kiemelt tartalmak'}
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             {isAuthenticated 
-              ? 'Kurzusok, amelyek a te érdeklődési körödnek és tanulási stílusodnak megfelelnek'
-              : 'A legnépszerűbb és legmagasabb értékelésű kurzusaink, amelyeket már több ezer diák teljesített'
+              ? 'Tartalmak, amelyek a te érdeklődési körödnek és tanulási stílusodnak megfelelnek'
+              : 'A legnépszerűbb és legmagasabb értékelésű tartalmaink, amelyeket már több ezer diák teljesített'
             }
           </p>
         </motion.div>
@@ -292,10 +292,10 @@ export const FeaturedCourses: React.FC = () => {
             <div className="text-center mb-8">
               <div className="flex items-center justify-center gap-2 mb-4">
                 <Sparkles className="w-6 h-6 text-purple-600" />
-                <h3 className="text-2xl font-bold text-gray-900">Ajánlott kurzusok</h3>
+                <h3 className="text-2xl font-bold text-gray-900">Ajánlott tartalmak</h3>
               </div>
               <p className="text-gray-600">
-                A te érdeklődési köröd alapján kiválasztott kurzusok
+                A te érdeklődési köröd alapján kiválasztott tartalmak
               </p>
             </div>
             
@@ -325,7 +325,7 @@ export const FeaturedCourses: React.FC = () => {
             href="/courses"
             className="inline-flex items-center space-x-2 bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
           >
-            <span>{isAuthenticated ? 'További ajánlatok megtekintése' : 'Összes kurzus megtekintése'}</span>
+            <span>{isAuthenticated ? 'További ajánlatok megtekintése' : 'Összes tartalom megtekintése'}</span>
             <ArrowRight className="w-5 h-5" />
           </Link>
         </motion.div>

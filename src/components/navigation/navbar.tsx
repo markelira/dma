@@ -64,7 +64,7 @@ export function Navbar() {
 
               <nav className="hidden md:flex items-center space-x-8">
                 <Link href="/courses" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
-                  Kurzusok
+                  Tartalmak
                 </Link>
                 <Link href="/pricing" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
                   Árazás
@@ -155,7 +155,7 @@ export function Navbar() {
                 onClick={closeMenu}
                 className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
               >
-                Kurzusok
+                Tartalmak
               </Link>
               <Link
                 href="/pricing"

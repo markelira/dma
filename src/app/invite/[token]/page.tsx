@@ -131,7 +131,7 @@ export default function TeamInviteAcceptancePage() {
             Mostantól <strong>{teamName}</strong> tagja vagy.
           </p>
           <p className="text-gray-600 mb-4">
-            Hozzáférsz az összes kurzushoz a csapat előfizetésén keresztül.
+            Hozzáférsz az összes tartalomhoz a csapat előfizetésén keresztül.
           </p>
           <p className="text-sm text-gray-500">
             Átirányítás a vezérlőpultra...
@@ -215,7 +215,7 @@ export default function TeamInviteAcceptancePage() {
             <ul className="space-y-2 text-sm text-gray-600">
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
-                Hozzáférés az összes kurzushoz
+                Hozzáférés az összes tartalomhoz
               </li>
               <li className="flex items-center">
                 <CheckCircle2 className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
@@ -269,7 +269,7 @@ export default function TeamInviteAcceptancePage() {
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
               A meghívó elfogadásával hozzáférést kapsz a csapat előfizetéséhez tartozó
-              összes kurzushoz és tananyaghoz.
+              összes tartalomhoz és tananyaghoz.
             </p>
           </div>
         </motion.div>

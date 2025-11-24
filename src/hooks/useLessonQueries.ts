@@ -10,7 +10,7 @@ import { Lesson } from '@/types'
  */
 export const fetchLesson = async (id: string, courseId: string): Promise<Lesson> => {
   if (!courseId || !id) {
-    throw new Error('Hiányzó kurzus vagy lecke azonosító');
+    throw new Error('Hiányzó tartalom vagy lecke azonosító');
   }
 
   // Resolve course ID (handle slug or direct ID)

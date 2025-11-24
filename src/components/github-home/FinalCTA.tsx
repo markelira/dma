@@ -90,7 +90,7 @@ export function FinalCTA() {
             className="flex flex-wrap justify-center gap-8 text-sm text-gray-500 pt-16"
           >
             <a href="#" className="hover:text-gray-300 transition-colors">Platform</a>
-            <a href="#" className="hover:text-gray-300 transition-colors">Kurzusok</a>
+            <a href="#" className="hover:text-gray-300 transition-colors">Tartalmak</a>
             <a href="#" className="hover:text-gray-300 transition-colors">Árazás</a>
             <a href="#" className="hover:text-gray-300 transition-colors">Dokumentáció</a>
             <a href="#" className="hover:text-gray-300 transition-colors">Támogatás</a>

@@ -58,17 +58,17 @@ const navigationItems: NavigationItem[] = [
     roles: [UserRole.STUDENT, UserRole.INSTRUCTOR, UserRole.UNIVERSITY_ADMIN, UserRole.ADMIN]
   },
   {
-    label: 'Kurzusok',
+    label: 'Tartalmak',
     href: '/courses',
     icon: <BookOpen className="w-4 h-4" />,
     children: [
       {
-        label: 'Összes kurzus',
+        label: 'Összes tartalom',
         href: '/courses',
         roles: [UserRole.STUDENT, UserRole.INSTRUCTOR, UserRole.UNIVERSITY_ADMIN, UserRole.ADMIN]
       },
       {
-        label: 'Új kurzus létrehozása',
+        label: 'Új tartalom létrehozása',
         href: '/courses/create',
         roles: [UserRole.INSTRUCTOR, UserRole.ADMIN],
         permission: {
@@ -77,12 +77,12 @@ const navigationItems: NavigationItem[] = [
         }
       },
       {
-        label: 'Saját kurzusaim',
+        label: 'Saját tartalmaim',
         href: '/instructor/courses',
         roles: [UserRole.INSTRUCTOR, UserRole.ADMIN]
       },
       {
-        label: 'Kurzus jóváhagyás',
+        label: 'Tartalom jóváhagyás',
         href: '/university-admin/courses/approval',
         roles: [UserRole.UNIVERSITY_ADMIN, UserRole.ADMIN]
       }

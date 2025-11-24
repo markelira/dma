@@ -11,7 +11,7 @@ export const HeroSectionPlaceholder = () => (
   <section id="hero" className="py-24 bg-gradient-to-br from-primary/10 to-purple-50">
     <Container className="text-center">
       <Heading>[Hős szakasz]</Heading>
-      <p className="text-muted max-w-2xl mx-auto">Ide kerül majd a fő értékajánlat, CTA és kurzus meta.</p>
+      <p className="text-muted max-w-2xl mx-auto">Ide kerül majd a fő értékajánlat, CTA és tartalom meta.</p>
     </Container>
   </section>
 )
@@ -40,7 +40,7 @@ export const AudienceSectionPlaceholder = () => (
 export const VideoSectionPlaceholder = () => (
   <section id="bemutatkozo-video" className="py-24 bg-white">
     <Container className="text-center">
-      <Heading>Kurzusról röviden</Heading>
+      <Heading>Tartalomról röviden</Heading>
       <div className="aspect-video bg-gray-200 flex items-center justify-center rounded-lg">
         <span className="text-gray-500">[Videó lejátszó]</span>
       </div>
@@ -108,12 +108,12 @@ export const FAQSectionPlaceholder = () => (
   </section>
 )
 
-// 11. Kapcsolódó kurzusok
+// 11. Kapcsolódó tartalmak
 export const RelatedCoursesSectionPlaceholder = () => (
-  <section id="kapcsolodo-kurzusok" className="py-24 bg-white">
+  <section id="kapcsolodo-tartalmak" className="py-24 bg-white">
     <Container>
-      <Heading>Kapcsolódó kurzusok</Heading>
-      <p className="text-muted text-center">[Carousel kurzuskártyákkal]</p>
+      <Heading>Kapcsolódó tartalmak</Heading>
+      <p className="text-muted text-center">[Carousel tartalomkártyákkal]</p>
     </Container>
   </section>
 )
