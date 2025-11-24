@@ -354,8 +354,8 @@ export default function CompanyDashboardPage() {
               <Link href="/company/dashboard/employees" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
                 Alkalmazottak
               </Link>
-              <Link href="/company/dashboard/masterclasses" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
-                Masterclassok
+              <Link href="/company/dashboard/courses" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
+                Kurzusok
               </Link>
               <Link href="/company/dashboard/progress" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">
                 Haladás
@@ -405,8 +405,8 @@ export default function CompanyDashboardPage() {
                 <Link href="/company/dashboard/employees" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
                   Alkalmazottak
                 </Link>
-                <Link href="/company/dashboard/masterclasses" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
-                  Masterclassok
+                <Link href="/company/dashboard/courses" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
+                  Kurzusok
                 </Link>
                 <Link href="/company/dashboard/progress" className="block w-full text-left px-3 py-2 text-sm text-gray-600 hover:bg-gray-50/50 rounded-lg">
                   Haladás
@@ -614,13 +614,13 @@ export default function CompanyDashboardPage() {
               </div>
             </Link>
 
-            <Link href="/company/dashboard/masterclasses" className="group flex items-center space-x-3 p-4 bg-white/50 border border-gray-200/50 rounded-lg hover:bg-white/80 hover:border-purple-300 hover:shadow-md transition-all text-left">
+            <Link href="/company/dashboard/courses" className="group flex items-center space-x-3 p-4 bg-white/50 border border-gray-200/50 rounded-lg hover:bg-white/80 hover:border-purple-300 hover:shadow-md transition-all text-left">
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
-                <GraduationCap className="w-5 h-5 text-white" />
+                <BookOpen className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="font-medium text-gray-900">Masterclass kezelése</p>
-                <p className="text-xs text-gray-600">Képzések és hozzárendelések</p>
+                <p className="font-medium text-gray-900">Kurzusok böngészése</p>
+                <p className="text-xs text-gray-600">Minden elérhető kurzus</p>
               </div>
             </Link>
 
