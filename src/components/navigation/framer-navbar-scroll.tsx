@@ -34,7 +34,7 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
                 alt="DMA Logo"
                 className="w-5 h-5 object-contain"
               />
-              <span className="text-lg font-semibold text-gray-900">
+              <span className="text-lg font-bold text-gray-900">
                 DMA
               </span>
             </Link>

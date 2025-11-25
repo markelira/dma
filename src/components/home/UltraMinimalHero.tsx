@@ -35,7 +35,7 @@ export function UltraMinimalHero() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90 text-white font-semibold px-10 py-7 text-lg rounded-lg transition-colors shadow-sm"
+              className="bg-primary hover:bg-primary/90 text-white font-bold px-10 py-7 text-lg rounded-lg transition-colors shadow-sm"
               onClick={() => router.push('/register')}
             >
               Próbáld ki ingyen
@@ -43,7 +43,7 @@ export function UltraMinimalHero() {
             <Button
               size="lg"
               variant="ghost"
-              className="text-gray-700 hover:text-gray-900 font-semibold px-10 py-7 text-lg"
+              className="text-gray-700 hover:text-gray-900 font-bold px-10 py-7 text-lg"
               onClick={() => router.push('/pricing')}
             >
               Árak megtekintése

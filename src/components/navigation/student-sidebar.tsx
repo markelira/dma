@@ -82,7 +82,7 @@ export function StudentSidebar() {
     <aside className="w-64 bg-white border-r border-gray-200 min-h-screen">
       <nav className="flex flex-col gap-1 p-4">
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-900">Tanulói Panel</h2>
+          <h2 className="text-lg font-bold text-gray-900">Tanulói Panel</h2>
           <p className="text-sm text-gray-500">Fejlődj minden nap</p>
         </div>
         

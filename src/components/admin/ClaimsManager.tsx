@@ -422,10 +422,10 @@ export function ClaimsManager({
             
             {validation.recommendations.length > 0 && (
               <div className="space-y-2 mt-4">
-                <Label className="text-blue-600">Javaslatok:</Label>
+                <Label className="text-brand-secondary">Javaslatok:</Label>
                 <ul className="list-disc pl-5 space-y-1">
                   {validation.recommendations.map((rec, index) => (
-                    <li key={index} className="text-sm text-blue-600">{rec}</li>
+                    <li key={index} className="text-sm text-brand-secondary">{rec}</li>
                   ))}
                 </ul>
               </div>

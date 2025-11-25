@@ -83,10 +83,10 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
             <div className="sticky top-0 bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-b">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-xs font-bold text-blue-700">
+                  <div className="w-6 h-6 rounded-full bg-brand-secondary/10 flex items-center justify-center text-xs font-bold text-brand-secondary-hover">
                     {moduleIndex + 1}
                   </div>
-                  <h3 className="font-semibold text-gray-900 text-sm">{module.title}</h3>
+                  <h3 className="font-bold text-gray-900 text-sm">{module.title}</h3>
                 </div>
                 <Badge variant="outline" className="text-xs">
                   {completedInModule}/{totalInModule}
@@ -113,7 +113,7 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
                     key={lesson.id}
                     className={`group relative transition-all duration-200 ${
                       metadata.isActive 
-                        ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-r-4 border-blue-500' 
+                        ? 'bg-gradient-to-r from-brand-secondary/5 to-indigo-50 border-r-4 border-brand-secondary' 
                         : 'hover:bg-gray-50'
                     }`}
                   >
@@ -137,12 +137,12 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
                             <CheckCircle className="w-4 h-4 text-green-600" />
                           </div>
                         ) : metadata.isActive ? (
-                          <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
-                            <Play className="w-3 h-3 text-blue-600 ml-0.5" />
+                          <div className="w-6 h-6 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                            <Play className="w-3 h-3 text-brand-secondary ml-0.5" />
                           </div>
                         ) : (
-                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                            <Play className="w-3 h-3 text-gray-400 group-hover:text-blue-600 ml-0.5 transition-colors" />
+                          <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center group-hover:bg-brand-secondary/10 transition-colors">
+                            <Play className="w-3 h-3 text-gray-400 group-hover:text-brand-secondary ml-0.5 transition-colors" />
                           </div>
                         )}
                       </div>
@@ -152,10 +152,10 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
                         {/* Lesson Title */}
                         <div className={`font-medium text-sm leading-tight ${
                           metadata.isActive 
-                            ? 'text-blue-900' 
+                            ? 'text-brand-secondary-hover' 
                             : metadata.isLocked 
                               ? 'text-gray-400'
-                              : 'text-gray-900 group-hover:text-blue-700'
+                              : 'text-gray-900 group-hover:text-brand-secondary-hover'
                         } transition-colors`}>
                           {lessonIndex + 1}. {lesson.title}
                         </div>
@@ -217,7 +217,7 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
                       {/* Arrow indicator for active lesson */}
                       {metadata.isActive && (
                         <div className="flex-shrink-0 self-center">
-                          <ChevronRight className="w-4 h-4 text-blue-600" />
+                          <ChevronRight className="w-4 h-4 text-brand-secondary" />
                         </div>
                       )}
                     </button>

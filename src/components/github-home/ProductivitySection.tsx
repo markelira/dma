@@ -46,7 +46,7 @@ export function ProductivitySection() {
               <span className="text-white">Gyorsítsd fel a</span>
               <br />
               <GradientText
-                from="from-blue-400"
+                from="from-brand-secondary"
                 via="via-cyan-400"
                 to="to-teal-400"
               >
@@ -72,8 +72,8 @@ export function ProductivitySection() {
                   transition={{ delay: index * 0.1, duration: 0.5 }}
                   className="flex items-center gap-4 group"
                 >
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-5 h-5 text-blue-400" />
+                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-brand-secondary/50/20 to-purple-500/20 border border-brand-secondary/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <feature.icon className="w-5 h-5 text-brand-secondary" />
                   </div>
                   <span className="text-gray-300 text-lg">{feature.text}</span>
                 </motion.div>
@@ -89,7 +89,7 @@ export function ProductivitySection() {
                   viewport={{ once: true }}
                   className="text-4xl font-bold"
                 >
-                  <GradientText from="from-blue-400" to="to-cyan-400">
+                  <GradientText from="from-brand-secondary" to="to-cyan-400">
                     92%
                   </GradientText>
                 </motion.div>
@@ -127,14 +127,14 @@ export function ProductivitySection() {
             {/* Main dashboard mockup */}
             <div className="relative rounded-xl border border-gray-800 bg-gradient-to-br from-gray-900 to-gray-800 p-6 shadow-2xl overflow-hidden">
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-br from-brand-secondary/50/5 via-purple-500/5 to-transparent" />
 
               {/* Header */}
               <div className="relative z-10 flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500" />
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-secondary/50 to-purple-500" />
                   <div>
-                    <div className="text-sm font-semibold text-white">
+                    <div className="text-sm font-bold text-white">
                       Csapat Irányítópult
                     </div>
                     <div className="text-xs text-gray-500">24 aktív tag</div>
@@ -150,7 +150,7 @@ export function ProductivitySection() {
               {/* Progress bars */}
               <div className="relative z-10 space-y-4">
                 {[
-                  { label: 'Web Fejlesztés', progress: 85, color: 'bg-blue-500' },
+                  { label: 'Web Fejlesztés', progress: 85, color: 'bg-brand-secondary/50' },
                   { label: 'UI/UX Design', progress: 65, color: 'bg-purple-500' },
                   { label: 'Data Science', progress: 45, color: 'bg-pink-500' },
                 ].map((item, index) => (
@@ -189,7 +189,7 @@ export function ProductivitySection() {
                   {[...Array(8)].map((_, i) => (
                     <div
                       key={i}
-                      className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 border-2 border-gray-900"
+                      className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500 border-2 border-gray-900"
                     />
                   ))}
                   <div className="w-8 h-8 rounded-full bg-gray-800 border-2 border-gray-900 flex items-center justify-center">

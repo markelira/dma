@@ -46,7 +46,7 @@ export default function CompanyMyCourses() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-white0" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -75,7 +75,7 @@ export default function CompanyMyCourses() {
                 px-4 py-2 rounded-lg text-sm font-medium transition-colors
                 ${
                   filter === f.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-secondary text-white'
                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                 }
               `}
@@ -115,10 +115,10 @@ export default function CompanyMyCourses() {
       {filteredEnrollments.length === 0 && (
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12">
           <div className="flex flex-col items-center justify-center text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
-              <BookOpen className="h-10 w-10 text-blue-600" />
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand-secondary/5">
+              <BookOpen className="h-10 w-10 text-brand-secondary" />
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900">
+            <h3 className="mb-2 text-lg font-bold text-gray-900">
               {filter === 'all' ? 'Még nincs tartalmad' : 'Nincs találat'}
             </h3>
             <p className="mb-6 text-sm text-gray-500 max-w-md">
@@ -129,7 +129,7 @@ export default function CompanyMyCourses() {
             {filter === 'all' && (
               <Link
                 href="/company/dashboard/courses"
-                className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary-hover transition-colors"
               >
                 Tartalmak böngészése
               </Link>
@@ -158,7 +158,7 @@ export default function CompanyMyCourses() {
             >
               {/* Course Info */}
               <div className={viewMode === 'list' ? 'flex-1' : ''}>
-                <h3 className="font-semibold text-gray-900 mb-1">
+                <h3 className="font-bold text-gray-900 mb-1">
                   {enrollment.courseName}
                 </h3>
                 <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
@@ -184,7 +184,7 @@ export default function CompanyMyCourses() {
                   <div className="space-y-1.5">
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                        className="bg-brand-secondary/50 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${enrollment.progress}%` }}
                       />
                     </div>

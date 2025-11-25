@@ -10,8 +10,8 @@ export function HeroSection() {
   return (
     <section className="relative flex items-center justify-center overflow-hidden bg-[#0D1117]">
       {/* Background gradient effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-950/20 via-purple-950/10 to-[#0D1117]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-blue-600/10 rounded-full blur-[120px]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-950/20 via-purple-950/10 to-[#0D1117]" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-brand-secondary/10 rounded-full blur-[120px]" />
 
       {/* Grid pattern overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)]" />
@@ -50,7 +50,7 @@ export function HeroSection() {
               <span className="text-white">készségeket</span>
               <br />
               <GradientText
-                from="from-blue-400"
+                from="from-brand-secondary"
                 via="via-purple-500"
                 to="to-pink-500"
                 className="inline-block"
@@ -80,7 +80,7 @@ export function HeroSection() {
               {/* Primary CTA */}
               <Button
                 size="lg"
-                className="group bg-white text-black hover:bg-gray-100 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold"
+                className="group bg-white text-black hover:bg-gray-100 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
               >
                 Kezdd el ingyen
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -90,7 +90,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-gray-700 text-white hover:bg-gray-800 hover:border-gray-600 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold"
+                className="border-gray-700 text-white hover:bg-gray-800 hover:border-gray-600 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
               >
                 Árak megtekintése
               </Button>
@@ -135,10 +135,10 @@ export function HeroSection() {
               className="absolute top-20 left-0 bg-gray-900/90 backdrop-blur-sm border border-gray-800 rounded-lg p-4 shadow-2xl max-w-[200px]"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-500" />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500" />
                 <div>
                   <div className="text-xs text-gray-400">Éppen tanul</div>
-                  <div className="text-sm font-semibold text-white">3,429 hallgató</div>
+                  <div className="text-sm font-bold text-white">3,429 hallgató</div>
                 </div>
               </div>
             </motion.div>
@@ -153,7 +153,7 @@ export function HeroSection() {
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-orange-500" />
                 <div>
                   <div className="text-xs text-gray-400">Ma befejezett</div>
-                  <div className="text-sm font-semibold text-white">892 tartalom</div>
+                  <div className="text-sm font-bold text-white">892 tartalom</div>
                 </div>
               </div>
             </motion.div>

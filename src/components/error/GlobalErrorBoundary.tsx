@@ -235,7 +235,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <AlertTriangle className="w-6 h-6 text-orange-600" />
             </div>
             <div className="flex-1">
-              <h3 className="font-semibold text-orange-900 mb-2">
+              <h3 className="font-bold text-orange-900 mb-2">
                 A szakasz betöltése sikertelen
               </h3>
               <p className="text-orange-700 text-sm mb-3">

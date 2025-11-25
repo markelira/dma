@@ -24,7 +24,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return this.props.fallback || (
         <div className="p-4 text-center">
-          <h2 className="text-lg font-semibold text-red-600">Hiba történt</h2>
+          <h2 className="text-lg font-bold text-red-600">Hiba történt</h2>
           <p className="text-gray-600">Kérjük, próbáld újra később.</p>
         </div>
       );

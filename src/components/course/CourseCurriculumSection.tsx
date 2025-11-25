@@ -83,11 +83,11 @@ export function CourseCurriculumSection({
                 className="flex items-center justify-between p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-medium flex items-center justify-center">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-brand-secondary/10 text-brand-secondary-hover text-xs font-medium flex items-center justify-center">
                     {index + 1}
                   </span>
                   {lesson.type === 'video' ? (
-                    <PlayCircle className="w-5 h-5 text-blue-600" />
+                    <PlayCircle className="w-5 h-5 text-brand-secondary" />
                   ) : (
                     <FileText className="w-5 h-5 text-gray-400" />
                   )}
@@ -95,7 +95,7 @@ export function CourseCurriculumSection({
                     {lesson.title}
                   </span>
                   {lesson.preview && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                    <span className="text-xs bg-brand-secondary/10 text-brand-secondary-hover px-2 py-1 rounded">
                       Előnézet
                     </span>
                   )}
@@ -118,7 +118,7 @@ export function CourseCurriculumSection({
               <summary className="cursor-pointer list-none p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-bold text-gray-900">
                       {index + 1}. {module.title}
                     </h3>
                     {module.description && (
@@ -149,7 +149,7 @@ export function CourseCurriculumSection({
                   >
                     <div className="flex items-center gap-3">
                       {lesson.type === 'video' ? (
-                        <PlayCircle className="w-5 h-5 text-blue-600" />
+                        <PlayCircle className="w-5 h-5 text-brand-secondary" />
                       ) : (
                         <FileText className="w-5 h-5 text-gray-400" />
                       )}
@@ -157,7 +157,7 @@ export function CourseCurriculumSection({
                         {lesson.title}
                       </span>
                       {lesson.preview && (
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                        <span className="text-xs bg-brand-secondary/10 text-brand-secondary-hover px-2 py-1 rounded">
                           Előnézet
                         </span>
                       )}

@@ -323,7 +323,7 @@ export const SocialProof: React.FC = () => {
                       <Icon className="w-6 h-6 text-primary" />
                     </div>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                  <h3 className="font-bold text-gray-900 mb-2">
                     {indicator.title}
                   </h3>
                   <p className="text-sm text-gray-600">
@@ -456,7 +456,7 @@ export const SocialProof: React.FC = () => {
                     )}
                     
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-bold text-gray-900">
                         {story.user.firstName} {story.user.lastName}
                       </h3>
                       {story.user.company && (
@@ -486,7 +486,7 @@ export const SocialProof: React.FC = () => {
                     )}
                     {story.metrics.promotionTime && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Award className="w-4 h-4 text-blue-600" />
+                        <Award className="w-4 h-4 text-brand-secondary" />
                         <span className="text-gray-700">
                           Befizetés {story.metrics.promotionTime} hónapon belül
                         </span>

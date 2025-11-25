@@ -698,7 +698,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 						layoutId={"IGX7kogAf"}
 						ref={refBinding}
 						style={{
-							backgroundColor: "rgb(255, 255, 255)",
+							backgroundColor: "rgb(249, 250, 251)",
 							...style,
 						}}
 						{...addPropertyOverrides(
@@ -775,7 +775,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 										scopeId={"g3yWCPEnK"}
 									>
 										{_jsx(stdin_default, {
-											gQqOpdg6s: "Benefits",
+											gQqOpdg6s: "Előnyök",
 											height: "100%",
 											id: "L6eZUJs62",
 											layoutId: "L6eZUJs62",
@@ -814,7 +814,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Why Teams Choose TaskFlow"}
+												{"Miért a DMA?"}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -843,7 +843,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Experience the difference of an all-in-one workspace"}
+												{"20 év. Több száz cég. Bevált módszertan."}
 											</motion.p>
 										</React.Fragment>
 									</RichText>
@@ -902,7 +902,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													className={"framer-styles-preset-1bfwuz9"}
 													data-styles-preset={"nTTgTCwVw"}
 												>
-													{"Increased Productivity"}
+													{"A Vállalati Térkép módszertan"}
 												</motion.h3>
 											</React.Fragment>
 										</RichText>
@@ -930,7 +930,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 															"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 													}}
 												>
-													{"Streamline your workflow and get more done"}
+													{"Nem random videókat nézel – a DMA strukturált módszertanát kapod, amit 20 éve fejlesztünk."}
 												</motion.p>
 											</React.Fragment>
 										</RichText>
@@ -1023,7 +1023,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "40% less time spent in meetings",
+													vnAff7BpL: "20 év tapasztalat, strukturált programok",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1110,7 +1110,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "50% faster project completion",
+													vnAff7BpL: "Bizonyított keretrendszerek, nem elméletek",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1197,8 +1197,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL:
-														"Automated workflows save 10+ hours weekly",
+													vnAff7BpL: "Minden tartalom a Vállalati Térképre épül",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1252,7 +1251,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													className={"framer-styles-preset-1bfwuz9"}
 													data-styles-preset={"nTTgTCwVw"}
 												>
-													{"Better Organization"}
+													{"Építs, ne csak nézz"}
 												</motion.h3>
 											</React.Fragment>
 										</RichText>
@@ -1280,7 +1279,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 															"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 													}}
 												>
-													{"Keep everything organized and accessible"}
+													{"Rendszereket építesz, amiket azonnal bevezethetsz a cégedben, karrieredben."}
 												</motion.p>
 											</React.Fragment>
 										</RichText>
@@ -1373,7 +1372,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "All work centralized in one place",
+													vnAff7BpL: "Konkrét feladatok és gyakorlatok",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1460,8 +1459,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL:
-														"Never miss deadlines with smart reminderse",
+													vnAff7BpL: "Azonnal alkalmazható rendszerek és eszközök",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1548,8 +1546,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL:
-														"Find anything in seconds with powerful search",
+													vnAff7BpL: "Nem inspiráció – hanem megvalósítás",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1603,7 +1600,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													className={"framer-styles-preset-1bfwuz9"}
 													data-styles-preset={"nTTgTCwVw"}
 												>
-													{"Enhanced Collaboration"}
+													{"15+ aktív szakértő"}
 												</motion.h3>
 											</React.Fragment>
 										</RichText>
@@ -1631,7 +1628,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 															"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 													}}
 												>
-													{"Work better and smartertogether with your team"}
+													{"A DMA mentorcsapata és vendég szakértők, akik napi szinten dolgoznak cégvezetőkkel. 4 formátum, a te tempódban."}
 												</motion.p>
 											</React.Fragment>
 										</RichText>
@@ -1724,7 +1721,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "Real-time updates and notifications",
+													vnAff7BpL: "Gyakorló szakemberek, nem elméleti oktatók",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1811,7 +1808,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "Seamless file sharing and feedback",
+													vnAff7BpL: "Webinár, Akadémia, Masterclass, Podcast",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>
@@ -1898,7 +1895,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													style: {
 														width: "100%",
 													},
-													vnAff7BpL: "Cross-team collaboration made easy",
+													vnAff7BpL: "Saját tempódban, bárhol, bármikor",
 													width: "100%",
 												})}
 											</SmartComponentScopedContainer>

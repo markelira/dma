@@ -55,7 +55,7 @@ export default function CompanyLayout({
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-white0" />
           <p className="text-gray-600">
             {!authReady ? 'Hitelesítés inicializálása...' :
              isLoading ? 'Betöltés...' :

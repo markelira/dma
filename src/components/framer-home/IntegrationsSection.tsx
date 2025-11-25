@@ -107,7 +107,7 @@ export default function IntegrationsSection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/courses"
-              className="px-8 py-4 rounded-full font-semibold text-white transition-all hover:scale-105 hover:shadow-xl"
+              className="px-8 py-4 rounded-full font-bold text-white transition-all hover:scale-105 hover:shadow-xl"
               style={{
                 backgroundColor: "rgb(231, 43, 54)",
                 boxShadow: "0 4px 20px rgba(231, 43, 54, 0.3)",
@@ -117,7 +117,7 @@ export default function IntegrationsSection() {
             </Link>
             <Link
               href="/pricing"
-              className="px-8 py-4 rounded-full font-semibold border-2 transition-all hover:scale-105"
+              className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",
                 color: "rgb(18, 17, 17)",

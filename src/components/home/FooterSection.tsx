@@ -152,7 +152,7 @@ export function FooterSection() {
 
           {/* Link columns */}
           <motion.div variants={itemVariants}>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Tartalmak
             </h3>
             <ul className="space-y-3">
@@ -170,7 +170,7 @@ export function FooterSection() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Cég
             </h3>
             <ul className="space-y-3">
@@ -188,7 +188,7 @@ export function FooterSection() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Segítség
             </h3>
             <ul className="space-y-3">
@@ -206,7 +206,7 @@ export function FooterSection() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h3 className="text-white font-bold text-sm uppercase tracking-wider mb-4">
               Jogi
             </h3>
             <ul className="space-y-3">
@@ -234,7 +234,7 @@ export function FooterSection() {
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-white font-semibold text-lg mb-2">
+              <h3 className="text-white font-bold text-lg mb-2">
                 Iratkozz fel hírlevelünkre
               </h3>
               <p className="text-white/50 text-sm">
@@ -250,7 +250,7 @@ export function FooterSection() {
               />
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl bg-[rgb(231,43,54)] text-white font-semibold text-sm transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:shadow-[0_0_30px_rgba(231,43,54,0.3)]"
+                className="px-6 py-3 rounded-xl bg-[rgb(231,43,54)] text-white font-bold text-sm transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:shadow-[0_0_30px_rgba(231,43,54,0.3)]"
               >
                 Feliratkozás
               </button>

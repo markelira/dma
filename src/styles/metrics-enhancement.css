@@ -1,0 +1,208 @@
+/* World-class UX/UI Enhancement for Metrics Section */
+
+/* Enhanced glassmorphism with depth */
+.framer-TlLmC.framer-1i4bs2f {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(249, 250, 251, 0.98) 100%
+  ) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(231, 43, 54, 0.08) !important;
+  box-shadow:
+    0 1px 3px 0 rgba(0, 0, 0, 0.02),
+    0 4px 8px -2px rgba(0, 0, 0, 0.04),
+    0 12px 24px -4px rgba(231, 43, 54, 0.06),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Hover state with subtle lift and glow */
+.framer-TlLmC.framer-1i4bs2f:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  border-color: rgba(231, 43, 54, 0.15) !important;
+  box-shadow:
+    0 2px 6px 0 rgba(0, 0, 0, 0.03),
+    0 8px 16px -2px rgba(0, 0, 0, 0.06),
+    0 20px 40px -8px rgba(231, 43, 54, 0.12),
+    inset 0 1px 0 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(231, 43, 54, 0.1) !important;
+}
+
+/* Animated gradient accent line on top */
+.framer-TlLmC.framer-1i4bs2f::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(231, 43, 54, 0.8) 50%,
+    transparent 100%
+  );
+  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 20;
+}
+
+.framer-TlLmC.framer-1i4bs2f:hover::before {
+  left: 100%;
+}
+
+/* Subtle glow effect on hover */
+.framer-TlLmC.framer-1i4bs2f::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 80%;
+  background: radial-gradient(
+    circle,
+    rgba(231, 43, 54, 0.03) 0%,
+    transparent 70%
+  );
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.framer-TlLmC.framer-1i4bs2f:hover::after {
+  opacity: 1;
+}
+
+/* Enhanced number typography */
+.framer-TlLmC .framer-1genjko-container {
+  z-index: 10 !important;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
+}
+
+/* Number color with subtle gradient */
+.framer-TlLmC .framer-1genjko-container * {
+  background: linear-gradient(
+    135deg,
+    rgb(17, 23, 38) 0%,
+    rgb(231, 43, 54) 100%
+  );
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+}
+
+/* Description text enhancement */
+.framer-TlLmC .framer-18nx8kd {
+  z-index: 10 !important;
+  color: rgb(75, 85, 99) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.5 !important;
+}
+
+/* Metrics container - improved spacing and layout */
+.framer-u951C.framer-1m5kewl {
+  gap: 32px !important;
+  padding: 24px 0 !important;
+}
+
+@media (max-width: 768px) {
+  .framer-u951C.framer-1m5kewl {
+    gap: 20px !important;
+  }
+}
+
+/* Animated line between metrics */
+.framer-u951C .framer-92ju7p {
+  background: linear-gradient(
+    90deg,
+    rgba(231, 43, 54, 0) 0%,
+    rgba(231, 43, 54, 0.4) 50%,
+    rgba(231, 43, 54, 0) 100%
+  ) !important;
+  height: 2px !important;
+  animation: pulse-line 3s ease-in-out infinite;
+}
+
+@keyframes pulse-line {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scaleX(1.05);
+  }
+}
+
+/* Stagger animation on load */
+.framer-TlLmC.framer-1i4bs2f:nth-child(1) {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s backwards;
+}
+
+.framer-TlLmC.framer-1i4bs2f:nth-child(2) {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s backwards;
+}
+
+.framer-TlLmC.framer-1i4bs2f:nth-child(3) {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+}
+
+.framer-TlLmC.framer-1i4bs2f:nth-child(4) {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s backwards;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark mode support with enhanced contrast */
+@media (prefers-color-scheme: dark) {
+  .framer-TlLmC.framer-1i4bs2f {
+    background: linear-gradient(
+      135deg,
+      rgba(17, 24, 39, 0.95) 0%,
+      rgba(31, 41, 55, 0.98) 100%
+    ) !important;
+    border-color: rgba(231, 43, 54, 0.2) !important;
+  }
+
+  .framer-TlLmC .framer-18nx8kd {
+    color: rgb(156, 163, 175) !important;
+  }
+}
+
+/* Accessibility improvements */
+.framer-TlLmC.framer-1i4bs2f:focus-visible {
+  outline: 2px solid rgba(231, 43, 54, 0.5);
+  outline-offset: 4px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .framer-TlLmC.framer-1i4bs2f,
+  .framer-TlLmC.framer-1i4bs2f::before,
+  .framer-TlLmC.framer-1i4bs2f::after,
+  .framer-u951C .framer-92ju7p {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .framer-TlLmC.framer-1i4bs2f:hover {
+    transform: none !important;
+  }
+}

@@ -35,7 +35,7 @@ function UniversityCard({ university }: { university: University }) {
           
           {/* University Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
               {university.name}
             </h3>
             {university.address && (
@@ -75,7 +75,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <BookOpen className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.courseCount}
             </div>
             <div className="text-xs text-gray-500">Kurzus</div>
@@ -84,7 +84,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <Users className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.studentCount.toLocaleString('hu-HU')}
             </div>
             <div className="text-xs text-gray-500">Hallgató</div>
@@ -93,7 +93,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <GraduationCap className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.totalEnrollments.toLocaleString('hu-HU')}
             </div>
             <div className="text-xs text-gray-500">Beiratkozás</div>
@@ -218,7 +218,7 @@ export function UniversitiesListClient({ initialUniversities }: UniversitiesList
       {/* Results Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-gray-900">
+          <h2 className="text-2xl font-bold text-gray-900">
             {searchTerm ? `Keresési eredmények` : 'Partner Egyetemeink'}
           </h2>
           <p className="text-gray-600 mt-1">
@@ -232,7 +232,7 @@ export function UniversitiesListClient({ initialUniversities }: UniversitiesList
       {filteredAndSortedUniversities.length === 0 ? (
         <div className="text-center py-12">
           <GraduationCap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
             {searchTerm ? 'Nincs találat' : 'Nincsenek elérhető egyetemek'}
           </h3>
           <p className="text-gray-600">

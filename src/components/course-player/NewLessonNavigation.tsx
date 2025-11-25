@@ -44,7 +44,7 @@ export function NewLessonNavigation({
         <button
           onClick={onNext}
           disabled={isLoading}
-          className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 bg-brand-secondary/50 hover:bg-brand-secondary text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg shadow-brand-secondary/20 hover:shadow-brand-secondary/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <span>Következő lecke</span>
           <ArrowRightIcon size={20} />

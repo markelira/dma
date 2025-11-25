@@ -178,7 +178,7 @@ export default function CompanyCoursesPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4" />
+          <Loader2 className="w-10 h-10 animate-spin text-white0 mx-auto mb-4" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function CompanyCoursesPage() {
               placeholder="Tartalom keresése..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
             />
           </div>
 
@@ -224,7 +224,7 @@ export default function CompanyCoursesPage() {
                   onClick={() => setSelectedType(key)}
                   className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-secondary text-white'
                       : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                   }`}
                 >
@@ -253,7 +253,7 @@ export default function CompanyCoursesPage() {
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-blue-500 mx-auto mb-4" />
+            <Loader2 className="w-10 h-10 animate-spin text-white0 mx-auto mb-4" />
             <p className="text-gray-600">Tartalmak betöltése...</p>
           </div>
         </div>
@@ -262,7 +262,7 @@ export default function CompanyCoursesPage() {
           <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
             <BookOpen className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
             Nincs találat
           </h3>
           <p className="text-gray-600 mb-4">
@@ -276,7 +276,7 @@ export default function CompanyCoursesPage() {
                 setSearchInput('');
                 setSelectedType('ALL');
               }}
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-brand-secondary hover:text-brand-secondary-hover font-medium"
             >
               Szűrők törlése
             </button>

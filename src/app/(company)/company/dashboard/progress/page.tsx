@@ -128,7 +128,7 @@ export default function CompanyProgressDashboard() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-white0" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default function CompanyProgressDashboard() {
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => router.push('/company/dashboard')}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-brand-secondary text-white rounded-lg hover:bg-brand-secondary-hover transition-colors"
           >
             Vissza
           </button>
@@ -211,7 +211,7 @@ export default function CompanyProgressDashboard() {
           <select
             value={selectedMasterclass}
             onChange={(e) => setSelectedMasterclass(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent text-sm"
           >
             <option value="all">Minden képzés</option>
             {masterclasses.map((mc) => (
@@ -234,7 +234,7 @@ export default function CompanyProgressDashboard() {
                 onClick={() => setStatusFilter(option.value)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   statusFilter === option.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-secondary text-white'
                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -259,7 +259,7 @@ export default function CompanyProgressDashboard() {
       {/* Employee Progress Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900">
             Alkalmazotti haladás ({filteredEmployees.length})
           </h2>
         </div>
@@ -269,7 +269,7 @@ export default function CompanyProgressDashboard() {
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
               <Users className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Nincs találat
             </h3>
             <p className="text-gray-600">
@@ -309,8 +309,8 @@ export default function CompanyProgressDashboard() {
                   <tr key={`${emp.employeeId}-${emp.masterclassId}`} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                          <span className="text-sm font-medium text-brand-secondary">
                             {emp.employeeName.split(' ').map(n => n[0]).join('').slice(0, 2)}
                           </span>
                         </div>
@@ -338,7 +338,7 @@ export default function CompanyProgressDashboard() {
                                   ? 'bg-green-500'
                                   : emp.status === 'at-risk'
                                   ? 'bg-red-500'
-                                  : 'bg-blue-500'
+                                  : 'bg-brand-secondary/50'
                               }`}
                               style={{ width: `${emp.progressPercent}%` }}
                             />
@@ -366,7 +366,7 @@ export default function CompanyProgressDashboard() {
                           Lemaradásban
                         </span>
                       ) : emp.status === 'active' ? (
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary-hover">
                           <TrendingUp className="w-3 h-3 mr-1" />
                           Aktív
                         </span>
@@ -390,7 +390,7 @@ export default function CompanyProgressDashboard() {
                         <button
                           onClick={() => handleSendReminder(emp.employeeId, emp.masterclassId)}
                           disabled={sendingReminder === `${emp.employeeId}-${emp.masterclassId}`}
-                          className="inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="inline-flex items-center px-3 py-1.5 text-sm text-brand-secondary hover:text-brand-secondary-hover hover:bg-brand-secondary/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Mail className="w-4 h-4 mr-1" />
                           {sendingReminder === `${emp.employeeId}-${emp.masterclassId}` ? 'Küldés...' : 'Emlékeztető'}

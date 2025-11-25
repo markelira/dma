@@ -51,7 +51,7 @@ export function CourseSidebar({ courseData, ctaLabel, onCtaClick, isEnrolling }:
     <div className="space-y-6">
       {/* Course Summary Card */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="font-semibold text-lg mb-4">Tartalom összefoglaló</h3>
+        <h3 className="font-bold text-lg mb-4">Tartalom összefoglaló</h3>
         <div className="space-y-3">
           <div className="flex justify-between">
             <span className="text-gray-600">Nyelv</span>
@@ -78,7 +78,7 @@ export function CourseSidebar({ courseData, ctaLabel, onCtaClick, isEnrolling }:
 
       {/* Course Features Card */}
       <div className="bg-white rounded-lg shadow-sm p-6">
-        <h3 className="font-semibold text-lg mb-4">A tartalom tartalmaz:</h3>
+        <h3 className="font-bold text-lg mb-4">A tartalom tartalmaz:</h3>
         <div className="space-y-3">
           {courseFeatures.map((feature, index) => (
             <div key={index} className="flex items-center gap-3">
@@ -93,7 +93,7 @@ export function CourseSidebar({ courseData, ctaLabel, onCtaClick, isEnrolling }:
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-2 mb-4">
           <Share2 className="w-5 h-5 text-gray-600" />
-        <h3 className="font-semibold">Ossza meg a tartalmat</h3>
+        <h3 className="font-bold">Ossza meg a tartalmat</h3>
         </div>
         <div className="flex gap-2">
           {socialLinks.map((social, index) => (
@@ -112,7 +112,7 @@ export function CourseSidebar({ courseData, ctaLabel, onCtaClick, isEnrolling }:
       <div className="bg-[#0f766e] rounded-lg shadow-sm p-6 text-white">
         <div className="flex items-center gap-3 mb-4">
           <Users className="w-6 h-6" />
-          <h3 className="font-semibold text-lg">Csatlakozzon ma</h3>
+          <h3 className="font-bold text-lg">Csatlakozzon ma</h3>
         </div>
         <p className="text-sm mb-4 opacity-90">
           Csatlakozzon több mint {totalStudents.toLocaleString()} tanulóhoz, akik már fejlesztik készségeiket ezzel a tartalommal!

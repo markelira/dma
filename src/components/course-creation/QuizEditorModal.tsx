@@ -133,7 +133,7 @@ function SortableQuestionCard({ q, onChange, onRemove }: { q: QuizQuestion; onCh
           )}
 
           {/* ---- Válaszok ---- */}
-          <h4 className="text-sm font-semibold pt-2">Válaszok</h4>
+          <h4 className="text-sm font-bold pt-2">Válaszok</h4>
           <DndContext sensors={useSensors(useSensor(PointerSensor))} onDragEnd={(ev)=>{
             const { active, over } = ev;
             if(!over || active.id===over.id) return;
@@ -192,7 +192,7 @@ function SortableNavItem({ q, index, selected, onSelect }: { q: QuizQuestion; in
       )}
     >
       <GripVertical className="h-3 w-3 cursor-grab text-muted-foreground" {...listeners} />
-      <span className="text-xs font-semibold w-5">{index+1}.</span>
+      <span className="text-xs font-bold w-5">{index+1}.</span>
       {typeInfo[q.questionType].icon}
       <span className="truncate flex-1">{typeInfo[q.questionType].label}</span>
     </div>
@@ -225,7 +225,7 @@ function SortableAnswerRow({ answer, question, onChange, index }: { answer: Quiz
             onChange(updated);
           }}
         />
-        <Button variant="ghost" size="icon" onClick={()=> setFbOpen(o=>!o)}><MessageCircle className={clsx('h-4 w-4', answer.feedback && 'text-blue-600')} /></Button>
+        <Button variant="ghost" size="icon" onClick={()=> setFbOpen(o=>!o)}><MessageCircle className={clsx('h-4 w-4', answer.feedback && 'text-brand-secondary')} /></Button>
         <Button variant="ghost" size="icon" onClick={()=>{
           const updated = question.answers.filter(a=>a.id!==answer.id);
           onChange(updated);
@@ -285,7 +285,7 @@ export default function QuizEditorModal({ open, onOpenChange, value, onSave }: P
         </DialogHeader>
         {/* TIMING & ATTEMPTS */}
         <div className="space-y-2 mb-4">
-          <h3 className="text-sm font-semibold">Időzítés & próbálkozások</h3>
+          <h3 className="text-sm font-bold">Időzítés & próbálkozások</h3>
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={quiz.timeLimitMinutes !== null && quiz.timeLimitMinutes !== undefined}

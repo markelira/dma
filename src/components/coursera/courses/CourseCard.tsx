@@ -46,12 +46,12 @@ export function CourseCard({
             </span>
           </div>
           {price === 'Free' && (
-            <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-semibold text-coursera-blue">
+            <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-bold text-coursera-blue">
               Free
             </div>
           )}
           {typeof price === 'number' && (
-            <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-semibold text-coursera-blue">
+            <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-bold text-coursera-blue">
               ${price}
             </div>
           )}
@@ -59,7 +59,7 @@ export function CourseCard({
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="text-base font-semibold text-coursera-text-primary mb-2 line-clamp-2 group-hover:text-coursera-blue transition-colors">
+          <h3 className="text-base font-bold text-coursera-text-primary mb-2 line-clamp-2 group-hover:text-coursera-blue transition-colors">
             {title}
           </h3>
           <p className="text-sm text-coursera-text-secondary mb-3">
@@ -69,7 +69,7 @@ export function CourseCard({
           {/* Rating */}
           <div className="flex items-center space-x-2 mb-2">
             <div className="flex items-center">
-              <span className="text-sm font-semibold text-coursera-text-primary mr-1">
+              <span className="text-sm font-bold text-coursera-text-primary mr-1">
                 {rating.toFixed(1)}
               </span>
               <div className="flex items-center">

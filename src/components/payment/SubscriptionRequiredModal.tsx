@@ -170,7 +170,7 @@ export function SubscriptionRequiredModal({
       return 'border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50';
     }
     if (plan.popular) {
-      return 'border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50';
+      return 'border-brand-secondary/20 bg-gradient-to-br from-brand-secondary/5 to-cyan-50';
     }
     return 'border-border';
   };
@@ -185,7 +185,7 @@ export function SubscriptionRequiredModal({
           <DialogDescription className="text-center text-base">
             {courseName ? (
               <>
-                A <span className="font-semibold text-foreground">{courseName}</span> tartalomhoz való hozzáféréshez aktív előfizetés szükséges.
+                A <span className="font-bold text-foreground">{courseName}</span> tartalomhoz való hozzáféréshez aktív előfizetés szükséges.
               </>
             ) : (
               'A tartalmakhoz való hozzáféréshez aktív előfizetés szükséges.'
@@ -195,12 +195,12 @@ export function SubscriptionRequiredModal({
 
         <div className="space-y-6 py-4">
           {/* Benefits highlight */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg p-4">
             <div className="flex items-start space-x-3">
-              <Sparkles className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <Sparkles className="w-5 h-5 text-brand-secondary mt-0.5 flex-shrink-0" />
               <div className="space-y-2">
-                <h3 className="font-semibold text-blue-900">Miért érdemes előfizetni?</h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <h3 className="font-bold text-brand-secondary-hover">Miért érdemes előfizetni?</h3>
+                <ul className="text-sm text-brand-secondary-hover space-y-1">
                   <li>• Korlátlan hozzáférés <strong>MINDEN</strong> tartalomhoz</li>
                   <li>• 7 napos ingyenes próbaidőszak</li>
                   <li>• Bármikor lemondható</li>
@@ -225,7 +225,7 @@ export function SubscriptionRequiredModal({
                 >
                   {/* Badge */}
                   {plan.popular && (
-                    <div className="absolute top-0 right-0 bg-blue-500 text-white px-2 py-0.5 text-xs font-medium rounded-bl-lg">
+                    <div className="absolute top-0 right-0 bg-brand-secondary/50 text-white px-2 py-0.5 text-xs font-medium rounded-bl-lg">
                       <Star className="w-3 h-3 inline mr-1" />
                       Legnépszerűbb
                     </div>
@@ -242,13 +242,13 @@ export function SubscriptionRequiredModal({
                     <div className={cn(
                       "p-1.5 rounded-lg",
                       plan.premium ? "bg-purple-100 text-purple-600" :
-                      plan.popular ? "bg-blue-100 text-blue-600" :
+                      plan.popular ? "bg-brand-secondary/10 text-brand-secondary" :
                       "bg-muted text-muted-foreground"
                     )}>
                       {getPlanIcon(plan.id)}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-sm">{plan.name}</h4>
+                      <h4 className="font-bold text-sm">{plan.name}</h4>
                       <p className="text-xs text-muted-foreground">{plan.description}</p>
                     </div>
                   </div>

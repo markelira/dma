@@ -412,7 +412,7 @@ export function PaymentManagement({ className }: PaymentManagementProps) {
                         </div>
                         
                         <div className="flex items-center space-x-4">
-                          <span className="font-semibold">
+                          <span className="font-bold">
                             {formatCurrency(payment.amount, payment.currency)}
                           </span>
                           

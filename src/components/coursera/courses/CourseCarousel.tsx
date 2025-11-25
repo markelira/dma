@@ -49,7 +49,7 @@ export function CourseCarousel({ title, courses }: CourseCarouselProps) {
     <section className="py-12 md:py-16 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <motion.h2
-          className="text-2xl md:text-3xl font-semibold text-coursera-text-primary mb-8"
+          className="text-2xl md:text-3xl font-bold text-coursera-text-primary mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

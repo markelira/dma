@@ -21,7 +21,7 @@ export function HeroSection() {
           >
             {/* Badge */}
             <motion.div
-              className="inline-flex items-center space-x-2 bg-dma-red/10 text-dma-red px-4 py-2 rounded-full text-sm font-semibold"
+              className="inline-flex items-center space-x-2 bg-dma-red/10 text-dma-red px-4 py-2 rounded-full text-sm font-bold"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.6 }}
@@ -64,13 +64,13 @@ export function HeroSection() {
             >
               <Link
                 href="/register"
-                className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-semibold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300 text-lg"
+                className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-bold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300 text-lg"
               >
                 Próbáld ki ingyen 7 napig
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-dma-navy font-semibold rounded-full border-2 border-dma-navy hover:bg-dma-navy hover:text-white transition-all duration-300 text-lg"
+                className="inline-flex items-center justify-center px-8 py-4 bg-white text-dma-navy font-bold rounded-full border-2 border-dma-navy hover:bg-dma-navy hover:text-white transition-all duration-300 text-lg"
               >
                 Árak megtekintése
               </Link>

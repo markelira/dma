@@ -69,7 +69,7 @@ export function CategoryCard({
       <div className="flex flex-col items-start space-y-4">
         <div className="text-4xl">{icon}</div>
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">{title}</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-1">{title}</h3>
           <p className="text-sm text-gray-600">{description}</p>
           {courseCount !== undefined && (
             <p className="text-xs text-dma-red mt-2 font-medium">

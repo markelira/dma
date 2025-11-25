@@ -34,8 +34,8 @@ export function NewVideoPlayer({
   accentColor = 'blue',
 }: NewVideoPlayerProps) {
   // Accent color classes for progress bar
-  const progressColorClass = accentColor === 'red' ? 'bg-red-600' : 'bg-blue-500';
-  const progressHoverClass = accentColor === 'red' ? 'bg-red-500/50' : 'bg-blue-400/50';
+  const progressColorClass = accentColor === 'red' ? 'bg-red-600' : 'bg-brand-secondary/50';
+  const progressHoverClass = accentColor === 'red' ? 'bg-red-500/50' : 'bg-brand-secondary/50';
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const progressTrackingRef = useRef<NodeJS.Timeout | null>(null);

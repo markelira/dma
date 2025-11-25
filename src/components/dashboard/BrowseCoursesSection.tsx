@@ -153,7 +153,7 @@ export function BrowseCoursesSection() {
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Target className="w-5 h-5 text-gray-900 mr-2" />
-              <h3 className="text-lg font-semibold text-gray-900">Önnek ajánljuk</h3>
+              <h3 className="text-lg font-bold text-gray-900">Önnek ajánljuk</h3>
               <Badge variant="secondary" className="ml-2 bg-[#466C95]/10 text-[#466C95]">
                 Személyre szabott
               </Badge>
@@ -189,7 +189,7 @@ export function BrowseCoursesSection() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <TrendingUp className="w-5 h-5 text-green-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Felkapott tartalmak</h3>
+            <h3 className="text-lg font-bold text-gray-900">Felkapott tartalmak</h3>
             <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700">
               Trending
             </Badge>
@@ -222,7 +222,7 @@ export function BrowseCoursesSection() {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <BookOpen className="w-5 h-5 text-gray-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-900">
               {catalogFilters.search ? `Keresési eredmények: "${catalogFilters.search}"` : 'Népszerű tartalmak'}
             </h3>
           </div>
@@ -351,7 +351,7 @@ function CourseCard({
         {/* Course Info */}
         <CardContent className="p-4 space-y-3">
           <div>
-            <h4 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#466C95] transition-colors">
+            <h4 className="font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#466C95] transition-colors">
               {course.title}
             </h4>
             <p className="text-sm text-gray-600">
@@ -424,7 +424,7 @@ function EmptySearchResults({ searchQuery }: { searchQuery?: string }) {
       <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
         <Search className="w-8 h-8 text-gray-400" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <h3 className="text-lg font-bold text-gray-900 mb-2">
         {searchQuery ? `Nincs találat: "${searchQuery}"` : 'Nincsenek tartalmak'}
       </h3>
       <p className="text-gray-600 mb-6 max-w-md mx-auto">

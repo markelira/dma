@@ -106,7 +106,7 @@ export function EnhancedDashboardStats({ data, isLoading }: EnhancedDashboardSta
       {/* Personal Learning Stats */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 className="text-xl font-bold text-gray-900">
             {hasUserData ? 'Tanulási Áttekintés' : 'Kezdje Meg Tanulási Útját'}
           </h2>
           {hasUserData && (
@@ -160,7 +160,7 @@ export function EnhancedDashboardStats({ data, isLoading }: EnhancedDashboardSta
       {/* Weekly Goals (if user has data) */}
       {hasUserData && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Heti Célok</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Heti Célok</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {weeklyGoals.map((goal, index) => (
               <motion.div

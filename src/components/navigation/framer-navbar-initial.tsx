@@ -24,7 +24,7 @@ export function FramerNavbarInitial({ onMobileMenuToggle }: FramerNavbarInitialP
               alt="DMA Logo"
               className="w-6 h-6 object-contain"
             />
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-bold text-gray-900">
               DMA
             </span>
           </Link>

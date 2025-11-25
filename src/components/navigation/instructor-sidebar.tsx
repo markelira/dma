@@ -75,7 +75,7 @@ export function InstructorSidebar() {
   return (
     <nav className="flex flex-col gap-2 p-4">
       <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Oktató Panel</h2>
+        <h2 className="text-lg font-bold text-gray-900">Oktató Panel</h2>
         <p className="text-sm text-gray-500">Tartalmak és diákok kezelése</p>
       </div>
       {instructorNavItems.map((item) => {

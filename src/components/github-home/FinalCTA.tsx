@@ -10,8 +10,8 @@ export function FinalCTA() {
   return (
     <section className="relative flex items-center justify-center overflow-hidden bg-[#0D1117]">
       {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0D1117] via-blue-950/10 to-[#0D1117]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-blue-600/10 rounded-full blur-[150px]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0D1117] via-gray-950/10 to-[#0D1117]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] bg-brand-secondary/10 rounded-full blur-[150px]" />
 
       {/* Grid pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:72px_72px]" />
@@ -43,7 +43,7 @@ export function FinalCTA() {
               <span className="text-white">bárhonnan, hogy</span>
               <br />
               <GradientText
-                from="from-blue-400"
+                from="from-brand-secondary"
                 via="via-purple-500"
                 to="to-pink-500"
               >
@@ -66,7 +66,7 @@ export function FinalCTA() {
           >
             <Button
               size="lg"
-              className="group bg-white text-black hover:bg-gray-100 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold"
+              className="group bg-white text-black hover:bg-gray-100 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
             >
               Kezdd el ingyen
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -75,7 +75,7 @@ export function FinalCTA() {
             <Button
               size="lg"
               variant="outline"
-              className="border-gray-700 text-white hover:bg-gray-800 hover:border-gray-600 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-semibold"
+              className="border-gray-700 text-white hover:bg-gray-800 hover:border-gray-600 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
             >
               Kapcsolat
             </Button>

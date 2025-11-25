@@ -103,7 +103,7 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
   const getRarityColor = (rarity: Achievement['rarity']) => {
     switch (rarity) {
       case 'common': return 'bg-gray-100 text-gray-700 border-gray-300'
-      case 'rare': return 'bg-blue-100 text-blue-700 border-blue-300'
+      case 'rare': return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/30'
       case 'epic': return 'bg-purple-100 text-purple-700 border-purple-300'
       case 'legendary': return 'bg-yellow-100 text-yellow-700 border-yellow-300'
     }
@@ -173,7 +173,7 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
                     {recentEarned.rarity}
                   </Badge>
                 </div>
-                <h4 className="font-semibold text-gray-900">{recentEarned.name}</h4>
+                <h4 className="font-bold text-gray-900">{recentEarned.name}</h4>
                 <p className="text-sm text-gray-600">{recentEarned.description}</p>
               </div>
               <div className="text-right">
@@ -238,13 +238,13 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
+        <Card className="bg-gradient-to-br from-brand-secondary/5 to-cyan-50 border-brand-secondary/20">
           <CardContent className="p-4 text-center">
-            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-3">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 rounded-full bg-brand-secondary/10 flex items-center justify-center mx-auto mb-3">
+              <Target className="w-6 h-6 text-brand-secondary" />
             </div>
-            <div className="text-2xl font-bold text-blue-700">{stats.weeklyProgress}/{stats.weeklyGoal}</div>
-            <div className="text-sm text-blue-600">heti cél</div>
+            <div className="text-2xl font-bold text-brand-secondary-hover">{stats.weeklyProgress}/{stats.weeklyGoal}</div>
+            <div className="text-sm text-brand-secondary">heti cél</div>
             <Progress value={(stats.weeklyProgress / stats.weeklyGoal) * 100} className="h-1 mt-2" />
           </CardContent>
         </Card>
@@ -265,7 +265,7 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
+            <h3 className="text-lg font-bold flex items-center gap-2">
               <Trophy className="w-5 h-5 text-yellow-600" />
               Legutóbbi kitüntetések
             </h3>
@@ -309,11 +309,11 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Target className="w-5 h-5 text-blue-600" />
+            <h3 className="text-lg font-bold flex items-center gap-2">
+              <Target className="w-5 h-5 text-brand-secondary" />
               Elérhető kitüntetések
             </h3>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700">
+            <Badge variant="outline" className="bg-brand-secondary/5 text-brand-secondary-hover">
               {availableAchievements.length} elérhető
             </Badge>
           </div>
@@ -351,7 +351,7 @@ export const GamificationSystem: React.FC<GamificationSystemProps> = ({
       {/* Demo Button */}
       <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
         <CardContent className="p-6 text-center">
-          <h3 className="text-lg font-semibold text-green-900 mb-2">Szimulálás</h3>
+          <h3 className="text-lg font-bold text-green-900 mb-2">Szimulálás</h3>
           <p className="text-green-700 mb-4">Teszteld a gamifikációs rendszert</p>
           <Button 
             onClick={handleLessonComplete}

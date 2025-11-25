@@ -136,7 +136,7 @@ function FacultyCard({ faculty }: { faculty: { name: string; title: string; depa
 
         {/* Expertise */}
         <div>
-          <h4 className="text-sm font-semibold text-gray-700 mb-2">Szakterületek:</h4>
+          <h4 className="text-sm font-bold text-gray-700 mb-2">Szakterületek:</h4>
           <div className="flex flex-wrap gap-2">
             {faculty.expertise.map((skill, index) => (
               <span
@@ -152,7 +152,7 @@ function FacultyCard({ faculty }: { faculty: { name: string; title: string; depa
         {/* Awards */}
         {faculty.awards && faculty.awards.length > 0 && (
           <div>
-            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-1">
+            <h4 className="text-sm font-bold text-gray-700 mb-2 flex items-center gap-1">
               <Award className="w-4 h-4" />
               Díjak:
             </h4>
@@ -272,7 +272,7 @@ export function UniversityStorySection({ data }: UniversityStorySectionProps) {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
                   activeTab === tab.key
                     ? 'bg-primary text-white shadow-lg scale-105'
                     : 'bg-white text-gray-600 hover:bg-gray-50 shadow'

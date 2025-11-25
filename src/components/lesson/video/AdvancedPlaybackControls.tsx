@@ -431,18 +431,18 @@ export const AdvancedPlaybackControls: React.FC<Props> = ({
           {loopConfig?.enabled && (
             <>
               <div
-                className="absolute top-0 h-full bg-blue-500/30 pointer-events-none"
+                className="absolute top-0 h-full bg-brand-secondary/50/30 pointer-events-none"
                 style={{
                   left: `${(loopConfig.startTime / duration) * 100}%`,
                   width: `${((loopConfig.endTime - loopConfig.startTime) / duration) * 100}%`
                 }}
               />
               <div
-                className="absolute top-0 w-1 h-full bg-blue-500 pointer-events-none"
+                className="absolute top-0 w-1 h-full bg-brand-secondary/50 pointer-events-none"
                 style={{ left: `${(loopConfig.startTime / duration) * 100}%` }}
               />
               <div
-                className="absolute top-0 w-1 h-full bg-blue-500 pointer-events-none"
+                className="absolute top-0 w-1 h-full bg-brand-secondary/50 pointer-events-none"
                 style={{ left: `${(loopConfig.endTime / duration) * 100}%` }}
               />
             </>
@@ -475,7 +475,7 @@ export const AdvancedPlaybackControls: React.FC<Props> = ({
               </span>
             )}
             {loopConfig?.enabled && (
-              <span className="text-xs text-blue-600">
+              <span className="text-xs text-brand-secondary">
                 Loop: {loopConfig.currentLoop + 1}
                 {loopConfig.count && `/${loopConfig.count}`}
               </span>

@@ -169,7 +169,7 @@ function QuickAction({
 }) {
   const colorClasses = {
     teal: "bg-teal-50 text-teal-700 hover:bg-teal-100",
-    blue: "bg-blue-50 text-blue-700 hover:bg-blue-100",
+    blue: "bg-brand-secondary/5 text-brand-secondary-hover hover:bg-brand-secondary/10",
     purple: "bg-purple-50 text-purple-700 hover:bg-purple-100",
     amber: "bg-amber-50 text-amber-700 hover:bg-amber-100"
   }
@@ -203,7 +203,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
   }
 
   const typeColors = {
-    user_registered: "text-blue-600 bg-blue-100",
+    user_registered: "text-brand-secondary bg-brand-secondary/10",
     course_created: "text-purple-600 bg-purple-100",
     enrollment: "text-green-600 bg-green-100",
     payment: "text-emerald-600 bg-emerald-100",
@@ -428,7 +428,7 @@ export default function AdminDashboardPage() {
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900">
             Gyors Műveletek
           </h2>
         </div>
@@ -469,7 +469,7 @@ export default function AdminDashboardPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-bold text-gray-900">
                 Legutóbbi Tevékenységek
               </h2>
               <Link 
@@ -496,7 +496,7 @@ export default function AdminDashboardPage() {
         {/* System Status */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-bold text-gray-900">
               Rendszer Állapot
             </h2>
           </div>
@@ -599,7 +599,7 @@ export default function AdminDashboardPage() {
               {stats?.users?.total || 0}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 group-hover:text-teal-600 transition-colors">
+          <h3 className="font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
             Felhasználók Kezelése
           </h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -617,7 +617,7 @@ export default function AdminDashboardPage() {
               {stats?.courses?.total || 0}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
+          <h3 className="font-bold text-gray-900 group-hover:text-purple-600 transition-colors">
             Tartalmak Kezelése
           </h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -630,12 +630,12 @@ export default function AdminDashboardPage() {
           className="group bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
         >
           <div className="flex items-center justify-between mb-4">
-            <Building2 className="w-8 h-8 text-blue-600" />
+            <Building2 className="w-8 h-8 text-brand-secondary" />
             <span className="text-2xl font-bold text-gray-900">
               {stats?.universities?.total || 0}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+          <h3 className="font-bold text-gray-900 group-hover:text-brand-secondary transition-colors">
             Egyetemek Kezelése
           </h3>
           <p className="text-sm text-gray-600 mt-1">

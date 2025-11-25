@@ -92,7 +92,7 @@ export const EnhancedVideoControls: React.FC<EnhancedVideoControlsProps> = ({
   const getPlaybackRateColor = () => {
     if (playbackRate === 1) return 'text-gray-600'
     if (playbackRate > 1) return 'text-green-600'
-    if (playbackRate < 1) return 'text-blue-600'
+    if (playbackRate < 1) return 'text-brand-secondary'
     return 'text-gray-600'
   }
 
@@ -131,7 +131,7 @@ export const EnhancedVideoControls: React.FC<EnhancedVideoControlsProps> = ({
             </Badge>
             
             {duration > 0 && (
-              <Badge className="bg-blue-500/20 text-blue-200 border-blue-300">
+              <Badge className="bg-brand-secondary/50/20 text-brand-secondary-light border-brand-secondary/30">
                 {Math.round(getProgressPercentage())}%
               </Badge>
             )}
@@ -244,9 +244,9 @@ export const EnhancedVideoControls: React.FC<EnhancedVideoControlsProps> = ({
                 >
                   <div className="flex items-center justify-between w-full">
                     <span>{rate}x</span>
-                    {rate === 1 && <Badge className="ml-2 bg-blue-600 text-white text-xs">Normál</Badge>}
+                    {rate === 1 && <Badge className="ml-2 bg-brand-secondary text-white text-xs">Normál</Badge>}
                     {rate > 1 && <Badge className="ml-2 bg-green-600 text-white text-xs">Gyors</Badge>}
-                    {rate < 1 && <Badge className="ml-2 bg-blue-600 text-white text-xs">Lassú</Badge>}
+                    {rate < 1 && <Badge className="ml-2 bg-brand-secondary text-white text-xs">Lassú</Badge>}
                     {rate === playbackRate && <Star className="w-3 h-3 ml-2" />}
                   </div>
                 </DropdownMenuItem>

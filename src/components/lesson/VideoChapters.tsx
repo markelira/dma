@@ -211,7 +211,7 @@ export const VideoChapters: React.FC<VideoChaptersProps> = ({
                   <div
                     key={chapter.id}
                     className={`p-3 rounded-lg border transition-colors cursor-pointer ${
-                      isActive ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
+                      isActive ? 'bg-brand-secondary/5 border-brand-secondary/20' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => onSeekTo(chapter.startTime)}
                   >
@@ -221,7 +221,7 @@ export const VideoChapters: React.FC<VideoChaptersProps> = ({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h4 className={`font-medium truncate ${isActive ? 'text-blue-700' : 'text-gray-900'}`}>
+                          <h4 className={`font-medium truncate ${isActive ? 'text-brand-secondary-hover' : 'text-gray-900'}`}>
                             {chapter.title}
                           </h4>
                           <span className="text-sm text-gray-500 ml-2">
@@ -326,7 +326,7 @@ export const VideoChapters: React.FC<VideoChaptersProps> = ({
                           onClick={() => onSeekTo(bookmark.timestamp)}
                         >
                           <div className="flex items-center gap-2">
-                            <Bookmark className="w-4 h-4 text-blue-500" />
+                            <Bookmark className="w-4 h-4 text-white0" />
                             <h5 className="font-medium text-sm">{bookmark.title}</h5>
                             <span className="text-xs text-gray-500">
                               {formatTime(bookmark.timestamp)}

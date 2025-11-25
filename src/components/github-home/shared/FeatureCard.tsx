@@ -17,7 +17,7 @@ export function FeatureCard({
   title,
   description,
   className,
-  iconColor = 'text-blue-400',
+  iconColor = 'text-brand-secondary',
 }: FeatureCardProps) {
   return (
     <motion.div
@@ -46,7 +46,7 @@ export function FeatureCard({
       )}
 
       {/* Title */}
-      <h3 className="text-lg font-semibold text-white mb-2">
+      <h3 className="text-lg font-bold text-white mb-2">
         {title}
       </h3>
 
@@ -56,7 +56,7 @@ export function FeatureCard({
       </p>
 
       {/* Hover gradient effect */}
-      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-transparent group-hover:from-blue-500/5 group-hover:via-purple-500/5 transition-all duration-500 pointer-events-none" />
+      <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-brand-secondary/50/0 via-purple-500/0 to-transparent group-hover:from-brand-secondary/50/5 group-hover:via-purple-500/5 transition-all duration-500 pointer-events-none" />
     </motion.div>
   );
 }

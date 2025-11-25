@@ -53,7 +53,7 @@ export function CourseTable() {
     <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
       {/* Header with Tabs */}
       <div className="border-b border-gray-100 p-4">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Kurzusaim</h2>
+        <h2 className="text-lg font-bold text-gray-900 mb-3">Kurzusaim</h2>
 
         {/* Tabs */}
         <div className="flex gap-1">
@@ -63,7 +63,7 @@ export function CourseTable() {
               px-4 py-2 text-sm font-medium rounded-lg transition-colors
               ${
                 activeTab === 'in_progress'
-                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
+                  ? 'bg-brand-secondary/5 text-brand-secondary border-b-2 border-brand-secondary'
                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }
             `}
@@ -79,7 +79,7 @@ export function CourseTable() {
               px-4 py-2 text-sm font-medium rounded-lg transition-colors
               ${
                 activeTab === 'completed'
-                  ? 'bg-blue-50 text-blue-600 border-b-2 border-blue-500'
+                  ? 'bg-brand-secondary/5 text-brand-secondary border-b-2 border-brand-secondary'
                   : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
               }
             `}
@@ -103,7 +103,7 @@ export function CourseTable() {
             </p>
             <Link
               href="/courses"
-              className="mt-4 text-sm font-medium text-blue-600 hover:text-blue-700"
+              className="mt-4 text-sm font-medium text-brand-secondary hover:text-brand-secondary-hover"
             >
               Böngészd a kurzusokat →
             </Link>
@@ -119,7 +119,7 @@ export function CourseTable() {
                 <div className="flex items-start justify-between gap-4">
                   {/* Course Info */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate mb-1">
+                    <h3 className="font-bold text-gray-900 truncate mb-1">
                       {enrollment.courseName}
                     </h3>
                     <div className="flex items-center gap-3 text-sm text-gray-500 mb-3">
@@ -145,7 +145,7 @@ export function CourseTable() {
                       <div className="space-y-1">
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                            className="bg-brand-secondary/50 h-2 rounded-full transition-all duration-300"
                             style={{ width: `${enrollment.progress}%` }}
                           />
                         </div>

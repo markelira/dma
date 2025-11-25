@@ -28,10 +28,10 @@ export function RecentActivitySection() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-gray-900">Legutóbbi tevékenység</h2>
+        <h2 className="text-xl font-bold text-gray-900">Legutóbbi tevékenység</h2>
         <Link
           href="/dashboard/activity"
-          className="text-sm text-gray-500 hover:text-blue-600 flex items-center gap-1 transition-colors"
+          className="text-sm text-gray-500 hover:text-brand-secondary flex items-center gap-1 transition-colors"
         >
           Összes
           <ArrowRight className="w-4 h-4" />
@@ -53,7 +53,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
     const iconClass = 'w-4 h-4'
     switch (type) {
       case ActivityType.COURSE_ENROLLED:
-        return <Users className={`${iconClass} text-blue-600`} />
+        return <Users className={`${iconClass} text-brand-secondary`} />
       case ActivityType.COURSE_COMPLETED:
         return <Award className={`${iconClass} text-yellow-600`} />
       case ActivityType.CERTIFICATE_EARNED:
@@ -65,7 +65,7 @@ function ActivityItem({ activity }: { activity: Activity }) {
       case ActivityType.LESSON_COMPLETED:
         return <CheckCircle className={`${iconClass} text-green-600`} />
       case ActivityType.LEARNING_SESSION:
-        return <Play className={`${iconClass} text-blue-600`} />
+        return <Play className={`${iconClass} text-brand-secondary`} />
       default:
         return <BookOpen className={`${iconClass} text-gray-500`} />
     }

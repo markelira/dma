@@ -55,7 +55,7 @@ function CourseCardSmall({ course }: { course: PublicCourse }) {
         )}
       </div>
       <div className="p-4 flex-1 flex flex-col">
-        <h3 className="text-sm font-semibold line-clamp-2 flex-1 mb-2 group-hover:text-primary transition-colors">
+        <h3 className="text-sm font-bold line-clamp-2 flex-1 mb-2 group-hover:text-primary transition-colors">
           {course.title}
         </h3>
         
@@ -158,7 +158,7 @@ export function InteractiveCourseSection({ courses, universityName }: Interactiv
       {categories.length > 0 && (
         <section className="container mx-auto px-4">
           <div className="flex flex-col gap-4">
-            <h2 className="text-2xl font-semibold">Kurzusok böngészése</h2>
+            <h2 className="text-2xl font-bold">Kurzusok böngészése</h2>
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => handleCategoryChange('')}
@@ -198,7 +198,7 @@ export function InteractiveCourseSection({ courses, universityName }: Interactiv
       {featuredCourses.length > 0 && (
         <section className="bg-gray-50 py-10">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-semibold mb-6">
+            <h2 className="text-2xl font-bold mb-6">
               {selectedCategory ? `Kiemelt ${selectedCategory} kurzusok` : 'Kiemelt kurzusok'}
             </h2>
             {isLoading ? (
@@ -225,7 +225,7 @@ export function InteractiveCourseSection({ courses, universityName }: Interactiv
       {/* All Courses Grid */}
       <section className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-          <h2 className="text-2xl font-semibold mb-4 md:mb-0">
+          <h2 className="text-2xl font-bold mb-4 md:mb-0">
             {selectedCategory ? `${selectedCategory} kurzusok` : 'Az összes kurzus'}
             <span className="text-gray-500 text-lg ml-2">
               ({filteredCourses.length})

@@ -51,7 +51,7 @@ export function CourseraFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Coursera Column */}
           <div>
-            <h3 className="font-semibold text-coursera-text-primary mb-4">
+            <h3 className="font-bold text-coursera-text-primary mb-4">
               Coursera
             </h3>
             <ul className="space-y-2">
@@ -70,7 +70,7 @@ export function CourseraFooter() {
 
           {/* Community Column */}
           <div>
-            <h3 className="font-semibold text-coursera-text-primary mb-4">
+            <h3 className="font-bold text-coursera-text-primary mb-4">
               Community
             </h3>
             <ul className="space-y-2">
@@ -89,7 +89,7 @@ export function CourseraFooter() {
 
           {/* More Column */}
           <div>
-            <h3 className="font-semibold text-coursera-text-primary mb-4">
+            <h3 className="font-bold text-coursera-text-primary mb-4">
               More
             </h3>
             <ul className="space-y-2">
@@ -108,7 +108,7 @@ export function CourseraFooter() {
 
           {/* Mobile App Column */}
           <div>
-            <h3 className="font-semibold text-coursera-text-primary mb-4">
+            <h3 className="font-bold text-coursera-text-primary mb-4">
               Mobile
             </h3>
             <p className="text-sm text-coursera-text-secondary mb-4">

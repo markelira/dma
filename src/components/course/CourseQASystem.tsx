@@ -207,7 +207,7 @@ export const CourseQASystem: React.FC<CourseQASystemProps> = ({
   const getRoleIcon = (role: string) => {
     switch (role) {
       case 'INSTRUCTOR':
-        return <GraduationCap className="w-4 h-4 text-blue-600" />
+        return <GraduationCap className="w-4 h-4 text-brand-secondary" />
       case 'ADMIN':
         return <Shield className="w-4 h-4 text-purple-600" />
       default:
@@ -219,7 +219,7 @@ export const CourseQASystem: React.FC<CourseQASystemProps> = ({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'OPEN':
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-brand-secondary/10 text-brand-secondary-hover'
       case 'ANSWERED':
         return 'bg-green-100 text-green-800'
       case 'RESOLVED':
@@ -368,7 +368,7 @@ export const CourseQASystem: React.FC<CourseQASystemProps> = ({
       {loading ? (
         <Card>
           <CardContent className="p-6 text-center">
-            <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <div className="animate-spin w-8 h-8 border-2 border-brand-secondary border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-gray-600">Kérdések betöltése...</p>
           </CardContent>
         </Card>
@@ -416,7 +416,7 @@ export const CourseQASystem: React.FC<CourseQASystemProps> = ({
                         </Badge>
                       )}
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">{question.title}</h3>
+                    <h3 className="text-lg font-bold mb-2">{question.title}</h3>
                     <p className="text-gray-700 mb-3 whitespace-pre-wrap">{question.content}</p>
                   </div>
                   

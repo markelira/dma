@@ -390,7 +390,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
         {[1, 2, 3, 4].map((step) => (
           <div key={step} className="flex items-center">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold transition-all ${
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                 step === currentStep
                   ? 'bg-gray-900 text-white'
                   : step < currentStep
@@ -426,7 +426,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
           className="p-6 bg-green-50 border border-green-200 rounded-lg text-center"
         >
           <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-3" />
-          <h3 className="font-semibold text-green-900 mb-1">Sikeres regisztráció!</h3>
+          <h3 className="font-bold text-green-900 mb-1">Sikeres regisztráció!</h3>
           <p className="text-sm text-green-700">Átirányítás a céges irányítópultra...</p>
         </motion.div>
       )}
@@ -442,7 +442,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             className="space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Fiók tulajdonos</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Fiók tulajdonos</h3>
               <p className="text-sm text-gray-600">Add meg a vállalati fiók tulajdonosának adatait</p>
             </div>
 
@@ -524,7 +524,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             className="space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Vállalati adatok</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Vállalati adatok</h3>
               <p className="text-sm text-gray-600">Add meg a vállalat részleteit</p>
             </div>
 
@@ -598,7 +598,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             className="space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Alkalmazottak hozzáadása</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Alkalmazottak hozzáadása</h3>
               <p className="text-sm text-gray-600">Meghívhatod a csapattagjaidat (opcionális)</p>
             </div>
 
@@ -703,13 +703,13 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             className="space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Összefoglaló</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Összefoglaló</h3>
               <p className="text-sm text-gray-600">Ellenőrizd az adatokat mielőtt véglegesíted</p>
             </div>
 
             <div className="space-y-4">
               <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
+                <h4 className="font-bold text-gray-900 text-sm mb-3 flex items-center">
                   <User className="w-4 h-4 mr-2" />
                   Fiók tulajdonos
                 </h4>
@@ -720,7 +720,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
               </div>
 
               <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
+                <h4 className="font-bold text-gray-900 text-sm mb-3 flex items-center">
                   <Building2 className="w-4 h-4 mr-2" />
                   Vállalat
                 </h4>
@@ -733,7 +733,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
               </div>
 
               <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg">
-                <h4 className="font-semibold text-gray-900 text-sm mb-3 flex items-center">
+                <h4 className="font-bold text-gray-900 text-sm mb-3 flex items-center">
                   <Users className="w-4 h-4 mr-2" />
                   Alkalmazottak
                 </h4>

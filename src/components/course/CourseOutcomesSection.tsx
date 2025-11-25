@@ -13,14 +13,14 @@ export function CourseOutcomesSection({ outcomes }: CourseOutcomesSectionProps) 
 
   return (
     <motion.section
-      className="bg-gradient-to-br from-blue-50/50 to-purple-50/30 backdrop-blur-xl border border-blue-200/30 rounded-xl shadow-lg p-6 lg:p-8"
+      className="bg-gradient-to-br from-brand-secondary/5/50 to-purple-50/30 backdrop-blur-xl border border-brand-secondary/20/30 rounded-xl shadow-lg p-6 lg:p-8"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.15 }}
     >
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary/50 to-brand-secondary flex items-center justify-center shadow-md">
           <Target className="w-5 h-5 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900">

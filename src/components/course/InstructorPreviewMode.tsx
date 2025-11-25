@@ -69,26 +69,26 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Preview Header */}
-      <div className="bg-blue-600 text-white p-4 shadow-lg">
+      <div className="bg-brand-secondary text-white p-4 shadow-lg">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <Eye className="w-6 h-6" />
               <div>
                 <h1 className="text-xl font-bold">Oktató előnézet mód</h1>
-                <p className="text-blue-100 text-sm">
+                <p className="text-brand-secondary-light text-sm">
                   {course.title} - Így látják a diákok a tartalmat
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="flex bg-blue-700 rounded-lg p-1">
+              <div className="flex bg-brand-secondary-hover rounded-lg p-1">
                 <Button
                   variant={previewMode === 'student' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setPreviewMode('student')}
-                  className={previewMode === 'student' ? 'bg-white text-blue-600' : 'text-white hover:bg-blue-600'}
+                  className={previewMode === 'student' ? 'bg-white text-brand-secondary' : 'text-white hover:bg-brand-secondary'}
                 >
                   <Users className="w-4 h-4 mr-1" />
                   Diák nézet
@@ -97,7 +97,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
                   variant={previewMode === 'instructor' ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => setPreviewMode('instructor')}
-                  className={previewMode === 'instructor' ? 'bg-white text-blue-600' : 'text-white hover:bg-blue-600'}
+                  className={previewMode === 'instructor' ? 'bg-white text-brand-secondary' : 'text-white hover:bg-brand-secondary'}
                 >
                   <Settings className="w-4 h-4 mr-1" />
                   Oktató nézet
@@ -105,7 +105,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
               </div>
               
               {onExitPreview && (
-                <Button variant="outline" onClick={onExitPreview} className="text-blue-600 border-white hover:bg-blue-50">
+                <Button variant="outline" onClick={onExitPreview} className="text-brand-secondary border-white hover:bg-brand-secondary/5">
                   Szerkesztés folytatása
                 </Button>
               )}
@@ -128,8 +128,8 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{totalLessons}</div>
+                  <div className="text-center p-4 bg-brand-secondary/5 rounded-lg">
+                    <div className="text-2xl font-bold text-brand-secondary">{totalLessons}</div>
                     <div className="text-sm text-gray-600">Összes lecke</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -171,7 +171,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Award className="w-4 h-4 text-blue-500" />
+                      <Award className="w-4 h-4 text-white0" />
                       <span>Interaktív kvízek</span>
                     </div>
                     <Badge variant="outline">{quizLessons} kvíz</Badge>
@@ -229,8 +229,8 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
                 <div className="space-y-4">
                   {course.modules.map((module, moduleIndex) => (
                     <div key={module.id} className="border rounded-lg p-4">
-                      <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                        <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                      <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+                        <span className="bg-brand-secondary/10 text-brand-secondary-hover px-2 py-1 rounded text-sm">
                           {moduleIndex + 1}. modul
                         </span>
                         {module.title}
@@ -246,7 +246,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
                                 {lesson.type === 'VIDEO' && <Play className="w-4 h-4 text-red-500" />}
                                 {lesson.type === 'TEXT' && <FileText className="w-4 h-4 text-green-500" />}
                                 {lesson.type === 'READING' && <BookOpen className="w-4 h-4 text-purple-500" />}
-                                {lesson.type === 'QUIZ' && <Award className="w-4 h-4 text-blue-500" />}
+                                {lesson.type === 'QUIZ' && <Award className="w-4 h-4 text-white0" />}
                                 {lesson.type === 'PDF' && <Download className="w-4 h-4 text-orange-500" />}
                                 {lesson.type === 'AUDIO' && <Volume2 className="w-4 h-4 text-indigo-500" />}
                                 <span>{lesson.title}</span>
@@ -373,7 +373,7 @@ export const InstructorPreviewMode: React.FC<InstructorPreviewModeProps> = ({
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Award className="w-5 h-5 text-blue-500" />
+                    <Award className="w-5 h-5 text-white0" />
                     Kvíz Rendszer
                   </CardTitle>
                 </CardHeader>

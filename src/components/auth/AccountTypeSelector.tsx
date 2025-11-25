@@ -33,7 +33,7 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
               <User className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
                 Egyéni fiók
               </h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -67,7 +67,7 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
               <Building2 className="w-5 h-5 text-gray-700 group-hover:text-white transition-colors" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
                 Vállalati fiók
               </h3>
               <p className="text-sm text-gray-600 mb-3">

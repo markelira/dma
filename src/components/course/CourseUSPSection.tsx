@@ -14,7 +14,7 @@ export const CourseUSPSection: React.FC<Props> = ({ universities = [] }) => {
   const scrollingLogos = [...logos, ...logos] // duplicate for seamless loop
 
   const benefits: { icon: JSX.Element; label: string; hint: string; bgColor: string }[] = [
-    { icon: <Rocket className="w-8 h-8 text-primary" />, label: 'Gyakorlati Eredmények', hint: 'Valós projektek, azonnali haszon', bgColor: 'bg-blue-50 bg-opacity-40' },
+    { icon: <Rocket className="w-8 h-8 text-primary" />, label: 'Gyakorlati Eredmények', hint: 'Valós projektek, azonnali haszon', bgColor: 'bg-brand-secondary/5 bg-opacity-40' },
     { icon: <TrendingUp className="w-8 h-8 text-primary" />, label: 'Karrierváltás', hint: 'Tartalmak keresett szerepekhez', bgColor: 'bg-green-50 bg-opacity-40' },
     { icon: <Clock className="w-8 h-8 text-primary" />, label: 'Rugalmas Hozzáférés', hint: 'Tanulj a saját tempódban', bgColor: 'bg-yellow-50 bg-opacity-40' },
     { icon: <GraduationCap className="w-8 h-8 text-primary" />, label: 'Vezető Egyetemek', hint: 'Top magyar partnerek', bgColor: 'bg-pink-50 bg-opacity-40' },
@@ -51,7 +51,7 @@ export const CourseUSPSection: React.FC<Props> = ({ universities = [] }) => {
                     {b.icon}
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-900 text-sm">
+                    <span className="font-bold text-gray-900 text-sm">
                       {b.label}
                     </span>
                     <span className="block opacity-0 group-hover:opacity-100 text-xs text-gray-500 mt-1 transition-opacity">
@@ -98,7 +98,7 @@ export const CourseUSPSection: React.FC<Props> = ({ universities = [] }) => {
         <div className="text-center mt-12">
           <a
             href="#kategoriak-felfedezese"
-            className="inline-block px-8 py-3 rounded-full bg-primary text-white font-semibold shadow-md hover:shadow-lg hover:bg-primary/90 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary animate-cta-pulse"
+            className="inline-block px-8 py-3 rounded-full bg-primary text-white font-bold shadow-md hover:shadow-lg hover:bg-primary/90 transition-all transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary animate-cta-pulse"
           >
             Fedezd fel a kategóriákat
           </a>

@@ -63,7 +63,7 @@ interface VideoNotesPanel {
 
 const noteColors = [
   { name: 'Yellow', value: '#fbbf24', bg: 'bg-yellow-400', text: 'text-yellow-800' },
-  { name: 'Blue', value: '#3b82f6', bg: 'bg-blue-500', text: 'text-blue-800' },
+  { name: 'Blue', value: '#3b82f6', bg: 'bg-brand-secondary/50', text: 'text-brand-secondary-hover' },
   { name: 'Green', value: '#10b981', bg: 'bg-green-500', text: 'text-green-800' },
   { name: 'Purple', value: '#8b5cf6', bg: 'bg-purple-500', text: 'text-purple-800' },
   { name: 'Pink', value: '#ec4899', bg: 'bg-pink-500', text: 'text-pink-800' },
@@ -186,7 +186,7 @@ export const VideoNotesPanel: React.FC<VideoNotesPanel> = ({
       {/* Header */}
       <div className="p-4 border-b">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-gray-900">Jegyzetek és könyvjelzők</h3>
+          <h3 className="font-bold text-gray-900">Jegyzetek és könyvjelzők</h3>
           <Button
             variant="ghost"
             size="sm"
@@ -278,7 +278,7 @@ export const VideoNotesPanel: React.FC<VideoNotesPanel> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => onSeekToTime(note.timestamp)}
-                              className="p-0 h-auto text-xs text-blue-600 hover:text-blue-800"
+                              className="p-0 h-auto text-xs text-brand-secondary hover:text-brand-secondary-hover"
                             >
                               <Clock className="w-3 h-3 mr-1" />
                               {formatTime(note.timestamp)}
@@ -363,7 +363,7 @@ export const VideoNotesPanel: React.FC<VideoNotesPanel> = ({
                             variant="ghost"
                             size="sm"
                             onClick={() => onSeekToTime(bookmark.timestamp)}
-                            className="p-0 h-auto text-xs text-blue-600 hover:text-blue-800"
+                            className="p-0 h-auto text-xs text-brand-secondary hover:text-brand-secondary-hover"
                           >
                             <Play className="w-3 h-3 mr-1" />
                             {formatTime(bookmark.timestamp)}

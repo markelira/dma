@@ -117,7 +117,7 @@ export function PodcastSidePanel({
 
         {/* About Section */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             A podcastról
           </h4>
           <p className="text-gray-300 leading-relaxed text-sm">
@@ -128,7 +128,7 @@ export function PodcastSidePanel({
         {/* Current Episode */}
         <div className="h-px bg-gray-800" />
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             Most játszva
           </h4>
           <p className="text-white font-medium">{currentLesson.title}</p>

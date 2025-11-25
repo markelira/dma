@@ -98,14 +98,14 @@ export function UniversityAdminSidebar() {
     <div className="flex h-full w-64 flex-col bg-gray-900">
       {/* Header */}
       <div className="flex h-16 items-center justify-center border-b border-gray-800 px-6">
-        <Building className="h-8 w-8 text-blue-500 mr-2" />
+        <Building className="h-8 w-8 text-white0 mr-2" />
         <span className="text-xl font-bold text-white">Egyetem Admin</span>
       </div>
 
       {/* University Info */}
       <div className="border-b border-gray-800 p-4">
         <div className="text-sm text-gray-400">Intézmény</div>
-        <div className="text-white font-semibold">{user?.universityName || 'Egyetem Neve'}</div>
+        <div className="text-white font-bold">{user?.universityName || 'Egyetem Neve'}</div>
       </div>
 
       {/* Navigation */}
@@ -121,14 +121,14 @@ export function UniversityAdminSidebar() {
               className={cn(
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand-secondary text-white'
                   : 'text-gray-300 hover:bg-gray-800 hover:text-white'
               )}
             >
               <Icon className="h-5 w-5" />
               <span className="flex-1">{item.title}</span>
               {item.badge && (
-                <span className="rounded-full bg-blue-500 px-2 py-0.5 text-xs text-white">
+                <span className="rounded-full bg-brand-secondary/50 px-2 py-0.5 text-xs text-white">
                   {item.badge}
                 </span>
               )}
@@ -141,8 +141,8 @@ export function UniversityAdminSidebar() {
       <div className="border-t border-gray-800 p-4">
         <div className="mb-3">
           <p className="text-sm text-gray-400">Bejelentkezve mint</p>
-          <p className="text-sm font-semibold text-white">{user?.displayName || user?.email}</p>
-          <p className="text-xs text-blue-400">Egyetem Adminisztrátor</p>
+          <p className="text-sm font-bold text-white">{user?.displayName || user?.email}</p>
+          <p className="text-xs text-brand-secondary">Egyetem Adminisztrátor</p>
         </div>
         <Button
           variant="outline"

@@ -285,7 +285,7 @@ export default function UniversityAdminEnrollmentsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return <Badge className="bg-blue-100 text-blue-800">Aktív</Badge>;
+        return <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">Aktív</Badge>;
       case 'COMPLETED':
         return <Badge className="bg-green-100 text-green-800">Befejezett</Badge>;
       case 'CANCELLED':
@@ -299,7 +299,7 @@ export default function UniversityAdminEnrollmentsPage() {
 
   const getProgressColor = (progress: number) => {
     if (progress >= 80) return 'text-green-600';
-    if (progress >= 50) return 'text-blue-600';
+    if (progress >= 50) return 'text-brand-secondary';
     if (progress >= 20) return 'text-yellow-600';
     return 'text-gray-600';
   };
@@ -332,7 +332,7 @@ export default function UniversityAdminEnrollmentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-secondary"></div>
       </div>
     );
   }
@@ -367,7 +367,7 @@ export default function UniversityAdminEnrollmentsPage() {
             <CardTitle className="text-sm font-medium">Aktív</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{stats.activeEnrollments}</div>
+            <div className="text-2xl font-bold text-brand-secondary">{stats.activeEnrollments}</div>
           </CardContent>
         </Card>
         <Card>
@@ -476,7 +476,7 @@ export default function UniversityAdminEnrollmentsPage() {
                     <div className="flex items-center gap-2">
                       <div className="w-20 bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-blue-600 h-2 rounded-full" 
+                          className="bg-brand-secondary h-2 rounded-full" 
                           style={{ width: `${enrollment.progress}%` }}
                         />
                       </div>

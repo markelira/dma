@@ -100,7 +100,7 @@ export default function ResetPasswordPage() {
       <main className="relative flex grow">
         {/* Blue glow background */}
         <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/3">
-          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-blue-500 opacity-70 blur-[160px]"></div>
+          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-brand-secondary/50 opacity-70 blur-[160px]"></div>
         </div>
 
         <div className="w-full">
@@ -109,7 +109,7 @@ export default function ResetPasswordPage() {
               <div className="mx-auto w-full max-w-sm">
                 <div className="py-16 md:py-20">
                   <div className="flex flex-col items-center justify-center space-y-4">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                    <Loader2 className="h-8 w-8 animate-spin text-brand-secondary" />
                     <p className="text-gray-600">Token ellenőrzése...</p>
                   </div>
                 </div>
@@ -126,7 +126,7 @@ export default function ResetPasswordPage() {
       <main className="relative flex grow">
         {/* Blue glow background */}
         <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/3">
-          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-blue-500 opacity-70 blur-[160px]"></div>
+          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-brand-secondary/50 opacity-70 blur-[160px]"></div>
         </div>
 
         <div className="w-full">
@@ -159,7 +159,7 @@ export default function ResetPasswordPage() {
                       Kérj új jelszó visszaállítási linket.
                     </p>
                     <Link href="/login">
-                      <button className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
+                      <button className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
                         Vissza a bejelentkezéshez
                       </button>
                     </Link>
@@ -178,7 +178,7 @@ export default function ResetPasswordPage() {
       <main className="relative flex grow">
         {/* Blue glow background */}
         <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/3">
-          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-blue-500 opacity-70 blur-[160px]"></div>
+          <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-brand-secondary/50 opacity-70 blur-[160px]"></div>
         </div>
 
         <div className="w-full">
@@ -207,7 +207,7 @@ export default function ResetPasswordPage() {
 
                   {/* Action */}
                   <Link href="/login">
-                    <button className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
+                    <button className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
                       Bejelentkezés
                     </button>
                   </Link>
@@ -224,7 +224,7 @@ export default function ResetPasswordPage() {
     <main className="relative flex grow">
       {/* Blue glow background */}
       <div className="pointer-events-none absolute bottom-0 left-0 -translate-x-1/3">
-        <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-blue-500 opacity-70 blur-[160px]"></div>
+        <div className="h-80 w-80 rounded-full bg-gradient-to-tr from-brand-secondary/50 opacity-70 blur-[160px]"></div>
       </div>
 
       <div className="w-full">
@@ -322,7 +322,7 @@ export default function ResetPasswordPage() {
                     {/* Submit button */}
                     <button
                       type="submit"
-                      className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={isLoading}
                     >
                       {isLoading ? (
@@ -339,7 +339,7 @@ export default function ResetPasswordPage() {
 
                 {/* Footer links */}
                 <div className="mt-6 text-center text-sm text-gray-600">
-                  <Link href="/login" className="text-blue-600 hover:text-blue-700 hover:underline font-medium">
+                  <Link href="/login" className="text-brand-secondary hover:text-brand-secondary-hover hover:underline font-medium">
                     Vissza a bejelentkezéshez
                   </Link>
                 </div>

@@ -30,12 +30,12 @@ export default function LargeTestimonial() {
             </div>
             <p className="text-2xl font-bold leading-relaxed text-gray-900 md:text-3xl">
               "A DMA Akadémia teljesen megváltoztatta, ahogy a vállalatom működik. A strukturált kurzusok{" "}
-              <em className="italic text-blue-600">konkrét eredményeket</em> hoztak, nem csak elméletet."
+              <em className="italic text-brand-secondary">konkrét eredményeket</em> hoztak, nem csak elméletet."
             </p>
             <div className="text-sm font-medium text-gray-600">
-              <span className="text-gray-900 font-semibold">Nagy Péter</span>{" "}
+              <span className="text-gray-900 font-bold">Nagy Péter</span>{" "}
               <span className="text-gray-400">/</span>{" "}
-              <span className="text-blue-600">Ügyvezető, TechStart Kft.</span>
+              <span className="text-brand-secondary">Ügyvezető, TechStart Kft.</span>
             </div>
           </div>
         </div>

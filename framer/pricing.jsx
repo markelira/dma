@@ -251,7 +251,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 										scopeId={"JdBeeF2Pw"}
 									>
 										{_jsx(stdin_default, {
-											gQqOpdg6s: "Pricing",
+											gQqOpdg6s: "Hozzáférés",
 											height: "100%",
 											id: "Eb5osBN3e",
 											layoutId: "Eb5osBN3e",
@@ -290,7 +290,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Simple, Transparent Pricing"}
+												{"Kezdd el 7 napig ingyen"}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -319,7 +319,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Choose the perfect plan for your team's needs"}
+												{"Egy előfizetés, teljes hozzáférés minden tartalomhoz – egyének és csapatok számára egyaránt."}
 											</motion.p>
 										</React.Fragment>
 									</RichText>

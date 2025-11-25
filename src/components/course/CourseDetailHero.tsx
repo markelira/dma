@@ -61,7 +61,7 @@ export function CourseDetailHero({
   const getCourseTypeColor = (type?: string) => {
     switch (type) {
       case 'ACADEMIA':
-        return 'bg-blue-100 border-blue-300 text-blue-700';
+        return 'bg-brand-secondary/10 border-brand-secondary/30 text-brand-secondary-hover';
       case 'WEBINAR':
         return 'bg-purple-100 border-purple-300 text-purple-700';
       case 'MASTERCLASS':
@@ -89,9 +89,9 @@ export function CourseDetailHero({
   };
 
   return (
-    <section className="relative bg-gradient-to-br from-blue-50 via-blue-50/30 to-purple-50/20 pt-24 pb-16 lg:pt-32 lg:pb-20 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-brand-secondary/5 via-brand-secondary/5/30 to-purple-50/20 pt-24 pb-16 lg:pt-32 lg:pb-20 overflow-hidden">
       {/* Subtle background blur shapes */}
-      <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-200/20 rounded-full blur-3xl" aria-hidden="true"></div>
+      <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-brand-secondary/20/20 rounded-full blur-3xl" aria-hidden="true"></div>
       <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-purple-200/15 rounded-full blur-2xl" aria-hidden="true"></div>
 
       <div className="container mx-auto px-6 lg:px-12 relative z-10">

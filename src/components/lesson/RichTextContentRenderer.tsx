@@ -230,7 +230,7 @@ export const RichTextContentRenderer: React.FC<RichTextContentRendererProps> = (
     
     // Style headings
     processed = processed.replace(/<h1([^>]*)>/g, '<h1$1 class="text-3xl font-bold mb-6 mt-8">')
-    processed = processed.replace(/<h2([^>]*)>/g, '<h2$1 class="text-2xl font-semibold mb-4 mt-6">')
+    processed = processed.replace(/<h2([^>]*)>/g, '<h2$1 class="text-2xl font-bold mb-4 mt-6">')
     processed = processed.replace(/<h3([^>]*)>/g, '<h3$1 class="text-xl font-medium mb-3 mt-5">')
     
     // Style lists
@@ -239,7 +239,7 @@ export const RichTextContentRenderer: React.FC<RichTextContentRendererProps> = (
     processed = processed.replace(/<li>/g, '<li class="ml-4">')
     
     // Style blockquotes
-    processed = processed.replace(/<blockquote([^>]*)>/g, '<blockquote$1 class="border-l-4 border-blue-400 pl-4 italic my-4 text-gray-600">')
+    processed = processed.replace(/<blockquote([^>]*)>/g, '<blockquote$1 class="border-l-4 border-brand-secondary pl-4 italic my-4 text-gray-600">')
     
     // Style code blocks
     processed = processed.replace(/<pre([^>]*)>/g, '<pre$1 class="bg-gray-100 p-4 rounded-lg my-4 overflow-x-auto">')
@@ -247,7 +247,7 @@ export const RichTextContentRenderer: React.FC<RichTextContentRendererProps> = (
     
     // Style tables
     processed = processed.replace(/<table([^>]*)>/g, '<table$1 class="w-full border-collapse border border-gray-300 my-4">')
-    processed = processed.replace(/<th>/g, '<th class="border border-gray-300 px-4 py-2 bg-gray-50 font-semibold text-left">')
+    processed = processed.replace(/<th>/g, '<th class="border border-gray-300 px-4 py-2 bg-gray-50 font-bold text-left">')
     processed = processed.replace(/<td>/g, '<td class="border border-gray-300 px-4 py-2">')
     
     return processed
@@ -293,11 +293,11 @@ export const RichTextContentRenderer: React.FC<RichTextContentRendererProps> = (
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-50">
+              <div className="p-2 rounded-lg bg-brand-secondary/5">
                 {lessonType === 'READING' ? (
-                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  <BookOpen className="w-5 h-5 text-brand-secondary" />
                 ) : (
-                  <FileText className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-brand-secondary" />
                 )}
               </div>
               <div>

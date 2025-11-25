@@ -170,10 +170,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
-            <p className="text-lg text-gray-600">Tartalom betöltése...</p>
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-brand-secondary" />
+            <p className="text-base font-normal text-gray-600">Tartalom betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -186,15 +186,15 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Tartalom nem található</h1>
-            <p className="text-gray-600 mb-6">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">Tartalom nem található</h1>
+            <p className="text-base font-normal text-gray-600 mb-6">
               A keresett tartalom nem létezik vagy nem elérhető.
             </p>
             <button
               onClick={() => router.push('/courses')}
-              className="px-6 py-3 bg-gradient-to-t from-blue-600 to-blue-500 text-white rounded-lg font-semibold hover:shadow-md transition-all"
+              className="px-6 py-3 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg text-sm font-medium hover:shadow-md transition-all"
             >
               Vissza a tartalmakhoz
             </button>
@@ -283,7 +283,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/20">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20">
         {/* Hero Section */}
         <Hero1ConversionFocused
           title={c.title}
@@ -379,7 +379,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   <div className="space-y-3">
                     {c.targetAudience.map((item: string, index: number) => (
                       <div key={index} className="flex items-start gap-3">
-                        <ArrowRight className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <ArrowRight className="w-5 h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
                         <span className="text-gray-700">{item}</span>
                       </div>
                     ))}
@@ -429,7 +429,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                       >
                         <summary className="cursor-pointer list-none p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
                           <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-gray-900">
+                            <h3 className="font-bold text-gray-900">
                               {item.question}
                             </h3>
                             <svg

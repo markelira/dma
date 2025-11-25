@@ -82,7 +82,7 @@ export const ModuleAccordion: React.FC<ModuleAccordionProps> = ({
 
           {/* Module Number Badge */}
           <div
-            className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-semibold"
+            className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"
             style={{
               backgroundColor: hasCurrentLesson
                 ? playerColors.primary
@@ -99,7 +99,7 @@ export const ModuleAccordion: React.FC<ModuleAccordionProps> = ({
 
           {/* Module Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-gray-900 truncate group-hover:text-[#0066CC] transition-colors">
+            <h3 className="text-sm font-bold text-gray-900 truncate group-hover:text-[#0066CC] transition-colors">
               {module.title}
             </h3>
             <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">

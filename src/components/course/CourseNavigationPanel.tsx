@@ -149,7 +149,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
     
     if (isLocked) return 'text-gray-400'
     if (progress?.completed) return 'text-green-500'
-    if (progress?.watchPercentage > 0) return 'text-blue-500'
+    if (progress?.watchPercentage > 0) return 'text-white0'
     return 'text-gray-400'
   }
 
@@ -254,8 +254,8 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
         </Button>
         
         <div className="flex flex-col items-center space-y-2">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <span className="text-xs font-bold text-blue-600">
+          <div className="w-8 h-8 bg-brand-secondary/10 rounded-full flex items-center justify-center">
+            <span className="text-xs font-bold text-brand-secondary">
               {Math.round(courseStats.completionPercentage)}%
             </span>
           </div>
@@ -273,7 +273,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
       {/* Header */}
       <div className="p-4 border-b bg-gray-50">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-gray-900 truncate">{course.title}</h2>
+          <h2 className="font-bold text-gray-900 truncate">{course.title}</h2>
           <Button
             variant="ghost"
             size="sm"
@@ -373,7 +373,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
                       <Card
                         key={lesson.id}
                         className={`cursor-pointer transition-all hover:shadow-sm ${
-                          isActive ? 'ring-2 ring-blue-500 bg-blue-50' : ''
+                          isActive ? 'ring-2 ring-brand-secondary bg-brand-secondary/5' : ''
                         }`}
                         onClick={() => !isLocked && onLessonSelect(lesson.id)}
                       >
@@ -386,7 +386,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center space-x-2 mb-1">
                                 <h4 className={`text-sm font-medium truncate ${
-                                  isLocked ? 'text-gray-400' : isActive ? 'text-blue-700' : 'text-gray-900'
+                                  isLocked ? 'text-gray-400' : isActive ? 'text-brand-secondary-hover' : 'text-gray-900'
                                 }`}>
                                   {lesson.title}
                                 </h4>
@@ -443,7 +443,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
                                 
                                 <div className="flex items-center space-x-2">
                                   {moduleProgressData && (
-                                    <Badge className="text-xs bg-blue-100 text-blue-700">
+                                    <Badge className="text-xs bg-brand-secondary/10 text-brand-secondary-hover">
                                       {moduleProgressData.completedLessons}/{moduleProgressData.totalLessons}
                                     </Badge>
                                   )}
@@ -474,7 +474,7 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
                                       onClick={() => !isLocked && onLessonSelect(lesson.id)}
                                       className={`w-full text-left p-2 rounded transition-colors ${
                                         isActive 
-                                          ? 'bg-blue-100 text-blue-700' 
+                                          ? 'bg-brand-secondary/10 text-brand-secondary-hover' 
                                           : isLocked 
                                             ? 'text-gray-400 cursor-not-allowed'
                                             : 'hover:bg-gray-50 text-gray-700'
@@ -522,11 +522,11 @@ export const CourseNavigationPanel: React.FC<CourseNavigationPanelProps> = ({
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3 text-center">
-                  <div className="p-2 bg-blue-50 rounded">
-                    <div className="text-lg font-bold text-blue-600">
+                  <div className="p-2 bg-brand-secondary/5 rounded">
+                    <div className="text-lg font-bold text-brand-secondary">
                       {courseStats.completedLessons}
                     </div>
-                    <div className="text-xs text-blue-700">Befejezett lecke</div>
+                    <div className="text-xs text-brand-secondary-hover">Befejezett lecke</div>
                   </div>
                   <div className="p-2 bg-green-50 rounded">
                     <div className="text-lg font-bold text-green-600">

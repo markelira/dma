@@ -15,12 +15,12 @@ export function PromotionalBanner() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 flex-1">
             <p className="text-sm md:text-base">
-              <span className="font-semibold">Save up to 50% on Coursera Plus!</span>
+              <span className="font-bold">Save up to 50% on Coursera Plus!</span>
               <span className="ml-2">Limited time offer</span>
             </p>
             <Link
               href="/coursera-plus"
-              className="hidden sm:inline-block px-4 py-1.5 text-sm font-semibold bg-white text-coursera-blue rounded-md hover:bg-gray-100 transition-colors"
+              className="hidden sm:inline-block px-4 py-1.5 text-sm font-bold bg-white text-coursera-blue rounded-md hover:bg-gray-100 transition-colors"
             >
               Get Coursera Plus
             </Link>
@@ -36,7 +36,7 @@ export function PromotionalBanner() {
         <div className="sm:hidden mt-2">
           <Link
             href="/coursera-plus"
-            className="inline-block px-4 py-1.5 text-sm font-semibold bg-white text-coursera-blue rounded-md hover:bg-gray-100 transition-colors"
+            className="inline-block px-4 py-1.5 text-sm font-bold bg-white text-coursera-blue rounded-md hover:bg-gray-100 transition-colors"
           >
             Get Coursera Plus
           </Link>

@@ -36,9 +36,9 @@ export const StickyEnrollBar: React.FC<StickyEnrollBarProps> = ({ ctaLabel, onCt
     <div className="fixed inset-x-0 bottom-0 z-50 sm:bottom-4 sm:inset-x-auto sm:right-4 sm:w-auto">
       <div className="mx-auto sm:mx-0 bg-white shadow-cardDeep rounded-full border flex items-center gap-3 px-4 py-2 sm:px-6">
         {process.env.NEXT_PUBLIC_FEATURE_SUBSCRIPTION === 'true' && isPlus && (
-          <span className="text-xs font-semibold text-primary bg-primary/10 rounded-full px-2 py-1">DMA Plus</span>
+          <span className="text-xs font-bold text-primary bg-primary/10 rounded-full px-2 py-1">DMA Plus</span>
         )}
-        <Button onClick={onCtaClick} loading={loading} className="px-6 py-2 text-base font-semibold">
+        <Button onClick={onCtaClick} loading={loading} className="px-6 py-2 text-base font-bold">
           {ctaLabel}
         </Button>
       </div>

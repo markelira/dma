@@ -58,7 +58,7 @@ export function Hero3CleanEfficient({
 
   const getCourseTypeColor = (type?: string) => {
     switch (type) {
-      case 'ACADEMIA': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'ACADEMIA': return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/20';
       case 'WEBINAR': return 'bg-purple-100 text-purple-700 border-purple-200';
       case 'MASTERCLASS': return 'bg-teal-100 text-teal-700 border-teal-200';
       case 'PODCAST': return 'bg-green-100 text-green-700 border-green-200';
@@ -134,19 +134,19 @@ export function Hero3CleanEfficient({
             <div className="flex items-center gap-5 flex-wrap text-sm">
               <div className="flex items-center gap-1.5">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                <span className="font-semibold text-gray-900">{rating.toFixed(1)}</span>
+                <span className="font-bold text-gray-900">{rating.toFixed(1)}</span>
                 <span className="text-gray-600">({Math.floor(students * 0.3)} értékelés)</span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-gray-500" />
-                <span className="font-semibold text-gray-900">{students.toLocaleString('hu-HU')}</span>
+                <span className="font-bold text-gray-900">{students.toLocaleString('hu-HU')}</span>
                 <span className="text-gray-600">hallgató</span>
               </div>
 
               <div className="flex items-center gap-1.5">
                 <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="font-semibold text-gray-900">{recommendationPercent}%</span>
+                <span className="font-bold text-gray-900">{recommendationPercent}%</span>
                 <span className="text-gray-600">ajánlja</span>
               </div>
             </div>
@@ -164,7 +164,7 @@ export function Hero3CleanEfficient({
                     />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
                     {instructor.name.charAt(0)}
                   </div>
                 )}
@@ -197,7 +197,7 @@ export function Hero3CleanEfficient({
             <div className="flex items-center gap-4 pt-4">
               <Button
                 onClick={onEnroll}
-                className="bg-gradient-to-t from-blue-600 to-blue-500 text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg transition-all"
+                className="bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white px-8 py-3 rounded-lg font-bold hover:shadow-lg transition-all"
               >
                 Beiratkozás
               </Button>

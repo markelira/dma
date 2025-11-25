@@ -19,7 +19,7 @@ export const RoleSelector: React.FC = () => {
       description: 'Előléptetés, új munkahely, fizetésemelés',
       details: 'Szerezze meg a készségeket, amelyek biztosítják karrierje következő lépését.',
       icon: '💼',
-      color: 'from-blue-600 to-blue-700',
+      color: 'from-brand-secondary to-brand-secondary-hover',
       route: '/career-paths'
     },
     {

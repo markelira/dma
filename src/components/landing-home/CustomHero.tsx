@@ -42,12 +42,12 @@ export default function CustomHero() {
           {/* Buttons */}
           <div className="flex items-center justify-center gap-2">
             <a
-              className="btn group bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
+              className="btn group bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
               href="/register"
             >
               <span className="relative inline-flex items-center">
                 Próbáld ki 7 napig ingyen
-                <span className="ml-1 tracking-normal text-blue-300 transition-transform group-hover:translate-x-0.5">
+                <span className="ml-1 tracking-normal text-brand-secondary-light transition-transform group-hover:translate-x-0.5">
                   →
                 </span>
               </span>

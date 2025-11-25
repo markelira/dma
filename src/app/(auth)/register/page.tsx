@@ -368,16 +368,16 @@ function RegisterPageContent() {
 
       {/* Company Invite Banner */}
       {inviteData && (
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-6 p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <Building2 className="w-5 h-5 text-blue-600" />
+            <div className="p-2 bg-brand-secondary/10 rounded-full">
+              <Building2 className="w-5 h-5 text-brand-secondary" />
             </div>
             <div>
-              <p className="text-sm font-medium text-blue-900">
+              <p className="text-sm font-medium text-brand-secondary-hover">
                 Csatlakozás: {inviteData.companyName}
               </p>
-              <p className="text-xs text-blue-700">
+              <p className="text-xs text-brand-secondary-hover">
                 Regisztrálj, hogy hozzáférj a cég tartalmaihoz
               </p>
             </div>
@@ -487,7 +487,7 @@ function RegisterPageContent() {
         <div className="mt-6">
           <button
             type="submit"
-            className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
+            className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
             disabled={loading}
           >
             {loading ? 'Regisztráció...' : 'Regisztráció'}

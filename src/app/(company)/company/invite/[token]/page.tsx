@@ -237,9 +237,9 @@ export default function InviteAcceptancePage() {
           className="text-center max-w-md"
         >
           <div className="mb-6">
-            <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-gray-200 border-t-brand-secondary mx-auto"></div>
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Csatlakozás folyamatban...
           </h2>
           <p className="text-gray-600">
@@ -261,7 +261,7 @@ export default function InviteAcceptancePage() {
           <div className="mb-6">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Sikeres csatlakozás!
           </h2>
           <p className="text-gray-600 mb-4">
@@ -281,7 +281,7 @@ export default function InviteAcceptancePage() {
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {error || 'Érvénytelen meghívó'}
           </h2>
           <p className="text-gray-600 mb-6">
@@ -323,10 +323,10 @@ export default function InviteAcceptancePage() {
         >
           {/* Company Icon */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-              <Building2 className="w-8 h-8 text-blue-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-secondary/10 mb-4">
+              <Building2 className="w-8 h-8 text-brand-secondary" />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Csatlakozz a csapathoz!
             </h1>
           </div>
@@ -336,7 +336,7 @@ export default function InviteAcceptancePage() {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Vállalat</p>
-                <p className="text-lg font-semibold text-gray-900">{inviteData.companyName}</p>
+                <p className="text-lg font-bold text-gray-900">{inviteData.companyName}</p>
               </div>
 
               <div className="border-t border-gray-200 pt-4">
@@ -352,8 +352,8 @@ export default function InviteAcceptancePage() {
 
           {/* Auth Status */}
           {!user ? (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-900">
+            <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg p-4 mb-6">
+              <p className="text-sm text-brand-secondary-hover">
                 A meghívó elfogadásához először be kell jelentkezned vagy regisztrálnod kell.
               </p>
             </div>

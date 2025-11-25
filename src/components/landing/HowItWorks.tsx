@@ -10,8 +10,8 @@ const steps = [
     title: 'Válasszon tartalmat',
     description: 'Böngésszen több száz tartalom között, vagy használja a keresőt a tökéletes találat érdekében.',
     color: 'from-primary to-primary',
-    bgColor: 'bg-blue-50',
-    textColor: 'text-blue-700'
+    bgColor: 'bg-brand-secondary/5',
+    textColor: 'text-brand-secondary-hover'
   },
   {
     id: 2,
@@ -120,10 +120,10 @@ export const HowItWorks: React.FC = () => {
               Csatlakozzon több ezer diákhoz, akik már elkezdték a tanulási utazásukat az DMA platformon
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-              <button className="bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+              <button className="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors">
                 Ingyenes regisztráció
               </button>
-              <button className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition-colors">
+              <button className="border-2 border-white text-white px-8 py-3 rounded-full font-bold hover:bg-white hover:text-primary transition-colors">
                 Tartalmak böngészése
               </button>
             </div>

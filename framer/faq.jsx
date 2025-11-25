@@ -155,12 +155,12 @@ var humanReadableVariantMap = {
 var getProps = ({ answer, height, id, question, width, ...props }) => {
 	return {
 		...props,
-		kMvcjJ13y: question ?? props.kMvcjJ13y ?? "How does TaskFlow pricing work?",
+		kMvcjJ13y: question ?? props.kMvcjJ13y ?? "Hogyan működik az előfizetés?",
 		P7lvV731g: answer ?? props.P7lvV731g ?? (
 			<React.Fragment>
 				<motion.p>
 					{
-						"TaskFlow offers three simple pricing tiers: Free, Pro ($10/user/month), and Business ($20/user/month). All paid plans are billed monthly or annually with a 20% discount for annual billing. You only pay for active team members, and you can upgrade, downgrade, or cancel at any time."
+						"A DMA MasterClass havi előfizetéses modellben működik. Egyéni felhasználóként vagy céges csapattal (max. 10 fő) is előfizethetsz. Az előfizetés bármikor lemondható, és a teljes tartalomkönyvtárhoz azonnal hozzáférsz."
 					}
 				</motion.p>
 			</React.Fragment>
@@ -317,7 +317,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												"var(--extracted-1lwpl3i, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 										}}
 									>
-										{"How does TaskFlow pricing work?"}
+										{"Hogyan működik az előfizetés?"}
 									</motion.h5>
 								</React.Fragment>
 							</RichText>
@@ -436,14 +436,14 @@ addPropertyControls(Framers87BNvK0R, {
 		type: ControlType.Enum,
 	},
 	kMvcjJ13y: {
-		defaultValue: "How does TaskFlow pricing work?",
+		defaultValue: "Hogyan működik az előfizetés?",
 		displayTextArea: false,
 		title: "Question",
 		type: ControlType.String,
 	},
 	P7lvV731g: {
 		defaultValue:
-			"<p>TaskFlow offers three simple pricing tiers: Free, Pro ($10/user/month), and Business ($20/user/month). All paid plans are billed monthly or annually with a 20% discount for annual billing. You only pay for active team members, and you can upgrade, downgrade, or cancel at any time.</p>",
+			"<p>A DMA MasterClass havi előfizetéses modellben működik. Egyéni felhasználóként vagy céges csapattal (max. 10 fő) is előfizethetsz. Az előfizetés bármikor lemondható, és a teljes tartalomkönyvtárhoz azonnal hozzáférsz.</p>",
 		title: "Answer",
 		type: ControlType.RichText,
 	},
@@ -637,8 +637,7 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 						layoutId={"lZoNGwaTp"}
 						ref={ref ?? ref1}
 						style={{
-							backgroundColor:
-								"var(--token-08f2dbd6-30f3-4b80-b3ec-25d8f6146ee9, rgb(255, 255, 255))",
+							backgroundColor: "rgb(249, 250, 251)",
 							...style,
 						}}
 						{...addPropertyOverrides2(
@@ -701,7 +700,7 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										layoutId={"T4vGgPULx-container"}
 									>
 										{_jsx2(stdin_default, {
-											gQqOpdg6s: "FAQ",
+											gQqOpdg6s: "GYIK",
 											height: "100%",
 											id: "T4vGgPULx",
 											layoutId: "T4vGgPULx",
@@ -740,7 +739,7 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Common Questions"}
+												{"Gyakran ismételt kérdések"}
 											</motion2.h2>
 										</React2.Fragment>
 									</RichText2>
@@ -769,7 +768,7 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Everything you need to know about TaskFlow"}
+												{"Mielőtt elkezded"}
 											</motion2.p>
 										</React2.Fragment>
 									</RichText2>
@@ -823,13 +822,13 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										{_jsx2(stdin_default2, {
 											height: "100%",
 											id: "VKvaVYngY",
-											kMvcjJ13y: "How does TaskFlow pricing work?",
+											kMvcjJ13y: "Miben más a DMA, mint a Coursera vagy az Udemy?",
 											layoutId: "VKvaVYngY",
 											P7lvV731g: (
 												<React2.Fragment>
 													<p>
 														{
-															"TaskFlow offers three simple pricing tiers: Free, Pro ($10/user/month), and Business ($20/user/month). All paid plans are billed monthly or annually with a 20% discount for annual billing. You only pay for active team members, and you can upgrade, downgrade, or cancel at any time."
+															"A DMA nem általános online tartalmakat kínál. Minden anyagunk a Vállalati Térkép módszertanra épül – egy 20 éve fejlesztett, 50+ cégnél bizonyított rendszerre. Nem inspirációt kapsz, hanem konkrét keretrendszereket, amiket azonnal alkalmazhatsz."
 														}
 													</p>
 												</React2.Fragment>
@@ -884,14 +883,13 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										{_jsx2(stdin_default2, {
 											height: "100%",
 											id: "dLRgpXSNA",
-											kMvcjJ13y: "Can I use TaskFlow for free?",
+											kMvcjJ13y: "Tényleg ingyen kipróbálhatom 7 napig?",
 											layoutId: "dLRgpXSNA",
 											P7lvV731g: (
 												<React2.Fragment>
 													<p>
-														<strong>{"Yes!"}</strong>
 														{
-															" Our Free plan is perfect for individuals and small teams. It includes up to 3 team members, 5GB storage, basic project templates, and essential task management features. You can use the Free plan for as long as you want with no time limit."
+															"Igen, teljes hozzáféréssel. Nem kell bankkártya, nincs automatikus terhelés. Ha nem tetszik, egyszerűen nem csinálsz semmit – nem fogunk zaklatni."
 														}
 													</p>
 												</React2.Fragment>
@@ -946,13 +944,13 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										{_jsx2(stdin_default2, {
 											height: "100%",
 											id: "bLE1jT0Ml",
-											kMvcjJ13y: "How secure is TaskFlow?",
+											kMvcjJ13y: "Mennyi időt igényel?",
 											layoutId: "bLE1jT0Ml",
 											P7lvV731g: (
 												<React2.Fragment>
 													<p>
 														{
-															"TaskFlow takes security seriously. We use enterprise-grade encryption for all data, both in transit and at rest. Our infrastructure is hosted on AWS with SOC 2 Type II certification. We offer two-factor authentication, regular security audits, and automated backups. Business plans include additional security features like SSO and advanced permissions."
+															"Te döntöd el. Egy webinár 90 perc. Egy akadémia 10-20 szekció, amit a saját tempódban végezhetsz. A podcastokat útközben hallgathatod. Nincs határidő, nincs nyomás."
 														}
 													</p>
 												</React2.Fragment>
@@ -1007,34 +1005,15 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										{_jsx2(stdin_default2, {
 											height: "100%",
 											id: "LPTMtyJjT",
-											kMvcjJ13y: "What kind of support do you offer?",
+											kMvcjJ13y: "Egyénként és cégként is használhatom?",
 											layoutId: "LPTMtyJjT",
 											P7lvV731g: (
 												<React2.Fragment>
-													<p>{"Our support varies by plan:"}</p>
-													<ul>
-														<li data-preset-tag={"p"}>
-															<p>
-																{
-																	"Free: Email support with 24-48 hour response time"
-																}
-															</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>
-																{
-																	"Pro: Priority email and chat support with 12-hour response time"
-																}
-															</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>
-																{
-																	"Business: 24/7 dedicated support with 1-hour response time for critical issues All customers have access to our comprehensive help center, video tutorials, and community forum."
-																}
-															</p>
-														</li>
-													</ul>
+													<p>
+														{
+															"Igen. Egyéni előfizetéssel a saját fejlődésedre koncentrálhatsz. Céges előfizetéssel a teljes csapatod hozzáférést kap, te pedig látod a haladásukat és az eredményeket."
+														}
+													</p>
 												</React2.Fragment>
 											),
 											style: {
@@ -1087,41 +1066,15 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										{_jsx2(stdin_default2, {
 											height: "100%",
 											id: "AiPCLREZo",
-											kMvcjJ13y: "Can I import data from other tools?",
+											kMvcjJ13y: "Mi van, ha nem tetszik?",
 											layoutId: "AiPCLREZo",
 											P7lvV731g: (
 												<React2.Fragment>
 													<p>
 														{
-															"Yes! TaskFlow offers seamless importing from popular tools including:"
+															"A 7 napos próba után bármikor lemondhatsz egyetlen kattintással. Nincs hosszú távú elköteleződés, nincs rejtett költség. Ha úgy érzed, nem neked való – nincs harag."
 														}
-														<br />
-														<br className={"trailing-break"} />
 													</p>
-													<ul>
-														<li data-preset-tag={"p"}>
-															<p>{"Notion"}</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>{"Asana"}</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>{"Trello"}</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>{"Jira"}</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>{"Monday.com"}</p>
-														</li>
-														<li data-preset-tag={"p"}>
-															<p>
-																{
-																	"Microsoft Project Our import wizard guides you through the process, and our support team can assist with large-scale migrations for Business plan customers."
-																}
-															</p>
-														</li>
-													</ul>
 												</React2.Fragment>
 											),
 											style: {

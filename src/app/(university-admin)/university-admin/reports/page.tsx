@@ -69,7 +69,7 @@ export default function UniversityAdminReportsPage() {
         <Card className="cursor-pointer hover:shadow-lg transition-shadow">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <BarChart3 className="h-8 w-8 text-blue-600" />
+              <BarChart3 className="h-8 w-8 text-brand-secondary" />
               <Button size="sm" variant="outline" onClick={() => exportReport('enrollment')}>
                 <Download className="h-4 w-4" />
               </Button>

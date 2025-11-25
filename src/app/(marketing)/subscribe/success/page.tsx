@@ -138,23 +138,23 @@ function SubscribeSuccessContent() {
               <div className="bg-gray-50 rounded-lg p-6 space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Előfizetés típusa:</span>
-                  <span className="font-semibold">{subscriptionData.plan}</span>
+                  <span className="font-bold">{subscriptionData.plan}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Összeg:</span>
-                  <span className="font-semibold">{subscriptionData.amount}</span>
+                  <span className="font-bold">{subscriptionData.amount}</span>
                 </div>
                 {subscriptionData.nextBillingDate && (
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Következő számlázás:</span>
-                    <span className="font-semibold">{subscriptionData.nextBillingDate}</span>
+                    <span className="font-bold">{subscriptionData.nextBillingDate}</span>
                   </div>
                 )}
               </div>
             )}
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Mi következik?</h3>
+              <h3 className="text-lg font-bold text-gray-900">Mi következik?</h3>
               <div className="grid gap-4 text-left">
                 <div className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">

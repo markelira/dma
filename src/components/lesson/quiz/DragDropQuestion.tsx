@@ -360,8 +360,8 @@ export const DragDropQuestion: React.FC<Props> = ({
                 <div
                   key={item.id}
                   className={cn(
-                    "px-3 py-2 bg-blue-100 text-blue-800 rounded-lg cursor-grab border-2 border-transparent",
-                    "hover:bg-blue-200 transition-colors",
+                    "px-3 py-2 bg-brand-secondary/10 text-brand-secondary-hover rounded-lg cursor-grab border-2 border-transparent",
+                    "hover:bg-brand-secondary/20 transition-colors",
                     "active:cursor-grabbing active:scale-105",
                     dragState.draggedItem?.id === item.id && "opacity-50"
                   )}
@@ -388,7 +388,7 @@ export const DragDropQuestion: React.FC<Props> = ({
                 className={cn(
                   "p-4 min-h-[80px] border-2 border-dashed transition-colors",
                   zoneItems.length > 0 ? "border-green-300 bg-green-50" : "border-gray-300 bg-gray-50",
-                  dragState.isDragging && !isFull && "border-blue-400 bg-blue-50",
+                  dragState.isDragging && !isFull && "border-brand-secondary bg-brand-secondary/5",
                   isFull && "border-orange-300 bg-orange-50"
                 )}
               >
@@ -452,7 +452,7 @@ export const DragDropQuestion: React.FC<Props> = ({
         {dragState.isDragging && dragState.draggedItem && dragState.dragPreview && (
           <div
             ref={dragPreviewRef}
-            className="absolute pointer-events-none z-50 px-3 py-2 bg-blue-200 text-blue-800 rounded-lg border-2 border-blue-400 shadow-lg transform -translate-x-1/2 -translate-y-1/2"
+            className="absolute pointer-events-none z-50 px-3 py-2 bg-brand-secondary/20 text-brand-secondary-hover rounded-lg border-2 border-brand-secondary shadow-lg transform -translate-x-1/2 -translate-y-1/2"
             style={{
               left: dragState.dragPreview.x,
               top: dragState.dragPreview.y

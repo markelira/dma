@@ -267,7 +267,7 @@ export default function UniversityAdminStudentsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-secondary"></div>
       </div>
     );
   }
@@ -308,7 +308,7 @@ export default function UniversityAdminStudentsPage() {
             <CardTitle className="text-sm font-medium">Összes beiratkozás</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-brand-secondary">
               {students.reduce((sum, s) => sum + s.enrollmentCount, 0)}
             </div>
           </CardContent>
@@ -420,7 +420,7 @@ export default function UniversityAdminStudentsPage() {
                   <TableCell>
                     {student.averageGrade > 0 ? (
                       <div className="flex items-center gap-1">
-                        <TrendingUp className="h-4 w-4 text-blue-500" />
+                        <TrendingUp className="h-4 w-4 text-white0" />
                         {student.averageGrade.toFixed(1)}
                       </div>
                     ) : (

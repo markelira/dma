@@ -34,7 +34,7 @@ const COURSE_TYPE_DESCRIPTIONS: Record<string, string> = {
 }
 
 const COURSE_TYPE_GRADIENTS: Record<string, string> = {
-  ACADEMIA: 'from-blue-500 to-blue-600',
+  ACADEMIA: 'from-brand-secondary/50 to-brand-secondary',
   WEBINAR: 'from-purple-500 to-purple-600',
   MASTERCLASS: 'from-teal-500 to-teal-600',
   PODCAST: 'from-green-500 to-green-600',
@@ -127,12 +127,12 @@ function CourseCarouselSection({
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
-            <p className="text-gray-600 mt-1">{description}</p>
+            <p className="text-sm font-normal text-gray-600 mt-1">{description}</p>
           </div>
         </div>
         <a
           href={viewAllLink}
-          className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 font-semibold hover:bg-white/80 hover:shadow-md transition-all duration-200"
+          className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 text-sm font-medium hover:bg-white/80 hover:shadow-md transition-all duration-200"
         >
           Összes megtekintése
           <ChevronRight className="w-4 h-4" />
@@ -183,7 +183,7 @@ function CourseCarouselSection({
         <div className="md:hidden mt-6 text-center">
           <a
             href={viewAllLink}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 font-semibold hover:bg-white/80 hover:shadow-md transition-all duration-200"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 text-sm font-medium hover:bg-white/80 hover:shadow-md transition-all duration-200"
           >
             Összes {title}
             <ChevronRight className="w-4 h-4" />
@@ -273,10 +273,10 @@ export default function CoursesPage() {
     return (
       <>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-purple-600" />
-            <p className="text-lg text-gray-600">Tartalmak betöltése...</p>
+            <p className="text-base font-normal text-gray-600">Tartalmak betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -288,10 +288,10 @@ export default function CoursesPage() {
     <>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 relative overflow-hidden">
         {/* Background blur shapes */}
         <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-blue-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-brand-secondary/10/20 rounded-full blur-2xl" aria-hidden="true"></div>
         <div className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-teal-100/20 rounded-full blur-3xl" aria-hidden="true"></div>
 
         {/* Hero Section */}
@@ -306,7 +306,7 @@ export default function CoursesPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
                 Fedezd fel tartalmainkat
               </h1>
-              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+              <p className="text-base md:text-lg font-normal text-gray-600 max-w-3xl mx-auto mb-8">
                 Akadémiák, webinárok, mestertartalmak és podcastok szakértő mentoroktól.
                 Válaszd ki a számodra legmegfelelőbb tanulási formát.
               </p>
@@ -399,10 +399,10 @@ export default function CoursesPage() {
                 <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg">
                   <BookOpen className="w-10 h-10 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
                   Nincsenek elérhető tartalmak
                 </h3>
-                <p className="text-gray-600 text-center">
+                <p className="text-sm font-normal text-gray-600 text-center">
                   Jelenleg nincsenek közzétett tartalmak
                 </p>
               </motion.div>
@@ -413,7 +413,7 @@ export default function CoursesPage() {
         {/* CTA Section */}
         {courses.length > 0 && (
           <section className="relative py-20 overflow-hidden mt-12">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-secondary via-purple-600 to-teal-600" />
             <div className="absolute inset-0 bg-[url('/images/pattern.svg')] opacity-10" />
 
             <div className="container mx-auto px-6 lg:px-12 relative">
@@ -424,22 +424,22 @@ export default function CoursesPage() {
                 transition={{ duration: 0.6 }}
                 className="max-w-4xl mx-auto text-center"
               >
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                   Kezdd el még ma a tanulást
                 </h2>
-                <p className="text-xl text-white/90 mb-8">
+                <p className="text-lg font-normal text-white/90 mb-8">
                   Csatlakozz több ezer diákunkhoz és fejleszd karrieredet világszínvonalú oktatásunkkal
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/register"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full bg-white text-gray-900 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
+                    className="inline-flex items-center justify-center px-8 py-4 text-sm font-medium rounded-full bg-white text-gray-900 shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-200"
                   >
                     Ingyenes regisztráció
                   </a>
                   <a
                     href="/pricing"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full bg-white/10 backdrop-blur-xl text-white border-2 border-white/30 hover:bg-white/20 transition-all duration-200"
+                    className="inline-flex items-center justify-center px-8 py-4 text-sm font-medium rounded-full bg-white/10 backdrop-blur-xl text-white border-2 border-white/30 hover:bg-white/20 transition-all duration-200"
                   >
                     Árazás megtekintése
                   </a>

@@ -12,8 +12,8 @@ export const WhyDMA: React.FC = () => {
       description: 'Tanuljon egyetemi professzoroktól és vezető céges szakértőktől',
       icon: Award,
       color: 'from-primary to-primary',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-700'
+      bgColor: 'bg-brand-secondary/5',
+      textColor: 'text-brand-secondary-hover'
     },
     { 
       id: 'applicability', 

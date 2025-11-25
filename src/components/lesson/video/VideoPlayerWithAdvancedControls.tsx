@@ -700,7 +700,7 @@ export const VideoPlayerWithAdvancedControls: React.FC<Props> = ({
       <Card className="mt-4 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold">{lessonTitle}</h2>
+            <h2 className="text-xl font-bold">{lessonTitle}</h2>
             <p className="text-gray-600">{courseTitle}</p>
             <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
               <span>

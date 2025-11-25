@@ -148,7 +148,7 @@ export const HeroSection: React.FC = () => {
             >
               <div className="flex items-center space-x-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                 <span className="text-gray-900 dark:text-white text-lg font-bold tracking-wider">DMA</span>
-                <span className="text-gray-900 dark:text-white bg-teal-100 dark:bg-teal-900 text-xs font-semibold px-2 py-1 rounded-full">PLUS</span>
+                <span className="text-gray-900 dark:text-white bg-teal-100 dark:bg-teal-900 text-xs font-bold px-2 py-1 rounded-full">PLUS</span>
               </div>
             </motion.div>
 
@@ -228,14 +228,14 @@ export const HeroSection: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full max-w-xl mt-6">
               <Button
                 size="default"
-                className="flex-1 font-semibold text-base sm:text-lg"
+                className="flex-1 font-bold text-base sm:text-lg"
                 onClick={() => router.push('/register')}
               >
                 Próbálja ki ingyen most
               </Button>
               <Button
                 size="default"
-                className="flex-1 font-semibold text-base sm:text-lg bg-white/80 dark:bg-gray-800/80 text-primary dark:text-teal-400 border border-primary dark:border-teal-400 hover:bg-white dark:hover:bg-gray-700"
+                className="flex-1 font-bold text-base sm:text-lg bg-white/80 dark:bg-gray-800/80 text-primary dark:text-teal-400 border border-primary dark:border-teal-400 hover:bg-white dark:hover:bg-gray-700"
                 onClick={() => router.push('/courses')}
               >
                 Fedezze fel a tartalmakat
@@ -276,7 +276,7 @@ export const HeroSection: React.FC = () => {
                 className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm"
               >
                 <div className="text-center mb-4">
-                  <h3 className="text-gray-900 font-semibold mb-2">Egyetemi partnereink</h3>
+                  <h3 className="text-gray-900 font-bold mb-2">Egyetemi partnereink</h3>
                   <p className="text-gray-600 text-sm">Elismert intézmények által készített tartalmak</p>
                 </div>
                 
@@ -316,7 +316,7 @@ export const HeroSection: React.FC = () => {
                 className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-sm"
               >
                 <div className="text-center">
-                  <h3 className="text-gray-900 font-semibold mb-2">Egyetemi partnereink</h3>
+                  <h3 className="text-gray-900 font-bold mb-2">Egyetemi partnereink</h3>
                   <p className="text-gray-600 text-sm">Elismert intézmények által támogatott tartalmak</p>
                   <div className="mt-4 grid grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (

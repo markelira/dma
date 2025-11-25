@@ -415,7 +415,7 @@ export function PaymentHistory({
                           <span className="text-muted-foreground">Tartalom: </span>
                           <a 
                             href={`/courses/${payment.courseId}`}
-                            className="text-blue-600 hover:underline"
+                            className="text-brand-secondary hover:underline"
                           >
                             {payment.courseTitle}
                           </a>
@@ -424,7 +424,7 @@ export function PaymentHistory({
                     </div>
 
                     <div className="text-right space-y-2">
-                      <div className="text-lg font-semibold">
+                      <div className="text-lg font-bold">
                         {payment.status === 'refunded' && '−'}
                         {formatAmount(payment.amount, payment.currency)}
                       </div>

@@ -18,7 +18,7 @@ export const Navbar: React.FC = () => {
           <Link href="#" className="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium">
             Bejelentkezés
           </Link>
-          <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 h-9 rounded-md text-sm font-semibold">
+          <button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 h-9 rounded-md text-sm font-bold">
             Csatlakozzon ingyen
           </button>
         </div>

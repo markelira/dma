@@ -124,20 +124,20 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
         className={cn(
           'flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all group',
           isActive
-            ? 'bg-blue-50 text-blue-600 border-l-2 border-blue-500'
+            ? 'bg-brand-secondary/5 text-brand-secondary border-l-2 border-brand-secondary'
             : 'text-gray-700 hover:bg-gray-100 border-l-2 border-transparent'
         )}
       >
         <div className="flex items-center">
           <Icon className={cn(
             'w-4 h-4 mr-3',
-            isActive ? 'text-blue-600' : 'text-gray-500'
+            isActive ? 'text-brand-secondary' : 'text-gray-500'
           )} />
           {item.title}
         </div>
         <ChevronRight className={cn(
           'w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity',
-          isActive ? 'opacity-100 text-blue-600' : 'text-gray-400'
+          isActive ? 'opacity-100 text-brand-secondary' : 'text-gray-400'
         )} />
       </Link>
     </motion.div>
@@ -199,7 +199,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
               priority
             />
           </motion.div>
-          <span className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-blue-600 transition-colors">
+          <span className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-brand-secondary transition-colors">
             DMA
           </span>
         </Link>
@@ -210,7 +210,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
         <nav className="space-y-6 px-4">
           {sections.map((section, sectionIndex) => (
             <div key={sectionIndex}>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
                 {section.title}
               </h3>
               <div className="space-y-1">
@@ -232,7 +232,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center space-x-3 mb-4">
           <motion.div
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-blue-600"
+            className="w-8 h-8 rounded-full flex items-center justify-center bg-brand-secondary"
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
           >

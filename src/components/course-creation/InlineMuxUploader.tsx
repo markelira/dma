@@ -116,15 +116,15 @@ export default function InlineMuxUploader({
 
       {/* Pending file display */}
       {hasPendingFile && (
-        <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-center gap-3 p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg">
           <div className="flex-shrink-0">
-            <FileVideo className="h-8 w-8 text-blue-600" />
+            <FileVideo className="h-8 w-8 text-brand-secondary" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-blue-900 truncate">
+            <p className="text-sm font-medium text-brand-secondary-hover truncate">
               {pendingFile.name}
             </p>
-            <p className="text-xs text-blue-600">
+            <p className="text-xs text-brand-secondary">
               {formatFileSize(pendingFile.size)} • Feltöltés publikáláskor
             </p>
           </div>
@@ -134,7 +134,7 @@ export default function InlineMuxUploader({
             size="sm"
             onClick={clearFile}
             disabled={disabled}
-            className="text-blue-600 hover:text-blue-800 hover:bg-blue-100"
+            className="text-brand-secondary hover:text-brand-secondary-hover hover:bg-brand-secondary/10"
           >
             <X className="h-4 w-4" />
           </Button>

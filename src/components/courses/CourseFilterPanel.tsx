@@ -26,12 +26,12 @@ export function CourseFilterPanel({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Filter className="w-5 h-5 text-gray-700" />
-          <h3 className="font-semibold text-lg text-gray-900">Szűrők</h3>
+          <h3 className="font-bold text-lg text-gray-900">Szűrők</h3>
         </div>
         {selectedCategory !== 'all' && (
           <button
             onClick={onResetFilters}
-            className="text-sm text-blue-600 hover:text-blue-700 flex items-center gap-1"
+            className="text-sm text-brand-secondary hover:text-brand-secondary-hover flex items-center gap-1"
           >
             <X className="w-4 h-4" />
             Törlés

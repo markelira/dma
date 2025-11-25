@@ -120,7 +120,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
             <ul className="flex gap-1">
               <li>
                 <a
-                  className="flex items-center justify-center text-blue-500 transition hover:text-blue-600"
+                  className="flex items-center justify-center text-white0 transition hover:text-brand-secondary"
                   href="https://www.linkedin.com/company/dma-hu"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -137,7 +137,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
               </li>
               <li>
                 <a
-                  className="flex items-center justify-center text-blue-500 transition hover:text-blue-600"
+                  className="flex items-center justify-center text-white0 transition hover:text-brand-secondary"
                   href="https://www.facebook.com/dma.hu"
                   target="_blank"
                   rel="noopener noreferrer"

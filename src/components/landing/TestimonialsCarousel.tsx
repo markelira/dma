@@ -247,11 +247,11 @@ export const TestimonialsCarousel: React.FC = () => {
 
                     {/* User info */}
                     <div className="flex items-center">
-                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-semibold text-sm mr-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
                         {review.user.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <div className="font-semibold text-gray-900">
+                        <div className="font-bold text-gray-900">
                           {review.user.name}
                         </div>
                         {review.user.role && (

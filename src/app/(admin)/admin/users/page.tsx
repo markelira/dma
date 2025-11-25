@@ -218,7 +218,7 @@ export default function AdminUsersPage() {
       case 'COMPANY_ADMIN':
         return 'bg-purple-100 text-purple-700 border-purple-200'
       case 'INSTRUCTOR':
-        return 'bg-blue-100 text-blue-700 border-blue-200'
+        return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/20'
       case 'STUDENT':
         return 'bg-green-100 text-green-700 border-green-200'
       default:
@@ -252,7 +252,7 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-brand-secondary/50 to-indigo-600 rounded-xl p-8 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
         
@@ -260,12 +260,12 @@ export default function AdminUsersPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold mb-2">Felhasználók Kezelése</h1>
-              <p className="text-blue-100 text-lg">
+              <p className="text-brand-secondary-light text-lg">
                 Platform felhasználók áttekintése és adminisztrációja
               </p>
             </div>
             <div className="hidden lg:block">
-              <Button className="bg-white text-blue-600 hover:bg-gray-100 flex items-center gap-2">
+              <Button className="bg-white text-brand-secondary hover:bg-gray-100 flex items-center gap-2">
                 <Plus className="h-4 w-4" />
                 Új Felhasználó
               </Button>
@@ -277,8 +277,8 @@ export default function AdminUsersPage() {
       {/* Stats Section */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Felhasználói Statisztikák</h2>
-          <Badge className="bg-blue-100 text-blue-700">
+          <h2 className="text-xl font-bold text-gray-900">Felhasználói Statisztikák</h2>
+          <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
             <Sparkles className="w-3 h-3 mr-1" />
             Valós idejű
           </Badge>
@@ -288,8 +288,8 @@ export default function AdminUsersPage() {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-brand-secondary" />
                 </div>
                 <Badge variant="outline" className="text-xs text-green-600 border-green-600">
                   +{stats?.newUsersThisMonth || 0}
@@ -455,13 +455,13 @@ export default function AdminUsersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold">Felhasználó</TableHead>
-                <TableHead className="font-semibold">Email</TableHead>
-                <TableHead className="font-semibold">Szerepkör</TableHead>
-                <TableHead className="font-semibold">Regisztráció</TableHead>
-                <TableHead className="font-semibold">Utolsó Bejelentkezés</TableHead>
-                <TableHead className="font-semibold">Állapot</TableHead>
-                <TableHead className="text-right font-semibold">Műveletek</TableHead>
+                <TableHead className="font-bold">Felhasználó</TableHead>
+                <TableHead className="font-bold">Email</TableHead>
+                <TableHead className="font-bold">Szerepkör</TableHead>
+                <TableHead className="font-bold">Regisztráció</TableHead>
+                <TableHead className="font-bold">Utolsó Bejelentkezés</TableHead>
+                <TableHead className="font-bold">Állapot</TableHead>
+                <TableHead className="text-right font-bold">Műveletek</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -644,7 +644,7 @@ export default function AdminUsersPage() {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-secondary"
             >
               <option value="STUDENT">Hallgató</option>
               <option value="INSTRUCTOR">Oktató</option>
@@ -675,7 +675,7 @@ export default function AdminUsersPage() {
             <AlertDialogAction
               onClick={handleUpdateRole}
               disabled={updateRoleMutation.isPending || !selectedRole || selectedRole === selectedUser?.role}
-              className="bg-blue-600 text-white hover:bg-blue-700"
+              className="bg-brand-secondary text-white hover:bg-brand-secondary-hover"
             >
               {updateRoleMutation.isPending ? 'Mentés...' : 'Szerepkör Módosítása'}
             </AlertDialogAction>

@@ -109,7 +109,7 @@ export function StripeCheckoutButton({
             <CreditCard className="mr-2 h-4 w-4" />
             {title}
             {amount && (
-              <span className="ml-2 font-semibold">
+              <span className="ml-2 font-bold">
                 {formatAmount(amount, currency)}
               </span>
             )}

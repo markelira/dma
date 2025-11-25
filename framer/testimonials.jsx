@@ -685,7 +685,7 @@ var Component2 = /* @__PURE__ */ React2.forwardRef(function (props, ref) {
 										scopeId={"BJ_Yvw04c"}
 									>
 										{_jsx2(stdin_default, {
-											gQqOpdg6s: "Testimonials",
+											gQqOpdg6s: "Vélemények",
 											height: "100%",
 											id: "oFjV_ahW6",
 											layoutId: "oFjV_ahW6",

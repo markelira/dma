@@ -29,10 +29,10 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
         )}
       >
         {/* Gradient background */}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-600/40 via-purple-600/40 to-pink-600/40 blur-3xl" />
+        <div className="absolute inset-0 rounded-full bg-gradient-to-br from-brand-secondary/40 via-purple-600/40 to-pink-600/40 blur-3xl" />
 
         {/* Main sphere */}
-        <div className="relative w-full h-full rounded-full bg-gradient-to-br from-blue-500/20 via-purple-500/20 to-pink-500/20 border border-blue-500/30 overflow-hidden">
+        <div className="relative w-full h-full rounded-full bg-gradient-to-br from-brand-secondary/50/20 via-purple-500/20 to-pink-500/20 border border-brand-secondary/30 overflow-hidden">
           {/* Grid lines - horizontal */}
           {[...Array(6)].map((_, i) => (
             <motion.div
@@ -67,7 +67,7 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
 
           {/* Rotating highlight */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-br from-blue-400/20 via-transparent to-transparent"
+            className="absolute inset-0 bg-gradient-to-br from-brand-secondary/20 via-transparent to-transparent"
             animate={{ rotate: 360 }}
             transition={{
               duration: 20,
@@ -78,7 +78,7 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
 
           {/* Pulse effect */}
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-blue-400/30"
+            className="absolute inset-0 rounded-full border-2 border-brand-secondary/30"
             animate={{
               scale: [1, 1.2, 1],
               opacity: [0.5, 0, 0.5],
@@ -91,7 +91,7 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
           />
 
           {/* Inner glow */}
-          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-xl" />
+          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-brand-secondary/50/10 to-purple-500/10 blur-xl" />
         </div>
 
         {/* Orbiting dots */}
@@ -111,7 +111,7 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
               ease: 'linear',
             }}
           >
-            <div className="absolute top-0 left-1/2 w-2 h-2 -ml-1 rounded-full bg-blue-400/60 shadow-lg shadow-blue-400/50" />
+            <div className="absolute top-0 left-1/2 w-2 h-2 -ml-1 rounded-full bg-brand-secondary/60 shadow-lg shadow-brand-secondary/50" />
           </motion.div>
         ))}
       </motion.div>
@@ -120,7 +120,7 @@ export function AnimatedGlobe({ className, size = 'lg' }: AnimatedGlobeProps) {
       {[...Array(20)].map((_, i) => (
         <motion.div
           key={`particle-${i}`}
-          className="absolute w-1 h-1 rounded-full bg-blue-400/40"
+          className="absolute w-1 h-1 rounded-full bg-brand-secondary/40"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,

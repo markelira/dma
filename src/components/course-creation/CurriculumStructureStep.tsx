@@ -315,7 +315,7 @@ export default function CurriculumStructureStep({ courseId }: Props) {
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <Input
-                    className="text-lg font-semibold"
+                    className="text-lg font-bold"
                     defaultValue={sel.title}
                     onBlur={(e)=>{
                       const v=e.target.value.trim(); if(v && v!==sel.title) updateModule(sel.id,{title:v});

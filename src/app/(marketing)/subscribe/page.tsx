@@ -84,7 +84,7 @@ export default function SubscribePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/5 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -100,18 +100,18 @@ export default function SubscribePage() {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {loadingPlans ? (
             <div className="col-span-2 text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-secondary mx-auto"></div>
               <p className="mt-4 text-gray-600">Előfizetési tervek betöltése...</p>
             </div>
           ) : (
             plans.map((plan) => (
             <Card 
               key={plan.id} 
-              className={`relative ${plan.popular ? 'ring-2 ring-blue-500 shadow-xl' : ''}`}
+              className={`relative ${plan.popular ? 'ring-2 ring-brand-secondary shadow-xl' : ''}`}
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-brand-secondary/50 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2">
                     <Crown className="w-4 h-4" />
                     Legnépszerűbb
                   </div>
@@ -148,7 +148,7 @@ export default function SubscribePage() {
                   onClick={() => handleSubscribe(plan)}
                   loading={loading === plan.id}
                   disabled={loading !== null}
-                  className={`w-full ${plan.popular ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' : ''}`}
+                  className={`w-full ${plan.popular ? 'bg-gradient-to-r from-brand-secondary/50 to-purple-600 hover:from-brand-secondary hover:to-purple-700' : ''}`}
                   size="lg"
                 >
                   {loading === plan.id ? 'Feldolgozás...' : 'Előfizetés'}

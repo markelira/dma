@@ -175,7 +175,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-6 h-6 text-blue-600" />
+                <Sparkles className="w-6 h-6 text-brand-secondary" />
                 <h2 className="text-2xl font-bold">Személyre szabás</h2>
               </div>
               <Button
@@ -191,7 +191,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
             {/* Progress Bar */}
             <div className="relative h-2 bg-muted rounded-full overflow-hidden">
               <motion.div
-                className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-600 to-purple-600"
+                className="absolute inset-y-0 left-0 bg-gradient-to-r from-brand-secondary to-purple-600"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercentage}%` }}
                 transition={{ duration: 0.3 }}
@@ -216,11 +216,11 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                 {currentStep === 1 && (
                   <div>
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Target className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                        <Target className="w-6 h-6 text-brand-secondary" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold">Mi a szerepköröd?</h3>
+                        <h3 className="text-xl font-bold">Mi a szerepköröd?</h3>
                         <p className="text-sm text-muted-foreground">
                           Ez segít nekünk releváns tartalmakat ajánlani
                         </p>
@@ -248,7 +248,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                         <Book className="w-6 h-6 text-purple-600" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold">Mik az érdeklődési köreid?</h3>
+                        <h3 className="text-xl font-bold">Mik az érdeklődési köreid?</h3>
                         <p className="text-sm text-muted-foreground">
                           Válassz legalább 2 témát, ami érdekel (több is lehet)
                         </p>
@@ -287,7 +287,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                         <Target className="w-6 h-6 text-green-600" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold">Mik a céljaid?</h3>
+                        <h3 className="text-xl font-bold">Mik a céljaid?</h3>
                         <p className="text-sm text-muted-foreground">
                           Mit szeretnél elérni a tanulással?
                         </p>
@@ -328,7 +328,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                         <Book className="w-6 h-6 text-orange-600" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold">Hogyan szeretsz tanulni?</h3>
+                        <h3 className="text-xl font-bold">Hogyan szeretsz tanulni?</h3>
                         <p className="text-sm text-muted-foreground">
                           Válaszd ki a számodra legmegfelelőbb módszert
                         </p>
@@ -370,11 +370,11 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                 {currentStep === 5 && (
                   <div>
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-brand-secondary" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold">Heti tanulási cél</h3>
+                        <h3 className="text-xl font-bold">Heti tanulási cél</h3>
                         <p className="text-sm text-muted-foreground">
                           Hány órát szeretnél hetente tanulni?
                         </p>
@@ -389,15 +389,15 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
                             onClick={() => updateData('weeklyHoursGoal', preset.minutes)}
                             className={`
                               p-4 rounded-lg border-2 transition-all
-                              hover:border-blue-300 hover:bg-blue-50/50
+                              hover:border-brand-secondary/30 hover:bg-brand-secondary/5/50
                               ${
                                 onboardingData.weeklyHoursGoal === preset.minutes
-                                  ? 'border-blue-600 bg-blue-50'
+                                  ? 'border-brand-secondary bg-brand-secondary/5'
                                   : 'border-border bg-background'
                               }
                             `}
                           >
-                            <div className="text-2xl font-bold text-blue-600 mb-1">
+                            <div className="text-2xl font-bold text-brand-secondary mb-1">
                               {preset.label}
                             </div>
                             <div className="text-sm text-muted-foreground">
@@ -472,7 +472,7 @@ export function OnboardingWizard({ onComplete, onSkip, initialData }: Onboarding
             <Button
               onClick={handleNext}
               disabled={!canProceed() || isSubmitting}
-              className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              className="gap-2 bg-gradient-to-r from-brand-secondary to-purple-600 hover:from-brand-secondary-hover hover:to-purple-700"
             >
               {currentStep === TOTAL_STEPS ? (
                 isSubmitting ? (

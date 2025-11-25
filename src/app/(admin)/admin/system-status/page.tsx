@@ -104,7 +104,7 @@ export default function AdminSystemStatusPage() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl p-8 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-cyan-500 to-brand-secondary rounded-xl p-8 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
         
@@ -129,7 +129,7 @@ export default function AdminSystemStatusPage() {
       {/* System Overview */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Rendszer Áttekintés</h2>
+          <h2 className="text-xl font-bold text-gray-900">Rendszer Áttekintés</h2>
           <Badge className="bg-cyan-100 text-cyan-700">
             <Activity className="w-3 h-3 mr-1" />
             Valós idejű monitoring
@@ -164,8 +164,8 @@ export default function AdminSystemStatusPage() {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-brand-secondary" />
                 </div>
               </div>
               <div className="mt-4">
@@ -286,10 +286,10 @@ export default function AdminSystemStatusPage() {
                   Aktív
                 </Badge>
               </div>
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-brand-secondary/5 to-indigo-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Database className="h-5 w-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-secondary/10 rounded-lg flex items-center justify-center">
+                    <Database className="h-5 w-5 text-brand-secondary" />
                   </div>
                   <span className="font-medium">Firestore Adatbázis</span>
                 </div>

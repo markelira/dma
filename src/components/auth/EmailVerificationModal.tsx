@@ -147,7 +147,7 @@ export function EmailVerificationModal({
 
             {/* Loading indicator */}
             <div className="flex justify-center mt-6">
-              <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+              <Loader2 className="w-6 h-6 text-brand-secondary animate-spin" />
             </div>
           </div>
         </motion.div>
@@ -168,11 +168,11 @@ export function EmailVerificationModal({
         className="relative w-full max-w-md mx-4"
       >
         {/* Blue glow effect */}
-        <div className="absolute -inset-4 bg-gradient-to-tr from-blue-500 to-blue-400 opacity-20 blur-2xl rounded-3xl"></div>
+        <div className="absolute -inset-4 bg-gradient-to-tr from-brand-secondary/50 to-brand-secondary opacity-20 blur-2xl rounded-3xl"></div>
 
         <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header with gradient */}
-          <div className="bg-gradient-to-t from-blue-600 to-blue-500 px-8 py-10 text-center">
+          <div className="bg-gradient-to-t from-brand-secondary to-brand-secondary/50 px-8 py-10 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
                 <Mail className="w-8 h-8 text-white" />
@@ -181,7 +181,7 @@ export function EmailVerificationModal({
             <h2 className="text-3xl font-bold text-white mb-2">
               Erősítsd meg az email címed
             </h2>
-            <p className="text-blue-100 text-sm">
+            <p className="text-brand-secondary-light text-sm">
               {maskEmail(email)}
             </p>
           </div>
@@ -229,7 +229,7 @@ export function EmailVerificationModal({
 
             {/* Loading state */}
             {isVerifying && (
-              <div className="flex items-center justify-center gap-2 mb-6 text-blue-600">
+              <div className="flex items-center justify-center gap-2 mb-6 text-brand-secondary">
                 <Loader2 className="w-5 h-5 animate-spin" />
                 <span className="text-sm font-medium">Ellenőrzés...</span>
               </div>
@@ -247,7 +247,7 @@ export function EmailVerificationModal({
                   text-sm font-medium transition-all duration-200
                   ${resendCooldown > 0 || resending
                     ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-blue-600 hover:text-blue-700 hover:underline'
+                    : 'text-brand-secondary hover:text-brand-secondary-hover hover:underline'
                   }
                 `}
               >

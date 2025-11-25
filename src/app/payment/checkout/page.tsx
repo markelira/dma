@@ -91,7 +91,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/5 to-indigo-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="mb-8">
@@ -201,13 +201,13 @@ export default function CheckoutPage() {
                 <div className="space-y-2 text-sm">
                   <div>
                     <strong>Email:</strong>{' '}
-                    <a href="mailto:support@dma.hu" className="text-blue-600 hover:underline">
+                    <a href="mailto:support@dma.hu" className="text-brand-secondary hover:underline">
                       support@dma.hu
                     </a>
                   </div>
                   <div>
                     <strong>Telefon:</strong>{' '}
-                    <a href="tel:+36-1-234-5678" className="text-blue-600 hover:underline">
+                    <a href="tel:+36-1-234-5678" className="text-brand-secondary hover:underline">
                       +36-1-234-5678
                     </a>
                   </div>

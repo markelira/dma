@@ -9,7 +9,7 @@ export function CollaborationSection() {
   return (
     <section className="relative py-16 lg:py-24 bg-[#0D1117]">
       {/* Background effects */}
-      <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[120px]" />
+      <div className="absolute top-1/2 left-0 w-[600px] h-[600px] bg-brand-secondary/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 mx-auto px-8 lg:px-12 max-w-[1280px]">
         {/* Section header */}
@@ -51,7 +51,7 @@ export function CollaborationSection() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
                   <MessageSquare className="w-6 h-6 text-purple-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-bold text-white">
                   Csapat Megbeszélések
                 </h3>
               </div>
@@ -76,7 +76,7 @@ export function CollaborationSection() {
                     transition={{ delay: i * 0.1 }}
                     className="flex items-start gap-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex-shrink-0" />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-medium text-white">{msg.name}</span>
@@ -94,10 +94,10 @@ export function CollaborationSection() {
           <BentoCard>
             <div className="h-full flex flex-col">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-secondary/50/20 to-cyan-500/20 border border-brand-secondary/30 flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-brand-secondary" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-bold text-white">
                   Megosztott Jegyzetek
                 </h3>
               </div>
@@ -132,7 +132,7 @@ export function CollaborationSection() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center">
                   <Award className="w-6 h-6 text-green-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-bold text-white">
                   Haladás Követés
                 </h3>
               </div>
@@ -195,7 +195,7 @@ export function CollaborationSection() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500/20 to-yellow-500/20 border border-orange-500/30 flex items-center justify-center">
                   <Share2 className="w-6 h-6 text-orange-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-white">
+                <h3 className="text-xl font-bold text-white">
                   Közös Eredmények
                 </h3>
               </div>

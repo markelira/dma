@@ -153,7 +153,7 @@ export function EnhancedCheckoutButton({
   const getVariantStyles = () => {
     switch (variant) {
       case 'primary':
-        return 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg';
+        return 'bg-brand-secondary hover:bg-brand-secondary-hover text-white shadow-lg';
       case 'premium':
         return 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl';
       default:

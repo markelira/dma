@@ -164,7 +164,7 @@ export default function PurchaseCoursePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-brand-secondary/5">
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <Link 
@@ -321,7 +321,7 @@ export default function PurchaseCoursePage() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <h4 className="font-semibold text-lg">{getInstructorName()}</h4>
+                    <h4 className="font-bold text-lg">{getInstructorName()}</h4>
                     {getInstructorTitle() && (
                       <p className="text-muted-foreground mb-2">{getInstructorTitle()}</p>
                     )}
@@ -392,7 +392,7 @@ export default function PurchaseCoursePage() {
                   <div className="flex items-center space-x-3">
                     <Shield className="w-8 h-8 text-green-600" />
                     <div>
-                      <h4 className="font-semibold text-sm">30 napos garancia</h4>
+                      <h4 className="font-bold text-sm">30 napos garancia</h4>
                       <p className="text-xs text-muted-foreground">
                         Ha nem elégedett, teljes összeget visszatérítjük
                       </p>

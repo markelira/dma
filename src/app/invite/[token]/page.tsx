@@ -124,7 +124,7 @@ export default function TeamInviteAcceptancePage() {
           <div className="mb-6">
             <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto" />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Sikeres csatlakozás!
           </h2>
           <p className="text-gray-600 mb-4">
@@ -147,7 +147,7 @@ export default function TeamInviteAcceptancePage() {
       <div className="min-h-screen bg-white flex items-center justify-center px-4">
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Hiányzó meghívó kód
           </h2>
           <p className="text-gray-600 mb-6">
@@ -187,10 +187,10 @@ export default function TeamInviteAcceptancePage() {
         >
           {/* Team Icon */}
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
-              <Users className="w-8 h-8 text-blue-600" />
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-secondary/10 mb-4">
+              <Users className="w-8 h-8 text-brand-secondary" />
             </div>
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Csatlakozz a csapathoz!
             </h1>
             <p className="text-gray-600">
@@ -241,7 +241,7 @@ export default function TeamInviteAcceptancePage() {
             <button
               onClick={handleAcceptInvite}
               disabled={accepting}
-              className="w-full inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full inline-flex items-center justify-center px-6 py-3 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {accepting ? (
                 <>

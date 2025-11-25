@@ -281,7 +281,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
                       />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
                     {t('subscription.required')}
                   </h3>
                   <p className="text-gray-600 mb-6">

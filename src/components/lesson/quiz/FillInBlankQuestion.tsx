@@ -277,7 +277,7 @@ export const FillInBlankQuestion: React.FC<Props> = ({
                 placeholder={blank.placeholder || '___'}
                 disabled={disabled}
                 className={cn(
-                  "w-24 h-8 text-center border-b-2 border-t-0 border-l-0 border-r-0 rounded-none bg-transparent focus:border-blue-500",
+                  "w-24 h-8 text-center border-b-2 border-t-0 border-l-0 border-r-0 rounded-none bg-transparent focus:border-brand-secondary",
                   submitted && blankResults[blank.id] === true && "border-green-500 text-green-700",
                   submitted && blankResults[blank.id] === false && "border-red-500 text-red-700"
                 )}
@@ -390,12 +390,12 @@ export const FillInBlankQuestion: React.FC<Props> = ({
 
       {/* Hints */}
       {showHints.size > 0 && (
-        <Card className="p-4 bg-blue-50 border-blue-200">
-          <h4 className="text-sm font-medium mb-2 text-blue-800">Tippek:</h4>
+        <Card className="p-4 bg-brand-secondary/5 border-brand-secondary/20">
+          <h4 className="text-sm font-medium mb-2 text-brand-secondary-hover">Tippek:</h4>
           {Array.from(showHints).map(blankId => {
             const blank = question.blanks.find(b => b.id === blankId)
             return blank?.hint ? (
-              <p key={blankId} className="text-sm text-blue-700 mb-1">
+              <p key={blankId} className="text-sm text-brand-secondary-hover mb-1">
                 • {blank.hint}
               </p>
             ) : null

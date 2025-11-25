@@ -204,7 +204,7 @@ export const InstructorShowcase: React.FC = () => {
                     {instructor?.name || 'Névtelen oktató'}
                   </h3>
                   
-                  <p className="text-primary font-semibold mb-2">
+                  <p className="text-primary font-bold mb-2">
                     {instructor.title}
                   </p>
                   
@@ -238,7 +238,7 @@ export const InstructorShowcase: React.FC = () => {
                   <div className="text-center">
                     <div className="flex items-center justify-center space-x-1 text-primary mb-1">
                       <Users className="w-4 h-4" />
-                      <span className="text-sm font-semibold">
+                      <span className="text-sm font-bold">
                         {Number(instructor?.studentCount ?? 0).toLocaleString()}
                       </span>
                     </div>
@@ -247,7 +247,7 @@ export const InstructorShowcase: React.FC = () => {
                   <div className="text-center">
                     <div className="flex items-center justify-center space-x-1 text-primary mb-1">
                       <BookOpen className="w-4 h-4" />
-                      <span className="text-sm font-semibold">
+                      <span className="text-sm font-bold">
                         {Number(instructor?.courseCount ?? 0)}
                       </span>
                     </div>
@@ -315,10 +315,10 @@ export const InstructorShowcase: React.FC = () => {
               Csatlakozzon több ezer diákunkhoz és kezdje el karrierjének fejlesztését ma.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors">
+              <button className="bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors">
                 Ingyenes próba
               </button>
-              <button className="border border-primary text-primary px-8 py-3 rounded-full font-semibold hover:bg-primary hover:text-white transition-colors">
+              <button className="border border-primary text-primary px-8 py-3 rounded-full font-bold hover:bg-primary hover:text-white transition-colors">
                 Tartalmak megtekintése
               </button>
             </div>

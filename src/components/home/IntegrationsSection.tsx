@@ -188,7 +188,7 @@ export function IntegrationsSection() {
         >
           <a
             href="/pricing"
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[rgb(231,43,54)] text-white font-semibold text-base transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:-translate-y-0.5 hover:shadow-[0_0_40px_rgba(231,43,54,0.3)]"
+            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[rgb(231,43,54)] text-white font-bold text-base transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:-translate-y-0.5 hover:shadow-[0_0_40px_rgba(231,43,54,0.3)]"
           >
             Csatlakozz most
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

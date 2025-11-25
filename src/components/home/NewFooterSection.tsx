@@ -35,7 +35,7 @@ export function NewFooterSection() {
             </p>
             <Link
               href="/register"
-              className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-semibold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300"
+              className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-bold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               Próbáld ki ingyen
             </Link>
@@ -47,7 +47,7 @@ export function NewFooterSection() {
       <div className="border-b border-white/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="max-w-md mx-auto text-center">
-            <h3 className="text-xl font-semibold mb-2">
+            <h3 className="text-xl font-bold mb-2">
               Iratkozz fel hírlevelünkre
             </h3>
             <p className="text-white/70 text-sm mb-6">
@@ -65,7 +65,7 @@ export function NewFooterSection() {
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-dma-red text-white font-semibold rounded-full hover:bg-dma-red-hover transition-colors"
+                className="px-6 py-3 bg-dma-red text-white font-bold rounded-full hover:bg-dma-red-hover transition-colors"
               >
                 Feliratkozás
               </button>
@@ -78,7 +78,7 @@ export function NewFooterSection() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <h4 className="font-semibold mb-4">Platform</h4>
+            <h4 className="font-bold mb-4">Platform</h4>
             <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <Link href="/courses" className="hover:text-white transition-colors">
@@ -98,7 +98,7 @@ export function NewFooterSection() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Támogatás</h4>
+            <h4 className="font-bold mb-4">Támogatás</h4>
             <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <Link href="/help" className="hover:text-white transition-colors">
@@ -118,7 +118,7 @@ export function NewFooterSection() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Jogi</h4>
+            <h4 className="font-bold mb-4">Jogi</h4>
             <ul className="space-y-2 text-sm text-white/70">
               <li>
                 <Link href="/privacy" className="hover:text-white transition-colors">
@@ -133,7 +133,7 @@ export function NewFooterSection() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Kövess minket</h4>
+            <h4 className="font-bold mb-4">Kövess minket</h4>
             <div className="flex space-x-4">
               <a
                 href="#"

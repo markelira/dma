@@ -73,7 +73,7 @@ export function Hero1ConversionFocused({
 
   const getCourseTypeColor = (type?: string) => {
     switch (type) {
-      case 'ACADEMIA': return 'bg-blue-100 border-blue-300 text-blue-700';
+      case 'ACADEMIA': return 'bg-brand-secondary/10 border-brand-secondary/30 text-brand-secondary-hover';
       case 'WEBINAR': return 'bg-purple-100 border-purple-300 text-purple-700';
       case 'MASTERCLASS': return 'bg-teal-100 border-teal-300 text-teal-700';
       case 'PODCAST': return 'bg-green-100 border-green-300 text-green-700';
@@ -153,7 +153,7 @@ export function Hero1ConversionFocused({
               {shouldShowMore && (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                  className="flex items-center gap-1 text-sm font-medium text-brand-secondary hover:text-brand-secondary-hover transition-colors"
                 >
                   {isDescriptionExpanded ? (
                     <>
@@ -195,13 +195,13 @@ export function Hero1ConversionFocused({
                     />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                     {instructor.name.charAt(0)}
                   </div>
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-600">Oktató</p>
-                  <p className="font-semibold text-gray-900">{instructor.name}</p>
+                  <p className="font-bold text-gray-900">{instructor.name}</p>
                   {instructor.title && (
                     <p className="text-sm text-gray-600 truncate">{instructor.title}</p>
                   )}
@@ -219,7 +219,7 @@ export function Hero1ConversionFocused({
               )}
               {getCourseTypeLabel(courseType) && (
                 <div className="flex items-center gap-2">
-                  <div className={`px-2.5 py-1 rounded-md text-xs font-semibold ${getCourseTypeColor(courseType)}`}>
+                  <div className={`px-2.5 py-1 rounded-md text-xs font-bold ${getCourseTypeColor(courseType)}`}>
                     {getCourseTypeLabel(courseType)}
                   </div>
                 </div>
@@ -248,13 +248,13 @@ export function Hero1ConversionFocused({
                     <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
                     <button className="absolute inset-0 flex items-center justify-center group">
                       <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                        <Play className="w-7 h-7 text-blue-600 ml-1" />
+                        <Play className="w-7 h-7 text-brand-secondary ml-1" />
                       </div>
                     </button>
                   </div>
                 ) : (
-                  <div className="relative aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                    <BookOpen className="w-16 h-16 text-blue-400 opacity-40" />
+                  <div className="relative aspect-video bg-gradient-to-br from-brand-secondary/10 to-purple-100 flex items-center justify-center">
+                    <BookOpen className="w-16 h-16 text-brand-secondary opacity-40" />
                   </div>
                 )}
 
@@ -276,7 +276,7 @@ export function Hero1ConversionFocused({
                   {/* Primary CTA */}
                   <Button
                     onClick={onEnroll}
-                    className="w-full bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-xl text-white font-bold py-4 text-lg rounded-lg transition-all hover:scale-[1.02]"
+                    className="w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 hover:shadow-xl text-white font-bold py-4 text-lg rounded-lg transition-all hover:scale-[1.02]"
                   >
                     <Infinity className="w-5 h-5 mr-2" />
                     Beiratkozás most
@@ -301,7 +301,7 @@ export function Hero1ConversionFocused({
                       <span>30 napos pénzvisszafizetési garancia</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-gray-700">
-                      <Infinity className="w-5 h-5 text-blue-600" />
+                      <Infinity className="w-5 h-5 text-brand-secondary" />
                       <span>Élethosszig tartó hozzáférés</span>
                     </div>
                   </div>

@@ -138,7 +138,7 @@ export function CourseCompletionModal({
       <div className="relative z-10 w-full max-w-md mx-4 animate-in zoom-in-95 fade-in duration-300">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header with gradient */}
-          <div className="bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-600 px-6 py-8 text-center">
+          <div className="bg-gradient-to-br from-brand-secondary/50 via-brand-secondary to-indigo-600 px-6 py-8 text-center">
             {/* Success icon */}
             <div className="mx-auto w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 animate-in zoom-in duration-500 delay-150">
               <CheckCircle className="w-12 h-12 text-white" strokeWidth={2.5} />
@@ -151,7 +151,7 @@ export function CourseCompletionModal({
             >
               Gratulálunk! 🎉
             </h2>
-            <p className="text-blue-100 animate-in slide-in-from-bottom duration-500 delay-300">
+            <p className="text-brand-secondary-light animate-in slide-in-from-bottom duration-500 delay-300">
               Sikeresen befejezted a kurzust!
             </p>
           </div>
@@ -159,7 +159,7 @@ export function CourseCompletionModal({
           {/* Course title */}
           <div className="px-6 py-4 border-b border-gray-100">
             <p className="text-center text-gray-600 text-sm">Befejezett kurzus:</p>
-            <p className="text-center text-gray-900 font-semibold mt-1 line-clamp-2">
+            <p className="text-center text-gray-900 font-bold mt-1 line-clamp-2">
               {courseTitle}
             </p>
           </div>
@@ -168,7 +168,7 @@ export function CourseCompletionModal({
           <div className="p-6 space-y-3">
             <button
               onClick={handleGoToCourse}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors duration-200"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-medium rounded-xl transition-colors duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
               Vissza a kurzushoz

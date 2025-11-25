@@ -69,7 +69,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       title: 'Kurzusok böngészése',
       description: 'Fedezze fel 100+ szakmai kurzust',
       href: '/dashboard/browse',
-      color: 'bg-blue-600 hover:bg-blue-700',
+      color: 'bg-brand-secondary hover:bg-brand-secondary-hover',
       badge: 'Népszerű'
     },
     {
@@ -236,22 +236,22 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
               whileHover={{ y: -4 }}
             >
               <div className="flex items-start justify-between mb-4">
-                <div className={`w-12 h-12 rounded-lg ${action?.color || 'bg-blue-600'} flex items-center justify-center text-white group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 rounded-lg ${action?.color || 'bg-brand-secondary'} flex items-center justify-center text-white group-hover:scale-110 transition-transform`}>
                   {action?.icon}
                 </div>
                 {action?.badge && (
-                  <span className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                  <span className="text-xs px-2 py-1 bg-brand-secondary/5 text-brand-secondary rounded-full">
                     {action.badge}
                   </span>
                 )}
               </div>
-              <h3 className="font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-bold text-gray-900 mb-2 group-hover:text-brand-secondary transition-colors">
                 {action?.title}
               </h3>
               <p className="text-gray-500 text-sm mb-4">
                 {action?.description}
               </p>
-              <div className="flex items-center text-blue-600 text-sm font-medium group-hover:text-blue-700 transition-colors">
+              <div className="flex items-center text-brand-secondary text-sm font-medium group-hover:text-brand-secondary-hover transition-colors">
                 Kezdés
                 <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -267,7 +267,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
             <h2 className="text-2xl font-bold text-gray-900">Kiemelt Kurzusok</h2>
             <p className="text-gray-500 mt-1">A legkeresettebb tanulási lehetőségek</p>
           </div>
-          <Link href="/dashboard/browse" className="text-blue-600 hover:text-blue-700 font-medium flex items-center">
+          <Link href="/dashboard/browse" className="text-brand-secondary hover:text-brand-secondary-hover font-medium flex items-center">
             Összes megtekintése
             <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
@@ -300,7 +300,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                 <BookOpen className="w-8 h-8 text-gray-400" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Nincsenek elérhető kurzusok
                 </h3>
                 <p className="text-gray-500 text-sm">
@@ -364,7 +364,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                     whileHover={{ y: -4 }}
                   >
                     {/* Thumbnail */}
-                    <div className="aspect-video relative bg-gradient-to-br from-blue-500 to-blue-700 overflow-hidden">
+                    <div className="aspect-video relative bg-gradient-to-br from-brand-secondary/50 to-brand-secondary-hover overflow-hidden">
                       {courseData.thumbnail ? (
                         <img
                           src={courseData.thumbnail}
@@ -383,7 +383,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                     <div className="p-5 flex-1 flex flex-col">
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2 mb-3">
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded">
+                        <span className="px-2 py-0.5 bg-brand-secondary/5 text-brand-secondary text-xs font-medium rounded">
                           {typeof courseData.category === 'string' ? courseData.category : 'Kurzus'}
                         </span>
                         <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded">
@@ -392,7 +392,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                       </div>
 
                       {/* Title */}
-                      <h3 className="font-semibold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors mb-2">
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight line-clamp-2 group-hover:text-brand-secondary transition-colors mb-2">
                         {courseData.title}
                       </h3>
 
@@ -429,7 +429,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
                       </div>
 
                       {/* CTA Button */}
-                      <button className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg py-2.5 text-sm font-medium transition-colors shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30">
+                      <button className="w-full flex items-center justify-center gap-2 bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-lg py-2.5 text-sm font-medium transition-colors shadow-lg shadow-brand-secondary/20 hover:shadow-brand-secondary/30">
                         <span>Megtekintés</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>

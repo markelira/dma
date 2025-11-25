@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* World-class metrics section enhancements */
+@import './metrics-enhancement.css';
+
 @layer components {
   /* Landing page buttons */
   .btn,
@@ -33,7 +36,7 @@
   .form-textarea,
   .form-multiselect,
   .form-select {
-    @apply bg-white text-sm py-2.5 px-4 focus:border-blue-300;
+    @apply bg-white text-sm py-2.5 px-4 focus:border-dma-red;
   }
 
   .form-input,
@@ -47,7 +50,7 @@
 
   .form-checkbox,
   .form-radio {
-    @apply text-gray-800 checked:bg-blue-500 checked:border-transparent;
+    @apply text-gray-800 checked:bg-dma-red checked:border-transparent;
   }
 
   .form-checkbox {
@@ -86,6 +89,16 @@
   --brand-secondary-light: #ff4d58;
   --brand-secondary-rgb: 231, 43, 54;
 
+  /* Framer Token Compatibility Layer (for Framer components) */
+  --token-05a7cdfd-1e0f-43da-a9f6-b4623556492c: rgb(17, 24, 39); /* Text primary */
+  --token-08f2dbd6-30f3-4b80-b3ec-25d8f6146ee9: rgb(255, 255, 255); /* White bg */
+  --token-fd483edb-af45-4817-a4ca-cfb10641cc8b: rgb(107, 114, 128); /* Text secondary */
+  --token-70ee1060-3c83-4aa7-a752-6352a72d1a9b: rgb(231, 43, 54); /* DMA RED (replaces blue) */
+  --token-7e2cee24-41e3-44f2-9710-90e095fcc68d: rgb(229, 231, 235); /* Border primary */
+  --token-d0b7823d-e074-4a91-a0da-87403f8dd55f: rgb(249, 250, 251); /* Bg primary */
+  --token-acd56db7-abb6-41e1-9fd7-b3514fc00033: rgb(243, 244, 246); /* Bg tertiary */
+  --token-b63e5580-f724-4b9d-a88b-9db74b9d4550: rgb(156, 163, 175); /* Text tertiary */
+
   /* Elevation system for course player */
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
@@ -112,52 +125,54 @@
   --space-32: 8rem;
   --gap-layout: 1.5rem;
 
-  /* Font sizes */
-  --font-xs: 0.75rem;
-  --font-sm: 0.875rem;
-  --font-base: 1rem;
-  --font-md: 1.125rem;
-  --font-lg: 1.25rem;
-  --font-xl: 1.5rem;
-  --font-2xl: 1.875rem;
-  --font-3xl: 2.25rem;
-  --font-4xl: 3rem;
-  --font-5xl: 3.75rem;
+  /* Framer Typography Scale (exact px values) */
+  --font-xs: 14px;      /* Badges, small text */
+  --font-sm: 16px;      /* Body regular */
+  --font-base: 18px;    /* Body large (primary) */
+  --font-lg: 20px;      /* Large body */
+  --font-xl: 24px;      /* H3 */
+  --font-2xl: 30px;     /* H2 tablet */
+  --font-3xl: 36px;     /* H2 desktop */
+  --font-4xl: 48px;     /* H1 */
+  --font-5xl: 60px;     /* Display (if needed) */
 
-  /* Line heights */
-  --leading-tight: 1.25;
-  --leading-snug: 1.375;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.625;
+  /* Framer Line Height Ratios */
+  --leading-tight: 1.167;   /* Headings (36px → 42px) */
+  --leading-snug: 1.25;     /* Sub-headings (24px → 30px) */
+  --leading-normal: 1.333;  /* Body text (18px → 24px) */
+  --leading-relaxed: 1.429; /* Small text (14px → 20px) */
 
-  /* CoursePlayerRedesign exact color scheme */
-  --background: 0 0% 100%;
-  --foreground: 216 15% 7%; /* #0F1114 */
+  /* Framer Letter Spacing */
+  --letter-tight: -0.01em;  /* Universal Framer standard */
+
+  /* CoursePlayerRedesign exact color scheme (Framer-aligned) */
+  --background: 0 0% 100%; /* White - rgb(255, 255, 255) */
+  --foreground: 210 11% 15%; /* Dark text - rgb(17, 24, 39) from Framer */
   --card: 0 0% 100%;
-  --card-foreground: 216 15% 7%;
+  --card-foreground: 210 11% 15%;
   --popover: 0 0% 100%;
-  --popover-foreground: 216 15% 7%;
-  --primary: 215 100% 41%; /* #0056D2 - Coursera blue */
+  --popover-foreground: 210 11% 15%;
+  --primary: 358 79% 54%; /* DMA Red #E72B36 - replaces Coursera blue */
   --primary-foreground: 0 0% 100%;
-  --secondary: 216 100% 97%; /* #F0F6FF */
-  --secondary-foreground: 215 100% 41%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 216 100% 97%; /* #F0F6FF */
-  --accent-foreground: 215 100% 41%;
+  --secondary: 210 20% 98%; /* Light bg - rgb(249, 250, 251) from Framer */
+  --secondary-foreground: 358 79% 54%; /* DMA Red for secondary text */
+  --muted: 215 16% 47%; /* Muted text - rgb(107, 114, 128) from Framer */
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 20% 98%; /* Light bg from Framer */
+  --accent-foreground: 358 79% 54%; /* DMA Red */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
-  --border: 214.3 31.8% 91.4%;
-  --input: 214.3 31.8% 91.4%;
-  --ring: 215 100% 41%;
-  --sidebar: 0 0% 98%; /* Off-white #FAFAFA */
-  --sidebar-foreground: 216 15% 7%;
-  --sidebar-primary: 215 100% 41%;
+  --border: 220 13% 91%; /* rgb(229, 231, 235) from Framer border-primary */
+  --input: 220 13% 91%;
+  --ring: 358 79% 54%; /* DMA Red for focus rings */
+  --sidebar: 210 20% 98%; /* rgb(249, 250, 251) from Framer */
+  --sidebar-foreground: 210 11% 15%; /* Dark text from Framer */
+  --sidebar-primary: 358 79% 54%; /* DMA Red */
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 216 100% 97%;
-  --sidebar-accent-foreground: 215 100% 41%;
-  --sidebar-border: 220 13% 91%; /* #E4E7EB */
-  --sidebar-ring: 215 100% 41%;
+  --sidebar-accent: 210 20% 98%; /* Light bg from Framer */
+  --sidebar-accent-foreground: 358 79% 54%; /* DMA Red */
+  --sidebar-border: 220 13% 91%; /* rgb(229, 231, 235) from Framer */
+  --sidebar-ring: 358 79% 54%; /* DMA Red */
   --radius: 0.5rem; /* 8px */
   --font-sans: 'Source Sans Pro', 'Arial', sans-serif;
   --chart-1: 12 76% 61%;
@@ -185,17 +200,17 @@
   --info: 183 100% 28%;
   --info-foreground: 0 0% 100%;
 
-  /* Text color tokens */
-  --text-primary: 222.2 84% 4.9%;
-  --text-secondary: 215.4 16.3% 46.9%;
-  --text-muted: 215.4 16.3% 46.9%;
-  --text-disabled: 215.4 16.3% 46.9%;
+  /* Text color tokens (Framer-aligned) */
+  --text-primary: 210 11% 15%; /* rgb(17, 24, 39) - Framer text-primary */
+  --text-secondary: 215 16% 47%; /* rgb(107, 114, 128) - Framer text-secondary */
+  --text-muted: 220 9% 65%; /* rgb(156, 163, 175) - Framer text-tertiary */
+  --text-disabled: 220 9% 65%;
 
-  /* Background color tokens */
-  --bg-primary: 0 0% 100%;
-  --bg-secondary: 210 40% 96.1%;
-  --bg-muted: 210 40% 96.1%;
-  --bg-accent: 210 40% 96.1%;
+  /* Background color tokens (Framer-aligned) */
+  --bg-primary: 0 0% 100%; /* rgb(255, 255, 255) - Framer bg-secondary */
+  --bg-secondary: 210 20% 98%; /* rgb(249, 250, 251) - Framer bg-primary */
+  --bg-muted: 215 19% 96%; /* rgb(243, 244, 246) - Framer bg-tertiary */
+  --bg-accent: 215 19% 96%;
 
   /* Tertiary colors */
   --tertiary: 210 40% 96.1%;
@@ -427,11 +442,11 @@
   }
 
   .blog-content h3 {
-    @apply text-2xl md:text-3xl font-semibold text-gray-900 mt-10 mb-5 leading-tight;
+    @apply text-2xl md:text-3xl font-bold text-gray-900 mt-10 mb-5 leading-tight;
   }
 
   .blog-content h4 {
-    @apply text-xl md:text-2xl font-semibold text-gray-900 mt-8 mb-4;
+    @apply text-xl md:text-2xl font-bold text-gray-900 mt-8 mb-4;
   }
 
   .blog-content p {
@@ -455,7 +470,7 @@
   }
 
   .blog-content a {
-    @apply text-blue-600 hover:text-blue-800 underline transition-colors;
+    @apply text-dma-red hover:text-dma-red-hover underline transition-colors;
   }
 
   .blog-content blockquote {
@@ -672,44 +687,174 @@ body {
   font-size: 14px;
   line-height: 1.8;
   letter-spacing: 0.6px;
+  /* Framer OpenType features for enhanced Inter rendering */
+  font-feature-settings:
+    'cv03' 1,  /* Simplified g */
+    'cv04' 1,  /* Open digits */
+    'cv09' 1,  /* Curved r */
+    'cv11' 1,  /* Single-story a */
+    'blwf' 1;  /* Below-base forms */
 }
+
+/* ============================================
+   Framer Heading Styles (H1-H5)
+   ============================================ */
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-weight: 700;
-  line-height: 1.4;
+  font-weight: 700; /* Framer uses bold for all headings */
+  letter-spacing: -0.01em; /* Universal Framer standard */
 }
 
 /* Course Player Heading Font (using Inter to match project font) */
 .font-heading {
   font-family: var(--font-inter), 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
+/* H1 - 48px (4xl), bold 700, line-height 54px */
 h1 {
-  font-size: 23px;
-  letter-spacing: 0.6px;
+  font-size: 48px;
+  line-height: 54px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
+/* H2 - Responsive: 36px desktop → 30px tablet → 24px mobile */
 h2 {
-  font-size: 20px;
+  font-size: 36px;
+  line-height: 42px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
+@media (max-width: 1024px) {
+  h2 {
+    font-size: 30px;
+    line-height: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  h2 {
+    font-size: 24px;
+    line-height: 30px;
+  }
+}
+
+/* H3 - 24px (xl), bold 700, line-height 30px */
 h3 {
-  font-size: 18px;
+  font-size: 24px;
+  line-height: 30px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
-/* DMA Primary Button - Clean, Corporate, Minimalist */
+/* H4 - 20px (lg), bold 700, line-height 28px */
+h4 {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+/* H5 - Responsive: 16px desktop → 14px mobile */
+h5 {
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  h5 {
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
+/* H6 - 14px (xs), bold 700 */
+h6 {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+}
+
+/* ============================================
+   Framer Body Text Variants
+   ============================================ */
+
+/* Body Large - 18px, weight 400, line-height 24px (Primary body text) */
+.body-large {
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+/* Body Medium - 18px, weight 500, line-height 24px (Enhanced emphasis) */
+.body-medium {
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.01em;
+  font-weight: 500;
+}
+
+/* Body Regular - 16px, weight 400, line-height 22px (Secondary body) */
+.body-regular {
+  font-size: 16px;
+  line-height: 22px;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+/* Body Small - 14px, weight 400, line-height 20px (Captions, badges) */
+.body-small {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+}
+
+/* Inline Bold - weight 900 (for emphasis within paragraphs) */
+.inline-bold {
+  font-weight: 900;
+}
+
+/* ============================================
+   Framer Component Typography
+   ============================================ */
+
+/* Framer Button Typography - 16px, weight 500, line-height 22px */
+.btn-typography {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Framer Badge Typography - 14px, weight 400, line-height 20px */
+.badge-typography {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* DMA Primary Button - Clean, Corporate, Minimalist (Updated with Framer typography) */
 .btn-dma-primary {
   background-color: #2C3E54;
   color: #FFFFFF;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 500; /* Framer standard (was 600) */
+  line-height: 22px;
   border: none;
   border-radius: 8px;
   padding: 12px 32px;
   transition: all 0.2s ease;
-  letter-spacing: 0.5px;
+  letter-spacing: -0.01em; /* Framer standard (was 0.5px) */
 }
 
 .btn-dma-primary:hover {
@@ -796,3 +941,57 @@ h3 {
 .text-dma-navy-light {
   color: #E8EBF0;
 }
+
+/* ============================================
+   Framer-Style Responsive Utilities
+   ============================================ */
+
+/* Base: 0-319px */
+@media (min-width: 0px) and (max-width: 319px) {
+  .unframer-hidden:not(.unframer-base) {
+    display: none !important;
+  }
+}
+
+/* Small (sm): 320-767px */
+@media (min-width: 320px) and (max-width: 767px) {
+  .unframer-hidden:not(.unframer-sm) {
+    display: none !important;
+  }
+}
+
+/* Medium (md): 768-959px */
+@media (min-width: 768px) and (max-width: 959px) {
+  .unframer-hidden:not(.unframer-md) {
+    display: none !important;
+  }
+}
+
+/* Large (lg): 960-1199px */
+@media (min-width: 960px) and (max-width: 1199px) {
+  .unframer-hidden:not(.unframer-lg) {
+    display: none !important;
+  }
+}
+
+/* Extra Large (xl): 1200-1535px */
+@media (min-width: 1200px) and (max-width: 1535px) {
+  .unframer-hidden:not(.unframer-xl) {
+    display: none !important;
+  }
+}
+
+/* 2 Extra Large (2xl): 1536px+ */
+@media (min-width: 1536px) {
+  .unframer-hidden:not(.unframer-2xl) {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   Integrated Framer Component Utilities
+   ============================================ */
+
+/* Note: Framer design tokens have been integrated into existing
+   --text-primary, --text-secondary, --bg-primary, --border, etc.
+   No separate utility classes needed - use Tailwind with existing tokens */

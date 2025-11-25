@@ -68,7 +68,7 @@ export const ProgressRing: React.FC<ProgressRingProps> = ({
       </svg>
 
       {showLabel && (
-        <div className={`absolute inset-0 flex items-center justify-center ${config.fontSize} font-semibold`}>
+        <div className={`absolute inset-0 flex items-center justify-center ${config.fontSize} font-bold`}>
           <span style={{ color: progressColor }}>
             {Math.round(percentage)}%
           </span>

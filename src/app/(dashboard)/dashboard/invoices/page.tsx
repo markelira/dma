@@ -112,10 +112,10 @@ export default function InvoicesPage() {
       {invoices.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">
           <div className="flex flex-col items-center justify-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-50">
-              <FileText className="h-8 w-8 text-blue-600" />
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-secondary/5">
+              <FileText className="h-8 w-8 text-brand-secondary" />
             </div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            <h2 className="text-xl font-bold text-gray-900 mb-2">
               Még nincsenek fizetéseid
             </h2>
             <p className="text-gray-500 mb-6">
@@ -123,7 +123,7 @@ export default function InvoicesPage() {
             </p>
             <Link
               href="/courses"
-              className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+              className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary-hover transition-colors"
             >
               Tartalmak böngészése
             </Link>
@@ -182,7 +182,7 @@ export default function InvoicesPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-bold text-gray-900">
                           {formatAmount(invoice.amount, invoice.currency)}
                         </span>
                       </td>
@@ -206,7 +206,7 @@ export default function InvoicesPage() {
                         {invoice.invoicePdfUrl ? (
                           <button
                             onClick={() => window.open(invoice.invoicePdfUrl, '_blank')}
-                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm rounded-lg text-gray-700 bg-white hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm rounded-lg text-gray-700 bg-white hover:bg-brand-secondary/5 hover:text-brand-secondary hover:border-brand-secondary/30 transition-colors"
                           >
                             <Download className="h-4 w-4 mr-1" />
                             Számla
@@ -223,10 +223,10 @@ export default function InvoicesPage() {
           </div>
 
           {/* Info Card */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
             <div className="flex">
               <div className="flex-shrink-0">
-                <FileText className="h-5 w-5 text-blue-600" />
+                <FileText className="h-5 w-5 text-brand-secondary" />
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-gray-900 mb-1">

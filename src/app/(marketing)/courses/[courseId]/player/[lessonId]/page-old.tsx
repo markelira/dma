@@ -149,7 +149,7 @@ export default function PlayerPage() {
           </p>
           <button
             onClick={() => router.push('/courses')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-brand-secondary text-white rounded hover:bg-brand-secondary-hover transition-colors"
           >
             Vissza a kurzusokhoz
           </button>
@@ -167,7 +167,7 @@ export default function PlayerPage() {
           <p className="text-gray-300 mb-4">A kért lecke vagy kurzus nem érhető el.</p>
           <button
             onClick={() => router.push('/courses')}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+            className="px-4 py-2 bg-brand-secondary text-white rounded hover:bg-brand-secondary-hover transition-colors"
           >
             Vissza a kurzusokhoz
           </button>
@@ -218,8 +218,8 @@ export default function PlayerPage() {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-8 max-w-md mx-4 text-center shadow-2xl">
             <div className="mb-6">
-              <div className="w-20 h-20 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 rounded-full bg-brand-secondary/10 flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-brand-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -241,7 +241,7 @@ export default function PlayerPage() {
               </button>
               <button
                 onClick={() => router.push(`/courses/${courseId}/player/${nextLesson.id}`)}
-                className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                className="flex-1 px-4 py-3 bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-lg font-medium transition-colors"
               >
                 Indítás most
               </button>

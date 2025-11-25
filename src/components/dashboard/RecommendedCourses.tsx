@@ -30,12 +30,12 @@ export function RecommendedCourses() {
   return (
     <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+        <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
           Ajánlott kurzusok
         </h2>
         <Link
           href="/courses"
-          className="text-sm font-medium text-blue-400 hover:text-blue-300"
+          className="text-sm font-medium text-brand-secondary hover:text-brand-secondary-light"
         >
           Összes →
         </Link>
@@ -61,7 +61,7 @@ export function RecommendedCourses() {
               className="block rounded-lg border border-gray-800 p-4 transition-all hover:border-gray-700 hover:bg-gray-800/50"
             >
               {/* Course Title */}
-              <h3 className="font-semibold text-white text-sm mb-2 line-clamp-2">
+              <h3 className="font-bold text-white text-sm mb-2 line-clamp-2">
                 {course.title}
               </h3>
 
@@ -92,7 +92,7 @@ export function RecommendedCourses() {
               {/* Category Badge */}
               {course.category && (
                 <div className="mt-3">
-                  <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-900/30 text-blue-400 rounded">
+                  <span className="inline-block px-2 py-1 text-xs font-medium bg-brand-secondary-hover/30 text-brand-secondary rounded">
                     {course.category}
                   </span>
                 </div>

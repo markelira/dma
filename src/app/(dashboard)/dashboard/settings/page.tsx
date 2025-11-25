@@ -105,8 +105,8 @@ export default function SettingsPage() {
                 <div className="p-10 space-y-7">
                   {/* Profile Picture */}
                   <div className="flex items-center gap-5 pb-7 border-b border-gray-200">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                      <span className="text-white text-2xl font-semibold">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary/50 to-brand-secondary flex items-center justify-center">
+                      <span className="text-white text-2xl font-bold">
                         {firstName?.[0]?.toUpperCase() || 'U'}{lastName?.[0]?.toUpperCase() || ''}
                       </span>
                     </div>
@@ -126,7 +126,7 @@ export default function SettingsPage() {
                       id="firstName"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
                       placeholder="János"
                     />
                   </div>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
                       id="lastName"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
                       placeholder="Kovács"
                     />
                   </div>
@@ -170,7 +170,7 @@ export default function SettingsPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+36 30 123 4567"
-                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
                     />
                   </div>
                 </div>
@@ -184,7 +184,7 @@ export default function SettingsPage() {
                     id="bio"
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm text-gray-900 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-all text-sm text-gray-900 placeholder:text-gray-400"
                     rows={4}
                     placeholder="Írjon magáról pár mondatot..."
                   />
@@ -195,7 +195,7 @@ export default function SettingsPage() {
                   <Button
                     onClick={saveProfile}
                     disabled={profileSaving}
-                    className="bg-blue-600 hover:bg-blue-700 h-11 px-10 text-sm font-medium"
+                    className="bg-brand-secondary hover:bg-brand-secondary-hover h-11 px-10 text-sm font-medium"
                   >
                     {profileSaving ? (
                       <>

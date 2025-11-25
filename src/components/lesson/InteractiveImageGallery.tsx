@@ -551,7 +551,7 @@ export const InteractiveImageGallery: React.FC<Props> = ({
                 {currentImage.annotations.map((annotation) => (
                   <div
                     key={annotation.id}
-                    className="absolute border-2 border-blue-500 bg-blue-500/20 cursor-pointer hover:bg-blue-500/40 transition-colors"
+                    className="absolute border-2 border-brand-secondary bg-brand-secondary/50/20 cursor-pointer hover:bg-brand-secondary/50/40 transition-colors"
                     style={{
                       left: `${annotation.x}%`,
                       top: `${annotation.y}%`,
@@ -560,7 +560,7 @@ export const InteractiveImageGallery: React.FC<Props> = ({
                     }}
                     title={annotation.title}
                   >
-                    <div className="absolute -top-6 left-0 bg-blue-500 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    <div className="absolute -top-6 left-0 bg-brand-secondary/50 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
                       {annotation.title}
                     </div>
                   </div>
@@ -716,15 +716,15 @@ export const InteractiveImageGallery: React.FC<Props> = ({
 
           {/* Assessment question */}
           {currentImage.assessmentData?.isAssessment && currentImage.assessmentData.questionText && (
-            <Card className="mt-4 p-4 bg-blue-50 border-blue-200">
+            <Card className="mt-4 p-4 bg-brand-secondary/5 border-brand-secondary/20">
               <div className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium">
+                <div className="w-6 h-6 rounded-full bg-brand-secondary/50 text-white flex items-center justify-center text-sm font-medium">
                   ?
                 </div>
                 <div>
-                  <p className="font-medium text-blue-900">Assessment Question</p>
-                  <p className="text-blue-800 mt-1">{currentImage.assessmentData.questionText}</p>
-                  <p className="text-blue-700 text-sm mt-2">
+                  <p className="font-medium text-brand-secondary-hover">Assessment Question</p>
+                  <p className="text-brand-secondary-hover mt-1">{currentImage.assessmentData.questionText}</p>
+                  <p className="text-brand-secondary-hover text-sm mt-2">
                     Click on the correct areas in the image above to answer.
                   </p>
                 </div>
@@ -773,7 +773,7 @@ export const InteractiveImageGallery: React.FC<Props> = ({
               className={cn(
                 "flex-shrink-0 w-16 h-16 rounded border-2 overflow-hidden transition-all",
                 index === currentImageIndex 
-                  ? "border-blue-500 shadow-lg" 
+                  ? "border-brand-secondary shadow-lg" 
                   : "border-gray-200 hover:border-gray-300"
               )}
               onClick={() => selectImage(index)}

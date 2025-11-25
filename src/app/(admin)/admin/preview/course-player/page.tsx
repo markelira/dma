@@ -161,7 +161,7 @@ export default function CoursePlayerPreviewPage() {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4 mx-auto" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-secondary mb-4 mx-auto" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -184,7 +184,7 @@ export default function CoursePlayerPreviewPage() {
           </p>
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center gap-2 text-brand-secondary hover:text-brand-secondary-hover font-medium"
           >
             <ArrowLeftIcon size={20} />
             Vissza

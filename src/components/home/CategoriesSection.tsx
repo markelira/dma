@@ -111,7 +111,7 @@ export function CategoriesSection() {
         >
           <Link
             href="/courses"
-            className="inline-flex items-center justify-center px-8 py-4 bg-dma-navy text-white font-semibold rounded-full shadow-lg hover:bg-dma-navy-hover hover:shadow-xl hover:scale-105 transition-all duration-300"
+            className="inline-flex items-center justify-center px-8 py-4 bg-dma-navy text-white font-bold rounded-full shadow-lg hover:bg-dma-navy-hover hover:shadow-xl hover:scale-105 transition-all duration-300"
           >
             Összes kategória megtekintése
           </Link>

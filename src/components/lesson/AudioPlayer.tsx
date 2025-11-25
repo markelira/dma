@@ -234,11 +234,11 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
     <div className={`space-y-4 ${className}`}>
       <Card className="overflow-hidden">
         {/* Main Player */}
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6">
+        <div className="bg-gradient-to-br from-brand-secondary/5 to-purple-50 p-6">
           <div className="flex items-start gap-6">
             {/* Cover Image */}
             <div className="flex-shrink-0">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-400 rounded-lg flex items-center justify-center">
+              <div className="w-32 h-32 bg-gradient-to-br from-brand-secondary to-purple-400 rounded-lg flex items-center justify-center">
                 {coverImage ? (
                   <img src={coverImage} alt={title} className="w-full h-full object-cover rounded-lg" />
                 ) : (
@@ -373,7 +373,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         <Card className="p-4">
           <div className="flex items-center gap-2 mb-3">
             <ListMusic className="w-5 h-5 text-gray-600" />
-            <h4 className="font-semibold">Fejezetek</h4>
+            <h4 className="font-bold">Fejezetek</h4>
           </div>
           <div className="space-y-2">
             {chapters.map((chapter) => (
@@ -382,7 +382,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
                 onClick={() => jumpToChapter(chapter)}
                 className={`w-full text-left p-3 rounded-lg transition-colors ${
                   currentChapter?.id === chapter.id
-                    ? 'bg-blue-50 border-blue-200 border'
+                    ? 'bg-brand-secondary/5 border-brand-secondary/20 border'
                     : 'hover:bg-gray-50'
                 }`}
               >
@@ -412,7 +412,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
           >
             <div className="flex items-center gap-2">
               <FileAudio className="w-5 h-5 text-gray-600" />
-              <h4 className="font-semibold">Átírat</h4>
+              <h4 className="font-bold">Átírat</h4>
             </div>
             <Badge variant="secondary">
               {showTranscript ? 'Elrejtés' : 'Megjelenítés'}
@@ -434,7 +434,7 @@ export const AudioPlayer: React.FC<AudioPlayerProps> = ({
         <Card className="p-4 bg-gray-50">
           <div className="flex items-center gap-2 mb-3">
             <Activity className="w-5 h-5 text-gray-600" />
-            <h4 className="font-semibold text-sm">Audio Analytics</h4>
+            <h4 className="font-bold text-sm">Audio Analytics</h4>
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs">
             <div>

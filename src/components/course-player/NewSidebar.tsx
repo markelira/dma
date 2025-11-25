@@ -98,7 +98,7 @@ export function NewSidebar({
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-brand-secondary/50 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -119,10 +119,10 @@ export function NewSidebar({
                 className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors text-left"
               >
                 <div className="flex-1">
-                  <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                  <div className="text-xs font-bold text-brand-secondary uppercase tracking-wide mb-1">
                     {index + 1}. MODUL
                   </div>
-                  <div className="text-sm font-semibold text-gray-900">
+                  <div className="text-sm font-bold text-gray-900">
                     {module.title}
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export function NewSidebar({
                         onClick={() => onLessonClick(lesson.id)}
                         className={`w-full flex items-start gap-3 p-4 pl-6 text-left transition-colors ${
                           isCurrentLesson
-                            ? 'bg-blue-50 border-l-4 border-blue-500'
+                            ? 'bg-brand-secondary/5 border-l-4 border-brand-secondary'
                             : 'hover:bg-gray-100 border-l-4 border-transparent'
                         }`}
                       >
@@ -162,7 +162,7 @@ export function NewSidebar({
                           <div
                             className={`text-sm font-medium ${
                               isCurrentLesson
-                                ? 'text-blue-900'
+                                ? 'text-brand-secondary-hover'
                                 : isCompleted
                                 ? 'text-gray-700'
                                 : 'text-gray-900'

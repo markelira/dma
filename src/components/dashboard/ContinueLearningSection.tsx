@@ -75,7 +75,7 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
               <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 Szuper! Minden tartalmat teljesített!
               </h3>
               <p className="text-white/90 mb-6 max-w-md mx-auto">
@@ -173,7 +173,7 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
             {/* Course Info */}
             <div className="p-5 space-y-4">
               <div>
-                <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#466C95] transition-colors">
+                <h3 className="font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#466C95] transition-colors">
                   {course.title}
                 </h3>
                 <p className="text-sm text-gray-600">

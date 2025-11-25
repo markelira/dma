@@ -49,7 +49,7 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
         className="bg-white/40 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-lg"
       >
         <div className="text-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-bold text-gray-900">
             Fedezd fel a többi tartalom típust is
           </h3>
           <p className="text-sm text-gray-600 mt-1">
@@ -69,9 +69,9 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
                 text: 'text-purple-600'
               },
               blue: {
-                bg: 'from-blue-500 to-blue-600',
-                hover: 'hover:from-blue-600 hover:to-blue-700',
-                text: 'text-blue-600'
+                bg: 'from-brand-secondary/50 to-brand-secondary',
+                hover: 'hover:from-brand-secondary hover:to-brand-secondary-hover',
+                text: 'text-brand-secondary'
               },
               amber: {
                 bg: 'from-amber-500 to-amber-600',
@@ -98,7 +98,7 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h4 className={`text-base font-semibold ${colorClasses.text} group-hover:underline`}>
+                        <h4 className={`text-base font-bold ${colorClasses.text} group-hover:underline`}>
                           {config.label}
                         </h4>
                         <p className="text-xs text-gray-500 mt-0.5">

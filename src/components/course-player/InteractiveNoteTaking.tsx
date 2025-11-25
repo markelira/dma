@@ -141,12 +141,12 @@ export const InteractiveNoteTaking: React.FC<InteractiveNoteTakingProps> = ({
   return (
     <div className="space-y-4">
       {/* Quick Actions */}
-      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+      <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-brand-secondary/5 to-indigo-50 rounded-lg border border-brand-secondary/20">
         <Button
           variant="outline"
           size="sm"
           onClick={handleQuickBookmark}
-          className="flex items-center gap-2 bg-white hover:bg-blue-50"
+          className="flex items-center gap-2 bg-white hover:bg-brand-secondary/5"
         >
           <BookmarkPlus className="w-4 h-4" />
           Gyors könyvjelző
@@ -160,7 +160,7 @@ export const InteractiveNoteTaking: React.FC<InteractiveNoteTakingProps> = ({
           <Edit3 className="w-4 h-4" />
           Új jegyzet
         </Button>
-        <div className="ml-auto text-sm text-blue-700 font-medium">
+        <div className="ml-auto text-sm text-brand-secondary-hover font-medium">
           <Clock className="w-4 h-4 inline mr-1" />
           {formatTime(currentTime)}
         </div>
@@ -168,7 +168,7 @@ export const InteractiveNoteTaking: React.FC<InteractiveNoteTakingProps> = ({
 
       {/* New Note Form */}
       {showNewNoteForm && (
-        <Card className="border-blue-200">
+        <Card className="border-brand-secondary/20">
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-gray-900">Új jegyzet készítése</h3>
@@ -283,7 +283,7 @@ export const InteractiveNoteTaking: React.FC<InteractiveNoteTakingProps> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => onSeekTo?.(note.timestamp!)}
-                              className="p-1 h-auto text-xs text-blue-600 hover:text-blue-800"
+                              className="p-1 h-auto text-xs text-brand-secondary hover:text-brand-secondary-hover"
                             >
                               <Clock className="w-3 h-3 mr-1" />
                               {formatTime(note.timestamp)}

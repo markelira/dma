@@ -89,8 +89,8 @@ export const DynamicMetrics: React.FC = () => {
       label: 'Aktív diák',
       value: metrics?.totalUsers || 0,
       suffix: '+',
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50'
+      color: 'text-brand-secondary',
+      bgColor: 'bg-brand-secondary/5'
     },
     {
       icon: BookOpen,

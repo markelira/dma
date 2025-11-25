@@ -191,7 +191,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
 
           {/* Selected count */}
           {selectedLessons.size > 0 && (
-            <div className="bg-blue-50 text-blue-700 px-3 py-2 rounded-md text-sm">
+            <div className="bg-brand-secondary/5 text-brand-secondary-hover px-3 py-2 rounded-md text-sm">
               {selectedLessons.size} lecke kiválasztva
             </div>
           )}
@@ -228,7 +228,7 @@ export default function LessonImportModal({ open, onClose, excludeCourseId }: Pr
                             key={lesson.id}
                             className={`flex items-center gap-3 p-2 rounded-md cursor-pointer transition-colors ${
                               isLessonSelected(course.id, lesson.id)
-                                ? "bg-blue-50"
+                                ? "bg-brand-secondary/5"
                                 : "hover:bg-muted"
                             }`}
                             onClick={() => toggleLesson(course.id, course.title, lesson)}

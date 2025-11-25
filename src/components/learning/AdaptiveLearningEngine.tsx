@@ -266,7 +266,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
       case 'urgent': return 'bg-red-100 text-red-800 border-red-200'
       case 'high': return 'bg-orange-100 text-orange-800 border-orange-200'
       case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'low': return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/20'
       default: return 'bg-gray-100 text-gray-800 border-gray-200'
     }
   }
@@ -291,7 +291,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* AI Learning Assistant Header */}
-      <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
+      <Card className="bg-gradient-to-r from-purple-50 to-brand-secondary/5 border-purple-200">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Brain className="w-6 h-6 text-purple-600" />
@@ -311,7 +311,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
               <div className="text-xs text-gray-600">Elkötelezettség</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-brand-secondary">
                 {Math.round(learningAnalytics.focusScore)}%
               </div>
               <div className="text-xs text-gray-600">Fókusz</div>
@@ -378,7 +378,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
                 <Badge className={
                   learningProfile.learningSpeed === 'fast' ? 'bg-green-100 text-green-800' :
                   learningProfile.learningSpeed === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-blue-100 text-blue-800'
+                  'bg-brand-secondary/10 text-brand-secondary-hover'
                 }>
                   {learningProfile.learningSpeed === 'fast' && 'Gyors'}
                   {learningProfile.learningSpeed === 'medium' && 'Közepes'}
@@ -390,7 +390,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
                 <span className="text-sm text-gray-600">Szint:</span>
                 <Badge className={
                   learningProfile.comprehensionLevel === 'advanced' ? 'bg-purple-100 text-purple-800' :
-                  learningProfile.comprehensionLevel === 'intermediate' ? 'bg-blue-100 text-blue-800' :
+                  learningProfile.comprehensionLevel === 'intermediate' ? 'bg-brand-secondary/10 text-brand-secondary-hover' :
                   'bg-green-100 text-green-800'
                 }>
                   {learningProfile.comprehensionLevel === 'advanced' && 'Haladó'}
@@ -450,7 +450,7 @@ export const AdaptiveLearningEngine: React.FC<AdaptiveLearningEngineProps> = ({
                   rec.priority === 'urgent' ? 'border-l-red-500' :
                   rec.priority === 'high' ? 'border-l-orange-500' :
                   rec.priority === 'medium' ? 'border-l-yellow-500' :
-                  'border-l-blue-500'
+                  'border-l-brand-secondary'
                 }`}>
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">

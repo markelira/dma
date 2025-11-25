@@ -273,7 +273,7 @@ export default function FirebaseVideoUploader({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Film className="h-5 w-5 text-primary" />
-              <h3 className="font-semibold">Videó feltöltése</h3>
+              <h3 className="font-bold">Videó feltöltése</h3>
             </div>
             {status === 'done' && videoUrl && (
               <CheckCircle className="h-5 w-5 text-green-500" />
@@ -382,7 +382,7 @@ export default function FirebaseVideoUploader({
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <FileVideo className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Előnézeti kép (opcionális)</h3>
+            <h3 className="font-bold">Előnézeti kép (opcionális)</h3>
           </div>
 
           {!thumbnailUrl ? (

@@ -58,7 +58,7 @@ export function BentoCard({ children, className, colSpan = 1, rowSpan = 1 }: Ben
       )}
     >
       {/* Gradient hover effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-secondary/50/0 via-purple-500/0 to-pink-500/0 group-hover:from-brand-secondary/50/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 transition-all duration-500" />
 
       {/* Content */}
       <div className="relative z-10">

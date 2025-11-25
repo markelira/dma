@@ -22,7 +22,7 @@ const DEFAULT_ACTIONS: QuickAction[] = [
     label: 'Kurzusok böngészése',
     icon: BookOpen,
     href: '/courses',
-    color: 'bg-blue-600/20 text-blue-400 hover:bg-blue-600/30',
+    color: 'bg-brand-secondary/20 text-brand-secondary hover:bg-brand-secondary/30',
   },
   {
     label: 'Tanulás folytatása',
@@ -59,7 +59,7 @@ export function QuickActions({
 
   return (
     <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
-      <h2 className="mb-4 text-sm font-semibold text-gray-400 uppercase tracking-wide">
+      <h2 className="mb-4 text-sm font-bold text-gray-400 uppercase tracking-wide">
         Gyors műveletek
       </h2>
 

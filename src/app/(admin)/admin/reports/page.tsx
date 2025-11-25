@@ -112,7 +112,7 @@ export default function AdminReportsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge className="bg-blue-100 text-blue-700">Nyitott</Badge>
+        return <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">Nyitott</Badge>
       case 'in-progress':
         return <Badge className="bg-yellow-100 text-yellow-700">Folyamatban</Badge>
       case 'resolved':
@@ -133,7 +133,7 @@ export default function AdminReportsPage() {
       case 'normal':
         return <Badge className="bg-gray-100 text-gray-700">Normál</Badge>
       case 'low':
-        return <Badge className="bg-blue-100 text-blue-700">Alacsony</Badge>
+        return <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">Alacsony</Badge>
       default:
         return <Badge className="bg-gray-100 text-gray-700">Normál</Badge>
     }
@@ -295,9 +295,9 @@ export default function AdminReportsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Nyitott</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.open}</p>
+                  <p className="text-2xl font-bold text-brand-secondary">{stats.open}</p>
                 </div>
-                <AlertCircle className="w-8 h-8 text-blue-400" />
+                <AlertCircle className="w-8 h-8 text-brand-secondary" />
               </div>
             </CardContent>
           </Card>
@@ -426,7 +426,7 @@ export default function AdminReportsPage() {
                           <span className="text-xs font-mono text-gray-500">#{ticket.id.slice(-6).toUpperCase()}</span>
                           {getPriorityBadge(ticket.priority)}
                         </div>
-                        <h4 className="font-semibold text-gray-900 text-sm mb-1 line-clamp-1">
+                        <h4 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">
                           {ticket.subject}
                         </h4>
                         <p className="text-xs text-gray-600 mb-2">
@@ -472,7 +472,7 @@ export default function AdminReportsPage() {
                         <User className="w-5 h-5 text-teal-600" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900">
+                        <h4 className="font-bold text-gray-900">
                           {selectedTicket.userName}
                         </h4>
                         <div className="flex items-center gap-4 text-sm text-gray-600">
@@ -491,7 +491,7 @@ export default function AdminReportsPage() {
 
                   {/* Original Message */}
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-bold text-gray-900 mb-2">
                       Eredeti üzenet
                     </h4>
                     <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -504,14 +504,14 @@ export default function AdminReportsPage() {
                   {/* Responses */}
                   {selectedTicket.responses && selectedTicket.responses.length > 0 && (
                     <div>
-                      <h4 className="font-semibold text-gray-900 mb-2">
+                      <h4 className="font-bold text-gray-900 mb-2">
                         Válaszok ({selectedTicket.responses.length})
                       </h4>
                       <div className="space-y-3">
                         {selectedTicket.responses.map((response, index) => (
                           <div key={index} className="bg-teal-50 rounded-lg p-4">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-semibold text-teal-700">
+                              <span className="font-bold text-teal-700">
                                 {response.adminName}
                               </span>
                               <span className="text-xs text-gray-500">
@@ -529,7 +529,7 @@ export default function AdminReportsPage() {
 
                   {/* Admin Actions */}
                   <div className="border-t pt-4">
-                    <h4 className="font-semibold text-gray-900 mb-3">
+                    <h4 className="font-bold text-gray-900 mb-3">
                       Admin műveletek
                     </h4>
                     
@@ -574,7 +574,7 @@ export default function AdminReportsPage() {
               <Card className="h-[600px] flex items-center justify-center">
                 <div className="text-center">
                   <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">
                     Válassz egy jegyet
                   </h3>
                   <p className="text-gray-600">

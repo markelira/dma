@@ -112,10 +112,10 @@ export function ContinueCoursePreview() {
           Tanulás folytatása
         </h2>
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
-            <BookOpen className="h-8 w-8 text-blue-600" />
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-secondary/5">
+            <BookOpen className="h-8 w-8 text-brand-secondary" />
           </div>
-          <p className="mb-2 text-sm font-semibold text-gray-900">
+          <p className="mb-2 text-sm font-bold text-gray-900">
             Nincs folyamatban lévő kurzusod
           </p>
           <p className="mb-6 text-sm text-gray-500">
@@ -123,7 +123,7 @@ export function ContinueCoursePreview() {
           </p>
           <Link
             href="/courses"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 rounded-lg bg-brand-secondary px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-secondary-hover transition-colors"
           >
             Kurzusok böngészése
             <ChevronRight className="h-4 w-4" />
@@ -143,7 +143,7 @@ export function ContinueCoursePreview() {
           </h2>
           <Link
             href="/dashboard/courses"
-            className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+            className="text-sm font-bold text-brand-secondary hover:text-brand-secondary-hover transition-colors"
           >
             Összes →
           </Link>
@@ -170,14 +170,14 @@ export function ContinueCoursePreview() {
               />
             ) : (
               /* Fallback content when thumbnail doesn't exist */
-              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-700">
+              <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-secondary to-brand-secondary-hover">
                 <BookOpen className="h-16 w-16 text-white/80" />
               </div>
             )}
 
             {/* Play Overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 via-black/30 to-transparent hover:from-black/70 hover:via-black/40 transition-all duration-300 group/play">
-              <div className="flex h-18 w-18 items-center justify-center rounded-full bg-blue-600/90 backdrop-blur-sm shadow-xl group-hover/play:scale-110 transition-transform duration-300">
+              <div className="flex h-18 w-18 items-center justify-center rounded-full bg-brand-secondary/90 backdrop-blur-sm shadow-xl group-hover/play:scale-110 transition-transform duration-300">
                 <Play className="h-9 w-9 text-white fill-white ml-1" />
               </div>
             </div>
@@ -186,7 +186,7 @@ export function ContinueCoursePreview() {
             <div className="absolute bottom-0 left-0 right-0">
               <div className="w-full bg-gray-200/80 h-1">
                 <div
-                  className="bg-blue-500 h-1 transition-all duration-300"
+                  className="bg-brand-secondary/50 h-1 transition-all duration-300"
                   style={{ width: `${currentCourse.progress}%` }}
                 />
               </div>
@@ -216,7 +216,7 @@ export function ContinueCoursePreview() {
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-brand-secondary/50 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${currentCourse.progress}%` }}
                   />
                 </div>
@@ -241,7 +241,7 @@ export function ContinueCoursePreview() {
           {/* CTA Button */}
           <Link
             href={playerUrl}
-            className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3.5 text-sm font-bold text-white hover:bg-blue-700 transition-all duration-300 w-full shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+            className="flex items-center justify-center gap-2 rounded-lg bg-brand-secondary px-6 py-3.5 text-sm font-bold text-white hover:bg-brand-secondary-hover transition-all duration-300 w-full shadow-lg shadow-brand-secondary/20 hover:shadow-brand-secondary/30"
           >
             <Play className="h-5 w-5" />
             Tanulás folytatása

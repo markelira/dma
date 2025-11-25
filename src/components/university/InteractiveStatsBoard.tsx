@@ -81,7 +81,7 @@ function StatCard({
           )}
         </div>
         
-        <h3 className="font-semibold text-gray-900">{title}</h3>
+        <h3 className="font-bold text-gray-900">{title}</h3>
         <p className="text-sm text-gray-600">{subtitle}</p>
       </div>
 
@@ -131,8 +131,8 @@ export function InteractiveStatsBoard({ stats, universityName }: InteractiveStat
             title="Felkapott programok"
             value={stats.trendingPrograms?.length || 5}
             subtitle="népszerű szak idén"
-            color="bg-gradient-to-br from-blue-500 to-blue-600"
-            bgColor="bg-blue-50"
+            color="bg-gradient-to-br from-brand-secondary/50 to-brand-secondary"
+            bgColor="bg-brand-secondary/5"
             trend="up"
             trendValue="+23%"
             details={stats.trendingPrograms || [

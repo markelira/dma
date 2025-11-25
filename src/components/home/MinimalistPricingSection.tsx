@@ -76,7 +76,7 @@ export function MinimalistPricingSection() {
             >
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-semibold">
+                  <span className="bg-primary text-white px-4 py-1 rounded-full text-sm font-bold">
                     Legnépszerűbb
                   </span>
                 </div>
@@ -124,7 +124,7 @@ export function MinimalistPricingSection() {
                     plan.popular
                       ? 'bg-primary hover:bg-primary/90'
                       : 'bg-gray-900 hover:bg-gray-800'
-                  } text-white font-semibold py-6 text-base rounded-lg`}
+                  } text-white font-bold py-6 text-base rounded-lg`}
                   onClick={() => router.push('/register')}
                 >
                   Kezdd el most
@@ -139,7 +139,7 @@ export function MinimalistPricingSection() {
           <Button
             variant="outline"
             size="lg"
-            className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-8 py-6 text-base rounded-lg"
+            className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-6 text-base rounded-lg"
             onClick={() => router.push('/pricing')}
           >
             Részletes árazás

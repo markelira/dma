@@ -105,7 +105,7 @@ export const AllVariants: Story = {
   render: () => (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Default Variant</h3>
+        <h3 className="text-lg font-bold mb-4">Default Variant</h3>
         <div className="space-y-2">
           <Heading level={1} variant="default">Default H1</Heading>
           <Heading level={2} variant="default">Default H2</Heading>
@@ -114,7 +114,7 @@ export const AllVariants: Story = {
       </div>
       
       <div>
-        <h3 className="text-lg font-semibold mb-4">Display Variant</h3>
+        <h3 className="text-lg font-bold mb-4">Display Variant</h3>
         <div className="space-y-2">
           <Heading level={1} variant="display">Display H1</Heading>
           <Heading level={2} variant="display">Display H2</Heading>
@@ -123,7 +123,7 @@ export const AllVariants: Story = {
       </div>
       
       <div>
-        <h3 className="text-lg font-semibold mb-4">Section Variant</h3>
+        <h3 className="text-lg font-bold mb-4">Section Variant</h3>
         <div className="space-y-2">
           <Heading level={1} variant="section">Section H1</Heading>
           <Heading level={2} variant="section">Section H2</Heading>
@@ -132,7 +132,7 @@ export const AllVariants: Story = {
       </div>
       
       <div>
-        <h3 className="text-lg font-semibold mb-4">Subtitle Variant</h3>
+        <h3 className="text-lg font-bold mb-4">Subtitle Variant</h3>
         <div className="space-y-2">
           <Heading level={1} variant="subtitle">Subtitle H1</Heading>
           <Heading level={2} variant="subtitle">Subtitle H2</Heading>

@@ -504,7 +504,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
 
       {/* Marketing Section */}
       <div className="border-t pt-6 mt-6">
-        <h3 className="text-lg font-semibold mb-4">Marketing tartalom</h3>
+        <h3 className="text-lg font-bold mb-4">Marketing tartalom</h3>
 
         {/* What You'll Learn - Type-specific label */}
         <div className="space-y-2 mb-6">

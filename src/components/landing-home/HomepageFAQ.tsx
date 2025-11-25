@@ -22,34 +22,34 @@ export default function HomepageFAQ() {
 
   const faqs: FAQItem[] = [
     {
-      question: "Tényleg 7 napig teljesen ingyen van?",
+      question: "Miben más a DMA, mint a Coursera vagy az Udemy?",
       answer:
-        "Igen! Kipróbálhatod a platformot teljes hozzáféréssel 7 napig, kártyaadat megadása nélkül. Nincs rejtett költség, csak tiszta tudás.",
+        "A DMA nem általános online tartalmakat kínál. Minden anyagunk a Vállalati Térkép módszertanra épül – egy 20 éve fejlesztett, 50+ cégnél bizonyított rendszerre. Nem inspirációt kapsz, hanem konkrét keretrendszereket, amiket azonnal alkalmazhatsz.",
     },
     {
-      question: "Mi történik a próbaidőszak után?",
+      question: "Tényleg ingyen kipróbálhatom 7 napig?",
       answer:
-        "Ha úgy döntesz, hogy folytatod, előfizethetsz havi 15 000 Ft-ért. Ha nem tetszik, egyszerűen nem csinálsz semmit - nincs automatikus terhelés.",
+        "Igen, teljes hozzáféréssel. Nem kell bankkártya, nincs automatikus terhelés. Ha nem tetszik, egyszerűen nem csinálsz semmit – nem fogunk zaklatni.",
     },
     {
-      question: "Bármikor lemondhatom az előfizetést?",
+      question: "Mennyi időt igényel?",
       answer:
-        "Természetesen! Nincs hosszú távú kötöttség vagy előfizetési időszak. Bármikor leállíthatod az előfizetést egyetlen kattintással a fiókbeállításokban.",
+        "Te döntöd el. Egy webinár 90 perc. Egy akadémia 10-20 szekció, amit a saját tempódban végezhetsz. A podcastokat útközben hallgathatod. Nincs határidő, nincs nyomás.",
     },
     {
-      question: "Milyen típusú kurzusok vannak a platformon?",
+      question: "Egyénként és cégként is használhatom?",
       answer:
-        "Három típusú tanulási formát kínálunk: Akadémiák (többrészes, átfogó képzések), Webináriumok (egyszeri, témafókuszú előadások), és Mesterkurzusok (haladó szintű, mélyreható programok).",
+        "Igen. Egyéni előfizetéssel a saját fejlődésedre koncentrálhatsz. Céges előfizetéssel a teljes csapatod hozzáférést kap, te pedig látod a haladásukat és az eredményeket.",
     },
     {
-      question: "Kapok tanúsítványt a kurzus befejezése után?",
+      question: "Mi van, ha nem tetszik?",
       answer:
-        "Igen! Minden befejezett kurzushoz professzionális tanúsítványt kapsz, amelyet megoszthatál munkáltatókkal, partnerekkel vagy a LinkedIn profilodon.",
+        "A 7 napos próba után bármikor lemondhatsz egyetlen kattintással. Nincs hosszú távú elköteleződés, nincs rejtett költség. Ha úgy érzed, nem neked való – nincs harag.",
     },
     {
-      question: "Mennyi ideig férhetek hozzá a kurzusokhoz?",
+      question: "Kapok tanúsítványt?",
       answer:
-        "Amíg aktív előfizetéssel rendelkezel, korlátlan hozzáférésed van az összes kurzushoz. Saját tempódban tanulhatsz, bármikor visszanézheted a leckéket.",
+        "Igen, minden befejezett akadémiához és mesterkurzushoz. A tanúsítványt megoszthatod LinkedInen, munkáltatókkal vagy ügyfelekkel. A webinárokhoz és podcastokhoz nem jár tanúsítvány.",
     },
   ];
 
@@ -66,7 +66,7 @@ export default function HomepageFAQ() {
             Gyakran ismételt kérdések
           </h2>
           <p className="text-lg text-gray-600 md:text-xl">
-            Minden, amit tudnod kell az indulás előtt
+            Mielőtt elkezded
           </p>
         </div>
 
@@ -82,11 +82,11 @@ export default function HomepageFAQ() {
                 className="flex w-full items-center justify-between gap-4 p-6 text-left transition-colors hover:bg-white/80"
                 aria-expanded={openIndex === index}
               >
-                <span className="text-lg font-semibold text-gray-900">
+                <span className="text-lg font-bold text-gray-900">
                   {faq.question}
                 </span>
                 <ChevronDown
-                  className={`h-5 w-5 flex-shrink-0 text-blue-600 transition-transform duration-300 ${
+                  className={`h-5 w-5 flex-shrink-0 text-brand-secondary transition-transform duration-300 ${
                     openIndex === index ? "rotate-180" : ""
                   }`}
                 />
@@ -107,7 +107,7 @@ export default function HomepageFAQ() {
 
         {/* Bottom Contact CTA */}
         <div
-          className="mt-12 rounded-2xl bg-gradient-to-br from-blue-50/80 to-purple-50/80 p-8 text-center backdrop-blur-xl border border-white/20"
+          className="mt-12 rounded-2xl bg-gradient-to-br from-brand-secondary/5/80 to-purple-50/80 p-8 text-center backdrop-blur-xl border border-white/20"
           data-aos="fade-up"
           data-aos-delay="200"
         >
@@ -119,7 +119,7 @@ export default function HomepageFAQ() {
           </p>
           <a
             href="mailto:info@dma.hu"
-            className="inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-3 font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="inline-flex items-center rounded-lg bg-gradient-to-r from-brand-secondary to-brand-secondary/50 px-6 py-3 font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
           >
             Kapcsolatfelvétel
             <span className="ml-2">→</span>

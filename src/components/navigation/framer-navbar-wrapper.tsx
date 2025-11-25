@@ -153,7 +153,7 @@ export function FramerNavbarWrapper() {
                       closeMobileMenu()
                     }}
                     size="lg"
-                    className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-lg font-medium transition-all duration-200 min-h-[44px]"
+                    className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-sm font-medium transition-all duration-200 min-h-[44px]"
                   >
                     Kijelentkezés
                   </Button>
@@ -161,7 +161,7 @@ export function FramerNavbarWrapper() {
                   <Link href="/login" onClick={closeMobileMenu}>
                     <Button
                       size="lg"
-                      className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-lg font-medium transition-all duration-200 min-h-[44px]"
+                      className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-sm font-medium transition-all duration-200 min-h-[44px]"
                     >
                       Bejelentkezés
                     </Button>

@@ -543,7 +543,7 @@ export const UnifiedLessonPlayer: React.FC<Props> = ({
                   key={content.id}
                   className={cn(
                     "p-3 cursor-pointer transition-all",
-                    isCurrent && "ring-2 ring-blue-500 bg-blue-50",
+                    isCurrent && "ring-2 ring-brand-secondary bg-brand-secondary/5",
                     isCompleted && "bg-green-50 border-green-200",
                     isLocked && "opacity-50 cursor-not-allowed"
                   )}
@@ -554,7 +554,7 @@ export const UnifiedLessonPlayer: React.FC<Props> = ({
                       {isCompleted ? (
                         <CheckCircle className="w-5 h-5 text-green-600" />
                       ) : isCurrent ? (
-                        <Play className="w-5 h-5 text-blue-600" />
+                        <Play className="w-5 h-5 text-brand-secondary" />
                       ) : isLocked ? (
                         <AlertCircle className="w-5 h-5 text-gray-400" />
                       ) : (
@@ -610,7 +610,7 @@ export const UnifiedLessonPlayer: React.FC<Props> = ({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-brand-secondary h-2 rounded-full transition-all duration-300"
                   style={{ width: `${calculateOverallProgress()}%` }}
                 />
               </div>
@@ -732,7 +732,7 @@ export const UnifiedLessonPlayer: React.FC<Props> = ({
               <div className="flex items-center gap-2">
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-brand-secondary h-2 rounded-full transition-all duration-300"
                     style={{ width: `${calculateOverallProgress()}%` }}
                   />
                 </div>

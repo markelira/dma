@@ -55,8 +55,8 @@ const iconMap: Record<string, React.ComponentType<any>> = {
 const categoryDetails: CategoryStats = {
   'Karrier': {
     color: 'from-primary to-primary',
-    bgColor: 'bg-blue-50',
-    textColor: 'text-blue-700',
+    bgColor: 'bg-brand-secondary/5',
+    textColor: 'text-brand-secondary-hover',
     enrollmentCount: 0,
     courseCount: 0,
     averageRating: 0
@@ -264,7 +264,7 @@ export const CourseCategories: React.FC = () => {
                         <Icon className={`w-6 h-6 ${stats.textColor}`} />
                       </div>
                       <div>
-                        <h3 className="text-xl font-semibold text-gray-900">
+                        <h3 className="text-xl font-bold text-gray-900">
                           {category.name}
                         </h3>
                         <p className="text-sm text-gray-600">

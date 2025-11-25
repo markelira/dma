@@ -18,7 +18,7 @@ export const LessonSidebar: React.FC<Props> = ({ courseId, modules, currentLesso
     <aside className="w-full md:w-64 border-r bg-gray-50 h-full overflow-y-auto p-4 space-y-4">
       {modules.sort((a,b)=>a.order-b.order).map(module => (
         <div key={module.id} className="">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">{module.title}</h3>
+          <h3 className="text-sm font-bold text-gray-700 mb-2">{module.title}</h3>
           <ul className="space-y-1">
             {module.lessons.sort((a,b)=>a.order-b.order).map(lesson => {
               const locked = !hasSubscription && (module.status === 'PAID' || (module as any).subscriptionTier === 'PREMIUM')

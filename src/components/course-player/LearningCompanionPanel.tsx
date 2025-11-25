@@ -221,7 +221,7 @@ export const LearningCompanionPanel: React.FC<LearningCompanionPanelProps> = ({
                   />
                 </div>
               </div>
-              <span className="ml-3 text-sm font-semibold" style={{ color: playerColors.success }}>
+              <span className="ml-3 text-sm font-bold" style={{ color: playerColors.success }}>
                 {courseProgress}%
               </span>
             </div>

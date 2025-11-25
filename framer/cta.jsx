@@ -540,7 +540,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-2512d5c3-fb46-42ef-a96a-5b1cd92b4a5b, rgb(255, 255, 255)))",
 												}}
 											>
-												{"Transform How Teams Work Together"}
+												{"Készen állsz építeni?"}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -568,7 +568,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-2f970c4a-d681-4f67-b8e7-fc961b216d69, rgba(255, 255, 255, 0.8)))",
 												}}
 											>
-												{"Join thousands of teams already using TaskFlow"}
+												{"Próbáld ki 7 napig ingyen. Teljes hozzáférés, nincs bankkártya, nincs kötelezettség."}
 											</motion.p>
 										</React.Fragment>
 									</RichText>
@@ -624,7 +624,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											id: "R7xrpyUQ0",
 											idYdcR9Dy: "https://framer.com/r/signup",
 											layoutId: "R7xrpyUQ0",
-											sK45rfg_7: "Get Started Free",
+											sK45rfg_7: "Ingyenes próba indítása →",
 											variant: "LMljE2NbK",
 											width: "100%",
 											...addPropertyOverrides(

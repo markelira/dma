@@ -66,7 +66,7 @@ export default function HelpPage() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <HelpCircle className="w-6 h-6 text-blue-600" />
+          <HelpCircle className="w-6 h-6 text-brand-secondary" />
           <h1 className="text-3xl font-bold text-gray-900">
             Segítség
           </h1>
@@ -82,8 +82,8 @@ export default function HelpPage() {
         {/* Contact Support Cards */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <Mail className="w-8 h-8 text-blue-600 mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <Mail className="w-8 h-8 text-brand-secondary mb-3" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               E-mail támogatás
             </h3>
             <p className="text-sm text-gray-500 mb-4">
@@ -99,14 +99,14 @@ export default function HelpPage() {
           </div>
 
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <MessageCircle className="w-8 h-8 text-blue-600 mb-3" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <MessageCircle className="w-8 h-8 text-brand-secondary mb-3" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Élő chat
             </h3>
             <p className="text-sm text-gray-500 mb-4">
               Beszéljen egy támogatási munkatárssal
             </p>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full bg-brand-secondary hover:bg-brand-secondary-hover">
               Chat indítása
             </Button>
           </div>
@@ -150,15 +150,15 @@ export default function HelpPage() {
         </div>
 
         {/* Additional Resources */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-3">
+        <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-3">
             Nem találja amit keres?
           </h3>
           <p className="text-gray-600 mb-4">
             Látogasson el a teljes tudásbázisunkba, ahol részletes útmutatókat és videókat talál
             a platform használatához.
           </p>
-          <Button variant="outline" className="border-blue-300 text-blue-600 hover:bg-blue-100">
+          <Button variant="outline" className="border-brand-secondary/30 text-brand-secondary hover:bg-brand-secondary/10">
             Tudásbázis megtekintése
           </Button>
         </div>

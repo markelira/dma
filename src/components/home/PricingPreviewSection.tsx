@@ -72,7 +72,7 @@ export function PricingPreviewSection() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <span className="inline-block px-4 py-2 bg-gray-50 text-primary rounded-full text-sm font-semibold mb-4">
+          <span className="inline-block px-4 py-2 bg-gray-50 text-primary rounded-full text-sm font-bold mb-4">
             Egyszerű árazás
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
@@ -102,7 +102,7 @@ export function PricingPreviewSection() {
                 {/* Popular Badge */}
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="bg-gray-500 text-white px-4 py-1 text-xs font-semibold">
+                    <Badge className="bg-gray-500 text-white px-4 py-1 text-xs font-bold">
                       Legnépszerűbb
                     </Badge>
                   </div>
@@ -111,7 +111,7 @@ export function PricingPreviewSection() {
                 {/* Premium Badge */}
                 {plan.premium && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-1 text-xs font-semibold">
+                    <Badge className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-1 text-xs font-bold">
                       Legjobb érték
                     </Badge>
                   </div>
@@ -120,7 +120,7 @@ export function PricingPreviewSection() {
                 <Card
                   className={`h-full ${
                     plan.popular
-                      ? 'border-blue-300 shadow-xl scale-105'
+                      ? 'border-brand-secondary/30 shadow-xl scale-105'
                       : plan.premium
                       ? 'border-purple-300 shadow-lg'
                       : 'border-gray-200'
@@ -132,7 +132,7 @@ export function PricingPreviewSection() {
                       <div
                         className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                           plan.color === 'blue'
-                            ? 'bg-blue-100'
+                            ? 'bg-brand-secondary/10'
                             : plan.color === 'purple'
                             ? 'bg-purple-100'
                             : 'bg-gray-100'
@@ -141,7 +141,7 @@ export function PricingPreviewSection() {
                         <Icon
                           className={`w-6 h-6 ${
                             plan.color === 'blue'
-                              ? 'text-blue-600'
+                              ? 'text-brand-secondary'
                               : plan.color === 'purple'
                               ? 'text-purple-600'
                               : 'text-gray-600'
@@ -168,7 +168,7 @@ export function PricingPreviewSection() {
                         <Badge
                           variant="secondary"
                           className={`text-xs ${
-                            plan.premium ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                            plan.premium ? 'bg-purple-100 text-purple-700' : 'bg-brand-secondary/10 text-brand-secondary-hover'
                           }`}
                         >
                           Spórolj {formatPrice(plan.savings)} ({plan.savingsPercent}%)
@@ -192,7 +192,7 @@ export function PricingPreviewSection() {
                         plan.popular || plan.premium
                           ? 'bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary'
                           : 'bg-gray-900 hover:bg-gray-800'
-                      } text-white font-semibold py-6 text-base`}
+                      } text-white font-bold py-6 text-base`}
                       onClick={() => router.push('/register')}
                     >
                       Kezdd el most
@@ -215,7 +215,7 @@ export function PricingPreviewSection() {
           <Button
             variant="outline"
             size="lg"
-            className="group border-2 border-primary text-primary hover:bg-gray-50 font-semibold px-8 py-6 text-base"
+            className="group border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-base"
             onClick={() => router.push('/pricing')}
           >
             Részletes árazás megtekintése

@@ -252,7 +252,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/objectives"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes megtekintése</span>
+                    <span className="font-bold">Az összes megtekintése</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -286,7 +286,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/categories"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes megtekintése</span>
+                    <span className="font-bold">Az összes megtekintése</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -320,7 +320,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/courses?sort=new"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes új tartalom</span>
+                    <span className="font-bold">Az összes új tartalom</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -354,7 +354,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     href="/courses?sort=popular"
                     className="flex items-center justify-between p-4 rounded-lg hover:bg-white/15 transition-all duration-200 hover:scale-[1.01] group bg-white/5"
                   >
-                    <span className="font-semibold">Az összes népszerű tartalom</span>
+                    <span className="font-bold">Az összes népszerű tartalom</span>
                     <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>

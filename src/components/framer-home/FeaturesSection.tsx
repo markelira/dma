@@ -81,7 +81,7 @@ export default function FeaturesSection() {
               </p>
               <Link
                 href="/courses"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-semibold rounded-full hover:bg-gray-100 transition-colors w-fit"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-colors w-fit"
               >
                 Kezdd el most
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -172,7 +172,7 @@ export default function FeaturesSection() {
                 >
                   <div className="p-6">
                     <div className="text-5xl mb-4">{card.image}</div>
-                    <p className="text-white font-semibold">{card.title}</p>
+                    <p className="text-white font-bold">{card.title}</p>
                   </div>
                 </motion.div>
               ))}

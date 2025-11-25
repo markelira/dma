@@ -22,7 +22,7 @@ export function PlatformPreview() {
             <div className="w-full h-full bg-gradient-to-br from-dma-navy to-dma-navy-hover flex items-center justify-center">
               <div className="text-white text-center p-8">
                 <div className="text-6xl mb-4">📚</div>
-                <h3 className="text-xl font-semibold mb-2">DMA Platform</h3>
+                <h3 className="text-xl font-bold mb-2">DMA Platform</h3>
                 <p className="text-sm opacity-80">Tartalom előnézet</p>
               </div>
             </div>
@@ -37,7 +37,7 @@ export function PlatformPreview() {
                 M
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-bold text-gray-900 truncate">
                   Marketing Alapok
                 </p>
                 <p className="text-xs text-gray-500">75% kész</p>
@@ -53,7 +53,7 @@ export function PlatformPreview() {
                 D
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-bold text-gray-900 truncate">
                   Design Masterclass
                 </p>
                 <p className="text-xs text-gray-500">Új</p>

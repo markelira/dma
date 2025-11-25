@@ -38,7 +38,7 @@ export function CourseraNavbar() {
               <div className="w-8 h-8 bg-coursera-blue rounded flex items-center justify-center">
                 <span className="text-white font-bold text-lg">C</span>
               </div>
-              <span className="ml-2 text-xl font-semibold text-coursera-text-primary">
+              <span className="ml-2 text-xl font-bold text-coursera-text-primary">
                 Coursera
               </span>
             </div>
@@ -115,7 +115,7 @@ export function CourseraNavbar() {
             </Link>
             <Link
               href="/register"
-              className="px-4 py-2 text-sm font-semibold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors"
+              className="px-4 py-2 text-sm font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors"
             >
               Join for Free
             </Link>
@@ -169,7 +169,7 @@ export function CourseraNavbar() {
                 </Link>
                 <Link
                   href="/register"
-                  className="block px-4 py-2 text-sm font-semibold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover text-center"
+                  className="block px-4 py-2 text-sm font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover text-center"
                 >
                   Join for Free
                 </Link>

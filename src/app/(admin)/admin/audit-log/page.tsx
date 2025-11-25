@@ -142,7 +142,7 @@ export default function AdminAuditLogPage() {
     // Course actions
     if (action.includes('CREATE_COURSE')) return 'text-green-500';
     if (action.includes('PUBLISH_COURSE')) return 'text-emerald-400';
-    if (action.includes('UPDATE_COURSE')) return 'text-blue-400';
+    if (action.includes('UPDATE_COURSE')) return 'text-brand-secondary';
     if (action.includes('DELETE_COURSE')) return 'text-red-500';
     if (action.includes('ENROLL_COURSE')) return 'text-indigo-400';
     
@@ -150,7 +150,7 @@ export default function AdminAuditLogPage() {
     if (action.includes('CREATE_TICKET')) return 'text-purple-400';
     if (action.includes('ADMIN_RESPOND_TICKET')) return 'text-yellow-400';
     if (action.includes('CLOSE_TICKET')) return 'text-orange-400';
-    if (action.includes('UPDATE_TICKET')) return 'text-blue-300';
+    if (action.includes('UPDATE_TICKET')) return 'text-brand-secondary-light';
     
     // Payment actions
     if (action.includes('PAYMENT')) return 'text-green-400';
@@ -158,7 +158,7 @@ export default function AdminAuditLogPage() {
     
     // Generic CRUD actions
     if (action.includes('CREATE')) return 'text-green-400';
-    if (action.includes('UPDATE')) return 'text-blue-400';
+    if (action.includes('UPDATE')) return 'text-brand-secondary';
     if (action.includes('DELETE')) return 'text-red-400';
     
     return 'text-gray-400';
@@ -327,10 +327,10 @@ export default function AdminAuditLogPage() {
                     className="flex items-start gap-2 hover:bg-gray-900/50 px-2 py-1 rounded group"
                   >
                     <span className="text-gray-600">{formatted.timestamp}</span>
-                    <span className={cn('font-semibold', getSeverityColor(log.severity))}>
+                    <span className={cn('font-bold', getSeverityColor(log.severity))}>
                       {formatted.severity}
                     </span>
-                    <span className={cn('font-semibold', getActionColor(log.action))}>
+                    <span className={cn('font-bold', getActionColor(log.action))}>
                       {formatted.action}
                     </span>
                     <span className="text-cyan-400">{formatted.user}</span>
@@ -352,14 +352,14 @@ export default function AdminAuditLogPage() {
       <Card className="p-4">
         <div className="flex flex-wrap gap-6 text-xs">
           <div className="flex items-center gap-2">
-            <span className="font-semibold">Severity:</span>
+            <span className="font-bold">Severity:</span>
             <span className="text-green-500">● LOW</span>
             <span className="text-yellow-500">● MEDIUM</span>
             <span className="text-orange-500">● HIGH</span>
             <span className="text-red-500">● CRITICAL</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-semibold">Actions:</span>
+            <span className="font-bold">Actions:</span>
             <span className="text-cyan-400">● LOGIN</span>
             <span className="text-green-500">● COURSE</span>
             <span className="text-purple-400">● TICKET</span>

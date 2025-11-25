@@ -27,7 +27,7 @@ export function MobileBottomTabs({
           onClick={() => onTabChange('video')}
           className={`flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
             activeTab === 'video'
-              ? 'text-blue-600 bg-blue-50 border-t-2 border-blue-600'
+              ? 'text-brand-secondary bg-brand-secondary/5 border-t-2 border-brand-secondary'
               : 'text-gray-600 border-t-2 border-transparent'
           }`}
         >
@@ -40,7 +40,7 @@ export function MobileBottomTabs({
           onClick={() => onTabChange('lessons')}
           className={`flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
             activeTab === 'lessons'
-              ? 'text-blue-600 bg-blue-50 border-t-2 border-blue-600'
+              ? 'text-brand-secondary bg-brand-secondary/5 border-t-2 border-brand-secondary'
               : 'text-gray-600 border-t-2 border-transparent'
           }`}
         >

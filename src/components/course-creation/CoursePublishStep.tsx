@@ -180,7 +180,7 @@ export default function CoursePublishStep({ courseId, onPublish, isPublishing, i
               disabled={isPublishing || isPublished}
               variant="gradient"
               size="xl"
-              className="px-8 py-3 text-lg font-semibold"
+              className="px-8 py-3 text-lg font-bold"
             >
               {isPublishing ? "Publikálás..." : isPublished ? "Publikálva" : "TARTALOM PUBLIKÁLÁSA"}
             </Button>

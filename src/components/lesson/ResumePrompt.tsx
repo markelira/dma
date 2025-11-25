@@ -60,7 +60,7 @@ const getTypeColor = (type: string) => {
     case 'TEXT': 
     case 'READING': return 'text-green-600 bg-green-50 border-green-200'
     case 'PDF': return 'text-orange-600 bg-orange-50 border-orange-200'
-    case 'QUIZ': return 'text-blue-600 bg-blue-50 border-blue-200'
+    case 'QUIZ': return 'text-brand-secondary bg-brand-secondary/5 border-brand-secondary/20'
     default: return 'text-gray-600 bg-gray-50 border-gray-200'
   }
 }

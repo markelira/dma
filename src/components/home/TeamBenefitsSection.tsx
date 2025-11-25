@@ -46,7 +46,7 @@ export function TeamBenefitsSection() {
             transition={{ duration: 0.6 }}
           >
             <div>
-              <div className="inline-flex items-center space-x-2 bg-dma-red/10 text-dma-red px-4 py-2 rounded-full text-sm font-semibold mb-4">
+              <div className="inline-flex items-center space-x-2 bg-dma-red/10 text-dma-red px-4 py-2 rounded-full text-sm font-bold mb-4">
                 <span>Csapatfunkciók</span>
               </div>
               <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
@@ -73,7 +73,7 @@ export function TeamBenefitsSection() {
                     {feature.icon}
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">
                       {feature.title}
                     </h3>
                     <p className="text-gray-600">{feature.description}</p>
@@ -95,7 +95,7 @@ export function TeamBenefitsSection() {
               {/* Team Dashboard Mockup */}
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
                     Csapat áttekintés
                   </h3>
                   <div className="space-y-3">
@@ -104,7 +104,7 @@ export function TeamBenefitsSection() {
                         key={i}
                         className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                       >
-                        <div className="w-10 h-10 bg-gradient-to-br from-dma-navy to-dma-navy-light rounded-full flex items-center justify-center text-white font-semibold">
+                        <div className="w-10 h-10 bg-gradient-to-br from-dma-navy to-dma-navy-light rounded-full flex items-center justify-center text-white font-bold">
                           {i}
                         </div>
                         <div className="flex-1">

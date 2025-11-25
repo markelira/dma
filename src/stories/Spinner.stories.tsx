@@ -224,7 +224,7 @@ export const PageLoading: Story = {
     <div className="min-h-[200px] flex items-center justify-center">
       <div className="text-center">
         <Spinner size="lg" className="mx-auto mb-4" />
-        <h3 className="text-lg font-semibold mb-2">Loading Page</h3>
+        <h3 className="text-lg font-bold mb-2">Loading Page</h3>
         <p className="text-muted-foreground">Please wait while we prepare your content...</p>
       </div>
     </div>

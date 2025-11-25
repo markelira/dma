@@ -93,7 +93,7 @@ export function DashboardChart({
     <div className="rounded-lg bg-white p-6 shadow-sm border border-gray-200">
       {/* Header with Period Selector */}
       <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">
+        <h2 className="text-lg font-bold text-gray-900">
           Tanulási idő alakulása
         </h2>
 
@@ -101,7 +101,7 @@ export function DashboardChart({
         <select
           value={selectedPeriod}
           onChange={(e) => handlePeriodChange(e.target.value as 'month' | 'week' | 'year')}
-          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+          className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-colors"
         >
           <option value="week">Hét</option>
           <option value="month">Hónap</option>

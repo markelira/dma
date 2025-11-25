@@ -42,12 +42,12 @@ export function CourseStatsBar({
               transition={{ delay: 0.1 }}
               className="flex items-center gap-3"
             >
-              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-secondary" />
               </div>
               <div>
                 <p className="text-xs text-gray-500">{courseLabel}</p>
-                <p className="text-2xl font-semibold text-gray-900">{totalCourses}</p>
+                <p className="text-2xl font-bold text-gray-900">{totalCourses}</p>
               </div>
             </motion.div>
 
@@ -63,7 +63,7 @@ export function CourseStatsBar({
               </div>
               <div>
                 <p className="text-xs text-gray-500">Kategóriák</p>
-                <p className="text-2xl font-semibold text-gray-900">{categoriesCount}</p>
+                <p className="text-2xl font-bold text-gray-900">{categoriesCount}</p>
               </div>
             </motion.div>
 
@@ -79,7 +79,7 @@ export function CourseStatsBar({
               </div>
               <div>
                 <p className="text-xs text-gray-500">Találatok</p>
-                <p className="text-2xl font-semibold text-gray-900">{filteredCount}</p>
+                <p className="text-2xl font-bold text-gray-900">{filteredCount}</p>
               </div>
             </motion.div>
           </div>

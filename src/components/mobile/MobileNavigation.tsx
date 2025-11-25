@@ -20,7 +20,7 @@ export const MobileNavigation = () => {
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50">
           <div className="bg-white h-full w-64 p-4">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-semibold">Menü</h2>
+              <h2 className="text-lg font-bold">Menü</h2>
               <Button 
                 variant="ghost" 
                 size="sm"

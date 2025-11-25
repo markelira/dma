@@ -67,7 +67,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
     console.error('❌ [LessonContentRenderer] No lesson data provided');
     return (
       <div className="p-6 text-center">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Lecke betöltése...</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Lecke betöltése...</h2>
         <p className="text-gray-600">Egy pillanat, a lecke tartalmát töltük...</p>
       </div>
     );
@@ -77,7 +77,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
     console.error('❌ [LessonContentRenderer] Lesson missing type field:', lesson);
     return (
       <div className="p-6 text-center">
-        <h2 className="text-xl font-semibold text-red-600 mb-2">Hiba a lecke betöltésekor</h2>
+        <h2 className="text-xl font-bold text-red-600 mb-2">Hiba a lecke betöltésekor</h2>
         <p className="text-gray-600">A lecke formátuma érvénytelen. Kérjük próbálja újra később.</p>
         <p className="text-sm text-gray-500 mt-2">Hiba: Hiányzó típus információ</p>
       </div>
@@ -175,7 +175,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto">
             <BookOpen className="w-8 h-8 text-gray-400" />
           </div>
-          <h3 className="text-xl font-semibold text-gray-900">Korlátozott hozzáférés</h3>
+          <h3 className="text-xl font-bold text-gray-900">Korlátozott hozzáférés</h3>
           <p className="text-gray-600 max-w-md">
             Ez a lecke csak előfizetőknek érhető el. Vásárolja meg a kurzust a teljes tartalom eléréséhez.
           </p>
@@ -192,7 +192,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
       case 'VIDEO':
         return { icon: Play, color: 'text-red-500 bg-red-50', label: 'Videó lecke' }
       case 'QUIZ':
-        return { icon: Award, color: 'text-blue-500 bg-blue-50', label: 'Kvíz' }
+        return { icon: Award, color: 'text-white0 bg-brand-secondary/5', label: 'Kvíz' }
       case 'TEXT':
         return { icon: FileText, color: 'text-green-500 bg-green-50', label: 'Szöveges tartalom' }
       case 'READING':
@@ -290,19 +290,19 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
             {/* Reading Assessment */}
             {lesson.quiz && (
               <div className="bg-white rounded-lg border p-6">
-                <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div className="bg-brand-secondary/5 border-l-4 border-brand-secondary p-4 mb-6">
                   <div className="flex items-center">
-                    <BookOpen className="w-5 h-5 text-blue-400 mr-2" />
-                    <h3 className="text-lg font-medium text-blue-800">Értelmező kérdések</h3>
+                    <BookOpen className="w-5 h-5 text-brand-secondary mr-2" />
+                    <h3 className="text-lg font-medium text-brand-secondary-hover">Értelmező kérdések</h3>
                   </div>
-                  <p className="text-blue-700 text-sm mt-1">
+                  <p className="text-brand-secondary-hover text-sm mt-1">
                     Most, hogy elolvasta a szöveget, válaszoljon az alábbi kérdésekre.
                   </p>
                 </div>
 
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold">Kvíz</h3>
+                    <h3 className="text-lg font-bold">Kvíz</h3>
                     <p className="text-sm text-gray-600">
                       {lesson.quiz.questions.length} kérdés • {lesson.quiz.passingScore}% szükséges a teljesítéshez
                     </p>
@@ -321,8 +321,8 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
         {lesson.type === 'QUIZ' && (
           <div className="p-8">
             <div className="text-center space-y-6">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                <Award className="w-10 h-10 text-blue-600" />
+              <div className="w-20 h-20 bg-brand-secondary/10 rounded-full flex items-center justify-center mx-auto">
+                <Award className="w-10 h-10 text-brand-secondary" />
               </div>
               
               <div>
@@ -336,15 +336,15 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
                 <div className="bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">{lesson.quiz.questions.length}</div>
+                      <div className="font-bold text-gray-900">{lesson.quiz.questions.length}</div>
                       <div className="text-gray-500">Kérdés</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">{lesson.quiz.passingScore}%</div>
+                      <div className="font-bold text-gray-900">{lesson.quiz.passingScore}%</div>
                       <div className="text-gray-500">Átmenő</div>
                     </div>
                     <div className="text-center">
-                      <div className="font-semibold text-gray-900">
+                      <div className="font-bold text-gray-900">
                         {lesson.quiz.timeLimitMinutes || '∞'}
                       </div>
                       <div className="text-gray-500">Perc</div>
@@ -407,7 +407,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
           ) : (
             <div className="p-8 text-center">
               <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">PDF dokumentum nem érhető el</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">PDF dokumentum nem érhető el</h3>
               <p className="text-gray-600">A PDF fájl még nincs feltöltve ehhez a leckéhez.</p>
             </div>
           )
@@ -439,7 +439,7 @@ export const LessonContentRenderer: React.FC<LessonContentRendererProps> = ({
           ) : (
             <div className="p-8 text-center">
               <Volume2 className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Hanganyag nem érhető el</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Hanganyag nem érhető el</h3>
               <p className="text-gray-600">Az audio fájl még nincs feltöltve ehhez a leckéhez.</p>
             </div>
           )

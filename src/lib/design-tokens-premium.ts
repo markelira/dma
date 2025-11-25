@@ -57,9 +57,9 @@ export const glassMorphism = {
 
 // Typography Scale
 export const typography = {
-  h1: 'text-5xl lg:text-7xl font-semibold leading-tight',
-  h2: 'text-4xl lg:text-5xl font-semibold leading-tight',
-  h3: 'text-2xl font-semibold leading-tight',
+  h1: 'text-5xl lg:text-7xl font-bold leading-tight',
+  h2: 'text-4xl lg:text-5xl font-bold leading-tight',
+  h3: 'text-2xl font-bold leading-tight',
   h4: 'text-xl font-bold',
   body: 'text-base lg:text-lg leading-relaxed',
   small: 'text-sm leading-relaxed',

@@ -60,8 +60,8 @@ export const LessonOverviewTab: React.FC<LessonOverviewTabProps> = ({ lesson, co
             {lesson?.objectives && (
               <div className="mb-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <Target className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Tanulási célok</h3>
+                  <Target className="w-5 h-5 text-brand-secondary" />
+                  <h3 className="text-lg font-bold text-gray-900">Tanulási célok</h3>
                 </div>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                   {lesson.objectives.map((objective: string, index: number) => (
@@ -74,8 +74,8 @@ export const LessonOverviewTab: React.FC<LessonOverviewTabProps> = ({ lesson, co
             {lesson?.keyPoints && (
               <div>
                 <div className="flex items-center gap-2 mb-3">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">Kulcsfontosságú pontok</h3>
+                  <BookOpen className="w-5 h-5 text-brand-secondary" />
+                  <h3 className="text-lg font-bold text-gray-900">Kulcsfontosságú pontok</h3>
                 </div>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                   {lesson.keyPoints.map((point: string, index: number) => (

@@ -54,7 +54,7 @@ export function Hero2ImmersiveStorytelling({
 
   const getCourseTypeColor = (type?: string) => {
     switch (type) {
-      case 'ACADEMIA': return 'bg-blue-100/20 border-blue-300/30 text-blue-100';
+      case 'ACADEMIA': return 'bg-brand-secondary/10/20 border-brand-secondary/30/30 text-brand-secondary-light';
       case 'WEBINAR': return 'bg-purple-100/20 border-purple-300/30 text-purple-100';
       case 'MASTERCLASS': return 'bg-teal-100/20 border-teal-300/30 text-teal-100';
       case 'PODCAST': return 'bg-green-100/20 border-green-300/30 text-green-100';
@@ -80,7 +80,7 @@ export function Hero2ImmersiveStorytelling({
             priority
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900"></div>
+          <div className="w-full h-full bg-gradient-to-br from-gray-900 via-brand-secondary-hover to-purple-900"></div>
         )}
 
         {/* Gradient Overlay */}
@@ -88,7 +88,7 @@ export function Hero2ImmersiveStorytelling({
 
         {/* Animated Blur Shapes */}
         <motion.div
-          className="pointer-events-none absolute top-20 right-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"
+          className="pointer-events-none absolute top-20 right-20 w-96 h-96 bg-brand-secondary/50/20 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3],
@@ -156,12 +156,12 @@ export function Hero2ImmersiveStorytelling({
                     />
                   </div>
                 ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white/20">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white/20">
                     {instructor.name.charAt(0)}
                   </div>
                 )}
                 <div className="text-center">
-                  <p className="text-2xl font-semibold text-white">{instructor.name}</p>
+                  <p className="text-2xl font-bold text-white">{instructor.name}</p>
                   {instructor.title && (
                     <p className="text-sm text-white/80 mt-1">{instructor.title}</p>
                   )}

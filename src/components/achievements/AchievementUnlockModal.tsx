@@ -17,7 +17,7 @@ const TIER_COLORS = {
   bronze: 'from-amber-700 to-amber-900',
   silver: 'from-gray-400 to-gray-600',
   gold: 'from-yellow-400 to-yellow-600',
-  platinum: 'from-cyan-400 to-blue-600',
+  platinum: 'from-cyan-400 to-brand-secondary',
 };
 
 export function AchievementUnlockModal({
@@ -224,7 +224,7 @@ export function AchievementUnlockModal({
                   >
                     <button
                       onClick={onClose}
-                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all"
+                      className="w-full py-3 bg-gradient-to-r from-brand-secondary to-purple-600 hover:from-brand-secondary-hover hover:to-purple-700 text-white font-medium rounded-lg transition-all"
                     >
                       Nagyszerű!
                     </button>

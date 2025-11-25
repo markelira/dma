@@ -430,7 +430,7 @@ export const VideoPlayer: React.FC<Props> = ({
             {bookmarks.map((bookmark) => (
               <div
                 key={bookmark.id}
-                className="absolute top-0 w-1 h-2 bg-blue-400 rounded-full cursor-pointer transform -translate-y-1 hover:scale-125 transition-transform"
+                className="absolute top-0 w-1 h-2 bg-brand-secondary rounded-full cursor-pointer transform -translate-y-1 hover:scale-125 transition-transform"
                 style={{
                   left: `${(bookmark.timestamp / duration) * 100}%`
                 }}
@@ -455,7 +455,7 @@ export const VideoPlayer: React.FC<Props> = ({
       {showResumePrompt && resumePosition && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/80 z-20">
           <div className="bg-white rounded-lg p-6 max-w-sm mx-4 text-center">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Folytatás ott, ahol abbahagytad?
             </h3>
             <p className="text-gray-600 mb-6">
@@ -470,7 +470,7 @@ export const VideoPlayer: React.FC<Props> = ({
               </button>
               <button
                 onClick={handleResume}
-                className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                className="flex-1 px-4 py-2 bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-lg font-medium transition-colors"
               >
                 Folytatás
               </button>

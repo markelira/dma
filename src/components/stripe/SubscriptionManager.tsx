@@ -130,7 +130,7 @@ export function SubscriptionManager() {
     <div className="space-y-6">
       <div className="flex items-center space-x-2">
         <CreditCard className="h-5 w-5" />
-        <h2 className="text-lg font-semibold">Előfizetések kezelése</h2>
+        <h2 className="text-lg font-bold">Előfizetések kezelése</h2>
       </div>
 
       <div className="space-y-4">

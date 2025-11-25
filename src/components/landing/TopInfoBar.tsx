@@ -117,21 +117,21 @@ export const TopInfoBar: React.FC = () => {
         <div className="flex items-center space-x-2">
           <Sparkles className="w-5 h-5 text-yellow-400" />
           <span className="text-gray-800 font-medium">{courseCount.toLocaleString()} Tartalom</span>
-          <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">Új</span>
+          <span className="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">Új</span>
         </div>
         <div className="flex items-center space-x-2">
           <GraduationCap className="w-5 h-5 text-green-500" />
           <span className="text-gray-800 font-medium">{universityCount} Egyetem</span>
-          <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">Új</span>
+          <span className="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">Új</span>
         </div>
         <div className="flex items-center space-x-2">
           <Building className="w-5 h-5 text-primary" />
           <span className="text-gray-800 font-medium">{companyCount} Vállalat</span>
-          <span className="bg-primary text-white text-xs font-semibold px-2 py-0.5 rounded-full">Új</span>
+          <span className="bg-primary text-white text-xs font-bold px-2 py-0.5 rounded-full">Új</span>
         </div>
         <a
           href="#"
-          className="ml-2 bg-gradient-to-r from-primary-light to-primary-dark text-white px-4 py-1.5 rounded-full text-sm font-semibold hover:opacity-90 transition-all"
+          className="ml-2 bg-gradient-to-r from-primary-light to-primary-dark text-white px-4 py-1.5 rounded-full text-sm font-bold hover:opacity-90 transition-all"
         >
           Infó: első 2 modul ingyenesen kipróbálható az összes tartalomnál!
         </a>

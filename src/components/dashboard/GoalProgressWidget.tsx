@@ -42,14 +42,14 @@ export function GoalProgressWidget({
     return (
       <div className="rounded-xl bg-[#1a1a1a] p-6 border border-gray-800">
         <div className="text-center py-4">
-          <div className="w-16 h-16 bg-blue-600/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Target className="w-8 h-8 text-blue-400" />
+          <div className="w-16 h-16 bg-brand-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Target className="w-8 h-8 text-brand-secondary" />
           </div>
-          <h3 className="font-semibold mb-2 text-white">Állíts be tanulási célt</h3>
+          <h3 className="font-bold mb-2 text-white">Állíts be tanulási célt</h3>
           <p className="text-sm text-gray-400 mb-4">
             Tűzz ki heti tanulási időt és kövesd a haladásod
           </p>
-          <button onClick={onCreateGoal} className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+          <button onClick={onCreateGoal} className="inline-flex items-center gap-2 px-4 py-2 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary-hover transition-colors">
             <Plus className="w-4 h-4" />
             Cél létrehozása
           </button>
@@ -93,13 +93,13 @@ export function GoalProgressWidget({
       onMouseLeave={() => setIsHovering(false)}
     >
       {/* Background Decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-brand-secondary/50/10 to-purple-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
 
       {/* Header */}
       <div className="flex items-center justify-between mb-6 relative">
         <div className="flex items-center gap-2">
-          <Target className="w-5 h-5 text-blue-400" />
-          <h3 className="font-semibold text-white">{goal.title}</h3>
+          <Target className="w-5 h-5 text-brand-secondary" />
+          <h3 className="font-bold text-white">{goal.title}</h3>
         </div>
         {onEditGoal && (
           <button
@@ -149,7 +149,7 @@ export function GoalProgressWidget({
             transition={{ duration: 0.3 }}
             className="text-center"
           >
-            <div className="text-3xl font-bold text-blue-400">
+            <div className="text-3xl font-bold text-brand-secondary">
               {progressPercentage.toFixed(0)}%
             </div>
             <div className="text-xs text-gray-500 mt-1">
@@ -162,7 +162,7 @@ export function GoalProgressWidget({
       {/* Status Message */}
       <div
         className={`text-center mb-4 font-medium ${
-          isCompleted ? 'text-green-400' : 'text-blue-400'
+          isCompleted ? 'text-green-400' : 'text-brand-secondary'
         }`}
       >
         {getMessage()}
@@ -194,7 +194,7 @@ export function GoalProgressWidget({
           </div>
           <div className="w-full bg-gray-800 rounded-full h-2">
             <div
-              className={`h-2 rounded-full transition-all duration-300 ${isCompleted ? 'bg-green-500' : 'bg-blue-500'}`}
+              className={`h-2 rounded-full transition-all duration-300 ${isCompleted ? 'bg-green-500' : 'bg-brand-secondary/50'}`}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>

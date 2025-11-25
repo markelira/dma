@@ -163,7 +163,7 @@ export function AcademiaSidePanel({
 
         {/* About Section - Collapsible */}
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             Leírás
           </h4>
           {courseDescription ? (
@@ -202,7 +202,7 @@ export function AcademiaSidePanel({
 
         {/* Lesson Navigation */}
         <div className="space-y-4">
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
+          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             Részek
           </h4>
 

@@ -56,7 +56,7 @@ export const LessonTypeBadge: React.FC<{
   const { t } = useTranslation()
 
   const badgeColors: Record<string, string> = {
-    VIDEO: 'bg-blue-100 text-blue-800',
+    VIDEO: 'bg-brand-secondary/10 text-brand-secondary-hover',
     QUIZ: 'bg-yellow-100 text-yellow-800',
     TEXT: 'bg-gray-100 text-gray-800',
     READING: 'bg-purple-100 text-purple-800',

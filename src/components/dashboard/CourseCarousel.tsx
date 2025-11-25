@@ -123,7 +123,7 @@ export function CourseCarousel({ courseType, title }: CourseCarouselProps) {
                 onClick={() => setCurrentIndex(index * cardsPerView)}
                 className={`h-2 rounded-full transition-all duration-200 ${
                   Math.floor(currentIndex / cardsPerView) === index
-                    ? 'w-8 bg-blue-600'
+                    ? 'w-8 bg-brand-secondary'
                     : 'w-2 bg-gray-300 hover:bg-gray-400'
                 }`}
                 aria-label={`Go to slide ${index + 1}`}

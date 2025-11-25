@@ -58,7 +58,7 @@ export function StatCard({
   if (isLoading) {
     return (
       <div className="relative rounded-xl bg-white p-6 border border-gray-200 animate-pulse overflow-hidden shadow-sm">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-secondary/50 to-brand-secondary" />
         <div className="flex items-center gap-3 mb-4">
           <div className="h-12 w-12 rounded-xl bg-gray-200" />
           <div className="h-4 w-24 bg-gray-200 rounded" />
@@ -72,14 +72,14 @@ export function StatCard({
   return (
     <div className="relative rounded-xl bg-white p-6 border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden group shadow-sm hover:shadow-md">
       {/* Top accent border */}
-      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600" />
+      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-secondary/50 to-brand-secondary" />
 
       {/* Icon and Label */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 group-hover:bg-blue-100 transition-colors duration-300">
-          <Icon className="h-6 w-6 text-blue-600" />
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-secondary/5 group-hover:bg-brand-secondary/10 transition-colors duration-300">
+          <Icon className="h-6 w-6 text-brand-secondary" />
         </div>
-        <p className="text-sm font-semibold text-gray-500 uppercase tracking-wide">{label}</p>
+        <p className="text-sm font-bold text-gray-500 uppercase tracking-wide">{label}</p>
       </div>
 
       {/* Value and Trend */}

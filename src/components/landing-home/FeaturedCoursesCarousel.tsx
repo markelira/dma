@@ -230,7 +230,7 @@ export default function FeaturedCoursesCarousel() {
         <div className="mt-12 text-center" data-aos="fade-up" data-aos-delay="200">
           <a
             href="/courses"
-            className="inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="inline-flex items-center rounded-lg bg-gradient-to-r from-brand-secondary to-brand-secondary/50 px-8 py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
           >
             Összes kurzus megtekintése
             <span className="ml-2">→</span>

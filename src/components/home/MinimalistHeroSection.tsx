@@ -60,7 +60,7 @@ export function MinimalistHeroSection() {
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Button
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-6 text-base rounded-lg transition-colors"
+                className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-6 text-base rounded-lg transition-colors"
                 onClick={() => router.push('/register')}
               >
                 Próbáld ki ingyen
@@ -69,7 +69,7 @@ export function MinimalistHeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold px-8 py-6 text-base rounded-lg"
+                className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-6 text-base rounded-lg"
                 onClick={() => router.push('/pricing')}
               >
                 Árak megtekintése

@@ -102,7 +102,7 @@ export default function AdminNotificationsPage() {
   const getTypeBadge = (type: string) => {
     const typeConfig = {
       system: { label: 'Rendszer', className: 'bg-gray-100 text-gray-800' },
-      course: { label: 'Tartalom', className: 'bg-blue-100 text-blue-800' },
+      course: { label: 'Tartalom', className: 'bg-brand-secondary/10 text-brand-secondary-hover' },
       enrollment: { label: 'Beiratkozás', className: 'bg-green-100 text-green-800' },
       announcement: { label: 'Közlemény', className: 'bg-purple-100 text-purple-800' }
     }
@@ -319,7 +319,7 @@ export default function AdminNotificationsPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       {getPriorityIcon(notification.priority)}
-                      <h3 className="font-semibold">{notification.title}</h3>
+                      <h3 className="font-bold">{notification.title}</h3>
                       {getTypeBadge(notification.type)}
                       {notification.status === 'scheduled' && (
                         <Badge variant="outline" className="text-orange-600">

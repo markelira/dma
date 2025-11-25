@@ -29,7 +29,7 @@ export default function UniversityAdminLayout({ children }: UniversityAdminLayou
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-blue-600" />
+          <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-brand-secondary" />
           <p className="text-gray-600">
             {!authReady ? 'Hitelesítés inicializálása...' : 
              isLoading ? 'Betöltés...' : 

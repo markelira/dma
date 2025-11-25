@@ -17,7 +17,7 @@ export const JobRoleCard: React.FC<Props> = ({ role }) => {
 
       {/* Content */}
       <div className="p-5 flex-1 flex flex-col">
-        <h3 className="font-semibold text-gray-900 mb-2 text-base line-clamp-2">{role.title}</h3>
+        <h3 className="font-bold text-gray-900 mb-2 text-base line-clamp-2">{role.title}</h3>
         {role.description && (
           <p className="text-muted text-sm line-clamp-3 mb-4">{role.description}</p>
         )}

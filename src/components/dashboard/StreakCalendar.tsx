@@ -55,11 +55,11 @@ export function StreakCalendar({ streak, isLoading }: StreakCalendarProps) {
   // Determine color intensity based on minutes - using blue colors
   const getIntensity = (minutes: number): string => {
     if (minutes === 0) return 'bg-gray-800';
-    if (minutes < 30) return 'bg-blue-900/50';
+    if (minutes < 30) return 'bg-brand-secondary-hover/50';
     if (minutes < 60) return 'bg-blue-800/70';
-    if (minutes < 90) return 'bg-blue-700';
-    if (minutes < 120) return 'bg-blue-600';
-    return 'bg-blue-500';
+    if (minutes < 90) return 'bg-brand-secondary-hover';
+    if (minutes < 120) return 'bg-brand-secondary';
+    return 'bg-brand-secondary/50';
   };
 
   const hoveredData = hoveredDay ? streak.activityCalendar?.[hoveredDay] || 0 : 0;
@@ -69,7 +69,7 @@ export function StreakCalendar({ streak, isLoading }: StreakCalendarProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
+          <h3 className="text-lg font-bold flex items-center gap-2 text-white">
             <Flame className="w-5 h-5 text-orange-500" />
             Tanulási sorozat
           </h3>
@@ -97,9 +97,9 @@ export function StreakCalendar({ streak, isLoading }: StreakCalendarProps) {
           <div className="text-xs text-gray-500">Leghosszabb</div>
         </div>
 
-        <div className="text-center p-3 bg-blue-900/20 border border-blue-800/50 rounded-lg">
-          <Award className="w-5 h-5 text-blue-400 mx-auto mb-1" />
-          <div className="text-2xl font-bold text-blue-400">
+        <div className="text-center p-3 bg-brand-secondary-hover/20 border border-blue-800/50 rounded-lg">
+          <Award className="w-5 h-5 text-brand-secondary mx-auto mb-1" />
+          <div className="text-2xl font-bold text-brand-secondary">
             {streak.totalActiveDays}
           </div>
           <div className="text-xs text-gray-500">Aktív napok</div>
@@ -159,7 +159,7 @@ export function StreakCalendar({ streak, isLoading }: StreakCalendarProps) {
                   day: 'numeric',
                 })}
               </span>
-              <span className="text-blue-400 font-semibold">
+              <span className="text-brand-secondary font-bold">
                 {hoveredData} perc
                 {hoveredData > 0 && ` (${(hoveredData / 60).toFixed(1)} óra)`}
               </span>
@@ -172,11 +172,11 @@ export function StreakCalendar({ streak, isLoading }: StreakCalendarProps) {
           <span className="text-xs text-gray-500">Kevesebb</span>
           <div className="flex gap-1">
             <div className="w-3 h-3 rounded-sm bg-gray-800" />
-            <div className="w-3 h-3 rounded-sm bg-blue-900/50" />
+            <div className="w-3 h-3 rounded-sm bg-brand-secondary-hover/50" />
             <div className="w-3 h-3 rounded-sm bg-blue-800/70" />
-            <div className="w-3 h-3 rounded-sm bg-blue-700" />
-            <div className="w-3 h-3 rounded-sm bg-blue-600" />
-            <div className="w-3 h-3 rounded-sm bg-blue-500" />
+            <div className="w-3 h-3 rounded-sm bg-brand-secondary-hover" />
+            <div className="w-3 h-3 rounded-sm bg-brand-secondary" />
+            <div className="w-3 h-3 rounded-sm bg-brand-secondary/50" />
           </div>
           <span className="text-xs text-gray-500">Több</span>
         </div>

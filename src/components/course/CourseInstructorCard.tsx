@@ -62,7 +62,7 @@ export function CourseInstructorCard({
               />
             </div>
           ) : (
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-600 to-blue-500 flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-2xl font-bold">
               {name.charAt(0)}
             </div>
           )}

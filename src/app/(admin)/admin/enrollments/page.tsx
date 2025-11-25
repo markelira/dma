@@ -115,7 +115,7 @@ export default function AdminEnrollmentsPage() {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       active: { label: 'Aktív', className: 'bg-green-100 text-green-800' },
-      completed: { label: 'Befejezett', className: 'bg-blue-100 text-blue-800' },
+      completed: { label: 'Befejezett', className: 'bg-brand-secondary/10 text-brand-secondary-hover' },
       dropped: { label: 'Lemorzsolódott', className: 'bg-red-100 text-red-800' }
     }
     const config = statusConfig[status as keyof typeof statusConfig]

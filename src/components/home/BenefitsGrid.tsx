@@ -2,22 +2,22 @@ import { BarChart3, BookOpen, Award, LightbulbIcon } from 'lucide-react'
 
 const benefits = [
   {
-    icon: <BookOpen className="h-8 w-8 text-blue-600" />,
+    icon: <BookOpen className="h-8 w-8 text-brand-secondary" />,
     title: 'Courses from Recognized Hungarian Universities',
     description: 'Learn from courses created by the best Hungarian universities and their instructors to help you in your professional development.',
   },
   {
-    icon: <LightbulbIcon className="h-8 w-8 text-blue-600" />,
+    icon: <LightbulbIcon className="h-8 w-8 text-brand-secondary" />,
     title: 'Personalized Learning Experience',
     description: 'Our AI-based system helps you find the most suitable courses and learning paths for you.',
   },
   {
-    icon: <BarChart3 className="h-8 w-8 text-blue-600" />,
+    icon: <BarChart3 className="h-8 w-8 text-brand-secondary" />,
     title: 'Detailed Progress Statistics',
     description: 'Track your learning progress with detailed reports and performance indicators.',
   },
   {
-    icon: <Award className="h-8 w-8 text-blue-600" />,
+    icon: <Award className="h-8 w-8 text-brand-secondary" />,
     title: 'Recognized Certificates',
     description: 'Earn officially recognized certificates that hold real value in the job market.',
   },

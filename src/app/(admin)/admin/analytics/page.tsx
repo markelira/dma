@@ -104,7 +104,7 @@ export default function AdminAnalyticsPage() {
         <TabsContent value="overview" className="space-y-8">
           {/* Section Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Platform Növekedés</h2>
+            <h2 className="text-xl font-bold text-gray-900">Platform Növekedés</h2>
             <div className="flex items-center gap-2">
               <Badge className="bg-indigo-100 text-indigo-700">
                 <TrendingUp className="w-3 h-3 mr-1" />
@@ -219,7 +219,7 @@ export default function AdminAnalyticsPage() {
         <TabsContent value="video" className="space-y-8">
           {/* Section Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Videó Analitika</h2>
+            <h2 className="text-xl font-bold text-gray-900">Videó Analitika</h2>
             <Badge className="bg-purple-100 text-purple-700">
               <Video className="w-3 h-3 mr-1" />
               30 napos időszak
@@ -232,8 +232,8 @@ export default function AdminAnalyticsPage() {
         <TabsContent value="users" className="space-y-8">
           {/* Section Header */}
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Felhasználói Metrikák</h2>
-            <Badge className="bg-blue-100 text-blue-700">
+            <h2 className="text-xl font-bold text-gray-900">Felhasználói Metrikák</h2>
+            <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
               <Users className="w-3 h-3 mr-1" />
               Részletes elemzés
             </Badge>
@@ -291,14 +291,14 @@ export default function AdminAnalyticsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+                  <div className="p-4 bg-gradient-to-r from-brand-secondary/5 to-indigo-50 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="text-sm font-medium text-gray-600">Aktív felhasználók</p>
                         <p className="text-2xl font-bold text-gray-900">1,234</p>
                       </div>
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Users className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-brand-secondary/10 rounded-lg flex items-center justify-center">
+                        <Users className="w-5 h-5 text-brand-secondary" />
                       </div>
                     </div>
                     <p className="text-xs text-gray-500">Elmúlt 7 napban</p>

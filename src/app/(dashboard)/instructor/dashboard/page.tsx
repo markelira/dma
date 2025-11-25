@@ -25,7 +25,7 @@ export default function InstructorDashboard() {
         <div className="bg-white shadow rounded-lg p-6 flex flex-col justify-between">
           <div>
             <BookOpen className="h-8 w-8 text-primary mb-4" />
-            <h2 className="text-lg font-semibold mb-2">Beiratkozásaim</h2>
+            <h2 className="text-lg font-bold mb-2">Beiratkozásaim</h2>
             <p className="text-sm text-gray-600 mb-4">Módosítsa meglévő tartalmait, vagy tekintse meg statisztikáikat.</p>
           </div>
           <Link href="/admin/courses">
@@ -35,7 +35,7 @@ export default function InstructorDashboard() {
       </section>
       {/* Placeholder for analytics grid */}
       <section className="mt-8">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Gyors statisztikák</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Gyors statisztikák</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <div className="bg-white shadow rounded-lg p-6">
             <p className="text-sm text-gray-500">Összes tartalom</p>

@@ -21,7 +21,7 @@ export function InstructorsTab({ courseData }: InstructorsTabProps) {
       <section className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex items-center gap-2 mb-6">
           <GraduationCap className="w-5 h-5 text-[#0f766e]" />
-          <h2 className="text-xl font-semibold">Szakértő oktatók</h2>
+          <h2 className="text-xl font-bold">Szakértő oktatók</h2>
         </div>
         
         <div className="space-y-6">
@@ -38,7 +38,7 @@ export function InstructorsTab({ courseData }: InstructorsTabProps) {
                   <div className="w-16 h-16 bg-gray-300 rounded-full flex-shrink-0"></div>
                 )}
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-1">
+                  <h3 className="font-bold text-lg mb-1">
                     {instructor.firstName && instructor.lastName 
                       ? `${instructor.firstName} ${instructor.lastName}`
                       : instructor.name || `Oktató ${index + 1}`

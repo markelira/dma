@@ -457,7 +457,7 @@ export const InteractiveInfographics: React.FC<Props> = ({
     return (
       <div className="absolute top-full left-0 mt-2 p-4 bg-white rounded-lg shadow-lg border z-50 min-w-64 max-w-sm">
         <div className="flex items-start justify-between mb-2">
-          <h4 className="font-semibold text-gray-900">{hotspot.title}</h4>
+          <h4 className="font-bold text-gray-900">{hotspot.title}</h4>
           <Button
             size="sm"
             variant="ghost"
@@ -490,7 +490,7 @@ export const InteractiveInfographics: React.FC<Props> = ({
                 href={hotspot.content.linkUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm inline-flex items-center gap-1 mt-2"
+                className="text-brand-secondary hover:text-brand-secondary-hover text-sm inline-flex items-center gap-1 mt-2"
               >
                 <BookOpen className="w-4 h-4" />
                 További információ
@@ -503,8 +503,8 @@ export const InteractiveInfographics: React.FC<Props> = ({
         {hotspot.assessment?.isAssessment && (
           <div className="border-t pt-3 mt-3">
             <div className="flex items-center gap-2 mb-2">
-              <HelpCircle className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-medium text-blue-900">Kérdés</span>
+              <HelpCircle className="w-4 h-4 text-brand-secondary" />
+              <span className="text-sm font-medium text-brand-secondary-hover">Kérdés</span>
             </div>
             <p className="text-sm text-gray-700 mb-3">
               {hotspot.assessment.questionText}
@@ -678,7 +678,7 @@ export const InteractiveInfographics: React.FC<Props> = ({
                       <div className={cn(
                         "w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold",
                         completedHotspots.has(hotspot.id) ? "bg-green-500" :
-                        progress.hotspotsViewed.has(hotspot.id) ? "bg-blue-500" : "bg-gray-500"
+                        progress.hotspotsViewed.has(hotspot.id) ? "bg-brand-secondary/50" : "bg-gray-500"
                       )}>
                         {hotspot.type === 'info' && <Info className="w-3 h-3" />}
                         {hotspot.type === 'question' && <HelpCircle className="w-3 h-3" />}
@@ -732,7 +732,7 @@ export const InteractiveInfographics: React.FC<Props> = ({
                       <span className="w-12 truncate">{item.label}</span>
                       <div className="flex-1 bg-gray-200 rounded h-2">
                         <div 
-                          className="bg-blue-500 h-2 rounded transition-all duration-500"
+                          className="bg-brand-secondary/50 h-2 rounded transition-all duration-500"
                           style={{ 
                             width: `${(item.value / Math.max(...viz.data.map(d => d.value))) * 100}%` 
                           }}
@@ -752,7 +752,7 @@ export const InteractiveInfographics: React.FC<Props> = ({
       {showProgress && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="p-3 text-center">
-            <Eye className="w-8 h-8 text-blue-500 mx-auto mb-1" />
+            <Eye className="w-8 h-8 text-white0 mx-auto mb-1" />
             <div className="text-sm text-gray-600">Megtekintett</div>
             <div className="text-lg font-bold">{progress.hotspotsViewed.size}</div>
           </Card>

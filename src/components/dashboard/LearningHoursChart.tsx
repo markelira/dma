@@ -38,7 +38,7 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
         <div className="bg-[#1a1a1a] p-3 rounded-lg shadow-lg border border-gray-700">
           <p className="font-medium text-sm mb-1 text-white">{payload[0].payload.label}</p>
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-blue-400" />
+            <Clock className="w-4 h-4 text-brand-secondary" />
             <span className="text-sm text-gray-300">
               {payload[0].value} óra ({(payload[0].value * 60).toFixed(0)} perc)
             </span>
@@ -74,8 +74,8 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
+          <h3 className="text-lg font-bold flex items-center gap-2 text-white">
+            <TrendingUp className="w-5 h-5 text-brand-secondary" />
             Tanulási aktivitás
           </h3>
           <p className="text-sm text-gray-400 mt-1">
@@ -91,7 +91,7 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
             onClick={() => handleTimeRangeChange('week')}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               timeRange === 'week'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
@@ -101,7 +101,7 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
             onClick={() => handleTimeRangeChange('month')}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               timeRange === 'month'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
@@ -111,7 +111,7 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
             onClick={() => handleTimeRangeChange('year')}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               timeRange === 'year'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
@@ -122,12 +122,12 @@ export function LearningHoursChart({ data, onTimeRangeChange, isLoading }: Learn
 
       {/* Stats Summary */}
       <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg p-4">
+        <div className="bg-brand-secondary-hover/20 border border-blue-800/50 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-1">
-            <Calendar className="w-4 h-4 text-blue-400" />
-            <span className="text-xs font-medium text-blue-400">Összesen</span>
+            <Calendar className="w-4 h-4 text-brand-secondary" />
+            <span className="text-xs font-medium text-brand-secondary">Összesen</span>
           </div>
-          <div className="text-2xl font-bold text-blue-400">
+          <div className="text-2xl font-bold text-brand-secondary">
             {totalHours}h
           </div>
           <p className="text-xs text-gray-500 mt-1">

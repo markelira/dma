@@ -241,7 +241,7 @@ export function FeaturesSection() {
         >
           <a
             href="/courses"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-[rgb(18,17,17)] font-semibold text-base transition-all duration-300 hover:bg-[rgb(242,239,235)] hover:-translate-y-0.5 hover:shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-[rgb(18,17,17)] font-bold text-base transition-all duration-300 hover:bg-[rgb(242,239,235)] hover:-translate-y-0.5 hover:shadow-lg"
           >
             Összes tartalom megtekintése
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

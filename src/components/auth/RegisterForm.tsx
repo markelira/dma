@@ -266,7 +266,7 @@ export default function RegisterForm({
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-blue-600 hover:underline font-medium"
+              className="text-brand-secondary hover:underline font-medium"
               disabled={isSubmitting || loading}
             >
               Bejelentkezés

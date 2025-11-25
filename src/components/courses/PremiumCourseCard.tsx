@@ -229,7 +229,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
               {/* Course Type Badge */}
               {getCourseTypeLabel(course.courseType) && (
                 <div
-                  className="px-2.5 py-1 rounded-md text-xs font-medium"
+                  className="px-2.5 py-1 rounded-md text-xs font-normal"
                   style={{
                     background: courseTypeColors.bg,
                     border: `1px solid ${courseTypeColors.border}`,
@@ -241,7 +241,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
               )}
               {/* Category Badges - supports multiple */}
               {getCategoryNames().map((catName, idx) => (
-                <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-medium bg-blue-50/80 border border-blue-200/50 text-blue-600">
+                <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/5/80 border border-brand-secondary/20/50 text-brand-secondary">
                   {catName}
                 </div>
               ))}
@@ -249,7 +249,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             {/* Level Badge */}
             {course.level && (
               <div
-                className="px-2.5 py-1 rounded-md text-xs font-medium flex-shrink-0"
+                className="px-2.5 py-1 rounded-md text-xs font-normal flex-shrink-0"
                 style={{
                   background: levelColors.bg,
                   border: `1px solid ${levelColors.border}`,
@@ -262,18 +262,18 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors duration-200">
+          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-brand-secondary transition-colors duration-200">
             {course.title}
           </h3>
 
           {/* Description */}
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+          <p className="text-sm font-normal text-gray-600 line-clamp-2 mb-4 flex-1">
             {course.description}
           </p>
 
           {/* Instructor(s) - supports multiple */}
           {getInstructorNames().length > 0 && (
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs font-normal text-gray-500 mb-3">
               {getInstructorNames().length > 1 ? 'Oktatók' : 'Oktató'}: <span className="font-medium">{getInstructorNames().join(', ')}</span>
             </p>
           )}
@@ -302,7 +302,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
 
           {/* Action Button */}
           <button
-            className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all !rounded-lg !py-2.5 text-sm flex items-center justify-center gap-2"
+            className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white shadow-sm hover:shadow-md transition-all !rounded-lg !py-2.5 text-sm font-medium flex items-center justify-center gap-2"
             onClick={(e) => {
               e.stopPropagation();
               router.push(`/courses/${course.id}`);

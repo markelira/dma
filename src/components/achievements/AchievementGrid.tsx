@@ -48,7 +48,7 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold flex items-center gap-2 text-white">
+          <h3 className="text-lg font-bold flex items-center gap-2 text-white">
             <Award className="w-5 h-5 text-yellow-500" />
             Eredmények
           </h3>
@@ -63,7 +63,7 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
             onClick={() => setFilter('all')}
             className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               filter === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
@@ -74,7 +74,7 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
             onClick={() => setFilter('unlocked')}
             className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               filter === 'unlocked'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >
@@ -85,7 +85,7 @@ export function AchievementGrid({ achievements, isLoading, onBadgeClick }: Achie
             onClick={() => setFilter('locked')}
             className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               filter === 'locked'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-brand-secondary text-white'
                 : 'bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white'
             }`}
           >

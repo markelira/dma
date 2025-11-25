@@ -6,13 +6,13 @@
 // Professional e-learning color palette
 export const playerColors = {
   // Primary colors
-  primary: '#0066CC',      // Trust blue - main actions, links
-  primaryHover: '#0052A3', // Darker blue for hover states
-  primaryLight: '#E6F2FF', // Light blue for backgrounds
+  primary: '#E72B36',      // DMA red - main actions, links
+  primaryHover: '#c9232d', // Darker red for hover states
+  primaryLight: '#FFE6E8', // Light red for backgrounds
 
   // Secondary colors
-  secondary: '#00B4D8',    // Engagement blue - highlights, active states
-  secondaryLight: '#E0F7FA',
+  secondary: '#E72B36',    // DMA red - highlights, active states
+  secondaryLight: '#FFE6E8',
 
   // Status colors
   success: '#10B981',      // Completion green
@@ -34,7 +34,7 @@ export const playerColors = {
   // Border colors
   border: '#E5E7EB',
   borderDark: '#D1D5DB',
-  borderFocus: '#3B82F6',
+  borderFocus: '#E72B36',
 
   // Surface colors
   surfaceWhite: '#FFFFFF',
@@ -45,10 +45,10 @@ export const playerColors = {
 // Typography scale - Inter font family
 export const playerTypography = {
   // Headings
-  h1: 'text-[32px] font-semibold leading-tight tracking-[-0.3px]',
-  h2: 'text-2xl font-semibold leading-snug tracking-[-0.3px]',
-  h3: 'text-lg font-semibold leading-normal tracking-[-0.3px]',
-  h4: 'text-base font-semibold leading-normal',
+  h1: 'text-[32px] font-bold leading-tight tracking-[-0.3px]',
+  h2: 'text-2xl font-bold leading-snug tracking-[-0.3px]',
+  h3: 'text-lg font-bold leading-normal tracking-[-0.3px]',
+  h4: 'text-base font-bold leading-normal',
 
   // Body text
   body: 'text-sm font-normal leading-relaxed',
@@ -61,7 +61,7 @@ export const playerTypography = {
 
   // Special
   caption: 'text-xs font-normal leading-tight text-gray-500',
-  overline: 'text-xs font-semibold uppercase tracking-wide'
+  overline: 'text-xs font-bold uppercase tracking-wide'
 }
 
 // Spacing system (based on 8px grid)
@@ -82,10 +82,10 @@ export const playerComponents = {
   card: 'bg-white rounded-lg shadow-sm border border-gray-200',
   cardElevated: 'bg-white rounded-lg shadow-md border border-gray-200',
   cardHover: 'hover:shadow-md hover:border-gray-300 transition-all duration-200',
-  cardActive: 'bg-blue-50 border-blue-200 shadow-sm',
+  cardActive: 'bg-brand-secondary/5 border-brand-secondary/20 shadow-sm',
 
   // Buttons
-  buttonPrimary: 'bg-[#0066CC] hover:bg-[#0052A3] text-white font-medium rounded-lg px-4 py-2.5 transition-colors duration-200',
+  buttonPrimary: 'bg-brand-secondary hover:bg-brand-secondary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors duration-200',
   buttonSecondary: 'bg-white hover:bg-gray-50 text-gray-700 font-medium border border-gray-300 rounded-lg px-4 py-2.5 transition-colors duration-200',
   buttonGhost: 'bg-transparent hover:bg-gray-100 text-gray-700 font-medium rounded-lg px-4 py-2.5 transition-colors duration-200',
   buttonSuccess: 'bg-[#10B981] hover:bg-[#059669] text-white font-medium rounded-lg px-4 py-2.5 transition-colors duration-200',
@@ -93,11 +93,11 @@ export const playerComponents = {
   // Progress indicators
   progressRing: 'relative inline-flex items-center justify-center',
   progressBar: 'w-full bg-gray-200 rounded-full h-2 overflow-hidden',
-  progressBarFill: 'h-full bg-[#0066CC] rounded-full transition-all duration-300 ease-out',
+  progressBarFill: 'h-full bg-brand-secondary rounded-full transition-all duration-300 ease-out',
 
   // Badges
   badge: 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium',
-  badgeBlue: 'bg-blue-100 text-blue-800',
+  badgeBlue: 'bg-brand-secondary/10 text-brand-secondary',
   badgeGreen: 'bg-green-100 text-green-800',
   badgeGray: 'bg-gray-100 text-gray-800',
   badgeYellow: 'bg-yellow-100 text-yellow-800',
@@ -117,16 +117,16 @@ export const playerComponents = {
   moduleHeader: 'flex items-center justify-between p-4 hover:bg-gray-50 rounded-lg cursor-pointer transition-colors duration-150',
   lessonItem: 'flex items-center gap-3 p-3 rounded-lg border border-transparent transition-all duration-150',
   lessonItemHover: 'hover:bg-gray-50 hover:border-gray-200',
-  lessonItemActive: 'bg-blue-50 border-blue-200 border-l-4 border-l-[#0066CC]',
+  lessonItemActive: 'bg-brand-secondary/5 border-brand-secondary/20 border-l-4 border-l-brand-secondary',
   lessonItemCompleted: 'bg-green-50 border-green-200',
 
   // Tabs
   tabsList: 'flex border-b border-gray-200',
   tabButton: 'px-4 py-3 font-medium text-sm text-gray-600 hover:text-gray-900 hover:border-b-2 hover:border-gray-300 transition-all duration-150',
-  tabButtonActive: 'text-[#0066CC] border-b-2 border-[#0066CC]',
+  tabButtonActive: 'text-brand-secondary border-b-2 border-brand-secondary',
 
   // Input fields
-  input: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow duration-200',
+  input: 'w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent transition-shadow duration-200',
 
   // Tooltips
   tooltip: 'bg-gray-900 text-white text-xs rounded py-1 px-2 shadow-lg',
@@ -135,7 +135,7 @@ export const playerComponents = {
   divider: 'border-t border-gray-200',
 
   // Focus states
-  focusRing: 'focus:outline-none focus:ring-2 focus:ring-[#0066CC] focus:ring-offset-2'
+  focusRing: 'focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:ring-offset-2'
 }
 
 // Shadow system

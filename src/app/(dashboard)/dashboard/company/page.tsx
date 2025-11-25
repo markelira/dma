@@ -101,14 +101,14 @@ export default function CompanyPage() {
         <div className="max-w-5xl mx-auto space-y-6">
 
           {/* Subscription Notice */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
             <div className="flex items-start gap-4">
-              <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <CheckCircle className="w-6 h-6 text-brand-secondary flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                <h3 className="text-lg font-bold text-brand-secondary-hover mb-2">
                   Automatikus hozzáférés
                 </h3>
-                <p className="text-blue-800">
+                <p className="text-brand-secondary-hover">
                   Az Ön előfizetésével minden meghívott csapattag automatikusan hozzáfér az összes tartalomhoz.
                   Nincs további díj vagy korlátozás a csapattagok számára.
                 </p>
@@ -139,7 +139,7 @@ export default function CompanyPage() {
           {/* Team Members List */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 Csapattagok
               </h2>
             </div>
@@ -149,14 +149,14 @@ export default function CompanyPage() {
                 <div key={member.id} className="p-6 flex items-center justify-between hover:bg-gray-50 transition-colors">
                   <div className="flex items-center gap-4 flex-1">
                     {/* Avatar */}
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-semibold">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-white font-bold">
                       {member.name.charAt(0)}
                     </div>
 
                     {/* Info */}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-semibold text-gray-900">{member.name}</h3>
+                        <h3 className="font-bold text-gray-900">{member.name}</h3>
                         {member.status === 'active' && (
                           <span className="flex items-center gap-1 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
                             <CheckCircle className="w-3 h-3" />
@@ -200,7 +200,7 @@ export default function CompanyPage() {
             {teamMembers.length === 0 && (
               <div className="p-12 text-center">
                 <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Még nincs csapattag
                 </h3>
                 <p className="text-gray-600 mb-6">
@@ -254,8 +254,8 @@ export default function CompanyPage() {
                 />
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-900">
+              <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg p-3">
+                <p className="text-sm text-brand-secondary-hover">
                   <Mail className="w-4 h-4 inline mr-1" />
                   Küldünk egy meghívó e-mailt erre a címre.
                 </p>

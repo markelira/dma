@@ -595,7 +595,7 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
                 {question.questionType === 'SCENARIO' && 'Forgatókönyv'}
                 {question.questionType === 'CODE' && 'Kód feladat'}
               </Badge>
-              <Badge className="bg-blue-100 text-blue-800">
+              <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
                 {question.points} pont
               </Badge>
             </div>
@@ -603,13 +603,13 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
 
           {/* Scenario Content */}
           {question.scenarioContent && (
-            <Card className="mb-4 bg-blue-50 border-blue-200">
+            <Card className="mb-4 bg-brand-secondary/5 border-brand-secondary/20">
               <CardContent className="p-4">
                 <div className="flex items-start space-x-2">
-                  <BookOpen className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <BookOpen className="w-5 h-5 text-brand-secondary mt-0.5 flex-shrink-0" />
                   <div>
-                    <h4 className="font-medium text-blue-800 mb-2">Forgatókönyv</h4>
-                    <div className="text-sm text-blue-700 whitespace-pre-wrap">
+                    <h4 className="font-medium text-brand-secondary-hover mb-2">Forgatókönyv</h4>
+                    <div className="text-sm text-brand-secondary-hover whitespace-pre-wrap">
                       {question.scenarioContent}
                     </div>
                   </div>
@@ -641,7 +641,7 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
           )}
 
           {/* Question Text */}
-          <h3 className="text-lg font-semibold mb-4 leading-relaxed">
+          <h3 className="text-lg font-bold mb-4 leading-relaxed">
             {question.questionText}
           </h3>
 
@@ -754,9 +754,9 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
           {quizState.submitted && (
             <div className="mt-4 p-4 rounded-lg border">
               <div className="flex items-start space-x-2">
-                <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <Lightbulb className="w-5 h-5 text-white0 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-medium text-blue-800 mb-2">Magyarázat</h4>
+                  <h4 className="font-medium text-brand-secondary-hover mb-2">Magyarázat</h4>
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {question.explanation || 'Nincs elérhető magyarázat ehhez a kérdéshez.'}
                   </p>
@@ -883,9 +883,9 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
                     {result.feedback && (
                       <div className="p-3 border-t bg-white">
                         <div className="flex items-start space-x-2">
-                          <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                          <Lightbulb className="w-4 h-4 text-white0 mt-0.5 flex-shrink-0" />
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-blue-800 mb-1">Visszajelzés</p>
+                            <p className="text-sm font-medium text-brand-secondary-hover mb-1">Visszajelzés</p>
                             <p className="text-sm text-gray-700">{result.feedback}</p>
                             
                             {/* Show additional explanation if available */}
@@ -919,7 +919,7 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
                 {Object.entries(results.performanceByType).map(([type, stats]) => (
                   <div key={type} className="text-center p-3 bg-gray-50 rounded-lg">
                     <div className="flex justify-center mb-2">
-                      {type === 'SINGLE' && <HelpCircle className="w-6 h-6 text-blue-500" />}
+                      {type === 'SINGLE' && <HelpCircle className="w-6 h-6 text-white0" />}
                       {type === 'MULTIPLE' && <CheckCircle className="w-6 h-6 text-green-500" />}
                       {type === 'SCENARIO' && <BookOpen className="w-6 h-6 text-purple-500" />}
                       {type === 'CODE' && <Code className="w-6 h-6 text-orange-500" />}
@@ -977,10 +977,10 @@ export const InteractiveQuizEngine: React.FC<InteractiveQuizEngineProps> = ({
           fallback={
             <div className="p-8 text-center">
               <AlertTriangle className="w-16 h-16 mx-auto mb-4 text-red-500" />
-              <h3 className="text-xl font-semibold mb-2">Kvíz betöltési hiba</h3>
+              <h3 className="text-xl font-bold mb-2">Kvíz betöltési hiba</h3>
               <p className="text-gray-600 mb-4">A kvíz jelenleg nem érhető el.</p>
               {quizErrorHandling.progressSaved && (
-                <p className="text-sm text-blue-600 mb-4">
+                <p className="text-sm text-brand-secondary mb-4">
                   Az eddig elért haladása mentésre került.
                 </p>
               )}

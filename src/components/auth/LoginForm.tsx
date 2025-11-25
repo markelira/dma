@@ -77,7 +77,7 @@ export default function LoginForm() {
               <Label htmlFor="password">Jelszó</Label>
               <Link
                 href="/forgot-password"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-brand-secondary hover:underline"
               >
                 Elfelejtett jelszó?
               </Link>
@@ -120,7 +120,7 @@ export default function LoginForm() {
 
           <p className="text-center text-sm text-gray-600">
             Még nincs fiókod?{' '}
-            <Link href="/register" className="text-blue-600 hover:underline font-medium">
+            <Link href="/register" className="text-brand-secondary hover:underline font-medium">
               Regisztrálj itt
             </Link>
           </p>

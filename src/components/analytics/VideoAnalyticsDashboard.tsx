@@ -216,7 +216,7 @@ export const VideoAnalyticsDashboard: React.FC<VideoAnalyticsDashboardProps> = (
             {data.mostWatchedLessons.map((lesson, index) => (
               <div key={lesson.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-semibold">
+                  <div className="flex items-center justify-center w-8 h-8 bg-brand-secondary/10 text-brand-secondary rounded-full text-sm font-bold">
                     {index + 1}
                   </div>
                   <div>

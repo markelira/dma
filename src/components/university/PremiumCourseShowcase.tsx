@@ -223,7 +223,7 @@ export function PremiumCourseShowcase({ courses, universityName }: PremiumCourse
           {sortedCourses.length === 0 && (
             <div className="text-center py-16">
               <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              <h3 className="text-xl font-bold text-gray-600 mb-2">
                 Nincs találat
               </h3>
               <p className="text-gray-500">

@@ -409,7 +409,7 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
       />
 
       {isDragging && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10 pointer-events-none text-white text-xl font-semibold rounded-lg">
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-10 pointer-events-none text-white text-xl font-bold rounded-lg">
           Dobd ide a fájlt a feltöltéshez
         </div>
       )}

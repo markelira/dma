@@ -130,13 +130,13 @@ export default function UnauthorizedPage() {
         </Alert>
 
         {/* Contact Information */}
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-brand-secondary/5 border-brand-secondary/20">
           <CardContent className="pt-4">
-            <h3 className="font-semibold text-blue-900 mb-3 flex items-center">
+            <h3 className="font-bold text-brand-secondary-hover mb-3 flex items-center">
               <Mail className="w-4 h-4 mr-2" />
               Támogatás elérhetőségek
             </h3>
-            <div className="space-y-2 text-sm text-blue-800">
+            <div className="space-y-2 text-sm text-brand-secondary-hover">
               <div className="flex items-center">
                 <Mail className="w-4 h-4 mr-2" />
                 <span>support@dma.hu</span>
@@ -146,7 +146,7 @@ export default function UnauthorizedPage() {
                 <span>+36 1 234 5678</span>
               </div>
             </div>
-            <p className="text-xs text-blue-600 mt-3">
+            <p className="text-xs text-brand-secondary mt-3">
               Kérjük, adja meg a felhasználói fiókját és a hozzáférni kívánt oldalt.
             </p>
           </CardContent>
@@ -156,7 +156,7 @@ export default function UnauthorizedPage() {
         {user && user.role && (
           <Card className="bg-gray-50 border-gray-200">
             <CardContent className="pt-4">
-              <h3 className="font-semibold text-gray-900 mb-2">
+              <h3 className="font-bold text-gray-900 mb-2">
                 Információ a szerepköréről
               </h3>
               <div className="text-sm text-gray-600 space-y-2">

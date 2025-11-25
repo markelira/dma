@@ -252,7 +252,7 @@ export const Testimonials: Story = {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-primary rounded-full mr-3"></div>
               <div>
-                <p className="font-semibold">Sarah Johnson</p>
+                <p className="font-bold">Sarah Johnson</p>
                 <p className="text-sm text-muted-foreground">Software Engineer</p>
               </div>
             </div>
@@ -267,7 +267,7 @@ export const Testimonials: Story = {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-primary rounded-full mr-3"></div>
               <div>
-                <p className="font-semibold">Mike Chen</p>
+                <p className="font-bold">Mike Chen</p>
                 <p className="text-sm text-muted-foreground">Product Manager</p>
               </div>
             </div>
@@ -282,7 +282,7 @@ export const Testimonials: Story = {
             <div className="flex items-center">
               <div className="w-10 h-10 bg-primary rounded-full mr-3"></div>
               <div>
-                <p className="font-semibold">Emily Rodriguez</p>
+                <p className="font-bold">Emily Rodriguez</p>
                 <p className="text-sm text-muted-foreground">UX Designer</p>
               </div>
             </div>

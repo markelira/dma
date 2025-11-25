@@ -179,7 +179,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
             {/* Tab Header */}
             <div className="p-4 border-b bg-gray-50">
               <div className="flex items-center justify-between mb-3">
-                <h2 className="font-semibold text-gray-900 truncate">{course.title}</h2>
+                <h2 className="font-bold text-gray-900 truncate">{course.title}</h2>
                 <div className="flex items-center space-x-1">
                   <Button
                     variant="ghost"
@@ -320,7 +320,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
               </Button>
               
               <div className="min-w-0 flex-1">
-                <h1 className="font-semibold truncate">{lesson?.title}</h1>
+                <h1 className="font-bold truncate">{lesson?.title}</h1>
                 <div className="text-sm text-gray-500 truncate">
                   {flatLessons.find(l => l.id === currentLessonId)?.moduleTitle}
                 </div>
@@ -329,7 +329,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
             
             <div className="flex items-center gap-2">
               {/* Lesson Progress Indicator */}
-              <Badge className="bg-blue-100 text-blue-800">
+              <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
                 {currentIndex + 1} / {flatLessons.length}
               </Badge>
 
@@ -371,7 +371,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                 <div className="mb-6">
                   <BookOpen className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                 </div>
-                <h3 className="text-2xl font-semibold mb-4">Előfizetés szükséges</h3>
+                <h3 className="text-2xl font-bold mb-4">Előfizetés szükséges</h3>
                 <p className="text-gray-300 mb-6">
                   Ez a lecke csak előfizetőknek érhető el. Kezdje el az előfizetést a teljes tartalom eléréséhez.
                 </p>
@@ -442,7 +442,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
           <Card className="max-w-md w-full">
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Billentyűparancsok</h3>
+                <h3 className="text-lg font-bold">Billentyűparancsok</h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowHelp(false)}>
                   <X className="w-4 h-4" />
                 </Button>

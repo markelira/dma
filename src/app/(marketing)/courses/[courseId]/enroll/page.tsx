@@ -34,7 +34,7 @@ export default function CourseEnrollPage() {
       <div className="text-center space-y-2">
         <h1 className="text-3xl font-bold">Complete Purchase</h1>
         <p className="text-muted-foreground">You are purchasing the course <strong>{course.title}</strong></p>
-        <p className="text-2xl font-semibold">Price: {(course as any).priceHUF ?? 0} Ft</p>
+        <p className="text-2xl font-bold">Price: {(course as any).priceHUF ?? 0} Ft</p>
       </div>
 
       <div className="flex gap-4">

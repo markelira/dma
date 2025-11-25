@@ -141,7 +141,7 @@ export default function LoginPage() {
                   <p className="text-sm font-medium text-green-900 mb-1">
                     Email megerősítve!
                   </p>
-                  <p className="text-sm text-green-800">
+                  <p className="text-sm font-normal text-green-800">
                     Az email címed sikeresen megerősítettük. Most már bejelentkezhetsz a fiókodba.
                   </p>
                 </div>
@@ -207,7 +207,7 @@ export default function LoginPage() {
         <div className="mt-6">
           <button
             type="submit"
-            className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
+            className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
             disabled={loginMutation.isPending}
           >
             {loginMutation.isPending ? 'Bejelentkezés...' : 'Bejelentkezés'}
@@ -237,9 +237,9 @@ export default function LoginPage() {
               transition={{ duration: 0.3, ease: 'easeInOut' }}
               className="overflow-hidden"
             >
-              <div className="mt-4 p-6 bg-blue-50/50 border border-blue-100 rounded-lg">
+              <div className="mt-4 p-6 bg-brand-secondary/5/50 border border-brand-secondary/10 rounded-lg">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-bold text-gray-900">
                     Jelszó visszaállítás
                   </h3>
                   <button
@@ -283,7 +283,7 @@ export default function LoginPage() {
 
                     <button
                       type="submit"
-                      className="btn w-full bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
+                      className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white shadow-sm hover:shadow-md transition-all"
                       disabled={forgotLoading}
                     >
                       {forgotLoading ? 'Küldés...' : 'Visszaállítási link küldése'}

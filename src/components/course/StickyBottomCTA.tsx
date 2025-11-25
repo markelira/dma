@@ -35,7 +35,7 @@ export function StickyBottomCTA({ courseTitle, onEnroll, isEnrolled }: StickyBot
           </div>
           <Button
             onClick={onEnroll}
-            className="flex-shrink-0 bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-xl text-white font-bold px-6 py-3 rounded-lg transition-all"
+            className="flex-shrink-0 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 hover:shadow-xl text-white font-bold px-6 py-3 rounded-lg transition-all"
           >
             <Infinity className="w-4 h-4 mr-2" />
             Feliratkozás

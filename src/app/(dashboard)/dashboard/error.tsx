@@ -11,7 +11,7 @@ export default function DashboardError({
 }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-      <h2 className="text-xl font-semibold">Hoppá, hiba történt!</h2>
+      <h2 className="text-xl font-bold">Hoppá, hiba történt!</h2>
       <p className="mt-2 text-sm text-muted-foreground">
         Egy váratlan hiba merült fel a vezérlőpult betöltése közben.
       </p>

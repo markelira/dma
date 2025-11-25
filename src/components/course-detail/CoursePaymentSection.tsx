@@ -247,12 +247,12 @@ export function CoursePaymentSection({
             </div>
 
             {/* One-time purchase benefits */}
-            <div className="bg-blue-50 rounded-lg p-3 space-y-2">
-              <div className="flex items-center space-x-2 text-sm font-medium text-blue-800">
+            <div className="bg-brand-secondary/5 rounded-lg p-3 space-y-2">
+              <div className="flex items-center space-x-2 text-sm font-medium text-brand-secondary-hover">
                 <Calculator className="w-4 h-4" />
                 <span>Egyszeri vásárlás előnyei</span>
               </div>
-              <ul className="text-xs text-blue-700 space-y-1">
+              <ul className="text-xs text-brand-secondary-hover space-y-1">
                 <li>• Nincs havi díj</li>
                 <li>• Élethosszig hozzáférés</li>
                 <li>• Minden frissítés ingyen</li>
@@ -264,7 +264,7 @@ export function CoursePaymentSection({
           <TabsContent value="subscription" className="space-y-4 mt-4">
             <div className="space-y-4">
               <div className="text-center space-y-2">
-                <h3 className="font-semibold">Korlátlan hozzáférés</h3>
+                <h3 className="font-bold">Korlátlan hozzáférés</h3>
                 <p className="text-sm text-muted-foreground">
                   Hozzáférés az összes tartalomhoz és prémium funkciókhoz
                 </p>

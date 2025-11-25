@@ -123,7 +123,7 @@ export const FooterCTASectionPlaceholder = () => (
   <section id="lablec-cta" className="py-32 bg-primary text-white text-center">
     <Container>
       <h2 className="heading-2 mb-6">Készen állsz a fejlődésre?</h2>
-      <button className="mt-4 px-8 py-3 bg-white text-primary font-semibold rounded-full shadow hover:shadow-lg transition">
+      <button className="mt-4 px-8 py-3 bg-white text-primary font-bold rounded-full shadow hover:shadow-lg transition">
         Csatlakozom
       </button>
     </Container>

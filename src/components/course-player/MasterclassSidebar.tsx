@@ -129,7 +129,7 @@ export function MasterclassSidebar({
           </div>
           <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-blue-500 rounded-full transition-all duration-500 ease-out"
+              className="h-full bg-brand-secondary/50 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -142,9 +142,9 @@ export function MasterclassSidebar({
           <div key={groupIndex}>
             {/* Source course header (if imported) */}
             {group.source && (
-              <div className="px-4 py-3 bg-blue-50 border-b border-blue-100 flex items-center gap-2">
-                <Import className="w-4 h-4 text-blue-600" />
-                <span className="text-xs font-medium text-blue-700">
+              <div className="px-4 py-3 bg-brand-secondary/5 border-b border-brand-secondary/10 flex items-center gap-2">
+                <Import className="w-4 h-4 text-brand-secondary" />
+                <span className="text-xs font-medium text-brand-secondary-hover">
                   Importálva: {group.source}
                 </span>
               </div>
@@ -163,14 +163,14 @@ export function MasterclassSidebar({
                   onClick={() => onLessonClick(lesson.id)}
                   className={`w-full flex items-start gap-3 p-4 text-left transition-colors border-b border-gray-100 ${
                     isCurrentLesson
-                      ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                      ? 'bg-brand-secondary/5 border-l-4 border-l-brand-secondary'
                       : 'hover:bg-gray-50 border-l-4 border-l-transparent'
-                  } ${isImported && !isCurrentLesson ? 'bg-blue-50/30' : ''}`}
+                  } ${isImported && !isCurrentLesson ? 'bg-brand-secondary/5/30' : ''}`}
                 >
                   {/* Lesson number */}
                   <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
                     isCurrentLesson
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-brand-secondary/50 text-white'
                       : isCompleted
                       ? 'bg-green-100 text-green-700'
                       : 'bg-gray-200 text-gray-600'
@@ -189,7 +189,7 @@ export function MasterclassSidebar({
                       <span
                         className={`text-sm font-medium line-clamp-2 ${
                           isCurrentLesson
-                            ? 'text-blue-900'
+                            ? 'text-brand-secondary-hover'
                             : isCompleted
                             ? 'text-gray-700'
                             : 'text-gray-900'
@@ -198,7 +198,7 @@ export function MasterclassSidebar({
                         {lesson.title}
                       </span>
                       {isImported && !group.source && (
-                        <Import className="w-3 h-3 text-blue-500 flex-shrink-0" />
+                        <Import className="w-3 h-3 text-white0 flex-shrink-0" />
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">

@@ -80,7 +80,7 @@ const SidebarComponent = function Sidebar({
                   <span className="text-xs font-bold text-primary uppercase tracking-wider">
                     {index + 1}. Modul
                   </span>
-                  <span className="font-semibold text-foreground text-base leading-tight">
+                  <span className="font-bold text-foreground text-base leading-tight">
                     {module.title}
                   </span>
                 </div>

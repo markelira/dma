@@ -139,7 +139,7 @@ export default function FeaturedCoursesGrid() {
         <div className="mt-12 text-center">
           <a
             href="/courses"
-            className="inline-flex items-center rounded-lg border-2 border-blue-600 bg-white px-8 py-3 text-base font-semibold text-blue-600 transition-colors hover:bg-blue-50"
+            className="inline-flex items-center rounded-lg border-2 border-brand-secondary bg-white px-8 py-3 text-base font-bold text-brand-secondary transition-colors hover:bg-brand-secondary/5"
           >
             Összes kurzus megtekintése
           </a>

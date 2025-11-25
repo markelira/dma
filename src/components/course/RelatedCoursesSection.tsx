@@ -62,7 +62,7 @@ export function RelatedCoursesSection({
           {title}
         </h2>
         <button
-          className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold text-sm transition-colors"
+          className="flex items-center gap-2 text-brand-secondary hover:text-brand-secondary-hover font-bold text-sm transition-colors"
           onClick={() => window.location.href = '/courses'}
         >
           Összes tartalom

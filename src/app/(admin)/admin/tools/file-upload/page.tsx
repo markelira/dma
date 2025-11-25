@@ -127,7 +127,7 @@ export default function FileUploadToolPage() {
                 href={uploadedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 underline break-all"
+                className="text-brand-secondary underline break-all"
               >
                 {uploadedUrl}
               </a>

@@ -328,7 +328,7 @@ export default function UniversityDetailPage() {
       )}
 
       {/* Branding Section */}
-      <h2 className="text-2xl font-semibold mt-8">Branding</h2>
+      <h2 className="text-2xl font-bold mt-8">Branding</h2>
       <Card className="mt-2">
         <CardContent className="space-y-4 pt-6">
           {/* Logo upload */}
@@ -411,7 +411,7 @@ export default function UniversityDetailPage() {
 
       {/* Member management */}
       <div className="flex items-center justify-between mt-8">
-        <h2 className="text-2xl font-semibold">Tagok Kezelése</h2>
+        <h2 className="text-2xl font-bold">Tagok Kezelése</h2>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button className="flex items-center gap-2"><Plus className="h-4 w-4" />Új Tag Hozzáadása</Button>
@@ -485,7 +485,7 @@ export default function UniversityDetailPage() {
 
       {/* Courses management */}
       <div className="flex items-center justify-between mt-8">
-        <h2 className="text-2xl font-semibold">Tartalmak Kezelése</h2>
+        <h2 className="text-2xl font-bold">Tartalmak Kezelése</h2>
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button>Tartalmak Hozzárendelése</Button>

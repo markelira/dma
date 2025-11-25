@@ -36,7 +36,7 @@ export function CourseraHero() {
           >
             <Link
               href="/register"
-              className="inline-block px-8 py-3 text-base font-semibold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors shadow-md hover:shadow-lg"
+              className="inline-block px-8 py-3 text-base font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors shadow-md hover:shadow-lg"
             >
               Join for Free
             </Link>
@@ -49,15 +49,15 @@ export function CourseraHero() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <div className="flex items-center space-x-2">
-              <span className="font-semibold text-coursera-text-primary">7,000+</span>
+              <span className="font-bold text-coursera-text-primary">7,000+</span>
               <span>courses</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-semibold text-coursera-text-primary">300+</span>
+              <span className="font-bold text-coursera-text-primary">300+</span>
               <span>partners</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="font-semibold text-coursera-text-primary">100M+</span>
+              <span className="font-bold text-coursera-text-primary">100M+</span>
               <span>learners</span>
             </div>
           </motion.div>

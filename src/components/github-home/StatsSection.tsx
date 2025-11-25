@@ -41,7 +41,7 @@ export function StatsSection() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
-              className="text-2xl lg:text-3xl text-white font-semibold mb-4"
+              className="text-2xl lg:text-3xl text-white font-bold mb-4"
             >
               növekedés a készségekben
             </motion.h2>

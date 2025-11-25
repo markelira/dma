@@ -96,14 +96,14 @@ export const EnhancedProgressSystem: React.FC<EnhancedProgressSystemProps> = ({
   return (
     <div className="space-y-4">
       {/* Overall Progress Card */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className="bg-gradient-to-r from-brand-secondary/5 to-indigo-50 border-brand-secondary/20">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-blue-900">Kurzus előrehaladás</span>
+              <BookOpen className="w-5 h-5 text-brand-secondary" />
+              <span className="font-bold text-brand-secondary-hover">Kurzus előrehaladás</span>
             </div>
-            <Badge className="bg-blue-100 text-blue-700">
+            <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
               {completedLessons}/{totalLessons} lecke
             </Badge>
           </div>
@@ -111,9 +111,9 @@ export const EnhancedProgressSystem: React.FC<EnhancedProgressSystemProps> = ({
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-gray-700">Teljesítve</span>
-              <span className="font-medium text-blue-700">{overallProgress}%</span>
+              <span className="font-medium text-brand-secondary-hover">{overallProgress}%</span>
             </div>
-            <Progress value={overallProgress} className="h-3 bg-blue-100" />
+            <Progress value={overallProgress} className="h-3 bg-brand-secondary/10" />
           </div>
 
           {estimatedTimeRemaining > 0 && (
@@ -180,7 +180,7 @@ export const EnhancedProgressSystem: React.FC<EnhancedProgressSystemProps> = ({
                         module.progress === 100 
                           ? 'bg-green-50 text-green-700 border-green-200' 
                           : module.progress > 0 
-                            ? 'bg-blue-50 text-blue-700 border-blue-200'
+                            ? 'bg-brand-secondary/5 text-brand-secondary-hover border-brand-secondary/20'
                             : 'bg-gray-50 text-gray-600 border-gray-200'
                       }`}
                     >
@@ -194,7 +194,7 @@ export const EnhancedProgressSystem: React.FC<EnhancedProgressSystemProps> = ({
                     module.progress === 100 
                       ? 'bg-green-100' 
                       : module.progress > 0 
-                        ? 'bg-blue-100'
+                        ? 'bg-brand-secondary/10'
                         : 'bg-gray-100'
                   }`} 
                 />

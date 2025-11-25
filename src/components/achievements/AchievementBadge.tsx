@@ -41,7 +41,7 @@ const TIER_COLORS = {
     border: 'border-yellow-600',
   },
   platinum: {
-    bg: 'from-cyan-400 to-blue-600',
+    bg: 'from-cyan-400 to-brand-secondary',
     glow: 'shadow-cyan-500/50',
     text: 'text-cyan-600',
     border: 'border-cyan-600',
@@ -99,7 +99,7 @@ export function AchievementBadge({
         {/* Achievement Title */}
         <h4
           className={`
-            text-sm font-semibold text-center mb-1
+            text-sm font-bold text-center mb-1
             ${isLocked ? 'text-gray-400' : 'text-white'}
           `}
         >
@@ -133,7 +133,7 @@ export function AchievementBadge({
                 initial={{ width: 0 }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.5 }}
-                className="h-full bg-blue-500 rounded-full"
+                className="h-full bg-brand-secondary/50 rounded-full"
               />
             </div>
             <p className="text-xs text-gray-500 text-center mt-1">{progress}% kész</p>

@@ -176,7 +176,7 @@ export function SubscriptionPlans({
       return 'border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 shadow-lg';
     }
     if (plan.popular) {
-      return 'border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 shadow-md';
+      return 'border-brand-secondary/20 bg-gradient-to-br from-brand-secondary/5 to-cyan-50 shadow-md';
     }
     return 'border-border';
   };
@@ -210,7 +210,7 @@ export function SubscriptionPlans({
             >
               {/* Popular badge */}
               {plan.popular && (
-                <div className="absolute top-0 right-0 bg-blue-500 text-white px-3 py-1 text-xs font-medium">
+                <div className="absolute top-0 right-0 bg-brand-secondary/50 text-white px-3 py-1 text-xs font-medium">
                   <Star className="w-3 h-3 inline mr-1" />
                   Legnépszerűbb
                 </div>
@@ -229,7 +229,7 @@ export function SubscriptionPlans({
                   <div className={cn(
                     "p-2 rounded-lg",
                     plan.premium ? "bg-purple-100 text-purple-600" :
-                    plan.popular ? "bg-blue-100 text-blue-600" :
+                    plan.popular ? "bg-brand-secondary/10 text-brand-secondary" :
                     "bg-muted text-muted-foreground"
                   )}>
                     {getPlanIcon(plan.id)}
@@ -289,21 +289,21 @@ export function SubscriptionPlans({
                 {/* Quick stats */}
                 <div className="flex items-center justify-around text-center text-sm border rounded-lg p-3 bg-background/50">
                   <div>
-                    <div className="font-semibold">
+                    <div className="font-bold">
                       {plan.limits.courses === 'unlimited' ? '∞' : plan.limits.courses}
                     </div>
                     <div className="text-muted-foreground text-xs">Tartalom</div>
                   </div>
                   <div className="border-l h-8"></div>
                   <div>
-                    <div className="font-semibold">
+                    <div className="font-bold">
                       {plan.limits.certificates ? '✓' : '✗'}
                     </div>
                     <div className="text-muted-foreground text-xs">Tanúsítvány</div>
                   </div>
                   <div className="border-l h-8"></div>
                   <div>
-                    <div className="font-semibold capitalize">
+                    <div className="font-bold capitalize">
                       {plan.limits.support}
                     </div>
                     <div className="text-muted-foreground text-xs">Támogatás</div>
@@ -362,7 +362,7 @@ export function SubscriptionPlans({
 
       {/* FAQ or additional info */}
       <div className="text-center space-y-4 pt-8 border-t">
-        <h3 className="text-lg font-semibold">Gyakran ismételt kérdések</h3>
+        <h3 className="text-lg font-bold">Gyakran ismételt kérdések</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-muted-foreground max-w-4xl mx-auto">
           <div className="space-y-2">
             <p className="font-medium text-foreground">Bármikor lemondhatom az előfizetést?</p>

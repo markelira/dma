@@ -95,7 +95,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Platform Links */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Platform</h3>
+            <h3 className="text-sm font-bold text-gray-900">Platform</h3>
             <ul className="space-y-2">
               {navigation.platform.map((item) => (
                 <li key={item.name}>
@@ -112,7 +112,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Hallgatóknak */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Hallgatóknak</h3>
+            <h3 className="text-sm font-bold text-gray-900">Hallgatóknak</h3>
             <ul className="space-y-2">
               {navigation.hallgatoknak.map((item) => (
                 <li key={item.name}>
@@ -129,7 +129,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Partnereknek */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Partnereknek</h3>
+            <h3 className="text-sm font-bold text-gray-900">Partnereknek</h3>
             <ul className="space-y-2">
               {navigation.partnereknek.map((item) => (
                 <li key={item.name}>
@@ -146,7 +146,7 @@ export function Footer({ className }: FooterProps) {
 
           {/* Support & Legal */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-gray-900">Támogatás</h3>
+            <h3 className="text-sm font-bold text-gray-900">Támogatás</h3>
             <ul className="space-y-2">
               {navigation.support.map((item) => (
                 <li key={item.name}>
@@ -160,7 +160,7 @@ export function Footer({ className }: FooterProps) {
               ))}
             </ul>
             <div className="pt-4">
-              <h3 className="text-sm font-semibold text-gray-900">Jogi</h3>
+              <h3 className="text-sm font-bold text-gray-900">Jogi</h3>
               <ul className="space-y-2 mt-2">
                 {navigation.legal.map((item) => (
                   <li key={item.name}>

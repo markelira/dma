@@ -52,7 +52,7 @@ export const StatsCard: React.FC = () => {
   
   return (
     <div className="bg-white rounded-2xl shadow-card p-4 max-w-xs">
-      <h4 className="text-base font-semibold text-gray-800 mb-2">Aktív felhasználók most  </h4>
+      <h4 className="text-base font-bold text-gray-800 mb-2">Aktív felhasználók most  </h4>
       <div className="flex items-center space-x-3">
         <div className="w-3 h-3 bg-green-500 rounded-full" />
         <div className="text-2xl font-bold text-gray-900">{userCount.toLocaleString()}</div>

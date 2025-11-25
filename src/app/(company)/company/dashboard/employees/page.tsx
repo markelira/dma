@@ -328,7 +328,7 @@ export default function EmployeesPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-white0" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -341,7 +341,7 @@ export default function EmployeesPage() {
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{error}</h2>
-          <Link href="/company/dashboard" className="text-blue-600 hover:underline">
+          <Link href="/company/dashboard" className="text-brand-secondary hover:underline">
             Vissza a vezérlőpultra
           </Link>
         </div>
@@ -365,7 +365,7 @@ export default function EmployeesPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-sm"
+          className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm"
         >
           <UserPlus className="w-5 h-5 mr-2" />
           Új alkalmazott
@@ -405,7 +405,7 @@ export default function EmployeesPage() {
               placeholder="Keresés név, email vagy pozíció szerint..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
             />
           </div>
 
@@ -423,7 +423,7 @@ export default function EmployeesPage() {
                 onClick={() => setStatusFilter(option.value as any)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   statusFilter === option.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-secondary text-white'
                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
                 }`}
               >
@@ -482,8 +482,8 @@ export default function EmployeesPage() {
                   <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-sm font-medium text-blue-600">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                          <span className="text-sm font-medium text-brand-secondary">
                             {employee.firstName[0]}{employee.lastName[0]}
                           </span>
                         </div>
@@ -514,7 +514,7 @@ export default function EmployeesPage() {
                         {employee.status === 'invited' && employee.inviteToken && (
                           <button
                             onClick={() => copyInviteLink(employee)}
-                            className="inline-flex items-center px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 text-sm text-brand-secondary hover:text-brand-secondary-hover hover:bg-brand-secondary/5 rounded-lg transition-colors"
                           >
                             {copiedToken === employee.id ? (
                               <>
@@ -595,7 +595,7 @@ export default function EmployeesPage() {
             >
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-gray-900">Új alkalmazott hozzáadása</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Új alkalmazott hozzáadása</h2>
                   <button
                     onClick={() => setShowAddModal(false)}
                     className="text-gray-400 hover:text-gray-600 rounded-lg p-1 hover:bg-gray-100 transition-colors"
@@ -615,7 +615,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={newEmployee.firstName}
                     onChange={(e) => setNewEmployee({ ...newEmployee, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="pl. János"
                     required
                     disabled={submitting}
@@ -631,7 +631,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={newEmployee.lastName}
                     onChange={(e) => setNewEmployee({ ...newEmployee, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="pl. Kovács"
                     required
                     disabled={submitting}
@@ -647,7 +647,7 @@ export default function EmployeesPage() {
                     type="email"
                     value={newEmployee.email}
                     onChange={(e) => setNewEmployee({ ...newEmployee, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="janos.kovacs@pelda.hu"
                     required
                     disabled={submitting}
@@ -663,7 +663,7 @@ export default function EmployeesPage() {
                     type="text"
                     value={newEmployee.jobTitle}
                     onChange={(e) => setNewEmployee({ ...newEmployee, jobTitle: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="pl. Marketing Manager"
                     disabled={submitting}
                   />
@@ -688,7 +688,7 @@ export default function EmployeesPage() {
                 </button>
                 <button
                   onClick={handleAddEmployee}
-                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 inline-flex items-center justify-center"
+                  className="flex-1 px-4 py-2 text-sm font-medium text-white bg-brand-secondary rounded-lg hover:bg-brand-secondary-hover transition-colors disabled:opacity-50 inline-flex items-center justify-center"
                   disabled={submitting}
                 >
                   {submitting ? (
@@ -732,7 +732,7 @@ export default function EmployeesPage() {
                   </button>
                 </div>
 
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {showRemoveConfirm.status === 'invited'
                     ? 'Meghívó visszavonása'
                     : 'Alkalmazott eltávolítása'}

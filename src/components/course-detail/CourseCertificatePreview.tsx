@@ -68,7 +68,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
               <div className="border-t border-gray-200 pt-6">
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Ez a tanúsítvány igazolja, hogy</p>
-                  <p className="font-semibold text-gray-900 mb-4">[Hallgató Neve]</p>
+                  <p className="font-bold text-gray-900 mb-4">[Hallgató Neve]</p>
                   <p className="text-sm text-gray-600 mb-2">sikeresen elvégezte a tartalmat</p>
                   <h4 className="font-bold text-lg text-[#0f766e] mb-4">{courseData.title}</h4>
                   <p className="text-xs text-gray-500">Kiadás dátuma: {new Date().toLocaleDateString('hu-HU')}</p>
@@ -110,7 +110,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
               <div className="mt-6 p-4 bg-[#0f766e]/5 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5 text-[#0f766e]" />
-                  <span className="font-semibold text-gray-900">Tartalom statisztikák</span>
+                  <span className="font-bold text-gray-900">Tartalom statisztikák</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -137,7 +137,7 @@ export function CourseCertificatePreview({ courseData, onCtaClick }: CourseCerti
               <div className="space-y-4">
                 {careerOutcomes.map((outcome, index) => (
                   <div key={index} className="border border-gray-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-900 mb-2">{outcome.title}</h4>
+                    <h4 className="font-bold text-gray-900 mb-2">{outcome.title}</h4>
                     <p className="text-sm text-gray-600 mb-1">{outcome.salary}</p>
                     <div className="flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>

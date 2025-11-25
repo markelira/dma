@@ -61,14 +61,14 @@ export default function HeroSection() {
           >
             <Link
               href="/courses"
-              className="px-8 py-4 rounded-full font-semibold text-white transition-all hover:scale-105"
+              className="px-8 py-4 rounded-full font-bold text-white transition-all hover:scale-105"
               style={{ backgroundColor: "rgb(18, 17, 17)" }}
             >
               Tartalmak felfedezése
             </Link>
             <Link
               href="/pricing"
-              className="px-8 py-4 rounded-full font-semibold border-2 transition-all hover:scale-105"
+              className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",
                 color: "rgb(18, 17, 17)"
@@ -117,7 +117,7 @@ export default function HeroSection() {
                       <span className="text-white text-xl">📚</span>
                     </div>
                     <p className="text-xs text-gray-400 mb-1">{course.category}</p>
-                    <h3 className="text-white font-semibold">{course.title}</h3>
+                    <h3 className="text-white font-bold">{course.title}</h3>
                   </div>
                 ))}
               </div>
@@ -135,7 +135,7 @@ export default function HeroSection() {
                 <span className="text-white">✓</span>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">1000+</p>
+                <p className="text-sm font-bold text-gray-900">1000+</p>
                 <p className="text-xs text-gray-500">Aktív hallgató</p>
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function HeroSection() {
                 <span className="text-white">⭐</span>
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">4.9/5</p>
+                <p className="text-sm font-bold text-gray-900">4.9/5</p>
                 <p className="text-xs text-gray-500">Átlagos értékelés</p>
               </div>
             </div>

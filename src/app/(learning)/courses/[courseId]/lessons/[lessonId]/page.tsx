@@ -125,7 +125,7 @@ export default function LessonPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Hiba a lecke betöltésekor</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Hiba a lecke betöltésekor</h2>
           <p className="text-gray-600 mb-4">{lessonError.message}</p>
           <button 
             onClick={() => window.location.reload()} 
@@ -292,7 +292,7 @@ export default function LessonPage() {
             </Button>
 
             <div className="border-l pl-4">
-              <h1 className="font-semibold text-gray-900 truncate max-w-md">
+              <h1 className="font-bold text-gray-900 truncate max-w-md">
                 {lesson?.title}
               </h1>
               <p className="text-sm text-gray-600">{course?.title}</p>
@@ -320,7 +320,7 @@ export default function LessonPage() {
         {/* Sidebar */}
         {showSidebar && (
           <div className="w-80 bg-white border-r p-6 overflow-y-auto">
-            <h3 className="font-semibold text-gray-900 mb-4">Course Content</h3>
+            <h3 className="font-bold text-gray-900 mb-4">Course Content</h3>
 
             <div className="space-y-4">
               {modules.map((module: any) => (
@@ -339,7 +339,7 @@ export default function LessonPage() {
                           disabled={isLocked}
                           className={`w-full text-left p-3 rounded-lg border transition-colors ${
                             isCurrentLesson
-                              ? 'bg-blue-50 border-blue-200 text-blue-900'
+                              ? 'bg-brand-secondary/5 border-brand-secondary/20 text-brand-secondary-hover'
                               : isCompleted
                               ? 'bg-green-50 border-green-200 hover:bg-green-100'
                               : isLocked
@@ -353,7 +353,7 @@ export default function LessonPage() {
                                 {isCompleted ? (
                                   <CheckCircle className="w-4 h-4 text-green-600" />
                                 ) : isCurrentLesson ? (
-                                  <Play className="w-4 h-4 text-blue-600" />
+                                  <Play className="w-4 h-4 text-brand-secondary" />
                                 ) : isLocked ? (
                                   <Lock className="w-4 h-4 text-gray-400" />
                                 ) : moduleLesson.type === 'VIDEO' ? (
@@ -413,7 +413,7 @@ export default function LessonPage() {
               <div className="flex-1 flex items-center justify-center text-center p-8">
                 <div>
                   <Monitor className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                  <h3 className="text-xl font-semibold mb-2">Előfizetés szükséges</h3>
+                  <h3 className="text-xl font-bold mb-2">Előfizetés szükséges</h3>
                   <p className="text-gray-600 mb-4">Ez a lecke csak előfizetőknek érhető el.</p>
                   <Button onClick={() => router.push(`/courses/${courseId}`)}>
                     Előfizetés indítása
@@ -426,7 +426,7 @@ export default function LessonPage() {
             {!locked && lesson?.type !== 'VIDEO' && lesson?.type !== 'PDF' && (
               <div className="bg-white p-8 rounded-lg mb-6">
                 <div className="flex items-center gap-2 mb-6">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
+                  <BookOpen className="w-5 h-5 text-brand-secondary" />
                   <Badge variant="outline">{lesson.type}</Badge>
                 </div>
 

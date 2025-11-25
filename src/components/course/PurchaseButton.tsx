@@ -247,7 +247,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
       <div className={`text-center ${className}`}>
         <button
           onClick={() => router.push('/dashboard')}
-          className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-semibold px-8 py-4 rounded-xl text-base transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold px-8 py-4 rounded-xl text-base transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
           <span className="flex items-center justify-center gap-2">
             Irányítópult megnyitása
@@ -266,7 +266,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
         disabled={isLoading || disabled}
         className={`
           w-full bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700
-          text-white font-semibold px-8 py-4 rounded-xl text-base
+          text-white font-bold px-8 py-4 rounded-xl text-base
           transition-all duration-200 shadow-lg hover:shadow-xl
           flex items-center justify-center gap-2
           ${isLoading || disabled

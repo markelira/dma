@@ -214,7 +214,7 @@ export default function UniversityAdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-secondary"></div>
       </div>
     );
   }
@@ -338,7 +338,7 @@ export default function UniversityAdminDashboard() {
           <CardContent className="space-y-4">
             {recentActivities.slice(0, 5).map((activity) => (
               <div key={activity.id} className="flex items-start gap-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
+                <div className="p-2 bg-brand-secondary/10 rounded-lg">
                   {getActivityIcon(activity)}
                 </div>
                 <div className="flex-1 space-y-1">

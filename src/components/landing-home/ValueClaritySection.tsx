@@ -16,25 +16,25 @@ export default function ValueClaritySection() {
   const values = [
     {
       icon: Map,
-      title: "Vállalati Térkép a sikerhez",
+      title: "A Vállalati Térkép módszertan",
       description:
-        "Ne tűzolts többet. Tanulj rendszerben, strukturált tanulási útvonalakon, ahol minden lépés a következőre épít.",
-      gradient: "from-blue-500 to-blue-600",
-      bgGradient: "from-blue-50/80 to-blue-100/80",
+        "Nem random videókat nézel – a DMA strukturált módszertanát kapod, amit 20 éve fejlesztünk és 50+ cégnél bizonyított. Minden tartalom erre épül.",
+      gradient: "from-brand-secondary/50 to-brand-secondary",
+      bgGradient: "from-brand-secondary/5/80 to-blue-100/80",
     },
     {
       icon: Users,
-      title: "DMA szakértő oktatók",
+      title: "15+ aktív mentor",
       description:
-        "Tanulj sikeres vállalatvezetőktől és a DMA szakértőitől, akik megosztják valós tapasztalataikat és bevált módszereiket.",
+        "A DMA mentorcsapata és meghívott szakértők, akik napi szinten dolgoznak cégvezetőkkel. Nem elméleti oktatók – gyakorló szakemberek.",
       gradient: "from-purple-500 to-purple-600",
       bgGradient: "from-purple-50/80 to-purple-100/80",
     },
     {
       icon: Target,
-      title: "Valós projektek, valós eredmények",
+      title: "Építs, ne csak nézz",
       description:
-        "Ne csak tanulj - alkalmazd is. Minden kurzus gyakorlati projektekkel zárul, amit azonnal használhatsz a vállalkozásodban.",
+        "Minden program konkrét feladatokkal zárul. Nem fogsz inspirálódni – rendszereket építesz, amiket azonnal bevezethetsz a cégedben vagy a munkádban.",
       gradient: "from-teal-500 to-teal-600",
       bgGradient: "from-teal-50/80 to-teal-100/80",
     },
@@ -46,10 +46,10 @@ export default function ValueClaritySection() {
         {/* Section Header */}
         <div className="mb-16 text-center" data-aos="fade-up">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Miért a DMA Akadémia?
+            Miért a DMA?
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 md:text-xl">
-            Strukturált tanulás, szakértő oktatók, gyakorlati eredmények
+            20 év. 8000+ cég. Bevált módszertan.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default function ValueClaritySection() {
                   </div>
 
                   {/* Content */}
-                  <h3 className="mb-4 text-center text-2xl font-semibold text-gray-900">
+                  <h3 className="mb-4 text-center text-2xl font-bold text-gray-900">
                     {value.title}
                   </h3>
                   <p className="text-center leading-relaxed text-gray-600">
@@ -100,9 +100,9 @@ export default function ValueClaritySection() {
           </p>
           <a
             href="/courses"
-            className="inline-flex items-center rounded-lg bg-gradient-to-r from-blue-600 to-blue-500 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
+            className="inline-flex items-center rounded-lg bg-gradient-to-r from-brand-secondary to-brand-secondary/50 px-8 py-4 text-lg font-bold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
           >
-            Fedezd fel a kurzusokat
+            Fedezd fel a tartalmakat
             <span className="ml-2">→</span>
           </a>
         </div>

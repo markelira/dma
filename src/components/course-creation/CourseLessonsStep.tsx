@@ -209,7 +209,7 @@ export default function CourseLessonsStep({ courseId }: Props) {
       {/* Header with actions */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">{lessonsLabel}</h3>
+          <h3 className="text-lg font-bold">{lessonsLabel}</h3>
           <p className="text-sm text-muted-foreground">
             {lessons.length} {lessons.length === 1 ? lessonLabel.toLowerCase() : lessonsLabel.toLowerCase()}
           </p>
@@ -258,7 +258,7 @@ export default function CourseLessonsStep({ courseId }: Props) {
               onDragEnd={handleDragEnd}
               className={`cursor-move transition-all ${
                 draggedIndex === index ? "opacity-50 scale-[0.98]" : ""
-              } ${lesson.isImported ? "border-blue-200 bg-blue-50/50" : ""}`}
+              } ${lesson.isImported ? "border-brand-secondary/20 bg-brand-secondary/5/50" : ""}`}
             >
               <CardContent className="flex items-center gap-4 py-3 px-4">
                 {/* Drag handle */}
@@ -283,7 +283,7 @@ export default function CourseLessonsStep({ courseId }: Props) {
                   <div className="flex items-center gap-2">
                     <p className="font-medium truncate">{lesson.title}</p>
                     {lesson.isImported && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                      <span className="text-xs bg-brand-secondary/10 text-brand-secondary-hover px-2 py-0.5 rounded">
                         Importált
                       </span>
                     )}

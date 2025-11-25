@@ -38,6 +38,7 @@ import "./chunks/chunk-6X4H3KEO.js";
 import "./chunks/chunk-HZSMZCXU.js";
 import "./chunks/chunk-U5LHETZW.js";
 import { routes } from "./chunks/chunk-UZZEI6KP.js";
+import { SocialProofLogos } from "../src/components/home/SocialProofLogos.tsx";
 
 // virtual:main-hero
 import { Fragment as Fragment2 } from "react";
@@ -775,14 +776,12 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											0 +
 											0),
 								),
-								pixelHeight: 1760,
-								pixelWidth: 1281,
+								pixelHeight: 3600,
+							pixelWidth: 2880,
 								positionX: "center",
 								positionY: "top",
 								sizes: `min(${componentViewport?.width || "100vw"} - 160px, 1440px)`,
-								src: "https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760",
-								srcSet:
-									"https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?scale-down-to=1024&width=1281&height=1760 745w,https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760 1281w",
+								src: "/images/hero.png",
 							}}
 							className={"framer-1edkqgx"}
 							data-framer-appear-id={"1edkqgx"}
@@ -811,14 +810,12 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														0 +
 														0),
 											),
-											pixelHeight: 1760,
-											pixelWidth: 1281,
+											pixelHeight: 3600,
+							pixelWidth: 2880,
 											positionX: "center",
 											positionY: "top",
 											sizes: `min(${componentViewport?.width || "100vw"} - 52px, 1440px)`,
-											src: "https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760",
-											srcSet:
-												"https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?scale-down-to=1024&width=1281&height=1760 745w,https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760 1281w",
+											src: "/images/hero.png",
 										},
 									},
 									tkiLDJXPK: {
@@ -833,14 +830,12 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														0 +
 														0),
 											),
-											pixelHeight: 1760,
-											pixelWidth: 1281,
+											pixelHeight: 3600,
+							pixelWidth: 2880,
 											positionX: "center",
 											positionY: "top",
 											sizes: `min(${componentViewport?.width || "100vw"} - 40px, 1440px)`,
-											src: "https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760",
-											srcSet:
-												"https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?scale-down-to=1024&width=1281&height=1760 745w,https://framerusercontent.com/images/bZWXnpYwsSd3Z3NIjTZ0xgfxqZc.jpg?width=1281&height=1760 1281w",
+											src: "/images/hero.png",
 										},
 									},
 								},
@@ -970,12 +965,12 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												scopeId={"S5FkFcOiX"}
 											>
 												{_jsx(stdin_default4, {
-													BaAd7mo9i: "See Updates",
+													BaAd7mo9i: "Rólunk",
 													height: "100%",
 													id: "yCzj25qwF",
 													layoutId: "yCzj25qwF",
-													lrZ6QDqlh: resolvedLinks[0],
-													PBhlelw1m: "We are launched Taskflow Beta 1.2",
+													lrZ6QDqlh: "https://dma.hu",
+													PBhlelw1m: "20 éve a magyar vállalkozások mellett.",
 													variant: "Qeolxld5Y",
 													width: "100%",
 													...addPropertyOverrides(
@@ -1034,7 +1029,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-gdpscs, var(--token-2512d5c3-fb46-42ef-a96a-5b1cd92b4a5b, rgb(255, 255, 255)))",
 												}}
 											>
-												{"Transform How Teams Work Together"}
+												{"A holnap kihívásaira ma kell felkészíteni csapatodat"}
 											</motion.h1>
 										</React.Fragment>
 									</RichText>
@@ -1064,7 +1059,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												}}
 											>
 												{
-													"TaskFlow helps teams move work forward by combining the tools you need - tasks, docs, goals, and projects - in one customizable platform."
+													"Amit 20 év alatt megtanultunk, egy kattintásra. Akár egyedül, akár munkatársaiddal - fix áron, korlátlan hozzáféréssel."
 												}
 											</motion.p>
 										</React.Fragment>
@@ -1143,11 +1138,11 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											scopeId={"S5FkFcOiX"}
 										>
 											{_jsx(stdin_default3, {
-												bL9DUTLS5: "Get Started - It's Free",
+												bL9DUTLS5: "Ingyenes próba indítása",
 												height: "100%",
 												id: "q03oD5D7d",
 												kI0zFLUtw:
-													"https://aidancreates.lemonsqueezy.com/buy/f2a024a0-2f82-408c-9bcc-63c0d0056fb2",
+													"/register?trial=true",
 												layoutId: "q03oD5D7d",
 												variant: "BzT_Mjmhp",
 												width: "100%",
@@ -1227,9 +1222,9 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											{_jsx(stdin_default, {
 												height: "100%",
 												id: "qa2qZyYOE",
-												idYdcR9Dy: "https://www.framer.com/enterprise/",
+												idYdcR9Dy: "/courses",
 												layoutId: "qa2qZyYOE",
-												sK45rfg_7: "See Demo",
+												sK45rfg_7: "Tartalmaink megtekintése",
 												variant: "LMljE2NbK",
 												width: "100%",
 												...addPropertyOverrides(
@@ -1290,6 +1285,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 									baseVariant,
 									gestureVariant,
 								)}
+							style={{ display: "none" }}
 							>
 								<SmartComponentScopedContainer
 									className={"framer-1jq70zg-container"}
@@ -1352,31 +1348,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 									gestureVariant,
 								)}
 							>
-								<SmartComponentScopedContainerWithFXWithOptimizedAppearEffect
-									__perspectiveFX={false}
-									__smartComponentFX={true}
-									__targetOpacity={1}
-									animate={animation6}
-									className={"framer-1tjot6i-container"}
-									data-framer-appear-id={"1tjot6i"}
-									initial={animation5}
-									layoutDependency={layoutDependency}
-									layoutId={"epVFFvgRQ-container"}
-									nodeId={"epVFFvgRQ"}
-									optimized={true}
-									rendersWithMotion={true}
-									scopeId={"S5FkFcOiX"}
-								>
-									{_jsx(stdin_default2, {
-										height: "100%",
-										id: "epVFFvgRQ",
-										layoutId: "epVFFvgRQ",
-										style: {
-											width: "100%",
-										},
-										width: "100%",
-									})}
-								</SmartComponentScopedContainerWithFXWithOptimizedAppearEffect>
+								<SocialProofLogos />
 							</ComponentViewportProvider>
 							<motion.div
 								className={"framer-1490lq7"}

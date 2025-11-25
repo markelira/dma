@@ -133,20 +133,20 @@ export function PremiumHeroSection({ university }: PremiumHeroSectionProps) {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4 pt-4">
-                <button className="group bg-white text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/90 transition-all duration-300 flex items-center gap-3 hover:scale-105 shadow-xl">
+                <button className="group bg-white text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-white/90 transition-all duration-300 flex items-center gap-3 hover:scale-105 shadow-xl">
                   <GraduationCap className="w-5 h-5 group-hover:rotate-12 transition-transform" />
                   Programok felfedezése
                 </button>
                 
                 {university.phone && (
-                  <button className="group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 hover:scale-105">
+                  <button className="group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 hover:scale-105">
                     <Phone className="w-5 h-5 group-hover:ring-2 group-hover:ring-white/50 group-hover:rounded-full transition-all" />
                     Kapcsolat
                   </button>
                 )}
 
                 {university.website && (
-                  <button className="group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 hover:scale-105">
+                  <button className="group bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-white/20 transition-all duration-300 flex items-center gap-3 hover:scale-105">
                     <ExternalLink className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                     Weboldal
                   </button>

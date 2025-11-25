@@ -5,7 +5,7 @@ export interface TextProps extends React.HTMLAttributes<HTMLParagraphElement> {
   as?: 'p' | 'span' | 'div' | 'label'
   variant?: 'default' | 'lead' | 'muted' | 'caption' | 'small'
   size?: 'xs' | 'sm' | 'base' | 'md' | 'lg' | 'xl'
-  weight?: 'normal' | 'medium' | 'semibold' | 'bold'
+  weight?: 'normal' | 'medium' | 'bold'
 }
 
 const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
@@ -40,7 +40,6 @@ const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
     const weightClasses = {
       normal: 'font-normal',
       medium: 'font-medium',
-      semibold: 'font-semibold',
       bold: 'font-bold'
     }
 

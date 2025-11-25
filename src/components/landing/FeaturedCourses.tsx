@@ -244,7 +244,7 @@ export const FeaturedCourses: React.FC = () => {
           >
             <div className="flex items-center gap-2 mb-4">
               <Award className="w-6 h-6 text-primary" />
-              <h3 className="text-lg font-semibold text-gray-900">Tanulási folyamatod</h3>
+              <h3 className="text-lg font-bold text-gray-900">Tanulási folyamatod</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center">
@@ -260,7 +260,7 @@ export const FeaturedCourses: React.FC = () => {
                 <div className="text-sm text-gray-600">Átlagos értékelés</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{userProgress.preferredCategories.length}</div>
+                <div className="text-2xl font-bold text-brand-secondary">{userProgress.preferredCategories.length}</div>
                 <div className="text-sm text-gray-600">Kedvenc kategória</div>
               </div>
             </div>
@@ -323,7 +323,7 @@ export const FeaturedCourses: React.FC = () => {
         >
           <Link
             href="/courses"
-            className="inline-flex items-center space-x-2 bg-primary text-white px-8 py-3 rounded-full font-semibold hover:bg-primary/90 transition-colors"
+            className="inline-flex items-center space-x-2 bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-primary/90 transition-colors"
           >
             <span>{isAuthenticated ? 'További ajánlatok megtekintése' : 'Összes tartalom megtekintése'}</span>
             <ArrowRight className="w-5 h-5" />

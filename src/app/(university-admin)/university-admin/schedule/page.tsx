@@ -71,7 +71,7 @@ export default function UniversityAdminSchedulePage() {
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'lecture':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/30';
       case 'exam':
         return 'bg-red-100 text-red-800 border-red-300';
       case 'seminar':
@@ -214,7 +214,7 @@ export default function UniversityAdminSchedulePage() {
                           {formatTime(event.startTime)} - {formatTime(event.endTime)}
                         </span>
                       </div>
-                      <h3 className="font-semibold mb-1">{event.title}</h3>
+                      <h3 className="font-bold mb-1">{event.title}</h3>
                       <div className="space-y-1 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <BookOpen className="h-3 w-3" />

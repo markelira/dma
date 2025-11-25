@@ -305,7 +305,7 @@ export default function UniversityAdminFinancePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-secondary"></div>
       </div>
     );
   }
@@ -430,7 +430,7 @@ export default function UniversityAdminFinancePage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-semibold">{stats.topCourse.title}</p>
+                <p className="font-bold">{stats.topCourse.title}</p>
                 <p className="text-sm text-muted-foreground">Legtöbb bevételt hozó tartalom</p>
               </div>
               <div className="text-right">
@@ -510,7 +510,7 @@ export default function UniversityAdminFinancePage() {
                   </TableCell>
                   <TableCell>{transaction.courseTitle || 'N/A'}</TableCell>
                   <TableCell>
-                    <div className="font-semibold">
+                    <div className="font-bold">
                       {transaction.amount.toLocaleString()} Ft
                     </div>
                   </TableCell>

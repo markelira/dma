@@ -54,7 +54,7 @@ interface UniversalCourseCardProps {
 
 const difficultyColors = {
   'Kezdő': 'bg-green-900/50 text-green-400',
-  'Haladó': 'bg-blue-900/50 text-blue-400',
+  'Haladó': 'bg-brand-secondary-hover/50 text-brand-secondary',
   'Középhaladó': 'bg-yellow-900/50 text-yellow-400',
   'Szakértő': 'bg-red-900/50 text-red-400'
 }
@@ -155,7 +155,7 @@ export function UniversalCourseCard({
         />
       ) : (
         <div className="flex items-center justify-center h-full">
-          <BookOpen className="w-12 h-12 text-blue-400/60" />
+          <BookOpen className="w-12 h-12 text-brand-secondary/60" />
         </div>
       )}
 
@@ -192,7 +192,7 @@ export function UniversalCourseCard({
               // Navigate to first lesson
               window.location.href = `/courses/${course.slug || course.id}/learn`
             }}
-            className="w-12 h-12 bg-blue-500/30 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-blue-500/50 transition-all hover:scale-110 cursor-pointer">
+            className="w-12 h-12 bg-brand-secondary/50/30 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-brand-secondary/50/50 transition-all hover:scale-110 cursor-pointer">
             <Play className="w-5 h-5 text-white ml-1" />
           </div>
         </div>
@@ -203,7 +203,7 @@ export function UniversalCourseCard({
         <div className="absolute bottom-0 left-0 right-0">
           <div className="w-full bg-gray-800/80 h-1">
             <div
-              className="bg-blue-500 h-1 transition-all duration-300"
+              className="bg-brand-secondary/50 h-1 transition-all duration-300"
               style={{ width: `${course.progress}%` }}
             />
           </div>
@@ -217,7 +217,7 @@ export function UniversalCourseCard({
 
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xl font-bold text-blue-400">
+        <span className="text-xl font-bold text-brand-secondary">
           {course.price.toLocaleString('hu-HU')} Ft
         </span>
         {hasDiscount && (
@@ -271,7 +271,7 @@ export function UniversalCourseCard({
 
     return (
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-blue-600/20 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 bg-brand-secondary/20 rounded-full flex items-center justify-center flex-shrink-0">
           {course.instructor.imageUrl ? (
             <Image
               src={course.instructor.imageUrl}
@@ -281,7 +281,7 @@ export function UniversalCourseCard({
               className="rounded-full object-cover"
             />
           ) : (
-            <span className="text-sm font-bold text-blue-400">
+            <span className="text-sm font-bold text-brand-secondary">
               {course.instructor.firstName[0]}{course.instructor.lastName[0]}
             </span>
           )}
@@ -326,7 +326,7 @@ export function UniversalCourseCard({
               <button
                 key={action}
                 onClick={() => handleAction('enroll')}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center min-w-[120px]"
+                className="flex-1 bg-brand-secondary text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-secondary-hover transition-colors text-center min-w-[120px]"
               >
                 {course.isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
               </button>
@@ -337,7 +337,7 @@ export function UniversalCourseCard({
               <button
                 key={action}
                 onClick={() => handleAction('purchase')}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center min-w-[120px]"
+                className="flex-1 bg-brand-secondary text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-secondary-hover transition-colors text-center min-w-[120px]"
               >
                 Beiratkozás
               </button>
@@ -348,7 +348,7 @@ export function UniversalCourseCard({
               <button
                 key={action}
                 onClick={() => handleAction('continue')}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-center min-w-[120px]"
+                className="flex-1 bg-brand-secondary text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-secondary-hover transition-colors text-center min-w-[120px]"
               >
                 Folytatás
               </button>
@@ -359,7 +359,7 @@ export function UniversalCourseCard({
               <Link
                 key={action}
                 href={courseUrl}
-                className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg font-semibold hover:bg-gray-800 hover:text-white transition-colors text-center"
+                className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg font-bold hover:bg-gray-800 hover:text-white transition-colors text-center"
               >
                 Részletek
               </Link>
@@ -405,7 +405,7 @@ export function UniversalCourseCard({
 
       <div className="p-6 space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-white line-clamp-2 group-hover:text-blue-400 transition-colors">
+          <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors">
             {course.title}
           </h3>
 
@@ -445,7 +445,7 @@ export function UniversalCourseCard({
               )}
               {course.duration && <span>{course.duration}h</span>}
               {course.price && (
-                <span className="font-bold text-blue-400">
+                <span className="font-bold text-brand-secondary">
                   {(course.price / 1000).toFixed(0)}k Ft
                 </span>
               )}
@@ -453,7 +453,7 @@ export function UniversalCourseCard({
 
             <button
               onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-xs font-medium transition-colors"
+              className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-3 py-1 rounded-md text-xs font-medium transition-colors"
             >
               {course.isEnrolled ? 'Folytatás' : 'Beiratkozás'}
             </button>
@@ -477,7 +477,7 @@ export function UniversalCourseCard({
 
       <div className="p-8 space-y-6">
         <div>
-          <h3 className="text-2xl font-bold text-white line-clamp-2 group-hover:text-blue-400 transition-colors mb-3">
+          <h3 className="text-2xl font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors mb-3">
             {course.title}
           </h3>
 
@@ -499,7 +499,7 @@ export function UniversalCourseCard({
         <div className="flex gap-4">
           <button
             onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-blue-500/20 transition-all hover:scale-105"
+            className="flex-1 bg-gradient-to-r from-brand-secondary to-brand-secondary-hover text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-brand-secondary/20 transition-all hover:scale-105"
           >
             Beiratkozás Most
           </button>
@@ -520,13 +520,13 @@ export function UniversalCourseCard({
         {renderThumbnail('aspect-square', 'h-16 w-16')}
 
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-white line-clamp-1 mb-1">
+          <h3 className="font-bold text-white line-clamp-1 mb-1">
             {course.title}
           </h3>
           <div className="flex items-center gap-3 text-sm text-gray-400">
             {renderUniversity()}
             {course.category && (
-              <span className="px-2 py-1 bg-blue-900/30 text-blue-400 rounded-full text-xs">
+              <span className="px-2 py-1 bg-brand-secondary-hover/30 text-brand-secondary rounded-full text-xs">
                 {typeof course.category === 'string' ? course.category : (course.category as any)?.name}
               </span>
             )}
@@ -542,14 +542,14 @@ export function UniversalCourseCard({
           )}
 
           {course.price && (
-            <div className="text-lg font-bold text-blue-400">
+            <div className="text-lg font-bold text-brand-secondary">
               {(course.price / 1000).toFixed(0)}k Ft
             </div>
           )}
 
           <button
             onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors whitespace-nowrap"
+            className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-2 rounded-lg font-bold transition-colors whitespace-nowrap"
           >
             Beiratkozás
           </button>
@@ -577,7 +577,7 @@ export function UniversalCourseCard({
             </div>
           )}
           {course.price && (
-            <span className="font-bold text-blue-400">
+            <span className="font-bold text-brand-secondary">
               {(course.price / 1000).toFixed(0)}k Ft
             </span>
           )}
@@ -585,7 +585,7 @@ export function UniversalCourseCard({
 
         <Link
           href={courseUrl}
-          className="text-blue-400 hover:text-blue-300 text-xs font-medium"
+          className="text-brand-secondary hover:text-brand-secondary-light text-xs font-medium"
         >
           Részletek
         </Link>

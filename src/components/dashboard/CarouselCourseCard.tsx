@@ -27,7 +27,7 @@ const courseTypeLabels: Record<string, string> = {
 
 const courseTypeColors: Record<string, string> = {
   webinar: 'bg-purple-100 text-purple-700 border-purple-200',
-  akademia: 'bg-blue-100 text-blue-700 border-blue-200',
+  akademia: 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/20',
   masterclass: 'bg-amber-100 text-amber-700 border-amber-200',
   podcast: 'bg-green-100 text-green-700 border-green-200',
 };
@@ -49,7 +49,7 @@ export function CarouselCourseCard({
         <div className="absolute top-3 right-3 z-10">
           <Badge
             variant="secondary"
-            className={`${courseTypeColors[courseType]} font-semibold text-xs px-3 py-1 border shadow-sm`}
+            className={`${courseTypeColors[courseType]} font-bold text-xs px-3 py-1 border shadow-sm`}
           >
             {courseTypeLabels[courseType]}
           </Badge>
@@ -71,7 +71,7 @@ export function CarouselCourseCard({
 
           {enrolled && (
             <div className="absolute bottom-3 left-3">
-              <Badge className="bg-green-600 text-white font-semibold text-xs px-3 py-1 shadow-md">
+              <Badge className="bg-green-600 text-white font-bold text-xs px-3 py-1 shadow-md">
                 <CheckCircle2 className="h-3 w-3 mr-1" />
                 Beiratkozva
               </Badge>
@@ -80,7 +80,7 @@ export function CarouselCourseCard({
         </div>
 
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors leading-tight">
+          <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-secondary transition-colors leading-tight">
             {title}
           </h3>
 
@@ -111,7 +111,7 @@ export function CarouselCourseCard({
               </div>
               <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-blue-600 to-blue-700 transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-brand-secondary to-brand-secondary-hover transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>

@@ -20,15 +20,15 @@ export default function CourseTypesSection() {
       title: "Akadémia",
       icon: GraduationCap,
       description:
-        "Hosszú, több leckéből álló átfogó képzés. Strukturált tanulási útvonal, amelyen lépésről lépésre építed a tudásod.",
+        "Ha alapoktól akarsz felépíteni egy készséget vagy rendszert. Hosszabb elkötelezettség, mélyebb eredmények.",
       features: [
-        "10-20+ videó lecke",
-        "Gyakorlati projektek",
-        "Tanúsítvány megszerzése",
-        "Élethosszig tartó hozzáférés",
+        "10-20+ videó szekció",
+        "Gyakorlati projektek minden modulhoz",
+        "Tanúsítvány a végén",
+        "Korlátlan visszanézés",
       ],
-      gradient: "from-blue-500 to-blue-600",
-      bgGradient: "from-blue-50 to-blue-100",
+      gradient: "from-brand-secondary/50 to-brand-secondary",
+      bgGradient: "from-brand-secondary/5 to-blue-100",
       href: "/courses?type=academia",
     },
     {
@@ -36,12 +36,12 @@ export default function CourseTypesSection() {
       title: "Webinár",
       icon: Video,
       description:
-        "Egyszeri, koncentrált alkalom egy konkrét témáról. Tömör, érthető előadás szakértőktől, gyors eredményekért.",
+        "Ha egy konkrét problémára keresel megoldást. 90 perc, egy téma, azonnal alkalmazható tudás.",
       features: [
-        "1-2 órás élő vagy felvett előadás",
-        "Konkrét témakör fókuszban",
-        "Letölthető anyagok",
-        "Interaktív Q&A szekció",
+        "90 perces fókuszált alkalom",
+        "Egy konkrét probléma – egy megoldás",
+        "Letölthető munkalapok",
+        "Q&A szekció",
       ],
       gradient: "from-purple-500 to-purple-600",
       bgGradient: "from-purple-50 to-purple-100",
@@ -52,12 +52,12 @@ export default function CourseTypesSection() {
       title: "Mesterkurzus",
       icon: BookOpen,
       description:
-        "Átfogó, mester szintű képzés iparági vezetőktől. Elmélyült tudás és szakértelem megszerzése egy területen.",
+        "Ha haladó szinten akarsz elmélyülni egy területen. Iparági vezetők és a DMA senior szakértői.",
       features: [
         "20-40+ órányi tartalom",
-        "Haladó szintű szakértelem",
-        "Esettanulmányok",
-        "Mentoráltság lehetőség",
+        "Haladó stratégiák és keretrendszerek",
+        "Esettanulmányok valós cégekből",
+        "Exkluzív interjúk",
       ],
       gradient: "from-teal-500 to-teal-600",
       bgGradient: "from-teal-50 to-teal-100",
@@ -68,12 +68,12 @@ export default function CourseTypesSection() {
       title: "Podcast",
       icon: Mic,
       description:
-        "Podcast epizódok szakértőkkel és gondolatvezetőkkel. Inspiráló beszélgetések és interjúk, bármikor meghallgathatók.",
+        "Ha útközben akarsz fejlődni. Beszélgetések, interjúk, betekintések – bárhol, bármikor.",
       features: [
-        "Audio vagy videó formátum",
-        "Beszélgetések szakértőkkel",
-        "Bárhol hallgatható",
-        "Inspiráló tartalmak",
+        "Audio és videó formátum",
+        "Vendég szakértők és cégvezetők",
+        "Heti új epizódok",
+        "Offline meghallgatás",
       ],
       gradient: "from-green-500 to-green-600",
       bgGradient: "from-green-50 to-green-100",
@@ -87,10 +87,10 @@ export default function CourseTypesSection() {
         {/* Section Header */}
         <div className="mb-16 text-center" data-aos="fade-up">
           <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Négy tanulási forma
+            Melyik formátum neked való?
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600 md:text-xl">
-            Válaszd ki azt, ami a legjobban illik a céljaidhoz és tempódhoz
+            Válaszd ki a céljaid és az időd alapján
           </p>
         </div>
 
@@ -144,7 +144,7 @@ export default function CourseTypesSection() {
                     </ul>
 
                     {/* CTA Link */}
-                    <div className="flex items-center justify-center text-sm font-semibold">
+                    <div className="flex items-center justify-center text-sm font-bold">
                       <span
                         className={`bg-gradient-to-r ${course.gradient} bg-clip-text text-transparent`}
                       >
@@ -167,8 +167,8 @@ export default function CourseTypesSection() {
         {/* Bottom Text */}
         <div className="mt-16 text-center" data-aos="fade-up" data-aos-delay="400">
           <p className="text-gray-600">
-            <span className="font-semibold text-gray-900">Nem tudod melyik a neked való?</span>{" "}
-            Kezdd egy webinárral, és építs onnan tovább.
+            <span className="font-bold text-gray-900">Nem tudod, hol kezdd?</span>{" "}
+            Próbálj ki egy webinárt – 90 perc alatt megérted, miről szól a DMA módszertan.
           </p>
         </div>
       </div>

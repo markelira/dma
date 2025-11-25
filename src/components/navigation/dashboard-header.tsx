@@ -124,10 +124,10 @@ export function DashboardHeader() {
             {user && (
               <div className="hidden md:flex items-center mr-4">
                 <span className={cn(
-                  "px-3 py-1 text-xs font-semibold rounded-full",
+                  "px-3 py-1 text-xs font-bold rounded-full",
                   user.role === 'ADMIN' ? "bg-red-100 text-red-700" :
                   user.role === 'INSTRUCTOR' ? "bg-purple-100 text-purple-700" :
-                  (user.role === 'UNIVERSITY_ADMIN' || user.role === 'university_admin') ? "bg-blue-100 text-blue-700" :
+                  (user.role === 'UNIVERSITY_ADMIN' || user.role === 'university_admin') ? "bg-brand-secondary/10 text-brand-secondary-hover" :
                   "bg-[#466C95]/10 text-[#466C95]"
                 )}>
                   {user.role === 'ADMIN' ? 'Admin' :

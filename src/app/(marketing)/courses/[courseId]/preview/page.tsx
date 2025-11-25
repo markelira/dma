@@ -69,7 +69,7 @@ export default function CoursePreviewPage({ params }: { params: { courseId: stri
             <p className="text-red-600 mb-4">{error || 'Tartalom nem található'}</p>
             <button 
               onClick={() => router.back()}
-              className="text-blue-600 hover:underline"
+              className="text-brand-secondary hover:underline"
             >
               Vissza
             </button>

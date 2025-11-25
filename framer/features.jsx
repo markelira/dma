@@ -39,6 +39,7 @@ import { routes } from "./chunks/chunk-UZZEI6KP.js";
 // virtual:features
 import { Fragment as Fragment2 } from "react";
 import { ContextProviders } from "unframer";
+import NextLink from "next/link";
 
 // /:https://framerusercontent.com/modules/QxsU37G2wIKS0PqfVLMZ/nSi5ynipTW8nahyVORhB/zEHEu7i6p.js
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
@@ -54,6 +55,7 @@ import {
 	SmartComponentScopedContainer,
 	useComponentViewport,
 	useLocaleInfo,
+	Link,
 	useVariantState,
 	withCSS,
 } from "unframer";
@@ -252,7 +254,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 										scopeId={"zEHEu7i6p"}
 									>
 										{_jsx(stdin_default, {
-											gQqOpdg6s: "Features",
+											gQqOpdg6s: "Tartalmak",
 											height: "100%",
 											id: "NjBQezwED",
 											layoutId: "NjBQezwED",
@@ -291,7 +293,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Everything You Need in One Place"}
+												{"Négy formátum. Egy cél: eredmény."}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -320,7 +322,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Powerful features designed to make teamwork seamless"}
+												{"Válaszd ki, hogyan szeretnéd elsajátítani a tudást. Mindegyik a DMA 20 éves módszertanára épül."}
 											</motion.p>
 										</React.Fragment>
 									</RichText>
@@ -383,29 +385,31 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 										rendersWithMotion={true}
 										scopeId={"zEHEu7i6p"}
 									>
-										{_jsx(stdin_default2, {
-											AcFY5tUVJ: addImageAlt(
-												{
-													pixelHeight: 1080,
-													pixelWidth: 2200,
-													src: "https://framerusercontent.com/images/h6yd2AmxNoWP16LZq7af2O2KgTI.png?width=2200&height=1080",
-													srcSet:
-														"https://framerusercontent.com/images/h6yd2AmxNoWP16LZq7af2O2KgTI.png?scale-down-to=512&width=2200&height=1080 512w,https://framerusercontent.com/images/h6yd2AmxNoWP16LZq7af2O2KgTI.png?scale-down-to=1024&width=2200&height=1080 1024w,https://framerusercontent.com/images/h6yd2AmxNoWP16LZq7af2O2KgTI.png?scale-down-to=2048&width=2200&height=1080 2048w,https://framerusercontent.com/images/h6yd2AmxNoWP16LZq7af2O2KgTI.png?width=2200&height=1080 2200w",
+										{_jsx(NextLink, {
+											href: "/masterclass",
+											
+											children: _jsx(stdin_default2, {
+												AcFY5tUVJ: addImageAlt(
+													{
+														pixelHeight: 1080,
+														pixelWidth: 2200,
+														src: "/images/masterclass.png",
+													},
+													"Masterclass",
+												),
+												height: "100%",
+												id: "mXTJZJEey",
+												layoutId: "mXTJZJEey",
+												style: {
+													width: "100%",
 												},
-												"",
-											),
-											height: "100%",
-											id: "mXTJZJEey",
-											layoutId: "mXTJZJEey",
-											style: {
+												TTDBuDFWn: "Masterclass",
+												variant: "QaMgSgIWy",
+												vVyXB7aUV:
+													"Mélyreható programok a DMA szakértőitől és meghívott iparági vezetőktől. Haladó módszerek azoknak, akik komolyan gondolják.",
 												width: "100%",
-											},
-											TTDBuDFWn: "Customizable Workspaces",
-											variant: "QaMgSgIWy",
-											vVyXB7aUV:
-												"Create your ideal workspace environment with our powerful drag-and-drop interface that enables seamless organization and efficient workflow management.",
-											width: "100%",
-											zXhcER6Sf: "100+ premium workspace templates",
+												zXhcER6Sf: "Felfedezés →",
+											}),
 										})}
 									</SmartComponentScopedContainer>
 								</ComponentViewportProvider>
@@ -474,41 +478,43 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											rendersWithMotion={true}
 											scopeId={"zEHEu7i6p"}
 										>
-											{_jsx(stdin_default2, {
-												AcFY5tUVJ: addImageAlt(
-													{
-														pixelHeight: 450,
-														pixelWidth: 581,
-														src: "https://framerusercontent.com/images/eqtk624g1gHQRyct3fZoINRn2YE.png?width=581&height=450",
-														srcSet:
-															"https://framerusercontent.com/images/eqtk624g1gHQRyct3fZoINRn2YE.png?scale-down-to=512&width=581&height=450 512w,https://framerusercontent.com/images/eqtk624g1gHQRyct3fZoINRn2YE.png?width=581&height=450 581w",
+											{_jsx(NextLink, {
+												href: "/webinar",
+												
+												children: _jsx(stdin_default2, {
+													AcFY5tUVJ: addImageAlt(
+														{
+															pixelHeight: 450,
+															pixelWidth: 581,
+															src: "/images/webinar.png",
+														},
+														"Webinár",
+													),
+													height: "100%",
+													id: "h3fJmS_RG",
+													layoutId: "h3fJmS_RG",
+													style: {
+														width: "100%",
 													},
-													"",
-												),
-												height: "100%",
-												id: "h3fJmS_RG",
-												layoutId: "h3fJmS_RG",
-												style: {
+													TTDBuDFWn: "Webinár",
+													variant: "gKNokyV1D",
+													vVyXB7aUV:
+														"90 perces koncentrált alkalmak egy konkrét problémára. Azonnal alkalmazható megoldások, időpazarlás nélkül.",
 													width: "100%",
-												},
-												TTDBuDFWn: "Seamless Collaboration",
-												variant: "gKNokyV1D",
-												vVyXB7aUV:
-													"Transform your team communication with our integrated collaboration tools",
-												width: "100%",
-												zXhcER6Sf: "100+ collaboration tools",
-												...addPropertyOverrides(
-													{
-														GHlXSV2k3: {
-															variant: "At5J0T6gX",
+													zXhcER6Sf: "Felfedezés →",
+													...addPropertyOverrides(
+														{
+															GHlXSV2k3: {
+																variant: "At5J0T6gX",
+															},
+															tkooi5MZZ: {
+																variant: "At5J0T6gX",
+															},
 														},
-														tkooi5MZZ: {
-															variant: "At5J0T6gX",
-														},
-													},
-													baseVariant,
-													gestureVariant,
-												),
+														baseVariant,
+														gestureVariant,
+													),
+												}),
 											})}
 										</SmartComponentScopedContainer>
 									</ComponentViewportProvider>
@@ -571,39 +577,43 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											rendersWithMotion={true}
 											scopeId={"zEHEu7i6p"}
 										>
-											{_jsx(stdin_default2, {
-												AcFY5tUVJ: addImageAlt(
-													{
-														pixelHeight: 450,
-														pixelWidth: 500,
-														src: "https://framerusercontent.com/images/jognhqEp7SLzWAq6zguuduyWOM.png?width=500&height=450",
+											{_jsx(NextLink, {
+												href: "/akademia",
+
+												children: _jsx(stdin_default2, {
+													AcFY5tUVJ: addImageAlt(
+														{
+															pixelHeight: 450,
+															pixelWidth: 500,
+															src: "/images/akademia.png",
+														},
+														"Akadémia",
+													),
+													height: "100%",
+													id: "sgXc0m1A_",
+													layoutId: "sgXc0m1A_",
+													style: {
+														width: "100%",
 													},
-													"",
-												),
-												height: "100%",
-												id: "sgXc0m1A_",
-												layoutId: "sgXc0m1A_",
-												style: {
+													TTDBuDFWn: "Akadémia",
+													variant: "gKNokyV1D",
+													vVyXB7aUV:
+														"Átfogó, strukturált programok, amelyek lépésről lépésre építik fel a szükséges készségeket. Nem elmélet – alkalmazható rendszerek.",
 													width: "100%",
-												},
-												TTDBuDFWn: "Smart Task Organization",
-												variant: "gKNokyV1D",
-												vVyXB7aUV:
-													"Experience streamlined task management with intelligent system",
-												width: "100%",
-												zXhcER6Sf: "100+ automation workflows",
-												...addPropertyOverrides(
-													{
-														GHlXSV2k3: {
-															variant: "At5J0T6gX",
+													zXhcER6Sf: "Felfedezés →",
+													...addPropertyOverrides(
+														{
+															GHlXSV2k3: {
+																variant: "At5J0T6gX",
+															},
+															tkooi5MZZ: {
+																variant: "At5J0T6gX",
+															},
 														},
-														tkooi5MZZ: {
-															variant: "At5J0T6gX",
-														},
-													},
-													baseVariant,
-													gestureVariant,
-												),
+														baseVariant,
+														gestureVariant,
+													),
+												}),
 											})}
 										</SmartComponentScopedContainer>
 									</ComponentViewportProvider>
@@ -666,40 +676,44 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											rendersWithMotion={true}
 											scopeId={"zEHEu7i6p"}
 										>
-											{_jsx(stdin_default2, {
-												AcFY5tUVJ: addImageAlt(
-													{
-														pixelHeight: 450,
-														pixelWidth: 500,
-														src: "https://framerusercontent.com/images/nXM7IQS1D3Vw7huzVyWDUlXN0.png?width=500&height=450",
+											{_jsx(NextLink, {
+												href: "/podcast",
+
+												children: _jsx(stdin_default2, {
+													AcFY5tUVJ: addImageAlt(
+														{
+															pixelHeight: 450,
+															pixelWidth: 500,
+															src: "/images/podcast.png",
+														},
+														"Podcast",
+													),
+													height: "100%",
+													id: "e8xTZxEFD",
+													layoutId: "e8xTZxEFD",
+													style: {
+														width: "100%",
 													},
-													"",
-												),
-												height: "100%",
-												id: "e8xTZxEFD",
-												layoutId: "e8xTZxEFD",
-												style: {
+													TTDBuDFWn: "Podcast",
+													variant: "gKNokyV1D",
+													vVyXB7aUV:
+														"Üzleti beszélgetések és interjúk útközben. Valós tapasztalatok, bevált stratégiák – futás, autózás vagy edzés közben.",
 													width: "100%",
-												},
-												TTDBuDFWn: "Projects Made Simple",
-												variant: "gKNokyV1D",
-												vVyXB7aUV:
-													"Track progress, set milestones, and manage tasks with intuitive project management tools",
-												width: "100%",
-												zXhcER6Sf:
-													"Multiple view options (Kanban, List, Timeline)",
-												...addPropertyOverrides(
-													{
-														GHlXSV2k3: {
-															variant: "At5J0T6gX",
+													zXhcER6Sf:
+														"Tovább →",
+													...addPropertyOverrides(
+														{
+															GHlXSV2k3: {
+																variant: "At5J0T6gX",
+															},
+															tkooi5MZZ: {
+																variant: "At5J0T6gX",
+															},
 														},
-														tkooi5MZZ: {
-															variant: "At5J0T6gX",
-														},
-													},
-													baseVariant,
-													gestureVariant,
-												),
+														baseVariant,
+														gestureVariant,
+													),
+												}),
 											})}
 										</SmartComponentScopedContainer>
 									</ComponentViewportProvider>

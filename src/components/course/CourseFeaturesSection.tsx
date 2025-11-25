@@ -39,12 +39,12 @@ export function CourseFeaturesSection({ features }: CourseFeaturesSectionProps) 
               className="flex gap-4 items-start p-4 rounded-lg bg-white/40 hover:bg-white/60 transition-all duration-200 border border-gray-100/50"
             >
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-brand-secondary/10 to-brand-secondary/5 flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-brand-secondary" />
                 </div>
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-gray-900 text-sm mb-1">
+                <h3 className="font-bold text-gray-900 text-sm mb-1">
                   {feature.title}
                 </h3>
                 <p className="text-xs text-gray-600 leading-relaxed">

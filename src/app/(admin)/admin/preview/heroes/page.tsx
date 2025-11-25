@@ -124,7 +124,7 @@ export default function HeroesPreviewPage() {
       name: 'Conversion-Focused',
       description: 'E-commerce style with sticky card',
       bestFor: 'Paid courses, high-volume',
-      color: 'bg-blue-600'
+      color: 'bg-brand-secondary'
     },
     {
       id: 'hero2' as HeroVariant,
@@ -236,7 +236,7 @@ export default function HeroesPreviewPage() {
                 }`}
               >
                 <div className="text-left">
-                  <div className="font-semibold text-sm">{variant.name}</div>
+                  <div className="font-bold text-sm">{variant.name}</div>
                   <div className={`text-xs mt-0.5 ${
                     selectedHero === variant.id ? 'text-white/80' : 'text-gray-500'
                   }`}>
@@ -276,11 +276,11 @@ export default function HeroesPreviewPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6 text-sm">
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">Best For</h3>
+              <h3 className="font-bold text-gray-700 mb-2">Best For</h3>
               <p className="text-gray-600">{heroVariants.find(v => v.id === selectedHero)?.bestFor}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">Key Features</h3>
+              <h3 className="font-bold text-gray-700 mb-2">Key Features</h3>
               <ul className="text-gray-600 space-y-1">
                 {selectedHero === 'hero1' && (
                   <>
@@ -306,7 +306,7 @@ export default function HeroesPreviewPage() {
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-700 mb-2">Component Path</h3>
+              <h3 className="font-bold text-gray-700 mb-2">Component Path</h3>
               <code className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-800">
                 {`/components/course/heroes/${
                   selectedHero === 'hero1' ? 'Hero1ConversionFocused' :

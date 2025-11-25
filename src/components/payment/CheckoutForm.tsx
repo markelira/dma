@@ -178,7 +178,7 @@ function CheckoutFormInner({
               <span className="text-muted-foreground">
                 {mode === 'subscription' ? 'Havi díj' : 'Egyszeri fizetés'}
               </span>
-              <span className="font-semibold text-lg">
+              <span className="font-bold text-lg">
                 {formatCurrency(amount, currency)}
               </span>
             </div>
@@ -203,7 +203,7 @@ function CheckoutFormInner({
 
           <Separator />
           
-          <div className="flex items-center justify-between font-semibold">
+          <div className="flex items-center justify-between font-bold">
             <span>Összesen</span>
             <span className="text-lg">{formatCurrency(amount, currency)}</span>
           </div>
@@ -333,7 +333,7 @@ function CheckoutFormInner({
             </div>
             
             <div className="flex items-start space-x-2">
-              <Shield className="w-4 h-4 mt-0.5 text-blue-600" />
+              <Shield className="w-4 h-4 mt-0.5 text-brand-secondary" />
               <div>
                 <p className="font-medium">Biztonságos fizetés</p>
                 <p>Adatai SSL titkosítással védettek, nem tároljuk bankkártya adatait.</p>

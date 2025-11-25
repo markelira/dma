@@ -133,7 +133,7 @@ export function OTPInput({
             transition-all duration-200
             ${error
               ? 'border-2 border-red-500 text-red-600 bg-red-50 focus:ring-2 focus:ring-red-500 focus:border-red-500'
-              : 'border-2 border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600'
+              : 'border-2 border-gray-200 text-gray-900 bg-white focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary'
             }
             ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-100' : 'hover:border-gray-300'}
             ${activeIndex === index && !error && !disabled ? 'shadow-lg scale-105' : ''}

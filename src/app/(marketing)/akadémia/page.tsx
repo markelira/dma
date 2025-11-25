@@ -126,9 +126,9 @@ export default function AkadémiaPage() {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50/30 to-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-brand-secondary/5 via-cyan-50/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-blue-600" />
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-brand-secondary" />
             <p className="text-lg text-gray-600">Akadémia tartalmak betöltése...</p>
           </div>
         </div>
@@ -141,9 +141,9 @@ export default function AkadémiaPage() {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50/30 to-gray-50 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-brand-secondary/5 via-cyan-50/30 to-gray-50 relative overflow-hidden">
         {/* Background blur shapes */}
-        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-blue-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-brand-secondary/10/30 rounded-full blur-3xl" aria-hidden="true"></div>
         <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-cyan-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
 
         {/* Hero Section */}
@@ -155,7 +155,7 @@ export default function AkadémiaPage() {
               transition={{ duration: 0.6 }}
               className="mb-6"
             >
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 mb-6 shadow-lg">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-brand-secondary/50 to-brand-secondary mb-6 shadow-lg">
                 <BookOpen className="w-10 h-10 text-white" />
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
@@ -179,7 +179,7 @@ export default function AkadémiaPage() {
                   placeholder="Keress akadémia tartalmak között..."
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-blue-500 transition-all text-gray-900 placeholder-gray-500"
+                  className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-brand-secondary transition-all text-gray-900 placeholder-gray-500"
                 />
               </div>
             </motion.div>
@@ -219,7 +219,7 @@ export default function AkadémiaPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5 }}
                 >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-6 shadow-lg">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-secondary/50 to-brand-secondary flex items-center justify-center mb-6 shadow-lg">
                     <BookOpen className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-2xl font-bold text-gray-900 mb-3">
@@ -230,7 +230,7 @@ export default function AkadémiaPage() {
                   </p>
                   <button
                     onClick={handleResetFilters}
-                    className="btn bg-gradient-to-t from-blue-600 to-blue-500 text-white shadow-sm hover:shadow-md transition-all"
+                    className="btn bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white shadow-sm hover:shadow-md transition-all"
                   >
                     Szűrők törlése
                   </button>

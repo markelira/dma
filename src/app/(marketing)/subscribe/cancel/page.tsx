@@ -26,7 +26,7 @@ export default function SubscribeCancelPage() {
 
           <CardContent className="space-y-6">
             <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Miért történhetett ez?</h3>
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Miért történhetett ez?</h3>
               <div className="space-y-3 text-left">
                 <div className="flex items-start gap-3">
                   <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
@@ -48,11 +48,11 @@ export default function SubscribeCancelPage() {
             </div>
 
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-900">Mit tehet?</h3>
+              <h3 className="text-lg font-bold text-gray-900">Mit tehet?</h3>
               <div className="grid gap-4 text-left">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <div className="w-6 h-6 bg-brand-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <RefreshCw className="w-4 h-4 text-brand-secondary" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Próbálja újra</p>
@@ -60,8 +60,8 @@ export default function SubscribeCancelPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <div className="w-6 h-6 bg-brand-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <RefreshCw className="w-4 h-4 text-brand-secondary" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Másik terv kiválasztása</p>
@@ -69,8 +69,8 @@ export default function SubscribeCancelPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <RefreshCw className="w-4 h-4 text-blue-600" />
+                  <div className="w-6 h-6 bg-brand-secondary/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <RefreshCw className="w-4 h-4 text-brand-secondary" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Kapcsolatfelvétel</p>
@@ -97,7 +97,7 @@ export default function SubscribeCancelPage() {
 
             <div className="pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-500">
-                Problémája van? Írjon nekünk: <a href="mailto:support@dma.hu" className="text-blue-600 hover:underline">support@dma.hu</a>
+                Problémája van? Írjon nekünk: <a href="mailto:support@dma.hu" className="text-brand-secondary hover:underline">support@dma.hu</a>
               </p>
             </div>
           </CardContent>

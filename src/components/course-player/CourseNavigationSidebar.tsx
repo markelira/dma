@@ -133,7 +133,7 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
               <span className={playerTypography.bodySmall} style={{ color: playerColors.textSecondary }}>
                 {t('sidebar.overallProgress')}
               </span>
-              <span className={`${playerTypography.labelSmall} font-semibold`} style={{ color: playerColors.primary }}>
+              <span className={`${playerTypography.labelSmall} font-bold`} style={{ color: playerColors.primary }}>
                 {courseStats.overallProgress}%
               </span>
             </div>

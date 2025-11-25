@@ -215,7 +215,7 @@ export default function PromoCodesPage() {
           {/* Promo Codes List */}
           <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 Promóciós kódok listája
               </h2>
             </div>
@@ -230,7 +230,7 @@ export default function PromoCodesPage() {
                         <h3 className="text-lg font-bold text-gray-900 font-mono">
                           {code.code}
                         </h3>
-                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${getStatusColor(code)}`}>
+                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${getStatusColor(code)}`}>
                           {getStatusText(code)}
                         </span>
                         <button
@@ -290,7 +290,7 @@ export default function PromoCodesPage() {
             {promoCodes.length === 0 && (
               <div className="p-12 text-center">
                 <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   Még nincs promóciós kód
                 </h3>
                 <p className="text-gray-600 mb-6">

@@ -169,7 +169,7 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
 
   const getProgressColor = (percentage: number): string => {
     if (percentage >= 80) return 'text-green-600'
-    if (percentage >= 60) return 'text-blue-600'
+    if (percentage >= 60) return 'text-brand-secondary'
     if (percentage >= 40) return 'text-yellow-600'
     return 'text-gray-600'
   }
@@ -188,18 +188,18 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
     <div className={`space-y-6 ${className}`}>
       {/* Main Progress Overview */}
       <Card className="overflow-hidden">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50">
+        <CardHeader className="bg-gradient-to-r from-brand-secondary/5 to-purple-50">
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center space-x-2">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <TrendingUp className="w-5 h-5 text-brand-secondary" />
                 <span>Tanulási haladás</span>
               </CardTitle>
               <p className="text-sm text-gray-600 mt-1">{courseProgress.courseTitle}</p>
             </div>
             
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-brand-secondary">
                 {Math.round(courseProgress.completionPercentage)}%
               </div>
               <div className="text-sm text-gray-500">teljesítve</div>
@@ -220,17 +220,17 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
 
             {/* Key Metrics */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center p-3 bg-blue-50 rounded-lg">
-                <Clock className="w-6 h-6 text-blue-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-blue-700">
+              <div className="text-center p-3 bg-brand-secondary/5 rounded-lg">
+                <Clock className="w-6 h-6 text-brand-secondary mx-auto mb-1" />
+                <div className="text-lg font-bold text-brand-secondary-hover">
                   {formatTime(courseProgress.totalTimeSpent)}
                 </div>
-                <div className="text-xs text-blue-600">Tanulási idő</div>
+                <div className="text-xs text-brand-secondary">Tanulási idő</div>
               </div>
               
               <div className="text-center p-3 bg-green-50 rounded-lg">
                 <Award className="w-6 h-6 text-green-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-green-700">
+                <div className="text-lg font-bold text-green-700">
                   {Math.round(courseProgress.averageScore)}%
                 </div>
                 <div className="text-xs text-green-600">Átlag pontszám</div>
@@ -238,7 +238,7 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
               
               <div className="text-center p-3 bg-orange-50 rounded-lg">
                 <Flame className="w-6 h-6 text-orange-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-orange-700">
+                <div className="text-lg font-bold text-orange-700">
                   {courseProgress.streakDays}
                 </div>
                 <div className="text-xs text-orange-600">Napos sorozat</div>
@@ -246,7 +246,7 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
               
               <div className="text-center p-3 bg-purple-50 rounded-lg">
                 <Target className="w-6 h-6 text-purple-600 mx-auto mb-1" />
-                <div className="text-lg font-semibold text-purple-700">
+                <div className="text-lg font-bold text-purple-700">
                   {courseProgress.learningVelocity.toFixed(1)}
                 </div>
                 <div className="text-xs text-purple-600">Lecke/hét</div>
@@ -271,7 +271,7 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Ezen a héten:</span>
                 <div className="text-right">
-                  <div className="font-semibold">{learningAnalytics.weeklyLessons} lecke</div>
+                  <div className="font-bold">{learningAnalytics.weeklyLessons} lecke</div>
                   <div className="text-xs text-gray-500">{formatTime(learningAnalytics.weeklyTime)}</div>
                 </div>
               </div>
@@ -279,14 +279,14 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Ebben a hónapban:</span>
                 <div className="text-right">
-                  <div className="font-semibold">{learningAnalytics.monthlyLessons} lecke</div>
+                  <div className="font-bold">{learningAnalytics.monthlyLessons} lecke</div>
                   <div className="text-xs text-gray-500">{formatTime(learningAnalytics.monthlyTime)}</div>
                 </div>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Átlagos munkamenet:</span>
-                <div className="font-semibold">{learningAnalytics.averageSessionTime} perc</div>
+                <div className="font-bold">{learningAnalytics.averageSessionTime} perc</div>
               </div>
               
               <div className="flex justify-between items-center">
@@ -295,7 +295,7 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
                   {React.createElement(getContentTypeIcon(learningAnalytics.favoriteType), {
                     className: 'w-4 h-4'
                   })}
-                  <span className="font-semibold text-sm">
+                  <span className="font-bold text-sm">
                     {learningAnalytics.favoriteType === 'VIDEO' && 'Videó'}
                     {learningAnalytics.favoriteType === 'TEXT' && 'Szöveg'}
                     {learningAnalytics.favoriteType === 'QUIZ' && 'Kvíz'}
@@ -319,14 +319,14 @@ export const CourseProgressTracker: React.FC<CourseProgressTrackerProps> = ({
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Szint:</span>
-                <Badge className="bg-blue-100 text-blue-800">
+                <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
                   {courseProgress.skillLevel}
                 </Badge>
               </div>
               
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-600">Legerősebb terület:</span>
-                <span className="font-semibold">{learningAnalytics.strongestSkill}</span>
+                <span className="font-bold">{learningAnalytics.strongestSkill}</span>
               </div>
               
               <div className="space-y-2">

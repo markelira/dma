@@ -107,7 +107,7 @@ export const PricingGuarantee: React.FC = () => {
         <div className="text-center mt-12">
           <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 text-white">
             <ShieldCheck className="w-5 h-5" />
-            <span className="font-semibold">Kockázatmentes próba</span>
+            <span className="font-bold">Kockázatmentes próba</span>
           </div>
         </div>
       </Container>

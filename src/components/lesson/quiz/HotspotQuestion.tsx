@@ -550,8 +550,8 @@ export const HotspotQuestion: React.FC<Props> = ({
 
       {/* Immediate Feedback */}
       {question.showFeedbackImmediately && feedback && !submitted && (
-        <Card className="p-4 bg-blue-50 border-blue-200">
-          <div className="flex items-center gap-2 text-blue-800">
+        <Card className="p-4 bg-brand-secondary/5 border-brand-secondary/20">
+          <div className="flex items-center gap-2 text-brand-secondary-hover">
             <Zap className="w-4 h-4" />
             <span className="text-sm">{feedback}</span>
           </div>

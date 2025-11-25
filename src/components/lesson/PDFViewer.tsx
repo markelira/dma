@@ -478,7 +478,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-secondary mx-auto"></div>
           <p className="text-gray-600">PDF betöltése...</p>
         </div>
       </div>
@@ -506,7 +506,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
             <FileText className="w-5 h-5 text-gray-600" />
-            <h3 className="font-semibold text-gray-900">{title || 'PDF dokumentum'}</h3>
+            <h3 className="font-bold text-gray-900">{title || 'PDF dokumentum'}</h3>
             <Badge variant="secondary">
               {currentPage} / {totalPages} oldal
             </Badge>
@@ -701,7 +701,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
               />
               {isSearching && (
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-secondary"></div>
                 </div>
               )}
             </div>
@@ -747,9 +747,9 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
                   key={annotation.id}
                   className={cn(
                     "absolute border-2 cursor-pointer transition-all duration-200",
-                    selectedAnnotation === annotation.id ? "ring-2 ring-blue-500" : "",
+                    selectedAnnotation === annotation.id ? "ring-2 ring-brand-secondary" : "",
                     annotation.type === 'highlight' ? "bg-yellow-200/60 border-yellow-400" :
-                    annotation.type === 'note' ? "bg-blue-200/60 border-blue-400" :
+                    annotation.type === 'note' ? "bg-brand-secondary/20/60 border-brand-secondary" :
                     "bg-gray-200/60 border-gray-400"
                   )}
                   style={{
@@ -925,7 +925,7 @@ export const PDFViewer: React.FC<PDFViewerProps> = ({
                               {annotation.type === 'highlight' ? (
                                 <Highlighter className="w-4 h-4 text-yellow-600" />
                               ) : (
-                                <MessageSquare className="w-4 h-4 text-blue-600" />
+                                <MessageSquare className="w-4 h-4 text-brand-secondary" />
                               )}
                               <span className="text-xs text-gray-500">Oldal {annotation.page}</span>
                             </div>

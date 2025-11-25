@@ -2,6 +2,9 @@
 
 import dynamic from 'next/dynamic';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
+import { HeroCourseShowcase } from '@/components/home/HeroCourseShowcase';
+import { CourseTypeShowcase } from '@/components/home/CourseTypeShowcase';
+import Footer from '@/components/landing-home/ui/footer';
 
 // Loading placeholder for sections
 const SectionLoader = () => (
@@ -23,11 +26,6 @@ const Benefits = dynamic(
   { ssr: false, loading: SectionLoader }
 );
 
-const VideoSection = dynamic(
-  () => import('@framer/video-section').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
 const Solutions = dynamic(
   () => import('@framer/solutions').then(m => m.default.Responsive || m.default),
   { ssr: false, loading: SectionLoader }
@@ -35,11 +33,6 @@ const Solutions = dynamic(
 
 const Pricing = dynamic(
   () => import('@framer/pricing').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const BlogSection = dynamic(
-  () => import('@framer/blog-section').then(m => m.default.Responsive || m.default),
   { ssr: false, loading: SectionLoader }
 );
 
@@ -58,10 +51,6 @@ const Cta = dynamic(
   { ssr: false, loading: SectionLoader }
 );
 
-const FramerFooter = dynamic(
-  () => import('@framer/footer').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
 
 // Common props for full-width Framer sections
 const fullWidthProps = {
@@ -77,16 +66,54 @@ export function TaskFlowHome() {
       {/* Main content - all sections full width */}
       <main className="w-full">
         <MainHero {...fullWidthProps} />
+        {/* Course Carousel Section */}
+        <div className="py-12">
+          <HeroCourseShowcase maxCourses={8} />
+        </div>
         <Features {...fullWidthProps} />
+        {/* Masterclass Carousel Section */}
+        <div className="py-12">
+          <CourseTypeShowcase
+            courseType="MASTERCLASS"
+            title="Masterclass-ok"
+            subtitle="Haladó stratégiák iparági vezetőktől és DMA szakértőktől."
+            maxCourses={8}
+          />
+        </div>
         <Benefits {...fullWidthProps} />
-        <VideoSection {...fullWidthProps} />
+        {/* Webinar Carousel Section */}
+        <div className="py-12">
+          <CourseTypeShowcase
+            courseType="WEBINAR"
+            title="Webinárok"
+            subtitle="Egy fókusz. Azonnal alkalmazható megoldás."
+            maxCourses={8}
+          />
+        </div>
         <Solutions {...fullWidthProps} />
         <Pricing {...fullWidthProps} />
-        <BlogSection {...fullWidthProps} />
+        {/* Akadémia Carousel Section */}
+        <div className="py-12">
+          <CourseTypeShowcase
+            courseType="ACADEMIA"
+            title="Akadémiák"
+            subtitle="Alapoktól a mesterszintig. Strukturált programok, mélyebb eredmények."
+            maxCourses={8}
+          />
+        </div>
         <Testimonials {...fullWidthProps} />
+        {/* Podcast Carousel Section */}
+        <div className="py-12">
+          <CourseTypeShowcase
+            courseType="PODCAST"
+            title="Podcastok"
+            subtitle="Fejlődj útközben. Beszélgetések, interjúk, betekintések – bárhol, bármikor."
+            maxCourses={8}
+          />
+        </div>
         <Faq {...fullWidthProps} />
         <Cta {...fullWidthProps} />
-        <FramerFooter {...fullWidthProps} />
+        <Footer border={true} />
       </main>
     </div>
   );

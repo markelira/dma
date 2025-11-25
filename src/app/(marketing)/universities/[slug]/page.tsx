@@ -230,13 +230,13 @@ export default async function UniversityPublicPage({ params }: { params: { slug:
       {data.credentials && (
         <section className="bg-gray-50 py-10">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-semibold mb-6">Egyetemi hitelesítések és eredmények</h2>
+            <h2 className="text-2xl font-bold mb-6">Egyetemi hitelesítések és eredmények</h2>
             <div className="grid md:grid-cols-3 gap-6">
               {data.credentials.accreditations && data.credentials.accreditations.length > 0 && (
                 <div className="bg-white p-6 rounded-xl shadow-card">
                   <div className="flex items-center gap-3 mb-4">
                     <Award className="w-6 h-6 text-primary" />
-                    <h3 className="font-semibold text-lg">Akreditációk</h3>
+                    <h3 className="font-bold text-lg">Akreditációk</h3>
                   </div>
                   <ul className="space-y-2 text-gray-700">
                     {data.credentials.accreditations.map((accreditation, index) => (
@@ -253,7 +253,7 @@ export default async function UniversityPublicPage({ params }: { params: { slug:
                 <div className="bg-white p-6 rounded-xl shadow-card">
                   <div className="flex items-center gap-3 mb-4">
                     <Globe className="w-6 h-6 text-primary" />
-                    <h3 className="font-semibold text-lg">Partnerek</h3>
+                    <h3 className="font-bold text-lg">Partnerek</h3>
                   </div>
                   <ul className="space-y-2 text-gray-700">
                     {data.credentials.partnerships.map((partnership, index) => (
@@ -270,7 +270,7 @@ export default async function UniversityPublicPage({ params }: { params: { slug:
                 <div className="bg-white p-6 rounded-xl shadow-card">
                   <div className="flex items-center gap-3 mb-4">
                     <TrendingUp className="w-6 h-6 text-primary" />
-                    <h3 className="font-semibold text-lg">Eredmények</h3>
+                    <h3 className="font-bold text-lg">Eredmények</h3>
                   </div>
                   <ul className="space-y-2 text-gray-700">
                     {data.credentials.achievements.map((achievement, index) => (
@@ -290,7 +290,7 @@ export default async function UniversityPublicPage({ params }: { params: { slug:
       {/* Enhanced Contact Section */}
       <section className="bg-gray-100 py-10">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-semibold mb-6">Kapcsolat</h2>
+          <h2 className="text-2xl font-bold mb-6">Kapcsolat</h2>
           <div className="grid md:grid-cols-2 gap-8">
             {/* Contact Information */}
             <div className="space-y-4">

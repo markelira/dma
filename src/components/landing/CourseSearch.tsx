@@ -282,7 +282,7 @@ export const CourseSearch: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => router.push('/courses?duration=0-2h')}
-                    className="flex items-center space-x-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm hover:bg-blue-100 transition-colors"
+                    className="flex items-center space-x-1 px-3 py-1 bg-brand-secondary/5 text-brand-secondary-hover rounded-full text-sm hover:bg-brand-secondary/10 transition-colors"
                   >
                     <Clock className="w-3 h-3" />
                     <span>Gyors</span>

@@ -29,7 +29,7 @@ export function CategoryCard({ id, name, icon, courseCount, color = '#0056D2' }:
           >
             {icon}
           </div>
-          <h3 className="text-lg font-semibold text-coursera-text-primary mb-2 group-hover:text-coursera-blue transition-colors">
+          <h3 className="text-lg font-bold text-coursera-text-primary mb-2 group-hover:text-coursera-blue transition-colors">
             {name}
           </h3>
           {courseCount !== undefined && (

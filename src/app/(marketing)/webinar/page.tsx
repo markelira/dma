@@ -126,7 +126,7 @@ export default function WebinarPage() {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-purple-600" />
             <p className="text-lg text-gray-600">Webinárok betöltése...</p>
@@ -141,10 +141,10 @@ export default function WebinarPage() {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50/30 to-gray-50 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 relative overflow-hidden">
         {/* Background blur shapes */}
         <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-blue-100/20 rounded-full blur-2xl" aria-hidden="true"></div>
+        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-brand-secondary/10/20 rounded-full blur-2xl" aria-hidden="true"></div>
 
         {/* Hero Section */}
         <div className="relative pt-20 pb-16 px-6 lg:px-12">

@@ -174,8 +174,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 						layoutId={"C3YPHn0db"}
 						ref={refBinding}
 						style={{
-							backgroundColor:
-								"var(--token-08f2dbd6-30f3-4b80-b3ec-25d8f6146ee9, rgb(255, 255, 255))",
+							backgroundColor: "rgb(249, 250, 251)",
 							...style,
 						}}
 						{...addPropertyOverrides(
@@ -252,7 +251,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 										scopeId={"lk3otI4uM"}
 									>
 										{_jsx(stdin_default, {
-											gQqOpdg6s: "Solutions",
+											gQqOpdg6s: "Megoldás",
 											height: "100%",
 											id: "W_kFhwccm",
 											layoutId: "W_kFhwccm",
@@ -291,7 +290,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Solutions for Every Team"}
+												{"Minden üzleti terület, egy platformon"}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -320,7 +319,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Customizable workflows for any team size or industry"}
+												{"Válaszd ki, hol szeretnél fejlődni – a DMA szakértői minden területen segítenek"}
 											</motion.p>
 										</React.Fragment>
 									</RichText>
@@ -394,7 +393,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												},
 												"",
 											),
-											RwK8T9gAW: "Project Management",
+											RwK8T9gAW: "Vezetés és menedzsment",
 											style: {
 												height: "100%",
 												width: "100%",
@@ -465,7 +464,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												},
 												"",
 											),
-											RwK8T9gAW: "Document Collaboration",
+											RwK8T9gAW: "Értékesítés és marketing",
 											style: {
 												height: "100%",
 												width: "100%",
@@ -536,7 +535,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												},
 												"",
 											),
-											RwK8T9gAW: "Meeting Management",
+											RwK8T9gAW: "Működés és rendszerek",
 											style: {
 												height: "100%",
 												width: "100%",
@@ -607,7 +606,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												},
 												"",
 											),
-											RwK8T9gAW: "Goal \u2028Tracking",
+											RwK8T9gAW: "Pénzügyek és kontroll",
 											style: {
 												height: "100%",
 												width: "100%",
@@ -678,7 +677,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												},
 												"",
 											),
-											RwK8T9gAW: "Team Communication",
+											RwK8T9gAW: "HR és csapatépítés",
 											style: {
 												height: "100%",
 												width: "100%",

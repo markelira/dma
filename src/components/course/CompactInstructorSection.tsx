@@ -41,8 +41,8 @@ export function CompactInstructorSection({ instructors }: CompactInstructorSecti
     <div>
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-          <User className="w-4 h-4 text-blue-600" />
+        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-secondary/10 to-brand-secondary/5 flex items-center justify-center">
+          <User className="w-4 h-4 text-brand-secondary" />
         </div>
         <span className="text-base font-bold text-gray-900">
           {instructors.length > 1 ? 'Oktatók' : 'Oktató'}
@@ -73,8 +73,8 @@ export function CompactInstructorSection({ instructors }: CompactInstructorSecti
                     />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-2 ring-white shadow-sm">
-                    <User className="w-7 h-7 text-blue-600" />
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-secondary/10 to-brand-secondary/20 flex items-center justify-center ring-2 ring-white shadow-sm">
+                    <User className="w-7 h-7 text-brand-secondary" />
                   </div>
                 )}
               </div>
@@ -95,7 +95,7 @@ export function CompactInstructorSection({ instructors }: CompactInstructorSecti
                     {shouldTruncate && (
                       <button
                         onClick={() => toggleBio(instructor.id)}
-                        className="text-xs text-blue-600 hover:text-blue-700 font-semibold mt-1.5"
+                        className="text-xs text-brand-secondary hover:text-brand-secondary-hover font-bold mt-1.5"
                       >
                         {isExpanded ? 'Kevesebb' : 'Több'}
                       </button>

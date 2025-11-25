@@ -12,7 +12,7 @@ interface GradientTextProps extends HTMLAttributes<HTMLSpanElement> {
 export function GradientText({
   children,
   className,
-  from = 'from-blue-400',
+  from = 'from-brand-secondary',
   via = 'via-purple-500',
   to = 'to-pink-500',
   ...props

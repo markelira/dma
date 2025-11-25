@@ -225,7 +225,7 @@ export default function TrendingPage() {
         {filteredCourses.length === 0 ? (
           <div className="text-center py-12">
             <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
               Nincs találat
             </h3>
             <p className="text-gray-600">
@@ -275,7 +275,7 @@ export default function TrendingPage() {
                     </Badge>
                   </div>
                   
-                  <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                     {course.title}
                   </h3>
                   

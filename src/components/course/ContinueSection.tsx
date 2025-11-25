@@ -70,7 +70,7 @@ export const ContinueSection: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                   {course.title}
                 </h3>
                 

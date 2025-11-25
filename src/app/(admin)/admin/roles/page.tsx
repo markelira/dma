@@ -191,7 +191,7 @@ export default function AdminRolesPage() {
       {/* Role Stats */}
       <div>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Szerepkör Eloszlás</h2>
+          <h2 className="text-xl font-bold text-gray-900">Szerepkör Eloszlás</h2>
           <Badge className="bg-purple-100 text-purple-700">
             <Sparkles className="w-3 h-3 mr-1" />
             Jogosultságok
@@ -202,8 +202,8 @@ export default function AdminRolesPage() {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-brand-secondary" />
                 </div>
                 <Badge variant="outline" className="text-xs">
                   <TrendingUp className="w-3 h-3 mr-1" />
@@ -359,12 +359,12 @@ export default function AdminRolesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="font-semibold">Felhasználó</TableHead>
-                <TableHead className="font-semibold">Email</TableHead>
-                <TableHead className="font-semibold">Jelenlegi Szerepkör</TableHead>
-                <TableHead className="font-semibold">Regisztráció</TableHead>
-                <TableHead className="font-semibold">Állapot</TableHead>
-                <TableHead className="text-right font-semibold">Műveletek</TableHead>
+                <TableHead className="font-bold">Felhasználó</TableHead>
+                <TableHead className="font-bold">Email</TableHead>
+                <TableHead className="font-bold">Jelenlegi Szerepkör</TableHead>
+                <TableHead className="font-bold">Regisztráció</TableHead>
+                <TableHead className="font-bold">Állapot</TableHead>
+                <TableHead className="text-right font-bold">Műveletek</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

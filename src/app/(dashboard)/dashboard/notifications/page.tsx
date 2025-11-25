@@ -167,12 +167,12 @@ export default function NotificationsPage() {
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <Bell className="w-4 h-4 text-white" />
-                <span className="font-semibold text-white">
+                <span className="font-bold text-white">
                   {unreadCount} Olvasatlan
                 </span>
               </motion.div>
 
-              <h1 className="text-4xl lg:text-5xl font-semibold text-white mb-3">
+              <h1 className="text-4xl lg:text-5xl font-bold text-white mb-3">
                 Értesítések
               </h1>
               <p className="text-white/80 text-lg max-w-2xl">
@@ -252,7 +252,7 @@ export default function NotificationsPage() {
           {filteredNotifications.length === 0 ? (
             <Card className="p-12 text-center">
               <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Nincsenek értesítések
               </h3>
               <p className="text-gray-600">

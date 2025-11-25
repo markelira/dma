@@ -46,13 +46,13 @@ export function CourseEnrollmentCard({
           </div>
         )}
         {!thumbnailUrl && (
-          <div className="relative aspect-video bg-gradient-to-br from-blue-100/50 to-purple-100/30 flex items-center justify-center">
-            <BookOpen className="w-16 h-16 text-blue-400 opacity-40" />
+          <div className="relative aspect-video bg-gradient-to-br from-brand-secondary/10/50 to-purple-100/30 flex items-center justify-center">
+            <BookOpen className="w-16 h-16 text-brand-secondary opacity-40" />
           </div>
         )}
 
         {/* Subscription Header */}
-        <div className="p-6 bg-gradient-to-br from-blue-600 to-blue-500 text-white">
+        <div className="p-6 bg-gradient-to-br from-brand-secondary to-brand-secondary/50 text-white">
           <div className="flex items-baseline gap-2 mb-2">
             <span className="text-2xl font-bold">Hozzáférés előfizetéssel</span>
           </div>
@@ -66,18 +66,18 @@ export function CourseEnrollmentCard({
           <div className="space-y-3">
             {duration && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Clock className="w-5 h-5 text-blue-600" />
+                <Clock className="w-5 h-5 text-brand-secondary" />
                 <span>{duration} tartalom</span>
               </div>
             )}
             {lessons > 0 && (
               <div className="flex items-center gap-3 text-gray-700">
-                <Play className="w-5 h-5 text-blue-600" />
+                <Play className="w-5 h-5 text-brand-secondary" />
                 <span>{lessons} lecke</span>
               </div>
             )}
             <div className="flex items-center gap-3 text-gray-700">
-              <Infinity className="w-5 h-5 text-blue-600" />
+              <Infinity className="w-5 h-5 text-brand-secondary" />
               <span>Korlátlan hozzáférés</span>
             </div>
           </div>
@@ -86,7 +86,7 @@ export function CourseEnrollmentCard({
           <div className="space-y-3 pt-4">
             <Button
               onClick={onEnroll}
-              className="w-full bg-gradient-to-t from-blue-600 to-blue-500 hover:shadow-xl text-white font-bold py-7 text-lg rounded-xl transition-all hover:scale-[1.02]"
+              className="w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 hover:shadow-xl text-white font-bold py-7 text-lg rounded-xl transition-all hover:scale-[1.02]"
               disabled={isEnrolled}
             >
               {isEnrolled ? (

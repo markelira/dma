@@ -492,7 +492,7 @@ export default function EditCoursePage() {
                               value={lesson.title}
                               onChange={(e) => updateLesson(index, { ...lesson, title: e.target.value })}
                               placeholder="Lecke címe"
-                              className="font-semibold"
+                              className="font-bold"
                             />
                           </div>
                           

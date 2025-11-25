@@ -115,10 +115,10 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                     </Link>
                     <Link
                       href="/akadémia"
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-secondary/5 hover:text-brand-secondary transition-colors"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-blue-600">📚</span>
+                        <span className="text-brand-secondary">📚</span>
                         <span>Akadémia</span>
                       </div>
                     </Link>

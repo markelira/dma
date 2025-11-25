@@ -164,7 +164,7 @@ export function SecuritySection() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-semibold text-white mb-3">
+                <h3 className="text-xl font-bold text-white mb-3">
                   {feature.title}
                 </h3>
                 <p className="text-white/60 text-sm leading-relaxed">

@@ -596,14 +596,14 @@ export const EnhancedQuizEngine: React.FC<Props> = ({
           feedback.type === 'success' && "border-green-500 bg-green-50",
           feedback.type === 'error' && "border-red-500 bg-red-50",
           feedback.type === 'warning' && "border-yellow-500 bg-yellow-50",
-          feedback.type === 'info' && "border-blue-500 bg-blue-50"
+          feedback.type === 'info' && "border-brand-secondary bg-brand-secondary/5"
         )}>
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
               {feedback.type === 'success' && <CheckCircle className="w-6 h-6 text-green-600" />}
               {feedback.type === 'error' && <XCircle className="w-6 h-6 text-red-600" />}
               {feedback.type === 'warning' && <Clock className="w-6 h-6 text-yellow-600" />}
-              {feedback.type === 'info' && <Zap className="w-6 h-6 text-blue-600" />}
+              {feedback.type === 'info' && <Zap className="w-6 h-6 text-brand-secondary" />}
             </div>
             
             <div className="flex-1">
@@ -620,7 +620,7 @@ export const EnhancedQuizEngine: React.FC<Props> = ({
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800"
+                        className="flex items-center gap-2 text-sm text-brand-secondary hover:text-brand-secondary-hover"
                       >
                         <BookOpen className="w-4 h-4" />
                         {resource.title}

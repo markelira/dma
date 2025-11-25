@@ -251,7 +251,7 @@ export default function InstructorsPage() {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       instructor.role === 'SZEREPLŐ'
                         ? 'bg-purple-100 text-purple-800'
-                        : 'bg-blue-100 text-blue-800'
+                        : 'bg-brand-secondary/10 text-brand-secondary-hover'
                     }`}>
                       {INSTRUCTOR_ROLE_LABELS[instructor.role || 'MENTOR']}
                     </span>
@@ -370,7 +370,7 @@ export default function InstructorsPage() {
                 <SelectContent>
                   <SelectItem value="MENTOR">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-500" />
+                      <span className="w-2 h-2 rounded-full bg-brand-secondary/50" />
                       Mentor
                     </div>
                   </SelectItem>
@@ -424,13 +424,13 @@ export default function InstructorsPage() {
                   >
                     {imageUploading ? (
                       <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                        <Loader2 className="w-8 h-8 text-brand-secondary animate-spin" />
                         <span className="text-sm text-gray-600">
                           Feltöltés... {uploadProgress}%
                         </span>
                         <div className="w-full max-w-xs bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            className="bg-brand-secondary h-2 rounded-full transition-all duration-300"
                             style={{ width: `${uploadProgress}%` }}
                           />
                         </div>

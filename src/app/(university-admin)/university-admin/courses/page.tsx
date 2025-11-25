@@ -249,7 +249,7 @@ export default function UniversityAdminCoursesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-secondary"></div>
       </div>
     );
   }
@@ -306,7 +306,7 @@ export default function UniversityAdminCoursesPage() {
             <CardTitle className="text-sm font-medium">Összes beiratkozás</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-brand-secondary">
               {courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)}
             </div>
           </CardContent>

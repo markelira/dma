@@ -57,7 +57,7 @@ export function NewLessonContent({
                 key={index}
                 className="flex items-start gap-3 text-gray-700"
               >
-                <span className="flex-shrink-0 w-1.5 h-1.5 bg-blue-500 rounded-full mt-2" />
+                <span className="flex-shrink-0 w-1.5 h-1.5 bg-brand-secondary/50 rounded-full mt-2" />
                 <span className="leading-relaxed">{outcome}</span>
               </li>
             ))}
@@ -86,7 +86,7 @@ export function NewLessonContent({
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 hover:underline font-medium"
+                  className="text-brand-secondary hover:text-brand-secondary-hover hover:underline font-medium"
                 >
                   {resource.title}
                 </a>

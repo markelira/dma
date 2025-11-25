@@ -278,7 +278,7 @@ export function TrendingCoursesSection() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <Flame className="w-5 h-5 text-orange-500" />
-                <span className="font-semibold text-gray-900">🔥 Ez a hét legmelegebb kurzusai</span>
+                <span className="font-bold text-gray-900">🔥 Ez a hét legmelegebb kurzusai</span>
               </div>
               <Badge className="bg-orange-100 text-orange-700">
                 Élő adatok
@@ -378,7 +378,7 @@ export function TrendingCoursesSection() {
                       </span>
                     </div>
 
-                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-[#466C95] transition-colors mb-1">
+                    <h3 className="font-bold text-gray-900 text-sm line-clamp-2 group-hover:text-[#466C95] transition-colors mb-1">
                       {course.title}
                     </h3>
 
@@ -411,7 +411,7 @@ export function TrendingCoursesSection() {
 
                   {/* Price and CTA */}
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-gray-900">
+                    <div className="text-sm font-bold text-gray-900">
                       {course.price}
                     </div>
                     <Link href={`/courses/${course.slug || course.id}`}>

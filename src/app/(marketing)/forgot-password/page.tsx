@@ -145,16 +145,16 @@ export default function ForgotPasswordPage() {
 
               {/* Development only: Show email preview link */}
               {previewUrl && (
-                <Alert className="border-blue-200 bg-blue-50">
+                <Alert className="border-brand-secondary/20 bg-brand-secondary/5">
                   <AlertDescription className="space-y-2">
-                    <p className="text-blue-800 font-semibold">
+                    <p className="text-brand-secondary-hover font-bold">
                       Fejlesztői mód - Email előnézet:
                     </p>
                     <a
                       href={previewUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800 underline text-sm break-all"
+                      className="inline-flex items-center text-brand-secondary hover:text-brand-secondary-hover underline text-sm break-all"
                     >
                       Megtekintés Ethereal Email-ben
                       <ExternalLink className="ml-1 h-3 w-3" />

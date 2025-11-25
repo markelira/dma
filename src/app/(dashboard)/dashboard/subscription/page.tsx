@@ -135,18 +135,18 @@ export default function SubscriptionPage() {
 
           {/* Trial Banner */}
           {isOnTrial && (
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
               <div className="flex items-start gap-4">
-                <Clock className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <Clock className="w-6 h-6 text-brand-secondary flex-shrink-0 mt-1" />
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                  <h3 className="text-lg font-bold text-brand-secondary-hover mb-2">
                     7 napos ingyenes próbaidőszak
                   </h3>
-                  <p className="text-blue-800 mb-3">
+                  <p className="text-brand-secondary-hover mb-3">
                     Még {trialDaysRemaining} nap van hátra az ingyenes próbaidőszakból.
                     Az első fizetés {new Date(Date.now() + trialDaysRemaining * 24 * 60 * 60 * 1000).toLocaleDateString('hu-HU')} napon esedékes.
                   </p>
-                  <div className="bg-blue-100 rounded-lg p-3 text-sm text-blue-900">
+                  <div className="bg-brand-secondary/10 rounded-lg p-3 text-sm text-brand-secondary-hover">
                     <p className="font-medium mb-1">Próbaidőszak után:</p>
                     <p>15 000 Ft / hónap, automatikus megújítással</p>
                   </div>
@@ -159,7 +159,7 @@ export default function SubscriptionPage() {
           {!hasActiveSubscription && !isOnTrial && (
             <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
               <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Nincs aktív előfizetés
               </h3>
               <p className="text-gray-600 mb-6">
@@ -236,7 +236,7 @@ export default function SubscriptionPage() {
                 <div className="flex items-start gap-3 mb-4">
                   <TrendingDown className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
                       Spóroljon előre fizetéssel
                     </h3>
                     <p className="text-gray-700">
@@ -254,7 +254,7 @@ export default function SubscriptionPage() {
                         <p className="text-2xl font-bold text-gray-900">81 000 Ft</p>
                         <p className="text-sm text-gray-600 mt-1">13 500 Ft / hó</p>
                       </div>
-                      <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+                      <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
                         -10%
                       </span>
                     </div>
@@ -274,7 +274,7 @@ export default function SubscriptionPage() {
                         <p className="text-2xl font-bold text-gray-900">158 400 Ft</p>
                         <p className="text-sm text-gray-600 mt-1">13 200 Ft / hó</p>
                       </div>
-                      <span className="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded">
+                      <span className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded">
                         -12%
                       </span>
                     </div>
@@ -290,7 +290,7 @@ export default function SubscriptionPage() {
 
               {/* What's Included */}
               <div className="bg-white border border-gray-200 rounded-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
                   Mit tartalmaz az előfizetés
                 </h3>
                 <div className="space-y-3">
@@ -318,11 +318,11 @@ export default function SubscriptionPage() {
               </div>
 
               {/* Guarantee */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+              <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
                 <div className="flex items-start gap-4">
-                  <Shield className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Shield className="w-6 h-6 text-brand-secondary flex-shrink-0 mt-1" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">
                       30 napos pénzvisszafizetési garancia
                     </h3>
                     <p className="text-gray-700">
@@ -351,7 +351,7 @@ export default function SubscriptionPage() {
                   Értékeljük, hogy velünk tanul. Szeretnénk felajánlani Önnek <strong>1 hónap ingyenes hozzáférést</strong> ajándékba.
                 </p>
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                  <p className="text-green-900 font-semibold text-center">
+                  <p className="text-green-900 font-bold text-center">
                     Fogadja el az ajánlatot, és kapjon 1 havi ingyenes hozzáférést!
                   </p>
                 </div>

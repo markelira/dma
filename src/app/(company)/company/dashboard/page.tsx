@@ -232,7 +232,7 @@ export default function CompanyDashboardPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-blue-500" />
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-white0" />
           <p className="text-gray-600">Betöltés...</p>
         </div>
       </div>
@@ -252,7 +252,7 @@ export default function CompanyDashboardPage() {
           </p>
           <Link
             href="/register"
-            className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors"
           >
             Vállalat regisztrálása
           </Link>
@@ -275,14 +275,14 @@ export default function CompanyDashboardPage() {
 
       {/* Subscription Banner */}
       {!hasActiveSubscription && !subscriptionStatusLoading && (
-        <div className="rounded-xl bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 p-6">
+        <div className="rounded-xl bg-gradient-to-r from-brand-secondary/5 to-purple-50 border border-brand-secondary/20 p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-start space-x-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-secondary/50 to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
                 <Star className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold text-gray-900 text-lg">Aktiváld az előfizetésedet</h3>
+                <h3 className="font-bold text-gray-900 text-lg">Aktiváld az előfizetésedet</h3>
                 <p className="text-gray-600 mt-1">
                   Az előfizetéssel korlátlan hozzáférést biztosíthatsz az összes tartalomhoz minden alkalmazottad számára.
                 </p>
@@ -305,7 +305,7 @@ export default function CompanyDashboardPage() {
             <button
               onClick={handleSubscribe}
               disabled={isCreatingCheckout}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors inline-flex items-center justify-center whitespace-nowrap disabled:opacity-50 shadow-sm"
+              className="px-6 py-3 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors inline-flex items-center justify-center whitespace-nowrap disabled:opacity-50 shadow-sm"
             >
               {isCreatingCheckout ? (
                 <>
@@ -391,16 +391,16 @@ export default function CompanyDashboardPage() {
 
       {/* Quick Actions */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        <h2 className="text-lg font-bold text-gray-900 mb-4">
           Gyors műveletek
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link
             href="/company/dashboard/employees"
-            className="group flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-200 transition-all"
+            className="group flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-brand-secondary/5 hover:border-brand-secondary/20 transition-all"
           >
-            <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 rounded-lg bg-brand-secondary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-secondary/20 transition-colors">
+              <Users className="w-5 h-5 text-brand-secondary" />
             </div>
             <div>
               <p className="font-medium text-gray-900">Alkalmazott hozzáadása</p>
@@ -439,13 +439,13 @@ export default function CompanyDashboardPage() {
       {/* Company Courses Section */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-            <BookOpen className="w-5 h-5 mr-2 text-blue-600" />
+          <h2 className="text-lg font-bold text-gray-900 flex items-center">
+            <BookOpen className="w-5 h-5 mr-2 text-brand-secondary" />
             Vállalati tartalmak
           </h2>
           <button
             onClick={() => setShowAddCourseModal(true)}
-            className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center px-3 py-1.5 text-sm bg-brand-secondary text-white rounded-lg hover:bg-brand-secondary-hover transition-colors"
           >
             <Plus className="w-4 h-4 mr-1" />
             Tartalom hozzáadása
@@ -454,7 +454,7 @@ export default function CompanyDashboardPage() {
 
         {enrolledCoursesLoading ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <Loader2 className="w-6 h-6 animate-spin text-brand-secondary" />
           </div>
         ) : enrolledCourses.length === 0 ? (
           <div className="text-center py-8">
@@ -481,8 +481,8 @@ export default function CompanyDashboardPage() {
                     />
                   </div>
                 ) : (
-                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
-                    <BookOpen className="w-12 h-12 text-blue-400" />
+                  <div className="aspect-video bg-gradient-to-br from-brand-secondary/10 to-purple-100 flex items-center justify-center">
+                    <BookOpen className="w-12 h-12 text-brand-secondary" />
                   </div>
                 )}
                 <div className="p-4">
@@ -516,7 +516,7 @@ export default function CompanyDashboardPage() {
               className="relative bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[80vh] overflow-hidden border border-gray-200"
             >
               <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Tartalom hozzáadása</h3>
+                <h3 className="text-lg font-bold text-gray-900">Tartalom hozzáadása</h3>
                 <p className="text-sm text-gray-500 mt-1">
                   Válassz ki egy tartalmat, amelyre be szeretnéd iratkoztatni az alkalmazottakat.
                 </p>
@@ -524,7 +524,7 @@ export default function CompanyDashboardPage() {
               <div className="p-6 max-h-[50vh] overflow-y-auto">
                 {coursesLoading ? (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+                    <Loader2 className="w-6 h-6 animate-spin text-brand-secondary" />
                   </div>
                 ) : availableCoursesForEnrollment.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
@@ -539,7 +539,7 @@ export default function CompanyDashboardPage() {
                         onClick={() => setSelectedCourseId(course.id)}
                         className={`w-full flex items-center p-3 rounded-lg border transition-all text-left ${
                           selectedCourseId === course.id
-                            ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-500/20'
+                            ? 'border-brand-secondary bg-brand-secondary/5 ring-2 ring-brand-secondary/20'
                             : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                         }`}
                       >
@@ -553,8 +553,8 @@ export default function CompanyDashboardPage() {
                             />
                           </div>
                         ) : (
-                          <div className="w-16 h-12 rounded bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center flex-shrink-0">
-                            <BookOpen className="w-6 h-6 text-blue-400" />
+                          <div className="w-16 h-12 rounded bg-gradient-to-br from-brand-secondary/10 to-purple-100 flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="w-6 h-6 text-brand-secondary" />
                           </div>
                         )}
                         <div className="ml-3 flex-1 min-w-0">
@@ -564,7 +564,7 @@ export default function CompanyDashboardPage() {
                           </p>
                         </div>
                         {selectedCourseId === course.id && (
-                          <CheckCircle2 className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                          <CheckCircle2 className="w-5 h-5 text-brand-secondary flex-shrink-0" />
                         )}
                       </button>
                     ))}
@@ -584,7 +584,7 @@ export default function CompanyDashboardPage() {
                 <button
                   onClick={handleEnrollCourse}
                   disabled={!selectedCourseId || enrollCompanyMutation.isPending}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
+                  className="px-4 py-2 text-sm font-medium text-white bg-brand-secondary rounded-lg hover:bg-brand-secondary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center"
                 >
                   {enrollCompanyMutation.isPending ? (
                     <>

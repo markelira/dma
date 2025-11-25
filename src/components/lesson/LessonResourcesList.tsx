@@ -159,7 +159,7 @@ const getResourceColor = (type: LessonResource['type']) => {
     case 'PDF':
       return 'text-red-600 bg-red-50'
     case 'DOC':
-      return 'text-blue-600 bg-blue-50'
+      return 'text-brand-secondary bg-brand-secondary/5'
     case 'XLS':
       return 'text-green-600 bg-green-50'
     case 'PPT':
@@ -440,7 +440,7 @@ export const LessonResourcesList: React.FC<LessonResourcesListProps> = ({
       <div className="p-6 border-b bg-gray-50">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold">{title}</h3>
+            <h3 className="text-lg font-bold">{title}</h3>
             <p className="text-sm text-gray-600 mt-1">
               {filteredAndSortedResources.length} of {resources.length} anyag
             </p>
@@ -643,7 +643,7 @@ export const LessonResourcesList: React.FC<LessonResourcesListProps> = ({
                 key={resource.id}
                 className={cn(
                   "relative group rounded-lg border transition-all duration-200",
-                  isSelected ? "border-blue-500 bg-blue-50" : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
+                  isSelected ? "border-brand-secondary bg-brand-secondary/5" : "border-gray-200 hover:border-gray-300 hover:shadow-sm",
                   isCompactMode ? "p-4" : "p-4"
                 )}
               >
@@ -657,7 +657,7 @@ export const LessonResourcesList: React.FC<LessonResourcesListProps> = ({
                       onClick={() => toggleResourceSelection(resource.id)}
                     >
                       {isSelected ? (
-                        <CheckSquare className="w-4 h-4 text-blue-600" />
+                        <CheckSquare className="w-4 h-4 text-brand-secondary" />
                       ) : (
                         <Square className="w-4 h-4" />
                       )}

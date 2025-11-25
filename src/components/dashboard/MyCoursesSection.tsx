@@ -110,7 +110,7 @@ export function MyCoursesSection({ data, isLoading = false }: MyCoursesProps) {
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-bold text-white mb-2">
               Még nem kezdtél el egyetlen kurzust sem
             </h3>
             <p className="text-white/90 mb-6 max-w-md mx-auto">
@@ -285,7 +285,7 @@ function EmptyFilterState({ activeFilter }: { activeFilter: CourseFilter }) {
       <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
         <Icon className="w-8 h-8 text-gray-400" />
       </div>
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
+      <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
       <p className="text-gray-600 mb-6 max-w-sm mx-auto">{description}</p>
       <Link href={action.href}>
         <Button>{action.label}</Button>

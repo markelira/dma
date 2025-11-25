@@ -88,7 +88,7 @@ function UniversityCard({ university }: { university: University }) {
           
           {/* University Info */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
+            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors line-clamp-2">
               {university.name}
             </h3>
             {university.address && (
@@ -127,7 +127,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <BookOpen className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.courseCount}
             </div>
             <div className="text-xs text-gray-500">Tartalom</div>
@@ -136,7 +136,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <Users className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.studentCount.toLocaleString('hu-HU')}
             </div>
             <div className="text-xs text-gray-500">Hallgató</div>
@@ -145,7 +145,7 @@ function UniversityCard({ university }: { university: University }) {
             <div className="flex items-center justify-center mb-1">
               <GraduationCap className="w-4 h-4 text-primary" />
             </div>
-            <div className="text-lg font-semibold text-gray-900">
+            <div className="text-lg font-bold text-gray-900">
               {university.totalEnrollments.toLocaleString('hu-HU')}
             </div>
             <div className="text-xs text-gray-500">Beiratkozás</div>
@@ -228,7 +228,7 @@ export default async function UniversitiesPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Partner Egyetemeink
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -239,7 +239,7 @@ export default async function UniversitiesPage() {
           {universities.length === 0 ? (
             <div className="text-center py-12">
               <GraduationCap className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Nincsenek elérhető egyetemek
               </h3>
               <p className="text-gray-600">
@@ -259,7 +259,7 @@ export default async function UniversitiesPage() {
       {/* CTA Section */}
       <section className="py-16 bg-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-semibold mb-4">
+          <h2 className="text-3xl font-bold mb-4">
             Készen áll a tanulásra?
           </h2>
           <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">
@@ -268,13 +268,13 @@ export default async function UniversitiesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/courses"
-              className="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="bg-white text-primary px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition-colors"
             >
               Tartalmak böngészése
             </a>
             <a
               href="/register"
-              className="bg-primary-dark text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary transition-colors border border-white/20"
+              className="bg-primary-dark text-white px-8 py-3 rounded-lg font-bold hover:bg-primary transition-colors border border-white/20"
             >
               Regisztráció
             </a>

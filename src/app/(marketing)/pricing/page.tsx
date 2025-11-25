@@ -30,13 +30,13 @@ export default function PricingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-3">
-                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg p-4 flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-brand-secondary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-blue-900 font-medium">
+                  <p className="text-brand-secondary-hover font-medium">
                     Előfizetés szükséges
                   </p>
-                  <p className="text-blue-800 text-sm mt-1">
+                  <p className="text-brand-secondary-hover text-sm mt-1">
                     A tartalmakhoz való hozzáféréshez aktív előfizetés szükséges. Válasszon egy csomagot az alábbiak közül.
                   </p>
                 </div>
@@ -51,7 +51,7 @@ export default function PricingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <span className="inline-block px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-semibold mb-4">
+            <span className="inline-block px-4 py-2 bg-teal-50 text-teal-700 rounded-full text-sm font-bold mb-4">
               Egyszerű, átlátható árazás
             </span>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
@@ -102,21 +102,21 @@ export default function PricingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
                   <div className="bg-white rounded-xl p-6 shadow-sm">
                     <div className="text-4xl mb-3">🎯</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Gyakorlati tudás</h3>
+                    <h3 className="font-bold text-gray-900 mb-2">Gyakorlati tudás</h3>
                     <p className="text-gray-600 text-sm">
                       Videótartalmak szakértőktől, valós projektekkel és azonnali alkalmazhatósággal.
                     </p>
                   </div>
                   <div className="bg-white rounded-xl p-6 shadow-sm">
                     <div className="text-4xl mb-3">👥</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Csapat együttműködés</h3>
+                    <h3 className="font-bold text-gray-900 mb-2">Csapat együttműködés</h3>
                     <p className="text-gray-600 text-sm">
                       Korlátlan tagok egyetlen előfizetéssel. Tanuljatok együtt, haladjatok gyorsabban.
                     </p>
                   </div>
                   <div className="bg-white rounded-xl p-6 shadow-sm">
                     <div className="text-4xl mb-3">💰</div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Legjobb ár-érték arány</h3>
+                    <h3 className="font-bold text-gray-900 mb-2">Legjobb ár-érték arány</h3>
                     <p className="text-gray-600 text-sm">
                       Spóroljon akár 12%-ot éves előfizetéssel. Nincs rejtett költség.
                     </p>

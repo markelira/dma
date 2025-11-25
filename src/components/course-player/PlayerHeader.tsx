@@ -145,7 +145,7 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
             </div>
           </div>
           <span
-            className={`${playerTypography.labelSmall} font-semibold flex-shrink-0`}
+            className={`${playerTypography.labelSmall} font-bold flex-shrink-0`}
             style={{ color: playerColors.primary }}
           >
             {t('header.complete', { progress: overallProgress })}

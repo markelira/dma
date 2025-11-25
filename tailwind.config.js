@@ -348,31 +348,35 @@ module.exports = {
         'academic-accent': 'linear-gradient(135deg, #FDE68A 0%, #F59E0B 100%)',
       },
       fontSize: {
-        xs: 'var(--font-xs)',
-        sm: 'var(--font-sm)',
-        base: 'var(--font-base)',
-        md: 'var(--font-md)',
-        lg: 'var(--font-lg)',
-        xl: 'var(--font-xl)',
-        '2xl': 'var(--font-2xl)',
-        '3xl': 'var(--font-3xl)',
-        '4xl': 'var(--font-4xl)',
-        '5xl': 'var(--font-5xl)',
-        display: 'clamp(2.5rem, 6vw, 4rem)', // DMA responsive display font
-        lead: '1.25rem', // DMA lead text size
-        muted: 'var(--font-sm)',
+        // Framer Typography Scale with exact line-height and letter-spacing
+        'xs': ['14px', { lineHeight: '20px', letterSpacing: '-0.01em' }],      // Badges, small text
+        'sm': ['16px', { lineHeight: '22px', letterSpacing: '-0.01em' }],      // Body regular
+        'base': ['18px', { lineHeight: '24px', letterSpacing: '-0.01em' }],    // Body large
+        'lg': ['20px', { lineHeight: '28px', letterSpacing: '-0.01em' }],      // Large body
+        'xl': ['24px', { lineHeight: '30px', letterSpacing: '-0.01em' }],      // H3
+        '2xl': ['30px', { lineHeight: '36px', letterSpacing: '-0.01em' }],     // H2 tablet
+        '3xl': ['36px', { lineHeight: '42px', letterSpacing: '-0.01em' }],     // H2 desktop
+        '4xl': ['48px', { lineHeight: '54px', letterSpacing: '-0.01em' }],     // H1
+        '5xl': ['60px', { lineHeight: '1', letterSpacing: '-0.01em' }],        // Display (if needed)
+        'display': 'clamp(2.5rem, 6vw, 4rem)',                                 // Responsive display
       },
       fontWeight: {
-        normal: 'var(--font-weight-normal)',
-        medium: 'var(--font-weight-medium)',
-        semibold: 'var(--font-weight-semibold)',
-        bold: 'var(--font-weight-bold)',
+        // Framer Minimal Weight Palette (400, 500, 700, 900 only)
+        normal: '400',      // Body text
+        medium: '500',      // Enhanced body, subtle emphasis
+        bold: '700',        // All headings, strong structure
+        black: '900',       // Extra emphasis (inline bold)
+      },
+      letterSpacing: {
+        tight: '-0.01em',   // Framer universal standard
+        normal: '0',
+        wide: '0.01em',
       },
       lineHeight: {
-        tight: 'var(--leading-tight)',
-        snug: 'var(--leading-snug)',
-        normal: 'var(--leading-normal)',
-        relaxed: 'var(--leading-relaxed)',
+        tight: '1.167',     // Headings (36px → 42px)
+        snug: '1.25',       // Sub-headings (24px → 30px)
+        normal: '1.333',    // Body text (18px → 24px)
+        relaxed: '1.429',   // Small text (14px → 20px)
       },
     },
   },

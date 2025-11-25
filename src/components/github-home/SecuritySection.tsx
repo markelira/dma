@@ -49,7 +49,7 @@ export function SecuritySection() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                   <Shield className="w-6 h-6 text-green-400" />
-                  <span className="text-white font-semibold">Biztonsági Központ</span>
+                  <span className="text-white font-bold">Biztonsági Központ</span>
                 </div>
                 <div className="px-3 py-1 rounded-full bg-green-500/20 border border-green-500/30">
                   <span className="text-xs text-green-400 font-medium">Aktív</span>
@@ -156,7 +156,7 @@ export function SecuritySection() {
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30 flex items-center justify-center">
                     <feature.icon className="w-5 h-5 text-green-400" />
                   </div>
-                  <h3 className="text-white font-semibold">{feature.title}</h3>
+                  <h3 className="text-white font-bold">{feature.title}</h3>
                   <p className="text-sm text-gray-500">{feature.description}</p>
                 </motion.div>
               ))}

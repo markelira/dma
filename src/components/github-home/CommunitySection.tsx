@@ -23,7 +23,7 @@ export function CommunitySection() {
               className="text-6xl lg:text-8xl font-bold"
             >
               <GradientText
-                from="from-blue-400"
+                from="from-brand-secondary"
                 via="via-cyan-400"
                 to="to-teal-400"
               >
@@ -61,8 +61,8 @@ export function CommunitySection() {
                 transition={{ delay: index * 0.1 }}
                 className="space-y-3"
               >
-                <div className="w-12 h-12 mx-auto rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center">
-                  <stat.icon className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 mx-auto rounded-lg bg-gradient-to-br from-brand-secondary/50/20 to-purple-500/20 border border-brand-secondary/30 flex items-center justify-center">
+                  <stat.icon className="w-6 h-6 text-brand-secondary" />
                 </div>
                 <div className="text-3xl font-bold text-white">{stat.value}</div>
                 <div className="text-sm text-gray-500">{stat.label}</div>
@@ -81,12 +81,12 @@ export function CommunitySection() {
               {[...Array(10)].map((_, i) => (
                 <div
                   key={i}
-                  className="w-12 h-12 rounded-full border-4 border-[#0D1117] bg-gradient-to-br from-blue-500 to-purple-500"
+                  className="w-12 h-12 rounded-full border-4 border-[#0D1117] bg-gradient-to-br from-brand-secondary/50 to-purple-500"
                 />
               ))}
             </div>
             <div className="text-left">
-              <div className="text-white font-semibold">50,000+ hallgató</div>
+              <div className="text-white font-bold">50,000+ hallgató</div>
               <div className="text-sm text-gray-500">tanul már velünk</div>
             </div>
           </motion.div>

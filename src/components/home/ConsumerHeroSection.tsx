@@ -49,7 +49,7 @@ export function ConsumerHeroSection() {
           >
             {/* Eyebrow Badge */}
             <motion.div
-              className="inline-flex items-center gap-2 bg-gray-50 text-primary px-4 py-2 rounded-full text-sm font-semibold"
+              className="inline-flex items-center gap-2 bg-gray-50 text-primary px-4 py-2 rounded-full text-sm font-bold"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
@@ -92,7 +92,7 @@ export function ConsumerHeroSection() {
                 </span>
               </h1>
               <p className="text-xl md:text-2xl text-gray-700 mt-6 leading-relaxed">
-                <span className="font-semibold text-gray-900">Korlátlan videó hozzáférés</span>,
+                <span className="font-bold text-gray-900">Korlátlan videó hozzáférés</span>,
                 korlátlan csapattagokkal. Egy előfizetés, minden kollégád ingyen.
               </p>
             </motion.div>
@@ -109,7 +109,7 @@ export function ConsumerHeroSection() {
                   <Check className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <span className="text-gray-900 font-semibold">Hívd meg a csapatodat</span>
+                  <span className="text-gray-900 font-bold">Hívd meg a csapatodat</span>
                   <p className="text-gray-600 text-sm">Annyi kollégát, amennyit szeretnél - egyetlen előfizetéssel</p>
                 </div>
               </li>
@@ -118,7 +118,7 @@ export function ConsumerHeroSection() {
                   <Check className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <span className="text-gray-900 font-semibold">Netflix-stílusú platform</span>
+                  <span className="text-gray-900 font-bold">Netflix-stílusú platform</span>
                   <p className="text-gray-600 text-sm">Prémium videótartalmak streaming, bármikor, bárhol</p>
                 </div>
               </li>
@@ -127,7 +127,7 @@ export function ConsumerHeroSection() {
                   <Check className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <span className="text-gray-900 font-semibold">7 napos ingyenes próba</span>
+                  <span className="text-gray-900 font-bold">7 napos ingyenes próba</span>
                   <p className="text-gray-600 text-sm">Kipróbálás nélkül, bármikor lemondható</p>
                 </div>
               </li>
@@ -142,7 +142,7 @@ export function ConsumerHeroSection() {
             >
               <Button
                 size="lg"
-                className="group bg-primary hover:bg-primary-hover text-white font-semibold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
+                className="group bg-primary hover:bg-primary-hover text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                 onClick={() => router.push('/register')}
               >
                 <span>Próbáld ki ingyen 7 napig</span>
@@ -151,7 +151,7 @@ export function ConsumerHeroSection() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-2 border-primary text-primary hover:bg-gray-50 font-semibold px-8 py-6 text-lg rounded-full"
+                className="border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-lg rounded-full"
                 onClick={() => router.push('/pricing')}
               >
                 Árak megtekintése
@@ -167,17 +167,17 @@ export function ConsumerHeroSection() {
             >
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-gray-900">10,000+</span>
+                <span className="font-bold text-gray-900">10,000+</span>
                 <span>aktív felhasználó</span>
               </div>
               <div className="flex items-center gap-2">
                 <Award className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-gray-900">500+</span>
+                <span className="font-bold text-gray-900">500+</span>
                 <span>videótartalom</span>
               </div>
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-primary" />
-                <span className="font-semibold text-gray-900">4.8/5</span>
+                <span className="font-bold text-gray-900">4.8/5</span>
                 <span>értékelés</span>
               </div>
             </motion.div>
@@ -191,7 +191,7 @@ export function ConsumerHeroSection() {
             transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
           >
             {/* Decorative blob */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-3xl blur-2xl opacity-40 animate-pulse" />
+            <div className="absolute -inset-4 bg-gradient-to-r from-brand-secondary/10 to-cyan-100 rounded-3xl blur-2xl opacity-40 animate-pulse" />
 
             {/* Platform Preview Card */}
             <div className="relative">
@@ -225,7 +225,7 @@ export function ConsumerHeroSection() {
               >
                 <div className="flex items-center gap-3">
                   <div className="flex -space-x-2">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-primary border-2 border-white flex items-center justify-center text-white font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary to-primary border-2 border-white flex items-center justify-center text-white font-bold text-sm">
                       A
                     </div>
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-cyan-600 border-2 border-white flex items-center justify-center text-white font-bold text-sm">
@@ -239,7 +239,7 @@ export function ConsumerHeroSection() {
                     </div>
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-gray-900">Csapatod tanul</p>
+                    <p className="text-sm font-bold text-gray-900">Csapatod tanul</p>
                     <p className="text-xs text-gray-600">8 aktív tag ma</p>
                   </div>
                 </div>

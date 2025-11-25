@@ -126,7 +126,7 @@ export const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
 
   const noteColors = [
     { name: 'Yellow', value: '#fbbf24', class: 'bg-yellow-400' },
-    { name: 'Blue', value: '#3b82f6', class: 'bg-blue-500' },
+    { name: 'Blue', value: '#3b82f6', class: 'bg-brand-secondary/50' },
     { name: 'Green', value: '#10b981', class: 'bg-green-500' },
     { name: 'Purple', value: '#8b5cf6', class: 'bg-purple-500' },
     { name: 'Pink', value: '#ec4899', class: 'bg-pink-500' },
@@ -400,7 +400,7 @@ export const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
           <div className="absolute top-0 left-0 right-0 z-50 bg-white border rounded-lg shadow-lg p-4 mt-2">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Jegyzet hozzáadása</h3>
+                <h3 className="font-bold">Jegyzet hozzáadása</h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowNoteDialog(false)}>
                   ×
                 </Button>
@@ -453,7 +453,7 @@ export const VideoPlayerControls: React.FC<VideoPlayerControlsProps> = ({
           <div className="absolute top-0 left-0 right-0 z-50 bg-white border rounded-lg shadow-lg p-4 mt-2">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold">Könyvjelző hozzáadása</h3>
+                <h3 className="font-bold">Könyvjelző hozzáadása</h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowBookmarkDialog(false)}>
                   ×
                 </Button>

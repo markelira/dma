@@ -100,16 +100,16 @@ export const DeviceSyncNotification: React.FC<DeviceSyncNotificationProps> = ({
   const resumePosition = progressData.progress.resumePosition || 0
 
   return (
-    <Card className={`border-blue-200 bg-blue-50 shadow-lg ${className}`}>
+    <Card className={`border-brand-secondary/20 bg-brand-secondary/5 shadow-lg ${className}`}>
       <div className="p-4">
         <div className="flex items-start justify-between mb-3">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-blue-100 rounded-full">
-              <Sync className="w-4 h-4 text-blue-600" />
+            <div className="p-2 bg-brand-secondary/10 rounded-full">
+              <Sync className="w-4 h-4 text-brand-secondary" />
             </div>
             <div>
-              <h4 className="font-semibold text-blue-900">Eszköz váltás észlelve</h4>
-              <p className="text-sm text-blue-700">
+              <h4 className="font-bold text-brand-secondary-hover">Eszköz váltás észlelve</h4>
+              <p className="text-sm text-brand-secondary-hover">
                 A haladása szinkronizálásra vár más eszközökkel
               </p>
             </div>
@@ -118,7 +118,7 @@ export const DeviceSyncNotification: React.FC<DeviceSyncNotificationProps> = ({
             variant="ghost" 
             size="sm" 
             onClick={handleDismiss}
-            className="text-blue-600 hover:text-blue-800"
+            className="text-brand-secondary hover:text-brand-secondary-hover"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -137,18 +137,18 @@ export const DeviceSyncNotification: React.FC<DeviceSyncNotificationProps> = ({
               </div>
             </div>
             <div className="flex-1 flex items-center justify-center">
-              <div className="flex items-center gap-2 text-blue-600">
-                <div className="w-8 border-t border-dashed border-blue-300"></div>
+              <div className="flex items-center gap-2 text-brand-secondary">
+                <div className="w-8 border-t border-dashed border-brand-secondary/30"></div>
                 <Sync className="w-4 h-4" />
-                <div className="w-8 border-t border-dashed border-blue-300"></div>
+                <div className="w-8 border-t border-dashed border-brand-secondary/30"></div>
               </div>
             </div>
             <div className="text-center">
-              <div className="p-2 bg-blue-100 rounded-full mb-1">
-                <CurrentDeviceIcon className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-secondary/10 rounded-full mb-1">
+                <CurrentDeviceIcon className="w-5 h-5 text-brand-secondary" />
               </div>
-              <div className="text-xs text-blue-600">Jelenlegi</div>
-              <div className="text-xs font-medium text-blue-800">
+              <div className="text-xs text-brand-secondary">Jelenlegi</div>
+              <div className="text-xs font-medium text-brand-secondary-hover">
                 {getDeviceType(deviceInfo.userAgent)}
               </div>
             </div>
@@ -163,7 +163,7 @@ export const DeviceSyncNotification: React.FC<DeviceSyncNotificationProps> = ({
           </div>
           
           {resumePosition > 0 && (
-            <div className="flex items-center gap-2 text-sm text-blue-700">
+            <div className="flex items-center gap-2 text-sm text-brand-secondary-hover">
               <Clock className="w-4 h-4" />
               <span>Folytatás: {Math.floor(resumePosition / 60)}:{(resumePosition % 60).toString().padStart(2, '0')}</span>
             </div>

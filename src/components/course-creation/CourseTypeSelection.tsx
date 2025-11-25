@@ -21,9 +21,9 @@ const courseTypeConfig: Record<CourseType, {
 }> = {
   ACADEMIA: {
     icon: BookOpen,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200 hover:border-blue-400',
+    color: 'text-brand-secondary',
+    bgColor: 'bg-brand-secondary/5',
+    borderColor: 'border-brand-secondary/20 hover:border-brand-secondary',
     examples: [
       'Többhetes képzések videókkal',
       '5-50 leckéből álló tartalmak',
@@ -130,7 +130,7 @@ export default function CourseTypeSelection({ onSelect, initialSelection }: Cour
                   </p>
 
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-gray-700">Jellemzők:</p>
+                    <p className="text-sm font-bold text-gray-700">Jellemzők:</p>
                     <ul className="space-y-1">
                       {config.examples.map((example, idx) => (
                         <li key={idx} className="text-sm text-gray-600 flex items-start">
@@ -160,9 +160,9 @@ export default function CourseTypeSelection({ onSelect, initialSelection }: Cour
       </div>
 
       {selectedType && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
-          <p className="text-sm text-blue-800">
-            <span className="font-semibold">{COURSE_TYPE_LABELS[selectedType]}</span> típusú tartalmat választottál.
+        <div className="mt-6 p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg text-center">
+          <p className="text-sm text-brand-secondary-hover">
+            <span className="font-bold">{COURSE_TYPE_LABELS[selectedType]}</span> típusú tartalmat választottál.
             Kattints a "Tovább" gombra a folytatáshoz.
           </p>
         </div>
