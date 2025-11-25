@@ -195,7 +195,7 @@ export const resendTeamInvite = onCall({
       : 'A csapat tulajdonosa';
 
     // 8. Resend invitation email
-    const appUrl = process.env.APP_URL || 'https://academion.hu';
+    const appUrl = process.env.APP_URL || 'https://masterclass.dma.hu';
     const inviteLink = `${appUrl}/invite/${member.inviteToken}`;
 
     await sendInvitationEmail({
@@ -322,7 +322,7 @@ DMA csapata
     `;
 
     await transporter.sendMail({
-      from: process.env.FROM_EMAIL || 'noreply@academion.hu',
+      from: process.env.FROM_EMAIL || 'noreply@dma.hu',
       to: data.to,
       subject: `Emlékeztető: Csatlakozz a(z) "${data.teamName}" csapatához`,
       text: textContent,

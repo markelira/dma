@@ -24,6 +24,9 @@ const CourseSchema = z.object({
     invalid_type_error: "Course type must be ACADEMIA, WEBINAR, MASTERCLASS, or PODCAST"
   }),
 
+  // Content creation date (YYYY-MM-DD) - when the content was originally recorded/produced
+  contentCreatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Content creation date must be in YYYY-MM-DD format"),
+
   language: z.string().nullish().default('hu'),
   difficulty: z.enum(['BEGINNER', 'INTERMEDIATE', 'ADVANCED']).nullish().default('BEGINNER'),
   certificateEnabled: z.boolean().nullish().default(false),
@@ -108,6 +111,7 @@ export const createCourse = onCall({
       instructorId: validatedData.instructorId,
       instructorIds: validatedData.instructorIds || [validatedData.instructorId], // NEW: Multiple instructors
       courseType: validatedData.courseType, // NEW: Course type
+      contentCreatedAt: validatedData.contentCreatedAt, // Content creation date (YYYY-MM-DD)
       language: validatedData.language || 'hu',
       difficulty: validatedData.difficulty || 'BEGINNER',
       certificateEnabled: validatedData.certificateEnabled || false,
@@ -230,6 +234,7 @@ export const updateCourse = onCall({
     if (updateData.categoryIds !== undefined) updates.categoryIds = updateData.categoryIds;
     if (updateData.instructorId !== undefined) updates.instructorId = updateData.instructorId;
     if (updateData.instructorIds !== undefined) updates.instructorIds = updateData.instructorIds;
+    if (updateData.contentCreatedAt !== undefined) updates.contentCreatedAt = updateData.contentCreatedAt;
     if (updateData.language !== undefined) updates.language = updateData.language;
     if (updateData.difficulty !== undefined) updates.difficulty = updateData.difficulty;
     if (updateData.certificateEnabled !== undefined) updates.certificateEnabled = updateData.certificateEnabled;

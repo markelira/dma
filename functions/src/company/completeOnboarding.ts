@@ -34,8 +34,7 @@ export const completeCompanyOnboarding = https.onCall(
     region: 'us-central1',
     memory: '512MiB',
     cors: [
-      'https://www.academion.hu',
-      'https://academion.hu',
+      'https://masterclass.dma.hu',
       'https://dmaapp-477d4.web.app',
       'https://dmaapp-477d4.firebaseapp.com'
     ]
@@ -244,7 +243,7 @@ export const completeCompanyOnboarding = https.onCall(
           employeesInvited++;
 
           // Send invitation email (non-blocking)
-          const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/company/invite/${inviteToken}`;
+          const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/invite/${inviteToken}`;
           try {
             await sendInvitationEmail(employee.email.trim().toLowerCase(), {
               firstName: employee.firstName.trim(),

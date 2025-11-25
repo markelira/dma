@@ -163,7 +163,7 @@ export const createCompany = https.onCall(
       // 6. Send welcome email (plain text for MVP)
       await sendWelcomeEmail(billingEmail, {
         companyName: name,
-        dashboardUrl: `${process.env.APP_URL || 'https://academion.hu'}/company/dashboard`,
+        dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/dashboard`,
       });
 
       return {
@@ -332,7 +332,7 @@ Az DMA csapata
     await sgMail.send({
       to,
       from: {
-        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
+        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
         name: 'DMA Masterclass',
       },
       subject,

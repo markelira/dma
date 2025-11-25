@@ -7,15 +7,15 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import Footer from '@/components/landing-home/ui/footer';
-import { Hero1ConversionFocused } from '@/components/course/heroes/Hero1ConversionFocused';
+import { NetflixStyleHero } from '@/components/course/heroes/NetflixStyleHero';
+import { CourseTypeInfo } from '@/components/course/CourseTypeInfo';
 import { CourseCurriculumSection } from '@/components/course/CourseCurriculumSection';
 import { CourseInstructorCard } from '@/components/course/CourseInstructorCard';
 import { CourseFeaturesSection } from '@/components/course/CourseFeaturesSection';
-import { CourseOutcomesSection } from '@/components/course/CourseOutcomesSection';
 import { RelatedCoursesSection } from '@/components/course/RelatedCoursesSection';
 import { StickyBottomCTA } from '@/components/course/StickyBottomCTA';
 import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
@@ -36,6 +36,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
+  const detailsRef = useRef<HTMLDivElement>(null);
 
   // Fetch instructors to get full instructor data
   const { data: instructors = [] } = useInstructors();
@@ -165,15 +166,20 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }
   }, [searchParams, id, queryClient, router]);
 
+  // Scroll to details section
+  const scrollToDetails = () => {
+    detailsRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   // Loading state
   if (isLoading) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-brand-secondary" />
-            <p className="text-base font-normal text-gray-600">Tartalom betöltése...</p>
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-700 border-t-white" />
+            <p className="text-base font-normal text-gray-400">Tartalom betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -186,15 +192,15 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Tartalom nem található</h1>
-            <p className="text-base font-normal text-gray-600 mb-6">
+            <h1 className="text-4xl font-bold text-white mb-4">Tartalom nem található</h1>
+            <p className="text-base font-normal text-gray-400 mb-6">
               A keresett tartalom nem létezik vagy nem elérhető.
             </p>
             <button
               onClick={() => router.push('/courses')}
-              className="px-6 py-3 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg text-sm font-medium hover:shadow-md transition-all"
+              className="px-6 py-3 bg-white text-gray-900 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all"
             >
               Vissza a tartalmakhoz
             </button>
@@ -228,7 +234,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const isFreeCourse = !c.price || c.price === 0;
   const coursePrice = c.price || 0;
 
-  // Prepare modules for curriculum section
+  // Prepare modules for curriculum section (includes Netflix episode data)
   const formattedModules = modulesData.map((module: any, index) => ({
     id: module.id || `module-${index}`,
     title: module.title || `Modul ${index + 1}`,
@@ -237,7 +243,12 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     lessons: (module.lessons || []).map((lesson: any, lessonIndex: number) => ({
       id: lesson.id || `lesson-${index}-${lessonIndex}`,
       title: lesson.title || `Lecke ${lessonIndex + 1}`,
+      description: lesson.description, // For Netflix episode description
       duration: lesson.duration,
+      durationSeconds: lesson.durationSeconds || lesson.duration, // Duration in seconds
+      muxDuration: lesson.muxDuration, // Mux-reported duration (more accurate)
+      muxThumbnailUrl: lesson.muxThumbnailUrl, // Video thumbnail from Mux
+      muxPlaybackId: lesson.muxPlaybackId, // Mux playback ID
       type: lesson.type || 'video',
       completed: lesson.completed || false,
       locked: lesson.locked || false,
@@ -283,52 +294,61 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-brand-secondary/5/30 to-purple-50/20">
-        {/* Hero Section */}
-        <Hero1ConversionFocused
+      <div className="min-h-screen bg-gray-950">
+        {/* Netflix-Style Hero Section */}
+        <NetflixStyleHero
           title={c.title}
           description={c.description || ''}
           categories={courseCategoryNames}
           imageUrl={c.thumbnailUrl || c.imageUrl}
           courseType={c.courseType}
           instructors={courseInstructors}
-          keyOutcomes={c.whatYouWillLearn?.slice(0, 3)}
           modules={modulesData}
-          price={coursePrice}
-          isSubscriptionIncluded={isFreeCourse || !coursePrice}
           onEnroll={handleEnroll}
-          onPreview={() => console.log('Preview clicked')}
+          onScrollToDetails={scrollToDetails}
         />
 
         {/* Main Content */}
-        <div className="container mx-auto px-6 lg:px-12 py-10 lg:py-12">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div ref={detailsRef} className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-10 lg:py-12">
+          {/* Course Type Info - Type-specific details */}
+          <CourseTypeInfo
+            courseType={courseType}
+            webinarDate={c.webinarDate}
+            liveStreamUrl={c.liveStreamUrl}
+            recordingAvailable={c.recordingAvailable}
+            university={c.university || c.instructorUniversity}
+            certificateEnabled={c.certificateEnabled}
+            isPlus={c.isPlus}
+            darkMode={true}
+          />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
             {/* Left Column - Main Content */}
-            <div className="lg:col-span-2 space-y-10">
+            <div className="lg:col-span-2 space-y-8">
               {/* What You'll Learn Section */}
               {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
                 <motion.section
-                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
+                  className="py-6 border-b border-gray-800"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">
                     {terminology.outcomesLabel}
                   </h2>
                   <div className="grid md:grid-cols-2 gap-4">
                     {c.whatYouWillLearn.map((item: string, index: number) => (
                       <div key={index} className="flex items-start gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{item}</span>
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-300">{item}</span>
                       </div>
                     ))}
                   </div>
                 </motion.section>
               )}
 
-              {/* Curriculum Section */}
+              {/* Curriculum Section - Netflix-style episode layout */}
               {formattedModules.length > 0 && (
                 <CourseCurriculumSection
                   modules={formattedModules}
@@ -338,26 +358,29 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   lessonLabel={terminology.lessonLabel}
                   lessonsLabel={terminology.lessonsLabel}
                   flatLessonMode={courseType !== 'ACADEMIA'}
+                  darkMode={true}
+                  netflixStyle={true}
+                  courseThumbnail={c.thumbnailUrl || c.imageUrl}
                 />
               )}
 
               {/* Requirements Section */}
               {c.requirements && c.requirements.length > 0 && (
                 <motion.section
-                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
+                  className="py-6 border-b border-gray-800"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">
                     Előfeltételek
                   </h2>
                   <ul className="space-y-3">
                     {c.requirements.map((item: string, index: number) => (
                       <li key={index} className="flex items-start gap-3">
-                        <span className="text-gray-400 mt-1">•</span>
-                        <span className="text-gray-700">{item}</span>
+                        <span className="text-gray-500 mt-1">•</span>
+                        <span className="text-gray-300">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -367,20 +390,20 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               {/* Target Audience Section */}
               {c.targetAudience && c.targetAudience.length > 0 && (
                 <motion.section
-                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
+                  className="py-6 border-b border-gray-800"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.2 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">
                     Kinek ajánlott ez a tartalom?
                   </h2>
                   <div className="space-y-3">
                     {c.targetAudience.map((item: string, index: number) => (
                       <div key={index} className="flex items-start gap-3">
                         <ArrowRight className="w-5 h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{item}</span>
+                        <span className="text-gray-300">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -388,12 +411,16 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
               )}
 
               {/* Course Features Section */}
-              <CourseFeaturesSection />
-
-              {/* Course Outcomes Section */}
-              {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
-                <CourseOutcomesSection outcomes={c.whatYouWillLearn} />
-              )}
+              <CourseFeaturesSection
+                course={{
+                  certificateEnabled: c.certificateEnabled,
+                  duration: stats.duration,
+                  language: c.language,
+                  enrollmentCount: stats.students,
+                  contentCreatedAt: c.contentCreatedAt
+                }}
+                darkMode={true}
+              />
 
               {/* Instructor Card(s) - Supports multiple instructors */}
               {courseInstructors.map((instructor, idx) => (
@@ -401,39 +428,40 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   key={instructor.id || idx}
                   name={instructor.name}
                   title={instructor.title}
-                  bio={instructor.bio || 'Tapasztalt előadó az Academion platformon.'}
+                  bio={instructor.bio || 'Tapasztalt előadó a DMA Masterclass platformon.'}
                   imageUrl={instructor.profilePictureUrl}
                   expertise={c.tags || ['Üzleti fejlődés', 'Soft skills', 'Szakmai képzés']}
                   roleLabel={terminology.instructorLabel}
                   instructorRole={instructor.role as 'MENTOR' | 'SZEREPLŐ' | undefined}
+                  darkMode={true}
                 />
               ))}
 
               {/* FAQ Section */}
               {c.faq && c.faq.length > 0 && (
                 <motion.section
-                  className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
+                  className="py-6"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h2 className="text-2xl font-bold text-white mb-6">
                     Gyakran Ismételt Kérdések
                   </h2>
                   <div className="space-y-4">
                     {c.faq.map((item: { question: string; answer: string }, index: number) => (
                       <details
                         key={index}
-                        className="group border border-gray-200 rounded-lg overflow-hidden"
+                        className="group border border-gray-700 rounded-lg overflow-hidden"
                       >
-                        <summary className="cursor-pointer list-none p-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+                        <summary className="cursor-pointer list-none p-4 bg-gray-800 hover:bg-gray-700 transition-colors duration-200">
                           <div className="flex items-center justify-between">
-                            <h3 className="font-bold text-gray-900">
+                            <h3 className="font-bold text-white">
                               {item.question}
                             </h3>
                             <svg
-                              className="w-5 h-5 text-gray-500 transition-transform duration-200 group-open:rotate-180"
+                              className="w-5 h-5 text-gray-400 transition-transform duration-200 group-open:rotate-180"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -447,8 +475,8 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                             </svg>
                           </div>
                         </summary>
-                        <div className="p-4 bg-white border-t border-gray-200">
-                          <p className="text-gray-700 whitespace-pre-line">
+                        <div className="p-4 bg-gray-900 border-t border-gray-700">
+                          <p className="text-gray-300 whitespace-pre-line">
                             {item.answer}
                           </p>
                         </div>
@@ -463,16 +491,18 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
             <div className="lg:col-span-1">
               <CourseEnrollmentCard
                 price={coursePrice}
+                originalPrice={c.originalPrice}
                 duration={stats.duration}
                 lessons={stats.lessons}
                 rating={stats.rating}
                 students={stats.students}
                 lifetimeAccess={true}
                 onEnroll={handleEnroll}
-                onPreview={() => console.log('Preview')}
                 isEnrolled={false}
                 thumbnailUrl={c.thumbnailUrl || c.imageUrl}
                 courseTitle={c.title}
+                courseType={courseType}
+                darkMode={true}
               />
             </div>
           </div>
@@ -480,12 +510,13 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
         {/* Related Courses Section */}
         {relatedCourses.length > 0 && (
-          <div className="container mx-auto px-6 lg:px-12 pb-10 lg:pb-12">
+          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-10 lg:pb-12">
             <RelatedCoursesSection
               courses={relatedCourses}
               categories={categories}
               instructors={instructors}
               title="Kapcsolódó tartalmak"
+              darkMode={true}
             />
           </div>
         )}

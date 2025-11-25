@@ -18,7 +18,7 @@ const auth = admin.auth();
 const firestore = admin.firestore();
 
 // Email configuration - lazy initialization
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@academion.hu';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@dma.hu';
 let sendGridInitialized = false;
 
 /**
@@ -727,7 +727,7 @@ export const sendEmailVerification = onCall({
         const msg = {
           to: email,
           from: FROM_EMAIL,
-          subject: 'Email cím megerősítése - Academion',
+          subject: 'Email cím megerősítése - DMA Masterclass',
           html: htmlContent,
         };
 
