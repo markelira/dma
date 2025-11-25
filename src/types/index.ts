@@ -308,6 +308,11 @@ export interface Course {
     title: string;
     lessons?: { title: string }[];
   }[];
+  /**
+   * Content creation date - when the course content was originally recorded/produced
+   * Format: ISO date string "YYYY-MM-DD"
+   */
+  contentCreatedAt?: string;
 }
 
 export interface Review {

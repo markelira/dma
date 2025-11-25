@@ -16,6 +16,8 @@ export interface WizardBasicInfo {
   // Marketing fields
   whatYouWillLearn?: string[];
   targetAudienceIds?: string[]; // Entity-based target audiences
+  // Content creation date (YYYY-MM-DD)
+  contentCreatedAt?: string;
 }
 
 interface WizardLesson extends Omit<Lesson, 'id'> {

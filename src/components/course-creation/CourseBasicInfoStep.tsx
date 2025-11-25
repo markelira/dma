@@ -42,6 +42,9 @@ export interface BasicInfoData {
   // Marketing fields
   whatYouWillLearn?: string[];
   targetAudienceIds?: string[]; // Entity-based target audiences
+
+  // Content creation date (YYYY-MM-DD)
+  contentCreatedAt?: string;
 }
 
 interface Props {
@@ -60,6 +63,7 @@ const schema = z.object({
   thumbnailUrl: z.string().optional(),
   whatYouWillLearn: z.array(z.string()).optional(),
   targetAudienceIds: z.array(z.string()).optional(),
+  contentCreatedAt: z.string().min(1, "A tartalom készítésének dátuma kötelező").regex(/^\d{4}-\d{2}-\d{2}$/, "Érvénytelen dátum formátum"),
 });
 
 export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: Props) {
@@ -113,6 +117,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
       categoryId: "",
       instructorId: "",
       thumbnailUrl: "",
+      contentCreatedAt: "",
     },
   });
 
@@ -248,6 +253,7 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
         instructorIds: selectedInstructors,
         whatYouWillLearn: whatYouWillLearn.filter(item => item.trim() !== ""),
         targetAudienceIds: selectedTargetAudiences,
+        contentCreatedAt: data.contentCreatedAt,
       };
       await onSubmit(completeData);
     } catch (error) {
@@ -281,6 +287,24 @@ export default function CourseBasicInfoStep({ initial, courseType, onSubmit }: P
           />
           {errors.title && (
             <p className="text-sm text-red-600">{errors.title.message}</p>
+          )}
+        </div>
+
+        {/* Content Creation Date */}
+        <div className="space-y-2">
+          <Label htmlFor="contentCreatedAt" required>Tartalom készítésének dátuma</Label>
+          <Input
+            id="contentCreatedAt"
+            type="date"
+            {...register("contentCreatedAt")}
+            className={errors.contentCreatedAt ? "border-red-500" : ""}
+            max={new Date().toISOString().split('T')[0]}
+          />
+          <p className="text-xs text-muted-foreground">
+            A tartalom eredeti felvételének/készítésének dátuma
+          </p>
+          {errors.contentCreatedAt && (
+            <p className="text-sm text-red-600">{errors.contentCreatedAt.message}</p>
           )}
         </div>
 
