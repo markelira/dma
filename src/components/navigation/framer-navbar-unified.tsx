@@ -4,6 +4,9 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
+import { CourseTypeDropdown } from './CourseTypeDropdown'
+import { CategoryDropdown } from './CategoryDropdown'
+import { CourseType } from '@/types'
 
 interface FramerNavbarUnifiedProps {
   onMobileMenuToggle: () => void
@@ -11,9 +14,17 @@ interface FramerNavbarUnifiedProps {
 
 const SCROLL_THRESHOLD = 100
 
+// Course type nav items configuration
+const COURSE_TYPE_NAV_ITEMS: { type: CourseType; label: string; color: string }[] = [
+  { type: 'WEBINAR', label: 'Webinárok', color: 'hover:text-purple-600' },
+  { type: 'ACADEMIA', label: 'Akadémia', color: 'hover:text-blue-600' },
+  { type: 'MASTERCLASS', label: 'Masterclass', color: 'hover:text-amber-600' },
+  { type: 'PODCAST', label: 'Podcast', color: 'hover:text-green-600' },
+]
+
 export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedProps) {
   const [scrolled, setScrolled] = useState(false)
-  const [coursesDropdownOpen, setCoursesDropdownOpen] = useState(false)
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const { isAuthenticated, user, isLoading } = useAuthStore()
 
   useEffect(() => {
@@ -25,6 +36,14 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  const handleDropdownEnter = (id: string) => {
+    setOpenDropdown(id)
+  }
+
+  const handleDropdownLeave = () => {
+    setOpenDropdown(null)
+  }
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full">
@@ -38,7 +57,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
         <div
           className="transition-all duration-500 ease-in-out"
           style={{
-            maxWidth: scrolled ? '1024px' : '100%',
+            maxWidth: scrolled ? '1000px' : '1400px',
             margin: '0 auto',
           }}
         >
@@ -46,18 +65,18 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
           <div
             className="flex items-center justify-between transition-all duration-500 ease-in-out"
             style={{
-              height: scrolled ? '64px' : '64px',
-              padding: scrolled ? '0 32px' : '0',
-              borderRadius: scrolled ? '40px' : '0px',
-              backgroundColor: scrolled ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0)',
-              backdropFilter: scrolled ? 'blur(10px)' : 'blur(0px)',
-              WebkitBackdropFilter: scrolled ? 'blur(10px)' : 'blur(0px)',
-              border: scrolled ? '1px solid rgba(117, 115, 114, 0.15)' : '1px solid transparent',
-              boxShadow: scrolled ? '0 1px 3px rgba(0, 0, 0, 0.1)' : 'none',
+              height: '64px',
+              padding: scrolled ? '0 24px' : '0 32px',
+              borderRadius: '40px',
+              backgroundColor: 'rgba(255, 255, 255, 0.8)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(117, 115, 114, 0.15)',
+              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
             }}
           >
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
               <img
                 src="/images/DMA.hu-logo.png"
                 alt="DMA Logo"
@@ -69,30 +88,52 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
               />
             </Link>
 
-            {/* Desktop Navigation - Centered when not scrolled */}
-            <div
-              className="hidden md:flex items-center gap-8 transition-all duration-500"
-              style={{
-                position: scrolled ? 'static' : 'absolute',
-                left: scrolled ? 'auto' : '50%',
-                transform: scrolled ? 'none' : 'translateX(-50%)',
-              }}
-            >
-              {/* Tartalmak Dropdown */}
+            {/* Desktop Navigation */}
+            <div className="hidden lg:flex items-center gap-1 flex-1 justify-center">
+              {/* Course Type Dropdowns */}
+              {COURSE_TYPE_NAV_ITEMS.map(({ type, label, color }) => (
+                <div
+                  key={type}
+                  className="relative"
+                  onMouseEnter={() => handleDropdownEnter(type)}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  <button
+                    className={`text-gray-700 ${color} font-bold font-inter transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 flex items-center gap-1`}
+                    style={{
+                      fontSize: scrolled ? '13px' : '14px',
+                    }}
+                  >
+                    {label}
+                    <svg
+                      className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === type ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  <CourseTypeDropdown courseType={type} isOpen={openDropdown === type} />
+                </div>
+              ))}
+
+              {/* Kategóriák Dropdown */}
               <div
                 className="relative"
-                onMouseEnter={() => setCoursesDropdownOpen(true)}
-                onMouseLeave={() => setCoursesDropdownOpen(false)}
+                onMouseEnter={() => handleDropdownEnter('categories')}
+                onMouseLeave={handleDropdownLeave}
               >
                 <button
-                  className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20 flex items-center gap-1"
+                  className="text-gray-700 hover:text-gray-900 font-bold font-inter transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 flex items-center gap-1"
                   style={{
-                    fontSize: scrolled ? '14px' : '16px',
+                    fontSize: scrolled ? '13px' : '14px',
                   }}
                 >
-                  Tartalmak
+                  Kategóriák
                   <svg
-                    className={`w-4 h-4 transition-transform duration-200 ${coursesDropdownOpen ? 'rotate-180' : ''}`}
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'categories' ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -101,69 +142,20 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                   </svg>
                 </button>
 
-                {/* Dropdown Menu */}
-                {coursesDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
-                    <Link
-                      href="/webinar"
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-purple-600">🎥</span>
-                        <span>Webinárok</span>
-                      </div>
-                    </Link>
-                    <Link
-                      href="/akadémia"
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-brand-secondary/5 hover:text-brand-secondary transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-brand-secondary">📚</span>
-                        <span>Akadémia</span>
-                      </div>
-                    </Link>
-                    <Link
-                      href="/masterclass"
-                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-amber-600">🎓</span>
-                        <span>Masterclass</span>
-                      </div>
-                    </Link>
-                  </div>
-                )}
+                <CategoryDropdown isOpen={openDropdown === 'categories'} />
               </div>
-              <Link
-                href="/pricing"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
-                style={{
-                  fontSize: scrolled ? '14px' : '16px',
-                }}
-              >
-                Árazás
-              </Link>
-              <Link
-                href="/blog"
-                className="text-gray-700 hover:text-gray-900 font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
-                style={{
-                  fontSize: scrolled ? '14px' : '16px',
-                }}
-              >
-                Blog
-              </Link>
             </div>
 
             {/* Desktop Auth Button */}
-            <div className="hidden md:flex items-center">
+            <div className="hidden lg:flex items-center flex-shrink-0">
               {isLoading ? null : isAuthenticated && user ? (
                 <Link href={user.role === 'INSTRUCTOR' ? '/instructor/dashboard' : user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}>
                   <Button
                     size="sm"
-                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium transition-all duration-200"
+                    className="bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-full font-medium font-inter transition-all duration-200"
                     style={{
                       padding: scrolled ? '8px 20px' : '10px 24px',
-                      fontSize: scrolled ? '14px' : '16px',
+                      fontSize: scrolled ? '13px' : '14px',
                     }}
                   >
                     Irányítópult
@@ -173,10 +165,10 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                 <Link href="/login">
                   <Button
                     size="sm"
-                    className="bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium transition-all duration-200"
+                    className="bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-full font-medium font-inter transition-all duration-200"
                     style={{
                       padding: scrolled ? '8px 20px' : '10px 24px',
-                      fontSize: scrolled ? '14px' : '16px',
+                      fontSize: scrolled ? '13px' : '14px',
                     }}
                   >
                     Bejelentkezés
@@ -188,7 +180,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
             {/* Mobile Hamburger Button */}
             <button
               onClick={onMobileMenuToggle}
-              className="md:hidden w-10 h-10 flex items-center justify-center"
+              className="lg:hidden w-10 h-10 flex items-center justify-center"
               aria-label="Open menu"
             >
               <div className="w-6 flex flex-col gap-1.5">
