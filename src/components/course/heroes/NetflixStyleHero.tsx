@@ -147,9 +147,9 @@ export function NetflixStyleHero({
         ) : (
           <div className={`w-full h-full bg-gradient-to-br ${config.gradientFallback}`} />
         )}
-        {/* Gradient overlays - Netflix-style heavy darkening */}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/80 to-gray-950/30" />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-950 via-gray-950/70 to-gray-950/20" />
+        {/* Gradient overlays - subtle fade from dark left to transparent right */}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,0.95)_0%,rgba(3,7,18,0.85)_30%,rgba(3,7,18,0.6)_50%,rgba(3,7,18,0.3)_65%,rgba(3,7,18,0.1)_75%,transparent_85%)]" />
       </div>
 
       {/* Content */}
