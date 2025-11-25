@@ -17,7 +17,11 @@ import {
   User,
   LogOut,
   Building2,
-  GraduationCap
+  GraduationCap,
+  Star,
+  Video,
+  Mic,
+  BarChart3
 } from 'lucide-react'
 
 /**
@@ -28,18 +32,28 @@ import {
 
 const navigationSections = [
   {
-    title: 'Cég kezelése',
+    title: 'Fő navigáció',
     items: [
-      { title: 'Vezérlőpult', href: '/company/dashboard', icon: Home },
-      { title: 'Alkalmazottak', href: '/company/dashboard/employees', icon: Users },
-      { title: 'Tartalmak', href: '/company/dashboard/courses', icon: BookOpen },
-      { title: 'Haladás', href: '/company/dashboard/progress', icon: TrendingUp },
+      { title: 'Kezdőlap', href: '/company/dashboard', icon: Home },
+      { title: 'Saját tartalmaim', href: '/company/dashboard/my-courses', icon: BookOpen },
+      { title: 'Összes tartalom', href: '/company/dashboard/courses', icon: GraduationCap },
     ]
   },
   {
-    title: 'Saját tanulás',
+    title: 'Kategóriák',
     items: [
-      { title: 'Beiratkozásaim', href: '/company/dashboard/my-courses', icon: GraduationCap },
+      { title: 'Masterclass', href: '/company/dashboard/masterclass', icon: Star },
+      { title: 'Webinár', href: '/company/dashboard/webinar', icon: Video },
+      { title: 'Akadémia', href: '/company/dashboard/academia', icon: GraduationCap },
+      { title: 'Podcast', href: '/company/dashboard/podcast', icon: Mic },
+    ]
+  },
+  {
+    title: 'Cég kezelése',
+    items: [
+      { title: 'Munkatársak', href: '/company/dashboard/employees', icon: Users },
+      { title: 'Haladás', href: '/company/dashboard/progress', icon: TrendingUp },
+      { title: 'Vezérlőpult', href: '/company/dashboard/vezerlopult', icon: BarChart3 },
     ]
   }
 ]
@@ -125,29 +139,23 @@ export function CompanyDashboardSidebar({ companyName, onNavigate }: CompanyDash
 
   return (
     <div className="h-full flex flex-col bg-white">
-      {/* Header with Company branding */}
+      {/* Header with logo */}
       <div className="px-6 py-5 border-b border-gray-200">
-        <Link href="/company/dashboard" className="flex items-center space-x-3 group">
+        <Link href="/company/dashboard" className="flex items-center group">
           <motion.div
-            className="relative w-10 h-10 flex-shrink-0"
-            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="relative w-28 h-8 flex-shrink-0"
+            whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             <Image
-              src="/images/navbar-logo.png"
+              src="/images/dma-logo.png"
               alt="DMA logo"
               fill
-              className="object-contain"
-              sizes="40px"
+              className="object-contain object-left"
+              sizes="112px"
               priority
             />
           </motion.div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-brand-secondary transition-colors">
-              DMA
-            </span>
-            <span className="text-xs text-gray-500">Cég vezérlőpult</span>
-          </div>
         </Link>
       </div>
 

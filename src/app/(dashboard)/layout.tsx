@@ -75,7 +75,7 @@ export default function DashboardRouteGroupLayout({
 
   return (
     <AuthProvider>
-      <div className="flex min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50">
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div
@@ -88,32 +88,29 @@ export default function DashboardRouteGroupLayout({
         <aside
           className={`
             fixed top-0 left-0 z-50 h-screen w-64 transform bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out
-            lg:relative lg:translate-x-0
+            lg:translate-x-0
             ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
         >
           <DashboardSidebar onNavigate={() => setSidebarOpen(false)} />
         </aside>
 
-        {/* Main Content Area */}
-        <div className="flex flex-1 flex-col">
-          {/* Mobile Menu Button - Floating */}
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
-          >
-            {sidebarOpen ? (
-              <X className="h-6 w-6 text-gray-700" />
-            ) : (
-              <Menu className="h-6 w-6 text-gray-700" />
-            )}
-          </button>
+        {/* Mobile Menu Button - Floating */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
+        >
+          {sidebarOpen ? (
+            <X className="h-6 w-6 text-gray-700" />
+          ) : (
+            <Menu className="h-6 w-6 text-gray-700" />
+          )}
+        </button>
 
-          {/* Main Content - Light theme */}
-          <main className="flex-1 overflow-y-auto bg-gray-50 p-4 lg:p-6">
-            {children}
-          </main>
-        </div>
+        {/* Main Content Area - offset by sidebar width on desktop */}
+        <main className="min-h-screen bg-gray-50 p-4 lg:p-6 lg:ml-64">
+          {children}
+        </main>
       </div>
     </AuthProvider>
   )

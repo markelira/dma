@@ -109,7 +109,7 @@ exports.sendEmployeeReminder = v2_1.https.onCall({
             firstName: employeeData.firstName,
             companyName,
             masterclassTitle,
-            dashboardUrl: `${process.env.APP_URL || 'https://academion.hu'}/dashboard`,
+            dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/dashboard`,
         });
         // 6. Log activity
         await db.collection('companies').doc(companyId).collection('activity').add({
@@ -248,7 +248,7 @@ ${data.companyName} & Az DMA csapata
         await sgMail.send({
             to,
             from: {
-                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
+                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
                 name: 'DMA Masterclass',
             },
             subject,

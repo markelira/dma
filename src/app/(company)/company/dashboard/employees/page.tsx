@@ -233,9 +233,9 @@ export default function EmployeesPage() {
       console.error('Error adding employee:', err);
 
       if (err.code === 'already-exists') {
-        setError('Ez az email cím már szerepel az alkalmazottak között');
+        setError('Ez az email cím már szerepel a munkatársak között');
       } else {
-        setError(err.message || 'Hiba történt az alkalmazott hozzáadása során');
+        setError(err.message || 'Hiba történt a munkatárs hozzáadása során');
       }
     } finally {
       setSubmitting(false);
@@ -272,7 +272,7 @@ export default function EmployeesPage() {
       setEmployees(prev => prev.filter(e => e.id !== employee.id));
     } catch (err: any) {
       console.error('Error removing employee:', err);
-      setError(err.message || 'Hiba történt az alkalmazott eltávolítása során');
+      setError(err.message || 'Hiba történt a munkatárs eltávolítása során');
     } finally {
       setRemovingEmployeeId(null);
     }
@@ -360,15 +360,15 @@ export default function EmployeesPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Alkalmazottak</h1>
-          <p className="text-gray-500">Kezeld a vállalat alkalmazottait és küldj meghívókat</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Munkatársak</h1>
+          <p className="text-gray-600">Kezeld a vállalat munkatársait és küldj meghívókat</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm"
         >
           <UserPlus className="w-5 h-5 mr-2" />
-          Új alkalmazott
+          Új munkatárs
         </button>
       </div>
 
@@ -376,7 +376,7 @@ export default function EmployeesPage() {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <StatCard
           icon={Users}
-          label="Összes alkalmazott"
+          label="Összes munkatárs"
           value={stats.total}
           isLoading={loading}
         />
@@ -470,7 +470,7 @@ export default function EmployeesPage() {
                     <p className="text-gray-600 font-medium">
                       {searchTerm || statusFilter !== 'all'
                         ? 'Nincs találat a keresési feltételekkel'
-                        : 'Még nincs hozzáadott alkalmazott'}
+                        : 'Még nincs hozzáadott munkatárs'}
                     </p>
                     {!searchTerm && statusFilter === 'all' && (
                       <p className="text-sm text-gray-500 mt-1">Kezdd el az első meghívó küldésével!</p>
@@ -576,7 +576,7 @@ export default function EmployeesPage() {
                   Betöltés...
                 </>
               ) : (
-                <>Több betöltése ({EMPLOYEES_PER_PAGE} alkalmazott)</>
+                <>Több betöltése ({EMPLOYEES_PER_PAGE} munkatárs)</>
               )}
             </button>
           </div>
@@ -595,7 +595,7 @@ export default function EmployeesPage() {
             >
               <div className="p-6 border-b border-gray-200">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-gray-900">Új alkalmazott hozzáadása</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Új munkatárs hozzáadása</h2>
                   <button
                     onClick={() => setShowAddModal(false)}
                     className="text-gray-400 hover:text-gray-600 rounded-lg p-1 hover:bg-gray-100 transition-colors"
@@ -735,7 +735,7 @@ export default function EmployeesPage() {
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {showRemoveConfirm.status === 'invited'
                     ? 'Meghívó visszavonása'
-                    : 'Alkalmazott eltávolítása'}
+                    : 'Munkatárs eltávolítása'}
                 </h3>
 
                 <p className="text-gray-600 mb-6">
@@ -746,8 +746,8 @@ export default function EmployeesPage() {
                     </>
                   ) : (
                     <>
-                      Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> alkalmazottat a vállalatból?
-                      Az alkalmazott elveszíti hozzáférését a vállalati tartalmakhoz.
+                      Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> munkatársat a vállalatból?
+                      A munkatárs elveszíti hozzáférését a vállalati tartalmakhoz.
                     </>
                   )}
                 </p>

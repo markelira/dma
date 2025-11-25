@@ -109,6 +109,7 @@ export function CourseCarousel({ courseType, title }: CourseCarouselProps) {
                   enrolled={course.isEnrolled}
                   enrollmentCount={course.enrollmentCount}
                   progress={course.progress}
+                  contentCreatedAt={course.contentCreatedAt}
                 />
               </div>
             ))}

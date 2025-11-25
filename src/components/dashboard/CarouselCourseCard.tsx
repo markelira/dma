@@ -3,8 +3,22 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Users, Clock, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Users, Clock, CheckCircle2, Calendar } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+
+// Helper function to format date in Hungarian locale
+const formatHungarianDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('hu-HU', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch {
+    return dateString;
+  }
+};
 
 export interface CarouselCourseCardProps {
   id: string;
@@ -16,6 +30,7 @@ export interface CarouselCourseCardProps {
   enrolled?: boolean;
   enrollmentCount?: number;
   progress?: number;
+  contentCreatedAt?: string; // Content creation date (YYYY-MM-DD)
 }
 
 const courseTypeLabels: Record<string, string> = {
@@ -42,6 +57,7 @@ export function CarouselCourseCard({
   enrolled = false,
   enrollmentCount,
   progress,
+  contentCreatedAt,
 }: CarouselCourseCardProps) {
   return (
     <Link href={`/courses/${id}`}>
@@ -88,7 +104,13 @@ export function CarouselCourseCard({
             {instructor}
           </p>
 
-          <div className="mt-auto flex items-center gap-4 text-xs font-medium text-gray-500">
+          <div className="mt-auto flex items-center flex-wrap gap-3 text-xs font-medium text-gray-500">
+            {contentCreatedAt && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>{formatHungarianDate(contentCreatedAt)}</span>
+              </div>
+            )}
             {duration && (
               <div className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />

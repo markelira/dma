@@ -18,7 +18,11 @@ import {
   Users,
   LogOut,
   Building2,
-  FolderOpen
+  FolderOpen,
+  BarChart3,
+  Star,
+  Video,
+  Mic
 } from 'lucide-react'
 import { brandGradient } from '@/lib/design-tokens'
 
@@ -38,13 +42,23 @@ const navigationSections = {
       title: 'Fő navigáció',
       items: [
         { title: 'Kezdőlap', href: '/dashboard', icon: Home },
-        { title: 'Beiratkozásaim', href: '/dashboard/courses', icon: BookOpen },
-        { title: 'Böngészés', href: '/courses', icon: GraduationCap },
+        { title: 'Saját tartalmaim', href: '/dashboard/courses', icon: BookOpen },
+        { title: 'Összes tartalom', href: '/courses', icon: GraduationCap },
+      ]
+    },
+    {
+      title: 'Kategóriák',
+      items: [
+        { title: 'Masterclass', href: '/dashboard/masterclass', icon: Star },
+        { title: 'Webinár', href: '/dashboard/webinar', icon: Video },
+        { title: 'Akadémia', href: '/dashboard/academia', icon: GraduationCap },
+        { title: 'Podcast', href: '/dashboard/podcast', icon: Mic },
       ]
     },
     {
       title: 'Eszközök',
       items: [
+        { title: 'Haladás', href: '/dashboard/vezerlopult', icon: BarChart3 },
         { title: 'Fizetések', href: '/dashboard/invoices', icon: FolderOpen },
         { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
       ]
@@ -182,26 +196,23 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
 
   return (
     <div className="h-full flex flex-col bg-white">
-      {/* Header with DMA branding */}
+      {/* Header with logo */}
       <div className="px-6 py-5 border-b border-gray-200">
-        <Link href="/dashboard" className="flex items-center space-x-3 group">
+        <Link href="/dashboard" className="flex items-center group">
           <motion.div
-            className="relative w-10 h-10 flex-shrink-0"
-            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="relative w-28 h-8 flex-shrink-0"
+            whileHover={{ scale: 1.02 }}
             transition={{ duration: 0.2 }}
           >
             <Image
-              src="/images/navbar-logo.png"
+              src="/images/dma-logo.png"
               alt="DMA logo"
               fill
-              className="object-contain"
-              sizes="40px"
+              className="object-contain object-left"
+              sizes="112px"
               priority
             />
           </motion.div>
-          <span className="text-xl font-bold text-gray-900 tracking-tight group-hover:text-brand-secondary transition-colors">
-            DMA
-          </span>
         </Link>
       </div>
 

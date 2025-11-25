@@ -23,7 +23,7 @@ interface Course {
   price?: number;
   thumbnailUrl?: string;
   lessons?: number;
-  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS';
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
 }
 
 interface Instructor {
@@ -39,26 +39,35 @@ interface RelatedCoursesSectionProps {
   categories?: Array<{ id: string; name: string }>;
   instructors?: Instructor[];
   title?: string;
+  darkMode?: boolean;
 }
 
 export function RelatedCoursesSection({
   courses,
   categories,
   instructors,
-  title = "Kapcsolódó tartalmak"
+  title = "Kapcsolódó tartalmak",
+  darkMode = false
 }: RelatedCoursesSectionProps) {
   if (!courses || courses.length === 0) return null;
 
+  // Dark mode styles
+  const containerClass = darkMode
+    ? 'py-6'
+    : 'bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 lg:p-8';
+
+  const headingClass = darkMode ? 'text-white' : 'text-gray-900';
+
   return (
     <motion.section
-      className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 lg:p-8"
+      className={containerClass}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.2 }}
     >
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className={`text-2xl font-bold ${headingClass}`}>
           {title}
         </h2>
         <button

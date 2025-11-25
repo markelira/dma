@@ -131,7 +131,7 @@ exports.addEmployee = v2_1.https.onCall({
         const companyName = companyDoc.data()?.name || 'DMA';
         // 6. Send invitation email via SendGrid (non-blocking)
         // Link directly to registration with email prefilled - user gets auto-linked when registering
-        const inviteUrl = `${process.env.APP_URL || 'https://academion.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(email.toLowerCase())}`;
+        const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(email.toLowerCase())}`;
         console.log('📨 [addEmployee] Attempting to send email...', {
             to: email,
             companyName,
@@ -549,7 +549,7 @@ Ha nem te kérted ezt a meghívót, egyszerűen figyelmen kívül hagyhatod ezt 
         await sgMail.send({
             to,
             from: {
-                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@academion.hu',
+                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
                 name: 'DMA Masterclass',
             },
             subject,

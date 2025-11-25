@@ -1,19 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from "motion/react"
-import { Video } from 'lucide-react'
+import { Video, Play, Info } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
-import { CourseStatsBar } from '@/components/courses/CourseStatsBar'
-import { CourseFilterPanel } from '@/components/courses/CourseFilterPanel'
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
 import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
 import { useInstructors } from '@/hooks/useInstructorQueries'
+import Link from 'next/link'
 
 interface Course {
   id: string
@@ -21,6 +20,7 @@ interface Course {
   description: string
   instructorName?: string
   category: string
+  categoryIds?: string[]
   level: string
   duration: string
   rating?: number
@@ -31,16 +31,13 @@ interface Course {
   lessons?: number
   createdAt?: any
   tags?: string[]
-  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS'
+  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
 }
 
 export default function WebinarPage() {
   const [courses, setCourses] = useState<Course[]>([])
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [categories, setCategories] = useState<string[]>(['all'])
   const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
 
   // Fetch instructors using React Query
@@ -54,13 +51,10 @@ export default function WebinarPage() {
         const result: any = await getCategories()
 
         if (result.data?.success && result.data?.categories) {
-          const categoryNames = ['all', ...result.data.categories.map((cat: any) => cat.name)]
-          setCategories(categoryNames)
           setCategoryObjects(result.data.categories)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)
-        setCategories(['all'])
         setCategoryObjects([])
       }
     }
@@ -83,7 +77,6 @@ export default function WebinarPage() {
       })) as Course[]
 
       setCourses(coursesData)
-      setFilteredCourses(coursesData)
       setLoading(false)
     }, (error) => {
       console.error('Error fetching webinar courses:', error)
@@ -93,43 +86,28 @@ export default function WebinarPage() {
     return () => unsubscribe()
   }, [])
 
-  // Filter courses
-  useEffect(() => {
-    let filtered = courses
+  // Get featured (latest) course
+  const featuredCourse = courses[0]
 
-    // Search filter
-    if (searchInput) {
-      filtered = filtered.filter(course =>
-        course.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-        course.description?.toLowerCase().includes(searchInput.toLowerCase()) ||
-        course.tags?.some(tag => tag.toLowerCase().includes(searchInput.toLowerCase()))
-      )
-    }
+  // Filter courses by search only - include all courses (featured one too)
+  const filteredCourses = useMemo(() => {
+    if (!searchInput) return courses
 
-    // Category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(course => {
-        const categoryName = typeof course.category === 'string' ? course.category : (course.category as any)?.name
-        return categoryName === selectedCategory
-      })
-    }
-
-    setFilteredCourses(filtered)
-  }, [searchInput, selectedCategory, courses])
-
-  const handleResetFilters = () => {
-    setSelectedCategory('all')
-    setSearchInput('')
-  }
+    return courses.filter(course =>
+      course.title.toLowerCase().includes(searchInput.toLowerCase()) ||
+      course.description?.toLowerCase().includes(searchInput.toLowerCase()) ||
+      course.tags?.some(tag => tag.toLowerCase().includes(searchInput.toLowerCase()))
+    )
+  }, [searchInput, courses])
 
   if (loading) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-purple-600" />
-            <p className="text-lg text-gray-600">Webinárok betöltése...</p>
+            <div className="animate-spin rounded-full h-12 w-12 mx-auto mb-4 border-4 border-gray-700 border-t-purple-500" />
+            <p className="text-gray-400">Webinárok betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -141,114 +119,137 @@ export default function WebinarPage() {
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-brand-secondary/5/30 to-gray-50 relative overflow-hidden">
-        {/* Background blur shapes */}
-        <div className="pointer-events-none absolute top-0 right-0 w-96 h-96 bg-purple-100/30 rounded-full blur-3xl" aria-hidden="true"></div>
-        <div className="pointer-events-none absolute bottom-0 left-0 w-64 h-64 bg-brand-secondary/10/20 rounded-full blur-2xl" aria-hidden="true"></div>
-
-        {/* Hero Section */}
-        <div className="relative pt-20 pb-16 px-6 lg:px-12">
-          <div className="container mx-auto max-w-6xl text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="mb-6"
-            >
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 mb-6 shadow-lg">
-                <Video className="w-10 h-10 text-white" />
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Webinárok
-              </h1>
-              <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">
-                Egyszeri, 1 videós alkalmak erőforrásokkal. Tömör, gyakorlatias tudás amelyet azonnal alkalmazhatsz.
-              </p>
-            </motion.div>
-
-            {/* Search Bar */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="max-w-2xl mx-auto"
-            >
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Keress webinárok között..."
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="w-full px-6 py-4 rounded-full border-2 border-white/50 bg-white/60 backdrop-blur-xl shadow-lg focus:outline-none focus:border-purple-500 transition-all text-gray-900 placeholder-gray-500"
+      <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
+        {/* Featured Hero - Netflix Style */}
+        {featuredCourse && (
+          <div className="relative h-[70vh] min-h-[500px] max-h-[700px]">
+            {/* Background Image */}
+            <div className="absolute inset-0">
+              {featuredCourse.thumbnailUrl ? (
+                <img
+                  src={featuredCourse.thumbnailUrl}
+                  alt={featuredCourse.title}
+                  className="w-full h-full object-cover"
                 />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-900 to-purple-950" />
+              )}
+              {/* Gradient overlays */}
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-950/80 via-transparent to-transparent" />
+            </div>
+
+            {/* Content */}
+            <div className="relative h-full flex items-end">
+              <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-16 w-full">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
+                  className="max-w-2xl"
+                >
+                  {/* Type Badge */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <Video className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-purple-400 font-medium text-sm uppercase tracking-wider">
+                      Webinár
+                    </span>
+                    <span className="text-gray-500">•</span>
+                    <span className="text-gray-400 text-sm">Legújabb</span>
+                  </div>
+
+                  {/* Title */}
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                    {featuredCourse.title}
+                  </h1>
+
+                  {/* Description */}
+                  <p className="text-gray-300 text-lg mb-6 line-clamp-3">
+                    {featuredCourse.description}
+                  </p>
+
+                  {/* CTA Buttons */}
+                  <div className="flex items-center gap-3">
+                    <Link
+                      href={`/courses/${featuredCourse.id}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                    >
+                      <Play className="w-5 h-5 fill-current" />
+                      Megtekintés
+                    </Link>
+                    <Link
+                      href={`/courses/${featuredCourse.id}`}
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-700/80 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                    >
+                      <Info className="w-5 h-5" />
+                      Részletek
+                    </Link>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Stats Bar */}
-        <CourseStatsBar
-          totalCourses={courses.length}
-          categoriesCount={categories.filter(c => c !== 'all').length}
-          filteredCount={filteredCourses.length}
-          courseType="WEBINAR"
-        />
-
-        {/* Cross-Type Navigation */}
-        <CrossTypeNavigation currentType="WEBINAR" />
-
-        {/* Main Content */}
-        <div className="container mx-auto px-6 lg:px-12 py-12 lg:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filter Sidebar */}
-            <div className="lg:col-span-1">
-              <CourseFilterPanel
-                selectedCategory={selectedCategory}
-                categories={categories}
-                onCategoryChange={setSelectedCategory}
-                onResetFilters={handleResetFilters}
+        {/* Course Grid Section */}
+        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12">
+          {/* Section Header */}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-white">
+              Összes webinár
+            </h2>
+            {/* Search */}
+            <div className="relative w-[300px]">
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                placeholder="Keresés..."
+                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 text-sm"
               />
             </div>
+          </div>
 
-            {/* Course Grid */}
-            <div className="lg:col-span-3">
-              {filteredCourses.length === 0 ? (
-                <motion.div
-                  className="flex flex-col items-center justify-center py-20 px-6 bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl shadow-xl"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                >
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center mb-6 shadow-lg">
-                    <Video className="w-10 h-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">
-                    Nincs találat
-                  </h3>
-                  <p className="text-gray-600 text-center max-w-md mb-6">
-                    Próbálj más szűrőket vagy keresési kifejezést használni
-                  </p>
-                  <button
-                    onClick={handleResetFilters}
-                    className="btn bg-gradient-to-t from-purple-600 to-purple-500 text-white shadow-sm hover:shadow-md transition-all"
-                  >
-                    Szűrők törlése
-                  </button>
-                </motion.div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredCourses.map((course, index) => (
-                    <PremiumCourseCard
-                      key={course.id}
-                      course={course}
-                      index={index}
-                      categories={categoryObjects}
-                      instructors={instructors}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
+          {filteredCourses.length === 0 && !featuredCourse ? (
+            <motion.div
+              className="flex flex-col items-center justify-center py-20 px-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div className="w-16 h-16 rounded-2xl bg-purple-500/20 flex items-center justify-center mb-4">
+                <Video className="w-8 h-8 text-purple-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">
+                Nincs találat
+              </h3>
+              <p className="text-gray-400 text-center max-w-md">
+                Hamarosan érkeznek új webinárok
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {filteredCourses.map((course, index) => (
+                <PremiumCourseCard
+                  key={course.id}
+                  course={course}
+                  index={index}
+                  categories={categoryObjects}
+                  instructors={instructors}
+                />
+              ))}
+            </motion.div>
+          )}
+
+          {/* Cross-Type Navigation */}
+          <div className="mt-16">
+            <CrossTypeNavigation currentType="WEBINAR" />
           </div>
         </div>
       </div>

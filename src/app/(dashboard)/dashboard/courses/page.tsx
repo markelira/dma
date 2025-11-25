@@ -1,216 +1,217 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo } from 'react'
 import Link from 'next/link'
-import { BookOpen, Filter, Grid, List, Search } from 'lucide-react'
-import { Progress } from '@/components/ui/progress'
-import { Badge } from '@/components/ui/badge'
+import { useRouter } from 'next/navigation'
+import { BookOpen, Play, Clock, CheckCircle, Loader2 } from 'lucide-react'
 import { useEnrollments } from '@/hooks/useEnrollments'
-import { Clock, User } from 'lucide-react'
-
-type ViewMode = 'grid' | 'list'
-type FilterType = 'all' | 'in_progress' | 'completed' | 'not_started'
+import { useCourses } from '@/hooks/useCourseQueries'
+import { useCategories } from '@/hooks/useCategoryQueries'
+import { useInstructors } from '@/hooks/useInstructorQueries'
+import { DashboardSearch } from '@/components/dashboard/DashboardSearch'
+import { EnrolledCourseCard } from '@/components/dashboard/EnrolledCourseCard'
+import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel'
 
 /**
- * Dashboard Courses Page
+ * Dashboard Courses Page - Netflix Style
  *
- * Displays all enrolled courses with filtering and view options
+ * Displays enrolled courses with carousels grouped by status
  */
 export default function DashboardCoursesPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('grid')
-  const [filter, setFilter] = useState<FilterType>('all')
+  const router = useRouter()
+  const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments()
+  const { data: courses = [], isLoading: coursesLoading } = useCourses()
+  const { data: categories = [] } = useCategories()
+  const { data: instructors = [] } = useInstructors()
 
-  // Fetch all enrollments
-  const { data: allEnrollments = [], isLoading } = useEnrollments()
+  // Merge enrollment data with course data
+  const enrichedEnrollments = useMemo(() => {
+    return enrollments.map(enrollment => {
+      const course = courses.find(c => c.id === enrollment.courseId)
+      return {
+        ...enrollment,
+        course,
+        thumbnailUrl: course?.thumbnailUrl,
+        courseType: course?.courseType,
+        duration: course?.duration,
+      }
+    }).filter(e => e.course) // Only show enrollments with valid courses
+  }, [enrollments, courses])
 
-  // Filter enrollments
-  const filteredEnrollments = allEnrollments.filter((enrollment) => {
-    if (filter === 'all') return true
-    return enrollment.status === filter
-  })
+  // Group by status
+  const inProgressCourses = useMemo(() =>
+    enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < 100)),
+    [enrichedEnrollments]
+  )
 
-  // Count by status
-  const counts = {
-    all: allEnrollments.length,
-    in_progress: allEnrollments.filter((e) => e.status === 'in_progress').length,
-    completed: allEnrollments.filter((e) => e.status === 'completed').length,
-    not_started: allEnrollments.filter((e) => e.status === 'not_started').length,
+  const completedCourses = useMemo(() =>
+    enrichedEnrollments.filter(e => e.status === 'completed' || e.progress === 100),
+    [enrichedEnrollments]
+  )
+
+  const notStartedCourses = useMemo(() =>
+    enrichedEnrollments.filter(e => e.status === 'not_started' || e.progress === 0),
+    [enrichedEnrollments]
+  )
+
+  // Most recent course for hero
+  const mostRecentCourse = useMemo(() => {
+    if (inProgressCourses.length > 0) {
+      return inProgressCourses[0]
+    }
+    return enrichedEnrollments[0]
+  }, [inProgressCourses, enrichedEnrollments])
+
+  const isLoading = enrollmentsLoading || coursesLoading
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-brand-secondary" />
+      </div>
+    )
   }
 
-  const filters: { value: FilterType; label: string }[] = [
-    { value: 'all', label: 'Összes' },
-    { value: 'in_progress', label: 'Folyamatban' },
-    { value: 'completed', label: 'Befejezett' },
-    { value: 'not_started', label: 'Nem kezdett' },
-  ]
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Beiratkozásaim</h1>
-        <p className="text-gray-500">
-          Kezeld és folytasd a tartalmaidat egy helyen
-        </p>
-      </div>
-
-      {/* Filters and View Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap gap-2">
-          {filters.map((f) => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                ${
-                  filter === f.value
-                    ? 'bg-brand-secondary text-white'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:text-gray-900'
-                }
-              `}
-            >
-              {f.label}
-              <span className="ml-2 text-xs opacity-75">
-                ({counts[f.value]})
-              </span>
-            </button>
-          ))}
+  // Empty state
+  if (enrichedEnrollments.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Saját tartalmaim</h1>
+          <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
         </div>
 
-        {/* View Mode Toggle */}
-        <div className="flex gap-1 border border-gray-200 rounded-lg p-1 bg-white shadow-sm">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`
-              p-2 rounded transition-colors text-gray-500
-              ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 hover:text-gray-900'}
-            `}
-          >
-            <Grid className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setViewMode('list')}
-            className={`
-              p-2 rounded transition-colors text-gray-500
-              ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'hover:bg-gray-50 hover:text-gray-900'}
-            `}
-          >
-            <List className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+        <DashboardSearch className="my-2" />
 
-      {/* Loading State */}
-      {isLoading && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-64 rounded-lg bg-gray-100 animate-pulse"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && filteredEnrollments.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-xl border border-gray-200">
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand-secondary/5">
             <BookOpen className="h-10 w-10 text-brand-secondary" />
           </div>
           <h3 className="mb-2 text-lg font-bold text-gray-900">
-            {filter === 'all' ? 'Még nincs tartalmad' : 'Nincs találat'}
+            Még nincs tartalmad
           </h3>
           <p className="mb-6 text-sm text-gray-500">
-            {filter === 'all'
-              ? 'Kezdj el egy új tartalmat a böngészés gombra kattintva'
-              : 'Próbálj meg egy másik szűrőt'}
+            Kezdj el egy új tartalmat a böngészés gombra kattintva
           </p>
-          {filter === 'all' && (
-            <Link
-              href="/courses"
-              className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary-hover transition-colors"
-            >
-              Tartalmak böngészése
-            </Link>
+          <Link
+            href="/courses"
+            className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary/90 transition-colors"
+          >
+            Tartalmak böngészése
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Saját tartalmaim</h1>
+        <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
+      </div>
+
+      {/* Hero - Continue Watching */}
+      {mostRecentCourse && mostRecentCourse.course && (
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800">
+          {/* Background Image */}
+          {mostRecentCourse.thumbnailUrl && (
+            <div className="absolute inset-0">
+              <img
+                src={mostRecentCourse.thumbnailUrl}
+                alt=""
+                className="w-full h-full object-cover opacity-30"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent" />
+            </div>
           )}
+
+          <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
+            <div className="flex-1 min-w-0">
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-brand-secondary/20 text-brand-secondary mb-3">
+                <Play className="w-3 h-3 mr-1" />
+                Folytatás
+              </span>
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-2 line-clamp-2">
+                {mostRecentCourse.courseName}
+              </h2>
+              <p className="text-gray-300 text-sm mb-4">
+                {mostRecentCourse.courseInstructor}
+              </p>
+
+              {/* Progress */}
+              {mostRecentCourse.progress > 0 && mostRecentCourse.progress < 100 && (
+                <div className="mb-4">
+                  <div className="flex items-center justify-between text-sm text-gray-400 mb-1">
+                    <span>{mostRecentCourse.progress}% befejezve</span>
+                  </div>
+                  <div className="w-full max-w-xs bg-gray-700 rounded-full h-1.5">
+                    <div
+                      className="bg-brand-secondary h-1.5 rounded-full transition-all"
+                      style={{ width: `${mostRecentCourse.progress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={() => router.push(`/courses/${mostRecentCourse.courseId}/learn`)}
+                className="inline-flex items-center px-5 py-2.5 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                <Play className="w-4 h-4 mr-2 fill-current" />
+                {mostRecentCourse.progress > 0 ? 'Folytatás' : 'Indítás'}
+              </button>
+            </div>
+
+            {/* Thumbnail */}
+            {mostRecentCourse.thumbnailUrl && (
+              <div className="hidden md:block w-48 h-32 rounded-lg overflow-hidden flex-shrink-0 shadow-xl">
+                <img
+                  src={mostRecentCourse.thumbnailUrl}
+                  alt=""
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Courses Grid/List */}
-      {!isLoading && filteredEnrollments.length > 0 && (
-        <div
-          className={
-            viewMode === 'grid'
-              ? 'grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'
-              : 'space-y-3'
-          }
-        >
-          {filteredEnrollments.map((enrollment) => (
-            <Link
-              key={enrollment.id}
-              href={`/courses/${enrollment.courseId}/learn`}
-              className={`
-                block rounded-xl border border-gray-200 bg-white p-6 transition-all hover:border-gray-300 hover:shadow-md shadow-sm
-                ${viewMode === 'list' ? 'flex items-center gap-6' : ''}
-              `}
-            >
-              {/* Course Info */}
-              <div className={viewMode === 'list' ? 'flex-1' : ''}>
-                <h3 className="font-bold text-gray-900 mb-1">
-                  {enrollment.courseName}
-                </h3>
-                <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-                  <div className="flex items-center gap-1">
-                    <User className="h-3.5 w-3.5" />
-                    <span>{enrollment.courseInstructor}</span>
-                  </div>
-                  {enrollment.lastAccessedAt && (
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3.5 w-3.5" />
-                      <span>
-                        {enrollment.lastAccessedAt.toLocaleDateString('hu-HU', {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                  )}
-                </div>
+      {/* Search */}
+      <DashboardSearch className="my-2" />
 
-                {/* Progress Bar */}
-                {enrollment.status === 'in_progress' && (
-                  <div className="space-y-1.5">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-brand-secondary/50 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${enrollment.progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      {enrollment.progress}% befejezve
-                    </p>
-                  </div>
-                )}
+      {/* In Progress Courses */}
+      {inProgressCourses.length > 0 && (
+        <EnrolledCourseCarousel
+          title="Folyamatban"
+          icon={<Clock className="w-5 h-5 text-brand-secondary" />}
+          enrollments={inProgressCourses}
+          categories={categories}
+          instructors={instructors}
+        />
+      )}
 
-                {/* Status Badge */}
-                {enrollment.status === 'completed' && (
-                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                    Befejezve
-                  </span>
-                )}
+      {/* Not Started Courses */}
+      {notStartedCourses.length > 0 && (
+        <EnrolledCourseCarousel
+          title="Még nem kezdett"
+          icon={<BookOpen className="w-5 h-5 text-gray-500" />}
+          enrollments={notStartedCourses}
+          categories={categories}
+          instructors={instructors}
+        />
+      )}
 
-                {enrollment.status === 'not_started' && (
-                  <span className="px-2 py-1 rounded-full text-xs font-medium border border-gray-300 text-gray-500">
-                    Még nem kezdett
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
+      {/* Completed Courses */}
+      {completedCourses.length > 0 && (
+        <EnrolledCourseCarousel
+          title="Befejezett"
+          icon={<CheckCircle className="w-5 h-5 text-green-500" />}
+          enrollments={completedCourses}
+          categories={categories}
+          instructors={instructors}
+        />
       )}
     </div>
   )

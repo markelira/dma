@@ -1,9 +1,8 @@
 'use client'
 
-import { FileText, Download, CreditCard, Calendar, CheckCircle, XCircle, Clock, Receipt, DollarSign } from 'lucide-react'
+import { FileText, Download, CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
-import { StatCard } from '@/components/dashboard/StatCard'
 import Link from 'next/link'
 import { useStripeInvoices } from '@/hooks/useStripeInvoices'
 
@@ -44,13 +43,6 @@ export default function InvoicesPage() {
     }).format(amount / 100) // Stripe amounts are in cents
   }
 
-  // Calculate stats
-  const totalAmount = invoices
-    .filter(inv => inv.status === 'succeeded')
-    .reduce((sum, inv) => sum + inv.amount, 0)
-  const successfulPayments = invoices.filter(inv => inv.status === 'succeeded').length
-  const pendingPayments = invoices.filter(inv => inv.status === 'pending').length
-
   if (loading) {
     return (
       <div className="space-y-6">
@@ -58,13 +50,6 @@ export default function InvoicesPage() {
         <div>
           <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-2" />
           <div className="h-5 w-64 bg-gray-200 rounded animate-pulse" />
-        </div>
-
-        {/* Stats Skeleton */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-gray-100 rounded-lg animate-pulse" />
-          ))}
         </div>
 
         {/* Table Skeleton */}
@@ -81,31 +66,6 @@ export default function InvoicesPage() {
         <p className="text-gray-500">
           Itt láthatod az összes korábbi fizetésed és számládat
         </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard
-          icon={DollarSign}
-          label="Összes költés"
-          value={new Intl.NumberFormat('hu-HU', {
-            style: 'currency',
-            currency: 'HUF'
-          }).format(totalAmount / 100)}
-          isLoading={loading}
-        />
-        <StatCard
-          icon={CheckCircle}
-          label="Sikeres fizetések"
-          value={successfulPayments}
-          isLoading={loading}
-        />
-        <StatCard
-          icon={Receipt}
-          label="Összes tranzakció"
-          value={invoices.length}
-          isLoading={loading}
-        />
       </div>
 
       {/* Empty State */}

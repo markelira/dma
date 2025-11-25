@@ -21,6 +21,8 @@ interface CourseInstructorCardProps {
   roleLabel?: string;
   /** Instructor's role from the instructors collection */
   instructorRole?: 'MENTOR' | 'SZEREPLŐ';
+  /** Dark mode styling */
+  darkMode?: boolean;
 }
 
 export function CourseInstructorCard({
@@ -31,22 +33,35 @@ export function CourseInstructorCard({
   stats,
   expertise,
   roleLabel = 'Oktató',
-  instructorRole
+  instructorRole,
+  darkMode = false
 }: CourseInstructorCardProps) {
   // Use instructor's actual role if available, otherwise use the passed roleLabel
   const displayRole = instructorRole
     ? (instructorRole === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor')
     : roleLabel;
 
+  // Dark mode styles
+  const containerClass = darkMode
+    ? 'py-6 border-b border-gray-800'
+    : 'bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8';
+
+  const headingClass = darkMode ? 'text-white' : 'text-gray-900';
+  const titleClass = darkMode ? 'text-gray-400' : 'text-gray-600';
+  const bioClass = darkMode ? 'text-gray-300' : 'text-gray-700';
+  const tagClass = darkMode
+    ? 'bg-gray-800 text-gray-300'
+    : 'bg-gray-100 text-gray-700';
+
   return (
     <motion.section
-      className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-8"
+      className={containerClass}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
     >
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <h2 className={`text-2xl font-bold ${headingClass} mb-6`}>
         {displayRole}
       </h2>
 
@@ -69,17 +84,17 @@ export function CourseInstructorCard({
         </div>
 
         <div className="flex-1">
-          <h3 className="text-xl font-bold text-gray-900">{name}</h3>
-          {title && <p className="text-gray-600 mb-3">{title}</p>}
+          <h3 className={`text-xl font-bold ${headingClass}`}>{name}</h3>
+          {title && <p className={`${titleClass} mb-3`}>{title}</p>}
 
-          <p className="text-gray-700 mb-4">{bio}</p>
+          <p className={`${bioClass} mb-4`}>{bio}</p>
 
           {expertise && expertise.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {expertise.map((skill, index) => (
                 <span
                   key={index}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
+                  className={`px-3 py-1 ${tagClass} rounded-full text-sm`}
                 >
                   {skill}
                 </span>

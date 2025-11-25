@@ -56,7 +56,7 @@ if (!admin.apps.length) {
 const auth = admin.auth();
 const firestore = admin.firestore();
 // Email configuration - lazy initialization
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@academion.hu';
+const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || process.env.FROM_EMAIL || 'noreply@dma.hu';
 let sendGridInitialized = false;
 /**
  * Initialize SendGrid (lazy initialization)
@@ -702,7 +702,7 @@ exports.sendEmailVerification = (0, https_1.onCall)({
                 const msg = {
                     to: email,
                     from: FROM_EMAIL,
-                    subject: 'Email cím megerősítése - Academion',
+                    subject: 'Email cím megerősítése - DMA Masterclass',
                     html: htmlContent,
                 };
                 await mail_1.default.send(msg);

@@ -46,7 +46,7 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/40 backdrop-blur-md border border-white/30 rounded-2xl p-6 shadow-lg"
+        className="bg-gray-100 border border-gray-200 rounded-2xl p-6"
       >
         <div className="text-center mb-4">
           <h3 className="text-lg font-bold text-gray-900">
@@ -91,10 +91,10 @@ export function CrossTypeNavigation({ currentType }: CrossTypeNavigationProps) {
                 href={config.url}
                 className="group"
               >
-                <div className="bg-white/60 backdrop-blur-xl border border-white/40 rounded-xl p-5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                <div className="bg-white border border-gray-200 rounded-xl p-5 hover:bg-gray-50 transition-all duration-300 hover:-translate-y-1 shadow-sm">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${colorClasses.bg} flex items-center justify-center shadow-md`}>
+                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${colorClasses.bg} flex items-center justify-center`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
                       <div>

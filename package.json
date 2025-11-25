@@ -25,7 +25,7 @@
     "deploy:hosting": "firebase deploy --only hosting",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "seed": "node ./seed-firebase.js",
+    "seed": "node ./scripts/seed-emulators.js",
     "security:check": "node scripts/security-verification.js",
     "security:validate-env": "node scripts/validate-environment.js",
     "security:rotate-keys": "node scripts/rotate-keys.js",

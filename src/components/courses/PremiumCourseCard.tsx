@@ -1,10 +1,24 @@
 'use client';
 
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Play } from "lucide-react";
+import { BookOpen, Clock, Star, Play, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
+
+// Helper function to format date in Hungarian locale
+const formatHungarianDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('hu-HU', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  } catch {
+    return dateString;
+  }
+};
 
 interface Course {
   id: string;
@@ -25,6 +39,7 @@ interface Course {
   thumbnailUrl?: string;
   lessons?: number;
   courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
+  contentCreatedAt?: string; // Content creation date (YYYY-MM-DD)
 }
 
 interface Instructor {
@@ -196,7 +211,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
       whileHover={{ y: -4 }}
     >
       <div
-        className="bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
+        className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
         onClick={() => router.push(`/courses/${course.id}`)}
       >
         {/* Course Image */}
@@ -279,7 +294,13 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           )}
 
           {/* Stats */}
-          <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
+          <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
+            {course.contentCreatedAt && (
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{formatHungarianDate(course.contentCreatedAt)}</span>
+              </div>
+            )}
             {course.duration && (
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" />
