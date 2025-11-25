@@ -149,7 +149,7 @@ export function NetflixStyleHero({
         )}
         {/* Gradient overlays - subtle fade from dark left to transparent right */}
         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,0.95)_0%,rgba(3,7,18,0.85)_30%,rgba(3,7,18,0.6)_50%,rgba(3,7,18,0.3)_65%,rgba(3,7,18,0.1)_75%,transparent_85%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,1)_0%,rgba(3,7,18,0.95)_35%,rgba(3,7,18,0.8)_50%,rgba(3,7,18,0.5)_65%,rgba(3,7,18,0.2)_75%,transparent_85%)]" />
       </div>
 
       {/* Content */}
