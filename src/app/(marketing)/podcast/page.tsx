@@ -134,9 +134,9 @@ export default function PodcastPage() {
               ) : (
                 <div className="w-full h-full bg-gradient-to-br from-green-500 to-emerald-600" />
               )}
-              {/* Gradient overlays */}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/60 to-transparent" />
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-950/80 via-transparent to-transparent" />
+              {/* Gradient overlays - enhanced for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,1)_0%,rgba(3,7,18,0.95)_35%,rgba(3,7,18,0.8)_50%,rgba(3,7,18,0.5)_65%,rgba(3,7,18,0.2)_75%,transparent_85%)]" />
             </div>
 
             {/* Content */}
