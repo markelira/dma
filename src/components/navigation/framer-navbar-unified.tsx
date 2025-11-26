@@ -67,7 +67,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
             style={{
               height: '64px',
               padding: scrolled ? '0 24px' : '0 32px',
-              borderRadius: '40px',
+              borderRadius: '24px',
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',

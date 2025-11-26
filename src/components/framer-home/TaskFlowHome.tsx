@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
-import { HeroCourseShowcase } from '@/components/home/HeroCourseShowcase';
+import { NetflixCourseCarousel } from '@/components/home/NetflixCourseCarousel';
 import { CourseTypeShowcase } from '@/components/home/CourseTypeShowcase';
 import Footer from '@/components/landing-home/ui/footer';
 
@@ -66,10 +66,8 @@ export function TaskFlowHome() {
       {/* Main content - all sections full width */}
       <main className="w-full">
         <MainHero {...fullWidthProps} />
-        {/* Course Carousel Section */}
-        <div className="py-12">
-          <HeroCourseShowcase maxCourses={8} />
-        </div>
+        {/* Netflix Course Carousel Section */}
+        <NetflixCourseCarousel />
         <Features {...fullWidthProps} />
         {/* Masterclass Carousel Section */}
         <div className="py-12">
