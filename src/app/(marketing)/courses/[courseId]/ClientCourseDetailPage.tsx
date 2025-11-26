@@ -7,6 +7,8 @@ import { useSearchParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
+import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import React, { useState, useMemo, useRef } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
@@ -256,31 +258,54 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }))
   }));
 
-  // Enrollment handler
+  // Helper to get first lesson ID from subcollection
+  const getFirstLessonId = async (courseId: string): Promise<string | undefined> => {
+    try {
+      const lessonsRef = collection(db, 'courses', courseId, 'lessons');
+      const q = query(lessonsRef, orderBy('order', 'asc'), limit(1));
+      const snap = await getDocs(q);
+      return snap.docs[0]?.id;
+    } catch (error) {
+      console.error('Error fetching first lesson:', error);
+      return undefined;
+    }
+  };
+
+  // Enrollment handler - redirects to player immediately, enrolls in background
   const handleEnroll = async () => {
     if (!isAuthenticated) {
       router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}`);
       return;
     }
 
-    try {
-      const result = await enrollMutation.mutateAsync(id);
-      if (result.alreadyEnrolled) {
-        toast.info('Már beiratkozott erre a tartalomra!');
-      } else {
-        toast.success('Sikeres beiratkozás!');
-      }
-      router.push('/dashboard/courses');
-    } catch (error: any) {
-      console.error('Enrollment failed:', error);
+    // Get first lesson ID for redirect
+    const firstLessonId = await getFirstLessonId(id);
+    const playerUrl = firstLessonId
+      ? `/courses/${id}/player/${firstLessonId}`
+      : `/courses/${id}`;
 
-      // Check if error is subscription required
-      if (error.code === 'SUBSCRIPTION_REQUIRED' || error.message.includes('SUBSCRIPTION_REQUIRED')) {
-        setShowSubscriptionModal(true);
-      } else {
-        toast.error(error.message || 'Hiba történt a beiratkozáskor. Próbálja újra.');
+    // Redirect immediately to player
+    router.push(playerUrl);
+
+    // Enroll in background (don't await)
+    enrollMutation.mutate(id, {
+      onSuccess: (data) => {
+        if (!data.alreadyEnrolled) {
+          toast.success('Sikeres beiratkozás!');
+        }
+      },
+      onError: (error: any) => {
+        console.error('Enrollment failed:', error);
+
+        // Check if error is subscription required
+        if (error.code === 'SUBSCRIPTION_REQUIRED' || error.message?.includes('SUBSCRIPTION_REQUIRED')) {
+          setShowSubscriptionModal(true);
+        } else {
+          // Silent retry on other errors
+          setTimeout(() => enrollMutation.mutate(id), 2000);
+        }
       }
-    }
+    });
   };
 
   const courseFeatures = [
