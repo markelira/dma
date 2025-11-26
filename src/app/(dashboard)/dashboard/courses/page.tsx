@@ -11,6 +11,23 @@ import { useInstructors } from '@/hooks/useInstructorQueries'
 import { DashboardSearch } from '@/components/dashboard/DashboardSearch'
 import { EnrolledCourseCard } from '@/components/dashboard/EnrolledCourseCard'
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel'
+import type { Course } from '@/types'
+
+// Helper to get first lesson ID from course modules
+function getFirstLessonId(course: Course): string | undefined {
+  const modules = course.modules || [];
+  if (modules.length === 0) return undefined;
+
+  const sortedModules = [...modules].sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+  for (const module of sortedModules) {
+    if (!module.lessons || module.lessons.length === 0) continue;
+    const sortedLessons = [...module.lessons]
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+    if (sortedLessons.length > 0) return sortedLessons[0].id;
+  }
+  return undefined;
+}
 
 /**
  * Dashboard Courses Page - Netflix Style
@@ -28,14 +45,18 @@ export default function DashboardCoursesPage() {
   const enrichedEnrollments = useMemo(() => {
     return enrollments.map(enrollment => {
       const course = courses.find(c => c.id === enrollment.courseId)
+      if (!course) return null;
       return {
         ...enrollment,
         course,
         thumbnailUrl: course?.thumbnailUrl,
         courseType: course?.courseType,
         duration: course?.duration,
+        // Add lesson IDs for player navigation
+        currentLessonId: enrollment.currentLessonId,
+        firstLessonId: enrollment.firstLessonId || getFirstLessonId(course),
       }
-    }).filter(e => e.course) // Only show enrollments with valid courses
+    }).filter((e): e is NonNullable<typeof e> => e !== null) // Only show enrollments with valid courses
   }, [enrollments, courses])
 
   // Group by status
@@ -156,7 +177,14 @@ export default function DashboardCoursesPage() {
               )}
 
               <button
-                onClick={() => router.push(`/courses/${mostRecentCourse.courseId}/learn`)}
+                onClick={() => {
+                  const targetLessonId = mostRecentCourse.currentLessonId || mostRecentCourse.firstLessonId;
+                  if (targetLessonId) {
+                    router.push(`/courses/${mostRecentCourse.courseId}/player/${targetLessonId}`);
+                  } else {
+                    router.push(`/courses/${mostRecentCourse.courseId}`);
+                  }
+                }}
                 className="inline-flex items-center px-5 py-2.5 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors"
               >
                 <Play className="w-4 h-4 mr-2 fill-current" />
