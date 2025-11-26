@@ -30,27 +30,17 @@ interface EnrollmentWithCourse extends Enrollment {
   courseType?: string
 }
 
-// Helper to get first published lesson from course modules
-function getFirstLessonId(modules: any[]): string | undefined {
-  if (!modules || modules.length === 0) return undefined;
+// Helper to get first published lesson from course (flat lessons array)
+function getFirstLessonId(courseData: any): string | undefined {
+  const lessons = courseData?.lessons || [];
+  if (lessons.length === 0) return undefined;
 
-  // Sort modules by order
-  const sortedModules = [...modules].sort((a, b) => (a.order || 0) - (b.order || 0));
+  // Sort by order and find first published lesson
+  const sortedLessons = [...lessons]
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
 
-  for (const module of sortedModules) {
-    if (!module.lessons || module.lessons.length === 0) continue;
-
-    // Sort lessons by order and find first published one
-    const sortedLessons = [...module.lessons]
-      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-      .filter((l: any) => l.status === 'PUBLISHED' || !l.status); // Default to published if no status
-
-    if (sortedLessons.length > 0) {
-      return sortedLessons[0].id;
-    }
-  }
-
-  return undefined;
+  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
 }
 
 /**
@@ -169,8 +159,8 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             lastAccessedAtDate = new Date(enrollmentData.lastAccessedAt);
           }
 
-          // Get first lesson ID from course modules
-          const firstLessonId = getFirstLessonId(courseData?.modules || []);
+          // Get first lesson ID from course
+          const firstLessonId = getFirstLessonId(courseData);
 
           return {
             id: enrollmentDoc.id,
@@ -217,8 +207,8 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
                 }
               }
 
-              // Get first lesson ID from course modules
-              const firstLessonId = getFirstLessonId(courseData.modules || []);
+              // Get first lesson ID from course
+              const firstLessonId = getFirstLessonId(courseData);
 
               return {
                 id: `sub_${courseDoc.id}`, // Virtual enrollment ID

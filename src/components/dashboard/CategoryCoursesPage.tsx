@@ -17,20 +17,16 @@ interface CategoryCoursesPageProps {
   description: string;
 }
 
-// Helper to get first lesson ID from course modules
+// Helper to get first lesson ID from course (flat lessons array)
 function getFirstLessonId(course: Course): string | undefined {
-  const modules = course.modules || [];
-  if (modules.length === 0) return undefined;
+  const lessons = (course as any).lessons || [];
+  if (lessons.length === 0) return undefined;
 
-  const sortedModules = [...modules].sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
-  for (const module of sortedModules) {
-    if (!module.lessons || module.lessons.length === 0) continue;
-    const sortedLessons = [...module.lessons]
-      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-      .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
-    if (sortedLessons.length > 0) return sortedLessons[0].id;
-  }
-  return undefined;
+  const sortedLessons = [...lessons]
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+
+  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
 }
 
 export function CategoryCoursesPage({ courseType, title, description }: CategoryCoursesPageProps) {
