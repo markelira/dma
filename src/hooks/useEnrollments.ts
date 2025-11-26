@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore'
+import { collection, query, where, getDocs, doc, getDoc, orderBy, limit as firestoreLimit } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
 
@@ -30,17 +30,33 @@ interface EnrollmentWithCourse extends Enrollment {
   courseType?: string
 }
 
-// Helper to get first published lesson from course (flat lessons array)
-function getFirstLessonId(courseData: any): string | undefined {
-  const lessons = courseData?.lessons || [];
-  if (lessons.length === 0) return undefined;
+// Fetch first published lesson from subcollection
+async function getFirstLessonId(courseId: string): Promise<string | undefined> {
+  try {
+    const lessonsRef = collection(db, 'courses', courseId, 'lessons');
+    // First try to get PUBLISHED lessons sorted by order
+    const q = query(
+      lessonsRef,
+      orderBy('order', 'asc'),
+      firestoreLimit(1)
+    );
+    const snap = await getDocs(q);
 
-  // Sort by order and find first published lesson
-  const sortedLessons = [...lessons]
-    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
-    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+    if (snap.docs.length > 0) {
+      // Filter for published or no status (fallback)
+      const lesson = snap.docs[0].data();
+      if (lesson.status === 'PUBLISHED' || !lesson.status) {
+        return snap.docs[0].id;
+      }
+    }
 
-  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
+    // Fallback: get any lesson if no published ones found
+    const fallbackSnap = await getDocs(query(lessonsRef, firestoreLimit(1)));
+    return fallbackSnap.docs.length > 0 ? fallbackSnap.docs[0].id : undefined;
+  } catch (error) {
+    console.error('Error fetching first lesson for course', courseId, error);
+    return undefined;
+  }
 }
 
 /**
@@ -159,8 +175,8 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             lastAccessedAtDate = new Date(enrollmentData.lastAccessedAt);
           }
 
-          // Get first lesson ID from course
-          const firstLessonId = getFirstLessonId(courseData);
+          // Get first lesson ID from subcollection
+          const firstLessonId = await getFirstLessonId(enrollmentData.courseId);
 
           return {
             id: enrollmentDoc.id,
@@ -207,8 +223,8 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
                 }
               }
 
-              // Get first lesson ID from course
-              const firstLessonId = getFirstLessonId(courseData);
+              // Get first lesson ID from subcollection
+              const firstLessonId = await getFirstLessonId(courseDoc.id);
 
               return {
                 id: `sub_${courseDoc.id}`, // Virtual enrollment ID
