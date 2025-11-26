@@ -202,15 +202,18 @@ export function NewVideoPlayer({
         onClick={togglePlay}
       />
 
-      {/* Large Centered Play Button (visible when paused) */}
+      {/* Large Centered Play Button with text prompt (visible when paused) */}
       {!isPlaying && (
         <div
-          className="absolute inset-0 flex items-center justify-center cursor-pointer"
+          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer bg-black/20"
           onClick={togglePlay}
         >
           <div className="transition-transform hover:scale-110">
             <LargePlayButton size={72} color={accentColor} />
           </div>
+          <span className="text-white text-base font-medium mt-3 bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
+            Kattints a lejátszáshoz
+          </span>
         </div>
       )}
 

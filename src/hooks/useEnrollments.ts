@@ -12,10 +12,12 @@ export interface Enrollment {
   enrolledAt: Date
   lastAccessedAt?: Date
   currentLessonId?: string
+  firstLessonId?: string
   courseName?: string
   courseInstructor?: string
   courseDescription?: string
   thumbnailUrl?: string
+  courseType?: string
 }
 
 interface EnrollmentWithCourse extends Enrollment {
@@ -24,6 +26,31 @@ interface EnrollmentWithCourse extends Enrollment {
   courseDescription?: string
   thumbnailUrl?: string
   currentLessonId?: string
+  firstLessonId?: string
+  courseType?: string
+}
+
+// Helper to get first published lesson from course modules
+function getFirstLessonId(modules: any[]): string | undefined {
+  if (!modules || modules.length === 0) return undefined;
+
+  // Sort modules by order
+  const sortedModules = [...modules].sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  for (const module of sortedModules) {
+    if (!module.lessons || module.lessons.length === 0) continue;
+
+    // Sort lessons by order and find first published one
+    const sortedLessons = [...module.lessons]
+      .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+      .filter((l: any) => l.status === 'PUBLISHED' || !l.status); // Default to published if no status
+
+    if (sortedLessons.length > 0) {
+      return sortedLessons[0].id;
+    }
+  }
+
+  return undefined;
 }
 
 /**
@@ -142,6 +169,9 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             lastAccessedAtDate = new Date(enrollmentData.lastAccessedAt);
           }
 
+          // Get first lesson ID from course modules
+          const firstLessonId = getFirstLessonId(courseData?.modules || []);
+
           return {
             id: enrollmentDoc.id,
             userId: enrollmentData.userId,
@@ -151,10 +181,12 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
             enrolledAt: enrolledAtDate,
             lastAccessedAt: lastAccessedAtDate,
             currentLessonId: enrollmentData.currentLessonId,
+            firstLessonId,
             courseName: courseData?.title || 'Unknown Course',
             courseInstructor: instructorName,
             courseDescription: courseData?.description,
             thumbnailUrl: courseData?.thumbnailUrl,
+            courseType: courseData?.courseType,
           } as EnrollmentWithCourse
         })
       )
@@ -185,6 +217,9 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
                 }
               }
 
+              // Get first lesson ID from course modules
+              const firstLessonId = getFirstLessonId(courseData.modules || []);
+
               return {
                 id: `sub_${courseDoc.id}`, // Virtual enrollment ID
                 userId: user.uid,
@@ -193,10 +228,13 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
                 progress: 0,
                 enrolledAt: new Date(), // Use current date for subscription access
                 lastAccessedAt: undefined,
+                currentLessonId: undefined,
+                firstLessonId,
                 courseName: courseData.title || 'Unknown Course',
                 courseInstructor: instructorName,
                 courseDescription: courseData.description,
                 thumbnailUrl: courseData.thumbnailUrl,
+                courseType: courseData.courseType,
               } as EnrollmentWithCourse
             })
         )

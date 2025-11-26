@@ -17,6 +17,8 @@ interface EnrolledCourseCarouselProps {
     thumbnailUrl?: string;
     courseType?: string;
     duration?: string;
+    currentLessonId?: string;
+    firstLessonId?: string;
   }>;
   categories?: Array<{ id: string; name: string }>;
   instructors?: Array<{ id: string; name: string }>;

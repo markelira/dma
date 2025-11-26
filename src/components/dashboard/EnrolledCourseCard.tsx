@@ -13,6 +13,8 @@ interface EnrolledCourseCardProps {
     thumbnailUrl?: string;
     courseType?: string;
     duration?: string;
+    currentLessonId?: string;
+    firstLessonId?: string;
   };
   index?: number;
 }
@@ -21,9 +23,15 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
   const isCompleted = enrollment.status === 'completed' || enrollment.progress === 100;
   const isInProgress = enrollment.progress > 0 && enrollment.progress < 100;
 
+  // Determine target lesson: resume from last watched, or start from first lesson
+  const targetLessonId = enrollment.currentLessonId || enrollment.firstLessonId;
+  const href = targetLessonId
+    ? `/courses/${enrollment.courseId}/player/${targetLessonId}`
+    : `/courses/${enrollment.courseId}`;
+
   return (
     <Link
-      href={`/courses/${enrollment.courseId}/learn`}
+      href={href}
       className="group block"
     >
       <div className="relative rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300">

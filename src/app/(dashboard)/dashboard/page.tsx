@@ -116,7 +116,25 @@ export default function DashboardPage() {
       duration?: string;
       progress?: number;
       isEnrolled?: boolean;
+      currentLessonId?: string;
+      firstLessonId?: string;
     }> = [];
+
+    // Helper to get first lesson ID from course modules
+    const getFirstLessonId = (course: Course): string | undefined => {
+      const modules = course.modules || [];
+      if (modules.length === 0) return undefined;
+
+      const sortedModules = [...modules].sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+      for (const module of sortedModules) {
+        if (!module.lessons || module.lessons.length === 0) continue;
+        const sortedLessons = [...module.lessons]
+          .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+          .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+        if (sortedLessons.length > 0) return sortedLessons[0].id;
+      }
+      return undefined;
+    };
 
     // Get instructor name helper
     const getInstructorName = (course: Course) => {
@@ -140,6 +158,8 @@ export default function DashboardPage() {
           duration: enrolledCourse.duration,
           progress: latestEnrollment.progress,
           isEnrolled: true,
+          currentLessonId: latestEnrollment.currentLessonId,
+          firstLessonId: latestEnrollment.firstLessonId || getFirstLessonId(enrolledCourse),
         });
       }
     }
@@ -165,6 +185,8 @@ export default function DashboardPage() {
         duration: latestMasterclass.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestMasterclass),
       });
     }
 
@@ -182,6 +204,8 @@ export default function DashboardPage() {
         duration: latestWebinar.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestWebinar),
       });
     }
 
@@ -199,6 +223,8 @@ export default function DashboardPage() {
         duration: latestAcademia.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestAcademia),
       });
     }
 
@@ -216,6 +242,8 @@ export default function DashboardPage() {
         duration: latestPodcast.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestPodcast),
       });
     }
 
@@ -257,6 +285,8 @@ export default function DashboardPage() {
           thumbnailUrl: course.thumbnailUrl,
           courseType: course.courseType,
           duration: course.duration,
+          currentLessonId: enrollment.currentLessonId,
+          firstLessonId: enrollment.firstLessonId,
         };
       })
       .filter((e): e is NonNullable<typeof e> => e !== null);

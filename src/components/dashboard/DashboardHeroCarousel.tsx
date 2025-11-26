@@ -17,6 +17,8 @@ interface HeroSlide {
   duration?: string;
   progress?: number; // 0-100, only for enrolled courses
   isEnrolled?: boolean;
+  currentLessonId?: string;
+  firstLessonId?: string;
 }
 
 interface DashboardHeroCarouselProps {
@@ -98,6 +100,15 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
   };
 
   const handleContinue = () => {
+    // For enrolled courses, go directly to course player with resume lesson
+    if (currentSlide.isEnrolled) {
+      const lessonId = currentSlide.currentLessonId || currentSlide.firstLessonId;
+      if (lessonId) {
+        router.push(`/courses/${currentSlide.id}/player/${lessonId}`);
+        return;
+      }
+    }
+    // Fallback to course detail page
     router.push(`/courses/${currentSlide.id}`);
   };
 
