@@ -39,20 +39,25 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  // Experimental: serverComponentsExternalPackages
-  serverExternalPackages: ['unframer'],
-  webpack: (config, { isServer }) => {
+  // Transpile unframer to handle next/document imports
+  transpilePackages: ['unframer'],
+  webpack: (config, { isServer, webpack }) => {
     if (!isServer) {
       config.resolve.fallback = { fs: false };
     }
 
-    // On server side, externalize unframer to prevent Html import issues
-    if (isServer) {
-      config.externals = config.externals || [];
-      config.externals.push({
-        'unframer': 'unframer',
-      });
-    }
+    // Only replace next/document when imported by unframer
+    config.plugins.push(
+      new webpack.NormalModuleReplacementPlugin(
+        /^next\/document$/,
+        (resource) => {
+          // Only replace if the import is coming from unframer
+          if (resource.context && resource.context.includes('unframer')) {
+            resource.request = path.resolve(__dirname, 'src/lib/next-document-mock.js');
+          }
+        }
+      )
+    );
 
     return config;
   },

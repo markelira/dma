@@ -1,5 +1,7 @@
 import '@/styles/framer.css';
 
+export const dynamic = 'force-dynamic';
+
 export default function MarketingLayout({
   children,
 }: {

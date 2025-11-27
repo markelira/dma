@@ -106,12 +106,34 @@ function RegisterPageContent() {
     verifyInvite();
   }, [inviteToken, inviteEmail]);
 
+  // Check for pending email verification on mount (survives page refresh)
+  useEffect(() => {
+    const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
+    if (pendingVerification && !showVerificationModal && !isVerifying) {
+      try {
+        const data = JSON.parse(pendingVerification);
+        console.log('[Register Page] Found pending verification in sessionStorage:', data);
+        setRegisteredUserId(data.userId);
+        setFormData(prev => ({ ...prev, email: data.email }));
+        setIsVerifying(true);
+        setShowVerificationModal(true);
+      } catch (err) {
+        console.error('[Register Page] Error parsing pending verification:', err);
+        sessionStorage.removeItem('pendingEmailVerification');
+      }
+    }
+  }, []); // Run once on mount
+
   useEffect(() => {
     // If user is already authenticated, redirect based on role
     // BUT: Don't redirect if we're in the middle of company registration OR email verification
     // (CompanyRegisterForm handles its own redirect after claims propagate)
     // (EmailVerificationModal handles redirect after verification)
-    if (user && !authLoading && !isCompanyRegistering && !isVerifying) {
+
+    // Also check sessionStorage for pending verification - don't redirect if pending
+    const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
+
+    if (user && !authLoading && !isCompanyRegistering && !isVerifying && !pendingVerification) {
       if (user.role === 'company_admin' || user.role === 'COMPANY_ADMIN') {
         console.log('[Register Page] COMPANY_ADMIN user authenticated, redirecting to /company/dashboard');
         router.push('/company/dashboard');
@@ -169,49 +191,37 @@ function RegisterPageContent() {
         lastName: formData.lastName
       });
 
-      console.log('[Register Page] Auth success, sending verification code');
+      console.log('[Register Page] Auth success');
       console.log('[Register Page] User ID:', userCredential.user.uid);
       console.log('[Register Page] Email:', formData.email);
 
       // Store user ID for verification modal
       setRegisteredUserId(userCredential.user.uid);
 
-      // Send verification code
-      try {
-        console.log('[Register Page] Calling sendEmailVerificationCode function...');
-        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
-        const result = await sendEmailVerificationCode({}) as any;
+      // Save to sessionStorage BEFORE showing modal (survives page refresh)
+      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+        userId: userCredential.user.uid,
+        email: formData.email
+      }));
+      console.log('[Register Page] Saved pending verification to sessionStorage');
 
-        console.log('[Register Page] Function call completed:', result.data);
+      // Show verification modal IMMEDIATELY - don't wait for email
+      console.log('[Register Page] Showing verification modal instantly');
+      setShowVerificationModal(true);
 
-        if (result.data.success) {
-          console.log('[Register Page] Verification code sent successfully');
-
-          // In emulator mode, log the code for testing
+      // Send verification email in BACKGROUND (fire and forget)
+      const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+      sendEmailVerificationCode({})
+        .then((result: any) => {
+          console.log('[Register Page] Verification email sent in background:', result.data);
           if (result.data.code) {
             console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
           }
-
-          // Show verification modal (hard block)
-          console.log('[Register Page] Setting showVerificationModal to true');
-          setShowVerificationModal(true);
-        } else {
-          console.error('[Register Page] Failed to send verification code:', result.data.error);
-          console.log('[Register Page] Still showing modal - user can try resend');
-          // Still show modal - user can try resend
-          setShowVerificationModal(true);
-        }
-      } catch (emailError: any) {
-        console.error('[Register Page] Error sending verification code:', emailError);
-        console.error('[Register Page] Error details:', {
-          message: emailError.message,
-          code: emailError.code,
-          details: emailError.details
+        })
+        .catch((emailError: any) => {
+          console.error('[Register Page] Background email send failed:', emailError);
+          // User can use "resend" button in modal if needed
         });
-        console.log('[Register Page] Still showing modal - user can try resend');
-        // Still show modal - user can try resend
-        setShowVerificationModal(true);
-      }
     } catch (err: any) {
       console.error('Registration error:', err);
 
@@ -266,6 +276,11 @@ function RegisterPageContent() {
         userId={registeredUserId}
         onVerified={async () => {
           console.log('[Register Page] Email verified successfully');
+
+          // Clear pending verification from sessionStorage
+          sessionStorage.removeItem('pendingEmailVerification');
+          console.log('[Register Page] Cleared pending verification from sessionStorage');
+
           setIsVerifying(false);
           setShowVerificationModal(false);
 
@@ -333,6 +348,12 @@ function RegisterPageContent() {
           // Store the userId and email for modal
           setRegisteredUserId(userId);
           setFormData(prev => ({ ...prev, email }));
+
+          // Save to sessionStorage (survives page refresh)
+          sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+            userId,
+            email
+          }));
 
           // Show verification modal
           setShowVerificationModal(true);

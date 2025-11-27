@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic';
+
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
@@ -26,6 +28,16 @@ export default function DashboardRouteGroupLayout({
       willCheckAuth: authReady && !isLoading,
       timestamp: Date.now()
     })
+
+    // Check for pending email verification - user shouldn't be in dashboard
+    if (typeof window !== 'undefined') {
+      const pendingVerification = sessionStorage.getItem('pendingEmailVerification')
+      if (pendingVerification) {
+        console.log('⚠️ [DIAGNOSTIC] DashboardLayout: Found pending email verification, redirecting to register')
+        router.replace('/register')
+        return
+      }
+    }
 
     if (authReady && !isLoading) {
       if (!user) {

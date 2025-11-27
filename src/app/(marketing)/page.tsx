@@ -1,9 +1,11 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
+
+import nextDynamic from 'next/dynamic';
 
 // Dynamically import TaskFlowHome with SSR disabled to prevent next/document errors
-const TaskFlowHome = dynamic(
+const TaskFlowHome = nextDynamic(
   () => import('@/components/framer-home/TaskFlowHome'),
   {
     ssr: false,

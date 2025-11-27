@@ -1,35 +1,33 @@
 // Mock for next/document to prevent SSR errors with unframer
-// This file is used as an alias when building for App Router
+// This completely bypasses Next.js's validation for Html component
 
-// Mock Html component - just returns children wrapped in fragment
-export const Html = function Html(props) {
-  return props.children || null;
-};
+import React from 'react';
 
-// Mock Head component
-export const Head = function Head(props) {
-  return props.children || null;
-};
+// Create a simple function component that returns null
+// This avoids any validation that happens when the component is rendered
+function createMockComponent(name) {
+  const Component = function(props) {
+    // During SSR/build, just return null or children
+    if (typeof window === 'undefined') {
+      return props?.children || null;
+    }
+    return props?.children || null;
+  };
+  Component.displayName = name;
+  return Component;
+}
 
-// Mock Main component
-export const Main = function Main() {
-  return null;
-};
-
-// Mock NextScript component
-export const NextScript = function NextScript() {
-  return null;
-};
+// Export mock components
+export const Html = createMockComponent('Html');
+export const Head = createMockComponent('Head');
+export const Main = createMockComponent('Main');
+export const NextScript = createMockComponent('NextScript');
 
 // Mock DocumentContext
-export const DocumentContext = {
-  Consumer: function Consumer(props) {
-    return props.children ? props.children({}) : null;
-  },
-  Provider: function Provider(props) {
-    return props.children || null;
-  },
-};
+export const DocumentContext = React.createContext({
+  _documentProps: { __NEXT_DATA__: { page: '', query: {} } },
+  _devOnlyInvalidateCacheQueryString: '',
+});
 
 // Mock DocumentInitialProps
 export const DocumentInitialProps = {};
@@ -39,7 +37,7 @@ function Document() {
   return null;
 }
 
-Document.getInitialProps = async function getInitialProps(ctx) {
+Document.getInitialProps = async function getInitialProps() {
   return { html: '', head: [], styles: [] };
 };
 

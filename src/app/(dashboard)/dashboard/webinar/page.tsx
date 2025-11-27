@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { CategoryCoursesPage } from '@/components/dashboard/CategoryCoursesPage';
 
 export default function WebinarPage() {
