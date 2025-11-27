@@ -4,22 +4,18 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 const logos = [
-  // Client logos
-  { src: '/images/companylogos/dma-mapei-logo.png', alt: 'Mapei', width: 120, height: 36 },
-  { src: '/images/companylogos/dma-follow-marketing-logo.png', alt: 'Follow Marketing', width: 322, height: 83 }, // 115% of doubled size
-
-  // Media logos
-  { src: '/images/companylogos/dma-forbes-logo.png', alt: 'Forbes', width: 100, height: 36 },
-  { src: '/images/companylogos/dma-portfolio-logo.png', alt: 'Portfolio', width: 120, height: 36 },
-  { src: '/images/companylogos/dma-piacesprofit-logo.png', alt: 'Piac és Profit', width: 84, height: 25 }, // 30% smaller
-  { src: '/images/companylogos/dma-penzcentrum-logo.png', alt: 'Pénzcentrum', width: 130, height: 36 },
-  { src: '/images/companylogos/dma-haszon-logo-300x300.png', alt: 'Haszon', width: 184, height: 83 }, // 115% of doubled size
-  { src: '/images/companylogos/dma-origo-logo-300x300.png', alt: 'Origo', width: 230, height: 83 }, // 115% of doubled size
-  { src: '/images/companylogos/dma-24.hu-logo-300x300.png', alt: '24.hu', width: 184, height: 83 }, // 115% of doubled size
-  { src: '/images/companylogos/dma-hirado.hu-logo-300x300.png', alt: 'Híradó.hu', width: 230, height: 83 }, // 115% of doubled size
-  { src: '/images/companylogos/dma-metropol-logo.png', alt: 'Metropol', width: 276, height: 83 }, // 115% of doubled size
-  { src: '/images/companylogos/dma-femcafe-logo.png', alt: 'FemCafé', width: 110, height: 36 },
-  { src: '/images/companylogos/dma-hrportal-logo.png', alt: 'HRPortal', width: 110, height: 36 },
+  { src: '/images/herocarousel/24hu logo.png', alt: '24.hu', width: 120, height: 60 },
+  { src: '/images/herocarousel/bizalmi kor logo.png', alt: 'Bizalmi Kör', width: 120, height: 60 },
+  { src: '/images/herocarousel/continental logo.png', alt: 'Continental', width: 120, height: 60 },
+  { src: '/images/herocarousel/forbes logo.png', alt: 'Forbes', width: 120, height: 60 },
+  { src: '/images/herocarousel/haszon logo.png', alt: 'Haszon', width: 120, height: 60 },
+  { src: '/images/herocarousel/mapei logo.png', alt: 'Mapei', width: 120, height: 60 },
+  { src: '/images/herocarousel/minicrm logo.png', alt: 'MiniCRM', width: 120, height: 60 },
+  { src: '/images/herocarousel/piacesprofit logo.png', alt: 'Piac és Profit', width: 120, height: 60 },
+  { src: '/images/herocarousel/portfolio logo.png', alt: 'Portfolio', width: 120, height: 60 },
+  { src: '/images/herocarousel/semsei logo.png', alt: 'Semsei', width: 120, height: 60 },
+  { src: '/images/herocarousel/szabo peter logo.png', alt: 'Szabó Péter', width: 120, height: 60 },
+  { src: '/images/herocarousel/szentkirályi logo.png', alt: 'Szentkirályi', width: 120, height: 60 },
 ]
 
 export function SocialProofLogos() {
