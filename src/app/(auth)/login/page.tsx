@@ -34,6 +34,8 @@ export default function LoginPage() {
 
   // Get redirect URL from query params or default to dashboard
   const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
+  // Check if this is a trial flow (coming from course detail page trial popup)
+  const isTrialFlow = searchParams?.get('trial') === 'true';
 
   useEffect(() => {
     console.log('🚀 [DIAGNOSTIC] Login page redirect check', {
@@ -42,6 +44,7 @@ export default function LoginPage() {
       userId: user?.id,
       willRedirect: user && !isLoading,
       redirectTo,
+      isTrialFlow,
       timestamp: Date.now()
     })
 
@@ -50,11 +53,18 @@ export default function LoginPage() {
       console.log('🚀 [DIAGNOSTIC] Login page: User authenticated, REDIRECTING to:', {
         redirectTo,
         userId: user.id,
+        isTrialFlow,
         timestamp: Date.now()
       });
-      router.push(redirectTo);
+
+      // If this is a trial flow, redirect to checkout instead of the original redirect_to
+      if (isTrialFlow) {
+        router.push(`/subscribe/start?plan=monthly&returnTo=${encodeURIComponent(redirectTo)}`);
+      } else {
+        router.push(redirectTo);
+      }
     }
-  }, [user, isLoading, redirectTo, router]);
+  }, [user, isLoading, redirectTo, isTrialFlow, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -315,12 +325,14 @@ export default function LoginPage() {
         </AnimatePresence>
       </div>
 
-      {/* Register link - preserve redirect_to for invite flows */}
+      {/* Register link - preserve redirect_to and trial flow for invite flows */}
       <div className="mt-6 text-center text-sm text-gray-600">
         Még nincs fiókod?{' '}
         <Link
           className="font-medium text-gray-900 underline hover:no-underline"
-          href={redirectTo !== '/dashboard' ? `/register?redirect_to=${encodeURIComponent(redirectTo)}` : '/register'}
+          href={redirectTo !== '/dashboard'
+            ? `/register?redirect_to=${encodeURIComponent(redirectTo)}${isTrialFlow ? '&trial=true' : ''}`
+            : '/register'}
         >
           Regisztrálj itt
         </Link>

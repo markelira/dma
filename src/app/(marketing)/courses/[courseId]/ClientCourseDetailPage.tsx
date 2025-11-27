@@ -22,6 +22,8 @@ import { RelatedCoursesSection } from '@/components/course/RelatedCoursesSection
 import { StickyBottomCTA } from '@/components/course/StickyBottomCTA';
 import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
 import { SubscriptionRequiredModal } from '@/components/payment/SubscriptionRequiredModal';
+import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { useInstructors } from '@/hooks/useInstructorQueries';
@@ -36,6 +38,9 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const { data: course, isLoading, error } = useCourse(id);
   const enrollMutation = useEnrollInCourse();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showTrialModal, setShowTrialModal] = useState(false);
+  const [trialVariant, setTrialVariant] = useState<'course-auth' | 'course-unauth'>('course-auth');
+  const { data: subscription, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const detailsRef = useRef<HTMLDivElement>(null);
@@ -271,14 +276,23 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }
   };
 
-  // Enrollment handler - redirects to player immediately, enrolls in background
+  // Enrollment handler - PROACTIVELY shows trial modal if no subscription
   const handleEnroll = async () => {
+    // SCENARIO 1: Unauthenticated - show trial popup with unauth variant
     if (!isAuthenticated) {
-      router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}`);
+      setTrialVariant('course-unauth');
+      setShowTrialModal(true);
       return;
     }
 
-    // Get first lesson ID for redirect
+    // SCENARIO 2: Authenticated but no subscription - show trial popup proactively
+    if (!subscription?.isActive) {
+      setTrialVariant('course-auth');
+      setShowTrialModal(true);
+      return;
+    }
+
+    // SCENARIO 3: Has subscription - proceed to player
     const firstLessonId = await getFirstLessonId(id);
     const playerUrl = firstLessonId
       ? `/courses/${id}/player/${firstLessonId}`
@@ -306,6 +320,22 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         }
       }
     });
+  };
+
+  // Handle trial modal actions
+  const handleTrialStart = () => {
+    if (trialVariant === 'course-unauth') {
+      // Store return URL, redirect to auth with trial flag
+      sessionStorage.setItem('trialReturnTo', `/courses/${id}`);
+      router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}&trial=true`);
+    } else {
+      // Authenticated user - go to Stripe checkout
+      router.push(`/subscribe/start?plan=monthly&returnTo=${encodeURIComponent(`/courses/${id}`)}`);
+    }
+  };
+
+  const handleTrialDismiss = () => {
+    setShowTrialModal(false);
   };
 
   const courseFeatures = [
@@ -546,7 +576,17 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           </div>
         )}
 
-        {/* Subscription Required Modal */}
+        {/* Free Trial Modal - Proactive subscription prompt */}
+        <FreeTrialModal
+          open={showTrialModal}
+          onOpenChange={setShowTrialModal}
+          variant={trialVariant}
+          courseName={c.title}
+          onStartTrial={handleTrialStart}
+          onDismiss={handleTrialDismiss}
+        />
+
+        {/* Subscription Required Modal - Fallback for errors */}
         <SubscriptionRequiredModal
           open={showSubscriptionModal}
           onOpenChange={setShowSubscriptionModal}

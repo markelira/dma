@@ -9,6 +9,8 @@ import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
 import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
+import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
+import { useTrialPopup } from '@/hooks/useTrialPopup';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
@@ -42,6 +44,10 @@ export default function DashboardPage() {
   const { preferences } = useGamificationData();
   const savePreferences = useSaveUserPreferences();
 
+  // Trial popup state
+  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription } = useTrialPopup();
+  const [showTrialModal, setShowTrialModal] = useState(false);
+
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<{ name: string; id: string } | null>(null);
 
@@ -70,12 +76,20 @@ export default function DashboardPage() {
     fetchCompanyInfo();
   }, [user?.companyId, isCompanyEmployee]);
 
-  // Check if onboarding is needed
+  // Check if trial popup should show (BEFORE onboarding)
+  // Company employees bypass trial popup (they have company subscription)
   useEffect(() => {
-    if (preferences.data && !preferences.data.onboardingCompleted) {
+    if (shouldShowForAuthUser && !isCompanyEmployee && !hasActiveSubscription) {
+      setShowTrialModal(true);
+    }
+  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription]);
+
+  // Check if onboarding is needed (only if trial modal not showing)
+  useEffect(() => {
+    if (preferences.data && !preferences.data.onboardingCompleted && !showTrialModal) {
       setShowOnboarding(true);
     }
-  }, [preferences.data]);
+  }, [preferences.data, showTrialModal]);
 
   // Redirect admin users
   useEffect(() => {
@@ -100,6 +114,18 @@ export default function DashboardPage() {
 
   const handleOnboardingSkip = () => {
     setShowOnboarding(false);
+  };
+
+  // Handle trial modal actions
+  const handleTrialStart = () => {
+    // Redirect to Stripe checkout with 7-day trial
+    router.push('/subscribe/start?plan=monthly');
+  };
+
+  const handleTrialDismiss = () => {
+    dismissTrial();
+    setShowTrialModal(false);
+    // Now onboarding can show if needed
   };
 
   // Build hero slides
@@ -369,8 +395,17 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Onboarding Wizard */}
-      {showOnboarding && (
+      {/* Free Trial Modal - Shows BEFORE onboarding */}
+      <FreeTrialModal
+        open={showTrialModal}
+        onOpenChange={setShowTrialModal}
+        variant="dashboard"
+        onStartTrial={handleTrialStart}
+        onDismiss={handleTrialDismiss}
+      />
+
+      {/* Onboarding Wizard - Shows only if trial modal not showing */}
+      {showOnboarding && !showTrialModal && (
         <OnboardingWizard
           onComplete={handleOnboardingComplete}
           onSkip={handleOnboardingSkip}
