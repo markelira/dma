@@ -4,18 +4,18 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 const logos = [
-  { src: '/images/herocarousel/24hu logo.png', alt: '24.hu', width: 120, height: 60 },
-  { src: '/images/herocarousel/bizalmi kor logo.png', alt: 'Bizalmi Kör', width: 120, height: 60 },
-  { src: '/images/herocarousel/continental logo.png', alt: 'Continental', width: 120, height: 60 },
-  { src: '/images/herocarousel/forbes logo.png', alt: 'Forbes', width: 120, height: 60 },
-  { src: '/images/herocarousel/haszon logo.png', alt: 'Haszon', width: 120, height: 60 },
-  { src: '/images/herocarousel/mapei logo.png', alt: 'Mapei', width: 120, height: 60 },
-  { src: '/images/herocarousel/minicrm logo.png', alt: 'MiniCRM', width: 120, height: 60 },
-  { src: '/images/herocarousel/piacesprofit logo.png', alt: 'Piac és Profit', width: 120, height: 60 },
-  { src: '/images/herocarousel/portfolio logo.png', alt: 'Portfolio', width: 120, height: 60 },
-  { src: '/images/herocarousel/semsei logo.png', alt: 'Semsei', width: 120, height: 60 },
-  { src: '/images/herocarousel/szabo peter logo.png', alt: 'Szabó Péter', width: 120, height: 60 },
-  { src: '/images/herocarousel/szentkirályi logo.png', alt: 'Szentkirályi', width: 120, height: 60 },
+  { src: '/images/herocarousel/24hu-logo.png', alt: '24.hu', width: 120, height: 60 },
+  { src: '/images/herocarousel/bizalmi-kor-logo.png', alt: 'Bizalmi Kör', width: 120, height: 60 },
+  { src: '/images/herocarousel/continental-logo.png', alt: 'Continental', width: 120, height: 60 },
+  { src: '/images/herocarousel/forbes-logo.png', alt: 'Forbes', width: 120, height: 60 },
+  { src: '/images/herocarousel/haszon-logo.png', alt: 'Haszon', width: 120, height: 60 },
+  { src: '/images/herocarousel/mapei-logo.png', alt: 'Mapei', width: 120, height: 60 },
+  { src: '/images/herocarousel/minicrm-logo.png', alt: 'MiniCRM', width: 120, height: 60 },
+  { src: '/images/herocarousel/piacesprofit-logo.png', alt: 'Piac és Profit', width: 120, height: 60 },
+  { src: '/images/herocarousel/portfolio-logo.png', alt: 'Portfolio', width: 120, height: 60 },
+  { src: '/images/herocarousel/semsei-logo.png', alt: 'Semsei', width: 120, height: 60 },
+  { src: '/images/herocarousel/szabo-peter-logo.png', alt: 'Szabó Péter', width: 120, height: 60 },
+  { src: '/images/herocarousel/szentkiralyi-logo.png', alt: 'Szentkirályi', width: 120, height: 60 },
 ]
 
 export function SocialProofLogos() {
