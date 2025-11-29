@@ -103,6 +103,22 @@ export function NetflixPlayerLayout({
   // Current lesson index for display
   const currentIndex = lessons.findIndex(l => l.id === currentLessonId);
 
+  // DIAGNOSTIC: Log video rendering decision
+  useEffect(() => {
+    console.log('🎬 [NetflixPlayerLayout] Video render decision:', {
+      courseType: course.type,
+      isWebinar,
+      isPodcast,
+      isAcademia,
+      isMasterclass,
+      videoSource: videoSource?.substring(0, 80),
+      hasVideoSource: !!videoSource,
+      currentLessonType: currentLesson?.type,
+      lessonTypeCheck: !currentLesson.type || currentLesson.type === 'VIDEO',
+      willRenderVideo: !!videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO'),
+    });
+  }, [course.type, isWebinar, isPodcast, isAcademia, isMasterclass, videoSource, currentLesson]);
+
   // WEBINAR Layout: Side panel on left + Video on right
   if (isWebinar) {
     return (

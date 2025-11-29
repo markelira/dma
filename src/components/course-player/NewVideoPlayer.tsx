@@ -19,6 +19,18 @@ interface NewVideoPlayerProps {
   accentColor?: 'blue' | 'red';
 }
 
+// DIAGNOSTIC: Helper to check if URL is HLS
+const isHlsUrl = (url: string): boolean => {
+  return url?.includes('.m3u8') || url?.includes('stream.mux.com');
+};
+
+// DIAGNOSTIC: Helper to extract Mux playback ID
+const extractMuxPlaybackId = (url: string): string | null => {
+  if (!url) return null;
+  const match = url.match(/https:\/\/stream\.mux\.com\/([^./?]+)/);
+  return match ? match[1] : null;
+};
+
 /**
  * NewVideoPlayer Component
  * Custom HTML5 video player matching the screenshot design exactly
@@ -33,6 +45,28 @@ export function NewVideoPlayer({
   onEnded,
   accentColor = 'blue',
 }: NewVideoPlayerProps) {
+  // ============ DIAGNOSTIC LOGGING ============
+  const isHls = isHlsUrl(src);
+  const muxPlaybackId = extractMuxPlaybackId(src);
+
+  useEffect(() => {
+    console.log('🎬 [NewVideoPlayer] DIAGNOSTIC:', {
+      src: src?.substring(0, 80) + (src?.length > 80 ? '...' : ''),
+      isHlsUrl: isHls,
+      muxPlaybackId,
+      poster: poster?.substring(0, 50),
+      initialTime,
+      accentColor,
+      WARNING: isHls ? '⚠️ HLS URL DETECTED - Plain <video> element CANNOT play HLS in Chrome/Firefox/Edge!' : 'Direct video URL - should work',
+      BROWSER: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) : 'SSR',
+    });
+
+    if (isHls) {
+      console.error('❌ [NewVideoPlayer] CRITICAL: This player uses HTML5 <video> element which CANNOT play HLS (.m3u8) streams in most browsers. Use MuxPlayer or HLS.js instead!');
+    }
+  }, [src, isHls, muxPlaybackId, poster, initialTime, accentColor]);
+  // ============ END DIAGNOSTIC ============
+
   // Accent color classes for progress bar
   const progressColorClass = accentColor === 'red' ? 'bg-red-600' : 'bg-brand-secondary/50';
   const progressHoverClass = accentColor === 'red' ? 'bg-red-500/50' : 'bg-brand-secondary/50';
@@ -130,6 +164,7 @@ export function NewVideoPlayer({
     if (!video) return;
 
     const handleLoadedMetadata = () => {
+      console.log('✅ [NewVideoPlayer] loadedmetadata fired - duration:', video.duration);
       setDuration(video.duration);
       if (initialTime > 0) {
         video.currentTime = initialTime;
@@ -149,18 +184,47 @@ export function NewVideoPlayer({
       setIsFullscreen(!!document.fullscreenElement);
     };
 
+    // DIAGNOSTIC: Error handler
+    const handleError = (e: Event) => {
+      const videoEl = e.target as HTMLVideoElement;
+      const error = videoEl?.error;
+      console.error('❌ [NewVideoPlayer] VIDEO ERROR:', {
+        errorCode: error?.code,
+        errorMessage: error?.message,
+        src: src?.substring(0, 80),
+        networkState: videoEl?.networkState,
+        readyState: videoEl?.readyState,
+        NETWORK_STATES: {
+          0: 'NETWORK_EMPTY',
+          1: 'NETWORK_IDLE',
+          2: 'NETWORK_LOADING',
+          3: 'NETWORK_NO_SOURCE'
+        },
+        currentNetworkState: videoEl?.networkState === 3 ? '⚠️ NETWORK_NO_SOURCE - Browser cannot play this format!' : 'other',
+      });
+    };
+
+    // DIAGNOSTIC: Can play handler
+    const handleCanPlay = () => {
+      console.log('✅ [NewVideoPlayer] canplay fired - video can start playing');
+    };
+
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
     video.addEventListener('timeupdate', handleTimeUpdate);
     video.addEventListener('ended', handleEnded);
+    video.addEventListener('error', handleError);
+    video.addEventListener('canplay', handleCanPlay);
     document.addEventListener('fullscreenchange', handleFullscreenChange);
 
     return () => {
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('timeupdate', handleTimeUpdate);
       video.removeEventListener('ended', handleEnded);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('canplay', handleCanPlay);
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
     };
-  }, [initialTime, onEnded]);
+  }, [initialTime, onEnded, src]);
 
   // Progress tracking callback (every 10 seconds)
   useEffect(() => {
