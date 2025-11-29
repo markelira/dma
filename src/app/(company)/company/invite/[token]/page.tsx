@@ -7,7 +7,8 @@ import Link from 'next/link';
 import { Building2, Mail, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase';
+import { functions, auth } from '@/lib/firebase';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface VerifyInviteResponse {
   valid: boolean;
@@ -26,6 +27,7 @@ export default function InviteAcceptancePage() {
   const router = useRouter();
   const params = useParams();
   const { user, loading: authLoading } = useAuth();
+  const queryClient = useQueryClient();
   const [verifying, setVerifying] = useState(true);
   const [accepting, setAccepting] = useState(false);
   const [inviteData, setInviteData] = useState<VerifyInviteResponse | null>(null);
@@ -139,9 +141,24 @@ export default function InviteAcceptancePage() {
 
       if (result.data.success) {
         setAccepted(true);
-        console.log('🎉 [INVITE PAGE] AUTO: Invite accepted successfully, redirecting to dashboard...');
+        console.log('🎉 [INVITE PAGE] AUTO: Invite accepted successfully');
+
+        // 🔄 CRITICAL: Refresh auth token to get new custom claims (companyId)
+        console.log('🔄 [INVITE PAGE] AUTO: Refreshing Firebase ID token...');
+        try {
+          await auth.currentUser?.getIdToken(true);
+          console.log('✅ [INVITE PAGE] AUTO: ID token refreshed');
+        } catch (tokenError) {
+          console.warn('⚠️ [INVITE PAGE] AUTO: Token refresh failed:', tokenError);
+        }
+
+        // 🔄 CRITICAL: Invalidate subscription cache so fresh check runs on dashboard
+        console.log('🔄 [INVITE PAGE] AUTO: Invalidating subscription cache...');
+        await queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+        console.log('✅ [INVITE PAGE] AUTO: Subscription cache invalidated');
 
         // Redirect employees to their personal dashboard
+        console.log('🚀 [INVITE PAGE] AUTO: Redirecting to dashboard...');
         setTimeout(() => {
           router.push('/dashboard');
         }, 2000);
@@ -191,10 +208,25 @@ export default function InviteAcceptancePage() {
 
       if (result.data.success) {
         setAccepted(true);
-        console.log('🎉 [INVITE PAGE] Invite accepted successfully, redirecting to dashboard...');
+        console.log('🎉 [INVITE PAGE] Invite accepted successfully');
+
+        // 🔄 CRITICAL: Refresh auth token to get new custom claims (companyId)
+        console.log('🔄 [INVITE PAGE] Refreshing Firebase ID token...');
+        try {
+          await auth.currentUser?.getIdToken(true);
+          console.log('✅ [INVITE PAGE] ID token refreshed');
+        } catch (tokenError) {
+          console.warn('⚠️ [INVITE PAGE] Token refresh failed:', tokenError);
+        }
+
+        // 🔄 CRITICAL: Invalidate subscription cache so fresh check runs on dashboard
+        console.log('🔄 [INVITE PAGE] Invalidating subscription cache...');
+        await queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+        console.log('✅ [INVITE PAGE] Subscription cache invalidated');
 
         // Redirect employees to their personal dashboard (not company dashboard)
         // They'll see courses there with company badge
+        console.log('🚀 [INVITE PAGE] Redirecting to dashboard...');
         setTimeout(() => {
           router.push('/dashboard');
         }, 2000);

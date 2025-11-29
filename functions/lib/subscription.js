@@ -193,10 +193,25 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
         }
         // PRIORITY 4: Check company subscription status (B2B model)
         const companyId = userData?.companyId;
+        v2_1.logger.info('🔍 [getSubscriptionStatus] Checking company subscription (PRIORITY 4):', {
+            userId,
+            companyId: companyId || 'NOT SET',
+            hasCompanyId: !!companyId,
+            userCompanyRole: userData?.companyRole || 'NOT SET',
+        });
         if (companyId) {
             const companyDoc = await firestore.collection('companies').doc(companyId).get();
+            v2_1.logger.info('🔍 [getSubscriptionStatus] Company document lookup:', {
+                companyId,
+                exists: companyDoc.exists,
+            });
             if (companyDoc.exists) {
                 const companyData = companyDoc.data();
+                v2_1.logger.info('🔍 [getSubscriptionStatus] Company data:', {
+                    companyId,
+                    subscriptionStatus: companyData?.subscriptionStatus || 'NOT SET',
+                    hasStripeSubscription: !!companyData?.stripeSubscriptionId,
+                });
                 // Check company's subscription status (Stripe handles trial via 7-day trial period)
                 if (companyData?.subscriptionStatus === 'active' || companyData?.subscriptionStatus === 'trialing') {
                     return {

@@ -407,8 +407,14 @@ export const acceptEmployeeInvite = https.onCall(
         console.log(`Created user document for ${userId} with company ${result.companyId}`);
       }
     } catch (userError: any) {
-      console.error('Error updating user document:', userError);
+      console.error('⚠️ [acceptEmployeeInvite] CRITICAL: Failed to update user document:', {
+        userId,
+        companyId: result.companyId,
+        error: userError.message,
+        code: userError.code,
+      });
       // Don't throw - invite was already accepted successfully
+      // But this failure means subscription check won't find companyId!
     }
 
     // 8. Auto-enroll employee in all company-purchased masterclasses
