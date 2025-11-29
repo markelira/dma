@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { Clock, User, Mic } from 'lucide-react';
 import { Instructor, Lesson } from '@/types';
@@ -37,9 +37,10 @@ export function PodcastSidePanel({
   };
 
   const duration = formatDuration(totalDuration || currentLesson.duration);
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 
   return (
-    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] min-h-screen overflow-y-auto border-r border-gray-800">
+    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
         {/* Guest/Speaker Card */}
         {instructor && (
@@ -120,9 +121,19 @@ export function PodcastSidePanel({
           <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
             A podcastról
           </h4>
-          <p className="text-gray-300 leading-relaxed text-sm">
+          <p className={`text-gray-300 leading-relaxed text-sm ${
+            !descriptionExpanded ? 'line-clamp-2' : ''
+          }`}>
             {courseDescription || currentLesson.description || 'Nincs leírás.'}
           </p>
+          {(courseDescription || currentLesson.description) && (
+            <button
+              onClick={() => setDescriptionExpanded(!descriptionExpanded)}
+              className="text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+            >
+              {descriptionExpanded ? 'Kevesebb' : 'Több'}
+            </button>
+          )}
         </div>
 
         {/* Current Episode */}

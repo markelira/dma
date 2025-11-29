@@ -414,7 +414,7 @@ export function NetflixPlayerLayout({
   // PODCAST Layout: Side panel on left + Video on right (single episode)
   if (isPodcast) {
     return (
-      <div className="min-h-screen bg-black flex">
+      <div className="h-screen bg-black flex overflow-hidden">
         {/* Left Side Panel */}
         <PodcastSidePanel
           courseTitle={course.title}
