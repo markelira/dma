@@ -61,8 +61,8 @@ export function NewVideoPlayer({
   // Use src directly only if it's NOT a Mux URL (fallback for non-Mux videos)
   const useSrc = !playbackId && src;
 
-  // Determine accent color for MuxPlayer
-  const primaryColor = accentColor === 'red' ? '#DC2626' : '#3B82F6';
+  // White controls for MuxPlayer
+  const controlsColor = '#FFFFFF';
 
   // Handle time update for progress tracking (every 10 seconds)
   const handleTimeUpdate = useCallback((event: any) => {
@@ -124,8 +124,9 @@ export function NewVideoPlayer({
         onTimeUpdate={handleTimeUpdate}
         onEnded={onEnded}
         startTime={initialTime}
-        primaryColor={primaryColor}
-        accentColor={primaryColor}
+        primaryColor={controlsColor}
+        secondaryColor={controlsColor}
+        accentColor={controlsColor}
         metadata={{
           video_title: 'Lecke videó',
         }}
