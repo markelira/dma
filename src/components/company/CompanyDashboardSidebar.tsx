@@ -21,7 +21,8 @@ import {
   Star,
   Video,
   Mic,
-  BarChart3
+  BarChart3,
+  FileText
 } from 'lucide-react'
 
 /**
@@ -53,6 +54,7 @@ const navigationSections = [
     items: [
       { title: 'Munkatársak', href: '/company/dashboard/employees', icon: Users },
       { title: 'Haladás', href: '/company/dashboard/progress', icon: TrendingUp },
+      { title: 'Számlák', href: '/company/dashboard/invoices', icon: FileText },
       { title: 'Vezérlőpult', href: '/company/dashboard/vezerlopult', icon: BarChart3 },
     ]
   }
