@@ -61,8 +61,6 @@ export function NewVideoPlayer({
   // Use src directly only if it's NOT a Mux URL (fallback for non-Mux videos)
   const useSrc = !playbackId && src;
 
-  // YouTube-style red progress bar
-  const progressColor = '#FF0000';
 
   // Handle time update for progress tracking (every 10 seconds)
   const handleTimeUpdate = useCallback((event: any) => {
@@ -124,8 +122,6 @@ export function NewVideoPlayer({
         onTimeUpdate={handleTimeUpdate}
         onEnded={onEnded}
         startTime={initialTime}
-        primaryColor={progressColor}
-        accentColor={progressColor}
         metadata={{
           video_title: 'Lecke videó',
         }}
@@ -133,9 +129,11 @@ export function NewVideoPlayer({
           width: '100%',
           aspectRatio: '16/9',
           borderRadius: '0.5rem',
-          // YouTube-style controls: transparent background, white icons
-          '--controls': 'white',
-          '--controls-background': 'linear-gradient(transparent, rgba(0,0,0,0.7))',
+          // YouTube-style controls using correct MuxPlayer CSS variables
+          '--media-primary-color': '#FFFFFF',
+          '--media-secondary-color': 'rgba(0,0,0,0.75)',
+          '--media-range-bar-color': '#FF0000',
+          '--media-range-thumb-background': '#FF0000',
           '--media-control-background': 'transparent',
           '--media-control-hover-background': 'rgba(255,255,255,0.1)',
         } as React.CSSProperties}
