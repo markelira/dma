@@ -218,7 +218,7 @@ export function CompanyDashboardSidebar({ companyName, onNavigate }: CompanyDash
         <div className="space-y-1">
           <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
             <Link
-              href="/dashboard/settings"
+              href="/company/dashboard/settings"
               onClick={onNavigate}
               className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             >
