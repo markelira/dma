@@ -56,7 +56,7 @@ export function AcademiaSidePanel({
   const hasMultipleInstructors = instructors.length > 1;
 
   return (
-    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] min-h-screen overflow-y-auto border-r border-gray-800">
+    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
         {/* Instructors Section */}
         {instructors.length > 0 && (

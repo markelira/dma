@@ -122,7 +122,7 @@ export function NetflixPlayerLayout({
   // WEBINAR Layout: Side panel on left + Video on right
   if (isWebinar) {
     return (
-      <div className="min-h-screen bg-black flex">
+      <div className="h-screen bg-black flex overflow-hidden">
         {/* Left Side Panel */}
         <WebinarSidePanel
           courseTitle={course.title}
@@ -192,7 +192,7 @@ export function NetflixPlayerLayout({
   // ACADEMIA Layout: Side panel with lesson navigation + Video on right
   if (isAcademia) {
     return (
-      <div className="min-h-screen bg-black flex">
+      <div className="h-screen bg-black flex overflow-hidden">
         {/* Left Side Panel with Lesson Navigation */}
         <AcademiaSidePanel
           courseTitle={course.title}
@@ -303,7 +303,7 @@ export function NetflixPlayerLayout({
   // MASTERCLASS Layout: Side panel with lesson navigation + Video on right + bottom nav
   if (isMasterclass) {
     return (
-      <div className="min-h-screen bg-black flex">
+      <div className="h-screen bg-black flex overflow-hidden">
         {/* Left Side Panel with Lesson Navigation */}
         <MasterclassSidePanel
           courseTitle={course.title}
