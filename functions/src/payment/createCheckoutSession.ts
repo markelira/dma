@@ -104,10 +104,16 @@ export const createCheckoutSession = onCall({
     }
 
     // Determine subscription type based on user's account
-    // Individual: user has NO teamId
-    // Company: user has teamId or isTeamOwner
-    const subscriptionType = (userData.teamId || userData.isTeamOwner) ? 'company' : 'individual';
-    logger.info(`Subscription type determined: ${subscriptionType} (teamId: ${userData.teamId}, isTeamOwner: ${userData.isTeamOwner})`);
+    // Individual: user has NO teamId AND NO companyId
+    // Company: user has companyId (B2B) or teamId/isTeamOwner (legacy)
+    const isCompanyUser = !!(userData.companyId || userData.teamId || userData.isTeamOwner);
+    const subscriptionType = isCompanyUser ? 'company' : 'individual';
+    const companyId = userData.companyId || userData.teamId || null;
+    logger.info(`Subscription type determined: ${subscriptionType}`, {
+      companyId,
+      teamId: userData.teamId,
+      isTeamOwner: userData.isTeamOwner,
+    });
 
     // Prepare session parameters
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
@@ -157,6 +163,7 @@ export const createCheckoutSession = onCall({
         userId,
         priceId: validatedData.priceId,
         subscriptionType,
+        ...(companyId && { companyId }), // Include companyId for company subscriptions
         ...validatedData.metadata
       }
     };

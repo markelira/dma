@@ -242,8 +242,19 @@ async function handleSubscriptionCheckout(session, stripe) {
             }
         }
         // Handle based on subscription type
-        if (subscriptionType === 'individual') {
-            // Individual subscription - create subscription document
+        // Also check if user has companyId - if so, always update company regardless of subscriptionType
+        // This fixes the bug where company users were processed as individual
+        const companyIdFromMetadata = session.metadata?.companyId;
+        const companyIdFromUser = userData.companyId;
+        const effectiveCompanyId = companyIdFromMetadata || companyIdFromUser;
+        v2_1.logger.info('[handleSubscriptionCheckout] Checking company association:', {
+            subscriptionType,
+            companyIdFromMetadata,
+            companyIdFromUser,
+            effectiveCompanyId,
+        });
+        if (subscriptionType === 'individual' && !effectiveCompanyId) {
+            // Pure individual subscription - create subscription document only
             await handleIndividualSubscription({
                 userId,
                 customerId,
@@ -261,15 +272,12 @@ async function handleSubscriptionCheckout(session, stripe) {
                 subscriptionId,
             });
         }
-        else if (subscriptionType === 'company') {
+        else if (effectiveCompanyId) {
             // Company subscription - update existing company
-            const companyId = session.metadata?.companyId;
-            if (!companyId) {
-                throw new Error('Company ID not found in session metadata');
-            }
+            // Also handles the case where subscriptionType was 'individual' but user has companyId
             await handleCompanySubscription({
                 userId,
-                companyId,
+                companyId: effectiveCompanyId,
                 customerId,
                 subscriptionId,
                 subscriptionStatus,
@@ -281,9 +289,10 @@ async function handleSubscriptionCheckout(session, stripe) {
             });
             v2_1.logger.info('[handleSubscriptionCheckout] Company subscription activated successfully', {
                 userId,
-                companyId,
+                companyId: effectiveCompanyId,
                 customerId,
                 subscriptionId,
+                wasOriginallyIndividual: subscriptionType === 'individual',
             });
         }
         else {
