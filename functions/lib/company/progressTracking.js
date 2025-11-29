@@ -104,20 +104,68 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             throw new https_1.HttpsError('not-found', 'Company not found');
         }
         const companyData = companyDoc.data();
-        // 3. Get all company enrollments from enrollments collection
-        // These are enrollments where enrolledByCompany matches this company
-        let enrollmentsQuery = db
-            .collection('enrollments')
-            .where('enrolledByCompany', '==', companyId);
-        // Filter by specific course if requested
-        if (filterCourseId) {
-            enrollmentsQuery = enrollmentsQuery.where('courseId', '==', filterCourseId);
+        // 3. Get all users who belong to this company
+        // First, get company employees from employees subcollection
+        const employeesSnapshot = await db
+            .collection('companies')
+            .doc(companyId)
+            .collection('employees')
+            .where('status', '==', 'active')
+            .get();
+        // Also get users who have companyId set on their user document
+        const usersWithCompanySnapshot = await db
+            .collection('users')
+            .where('companyId', '==', companyId)
+            .get();
+        // Collect all user IDs that belong to this company
+        const companyUserIds = new Set();
+        employeesSnapshot.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.userId) {
+                companyUserIds.add(data.userId);
+            }
+        });
+        usersWithCompanySnapshot.docs.forEach(doc => {
+            companyUserIds.add(doc.id);
+        });
+        console.log(`📊 Found ${companyUserIds.size} users belonging to company ${companyId}`);
+        if (companyUserIds.size === 0) {
+            // No users in company, return empty stats
+            return {
+                success: true,
+                companyName: companyData?.name,
+                stats: {
+                    totalEmployees: 0,
+                    activeEmployees: 0,
+                    completedCourses: 0,
+                    averageProgress: 0,
+                    atRiskCount: 0,
+                },
+                employees: [],
+                masterclasses: [],
+            };
         }
-        const enrollmentsSnapshot = await enrollmentsQuery.get();
-        console.log(`📊 Found ${enrollmentsSnapshot.size} company enrollments for ${companyId}`);
-        // 4. Get unique course IDs and fetch course details
+        // 4. Get all enrollments for company users
+        // Firestore 'in' query is limited to 30 values, so we need to batch
+        const userIdArray = Array.from(companyUserIds);
+        const enrollmentDocs = [];
+        // Batch queries in groups of 30 (Firestore limit for 'in' queries)
+        for (let i = 0; i < userIdArray.length; i += 30) {
+            const batch = userIdArray.slice(i, i + 30);
+            let enrollmentsQuery = db
+                .collection('enrollments')
+                .where('userId', 'in', batch);
+            // Filter by specific course if requested
+            if (filterCourseId) {
+                enrollmentsQuery = enrollmentsQuery.where('courseId', '==', filterCourseId);
+            }
+            const batchSnapshot = await enrollmentsQuery.get();
+            enrollmentDocs.push(...batchSnapshot.docs);
+        }
+        console.log(`📊 Found ${enrollmentDocs.length} enrollments for company users in ${companyId}`);
+        // 5. Get unique course IDs and fetch course details
         const courseIds = new Set();
-        enrollmentsSnapshot.docs.forEach(doc => {
+        enrollmentDocs.forEach(doc => {
             const data = doc.data();
             if (data.courseId) {
                 courseIds.add(data.courseId);
@@ -167,9 +215,9 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 });
             }
         }
-        // 5. Get unique user IDs from enrollments and fetch user details
+        // 6. Get unique user IDs from enrollments and fetch user details
         const userIds = new Set();
-        enrollmentsSnapshot.docs.forEach(doc => {
+        enrollmentDocs.forEach(doc => {
             const data = doc.data();
             if (data.userId) {
                 userIds.add(data.userId);
@@ -187,12 +235,8 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 });
             }
         }
-        // Also fetch employee data for job titles
-        const employeesSnapshot = await db
-            .collection('companies')
-            .doc(companyId)
-            .collection('employees')
-            .get();
+        // Use the already-fetched employee data for job titles
+        // (employeesSnapshot was fetched earlier)
         const employeesDataMap = new Map();
         employeesSnapshot.docs.forEach(doc => {
             const data = doc.data();
@@ -200,13 +244,14 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 employeesDataMap.set(data.userId, {
                     jobTitle: data.jobTitle,
                     employeeId: doc.id,
+                    fullName: data.fullName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
                 });
             }
         });
-        // 6. Build employee progress list from enrollments
+        // 7. Build employee progress list from enrollments
         const employeeProgressList = [];
         const stats = {
-            totalEmployees: userIds.size,
+            totalEmployees: companyUserIds.size, // Use company users count, not enrollment users
             activeEmployees: 0,
             completedCourses: 0,
             averageProgress: 0,
@@ -215,7 +260,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
         let totalProgress = 0;
         let progressCount = 0;
         const activeUserIds = new Set();
-        for (const enrollmentDoc of enrollmentsSnapshot.docs) {
+        for (const enrollmentDoc of enrollmentDocs) {
             const enrollment = enrollmentDoc.data();
             const enrollmentUserId = enrollment.userId;
             const enrollmentCourseId = enrollment.courseId;
@@ -270,7 +315,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             const daysActive = Math.floor((Date.now() - enrolledAt.getTime()) / (1000 * 60 * 60 * 24));
             employeeProgressList.push({
                 employeeId: employee?.employeeId || enrollmentUserId,
-                employeeName: user?.displayName || 'Unknown User',
+                employeeName: employee?.fullName || user?.displayName || 'Unknown User',
                 email: user?.email || '',
                 jobTitle: employee?.jobTitle,
                 masterclassId: enrollmentCourseId, // Keep for backwards compatibility
@@ -293,7 +338,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
         stats.averageProgress = progressCount > 0
             ? Math.round(totalProgress / progressCount)
             : 0;
-        // 7. Sort employees by progress (lowest first to highlight at-risk)
+        // 8. Sort employees by progress (lowest first to highlight at-risk)
         employeeProgressList.sort((a, b) => {
             // At-risk first
             if (a.status === 'at-risk' && b.status !== 'at-risk')
