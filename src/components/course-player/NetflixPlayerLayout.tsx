@@ -138,7 +138,7 @@ export function NetflixPlayerLayout({
           <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
             <div className="flex items-center gap-4">
               <Link
-                href={`/courses/${course.id}`}
+                href="/dashboard"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
               >
                 <ArrowLeftIcon size={20} />
@@ -210,7 +210,7 @@ export function NetflixPlayerLayout({
           <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
             <div className="flex items-center gap-4">
               <Link
-                href={`/courses/${course.id}`}
+                href="/dashboard"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
               >
                 <ArrowLeftIcon size={20} />
@@ -321,7 +321,7 @@ export function NetflixPlayerLayout({
           <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
             <div className="flex items-center gap-4">
               <Link
-                href={`/courses/${course.id}`}
+                href="/dashboard"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
               >
                 <ArrowLeftIcon size={20} />
@@ -430,7 +430,7 @@ export function NetflixPlayerLayout({
           <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
             <div className="flex items-center gap-4">
               <Link
-                href={`/courses/${course.id}`}
+                href="/dashboard"
                 className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors"
               >
                 <ArrowLeftIcon size={20} />

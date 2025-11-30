@@ -36,7 +36,7 @@ export const PlayerHeader: React.FC<PlayerHeaderProps> = ({
   const { t } = useTranslation()
 
   const handleBackToCourse = () => {
-    router.push(`/courses/${courseId}`)
+    router.push('/dashboard')
   }
 
   return (

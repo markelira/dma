@@ -132,7 +132,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
         // If course completed, you might want to redirect or show celebration
         if (data.data?.courseCompleted) {
           setTimeout(() => {
-            router.push(`/courses/${course.id}`)
+            router.push('/dashboard')
           }, 3000)
         }
       }
@@ -287,7 +287,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
                   <p className="text-gray-600 mb-6">
                     {t('subscription.message')}
                   </p>
-                  <Button onClick={() => router.push(`/courses/${course.id}`)}>
+                  <Button onClick={() => router.push('/pricing')}>
                     {t('subscription.viewPlans')}
                   </Button>
                 </div>

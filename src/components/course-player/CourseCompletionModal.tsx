@@ -98,8 +98,8 @@ export function CourseCompletionModal({
   // Navigation handlers
   const handleGoToCourse = useCallback(() => {
     onDismiss()
-    router.push(`/courses/${courseId}`)
-  }, [onDismiss, router, courseId])
+    router.push('/dashboard')
+  }, [onDismiss, router])
 
   const handleGoToDashboard = useCallback(() => {
     onDismiss()
