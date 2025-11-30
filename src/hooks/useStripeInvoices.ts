@@ -15,6 +15,7 @@ export interface StripeInvoice {
   createdAt: number
   paidAt?: number
   number?: string
+  paymentIntentId?: string // For szamlazz.hu invoice lookup
 }
 
 interface GetStripeInvoicesResponse {

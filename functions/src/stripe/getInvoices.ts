@@ -44,6 +44,7 @@ interface EnrichedInvoice {
   createdAt: number
   paidAt?: number
   number?: string
+  paymentIntentId?: string // Used for szamlazz.hu invoice lookup
 }
 
 /**
@@ -151,6 +152,14 @@ export const getStripeInvoices = onCall({
           }
         }
 
+        // Extract payment intent ID for szamlazz.hu lookup
+        let paymentIntentId: string | undefined;
+        if (invoice.payment_intent) {
+          paymentIntentId = typeof invoice.payment_intent === 'string'
+            ? invoice.payment_intent
+            : invoice.payment_intent.id;
+        }
+
         // Build enriched invoice object
         const enrichedInvoice: EnrichedInvoice = {
           id: invoice.id,
@@ -167,6 +176,7 @@ export const getStripeInvoices = onCall({
             ? invoice.status_transitions.paid_at * 1000
             : undefined,
           number: invoice.number || undefined,
+          paymentIntentId, // For szamlazz.hu invoice lookup
         };
 
         enrichedInvoices.push(enrichedInvoice);

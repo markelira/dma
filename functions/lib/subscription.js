@@ -444,7 +444,8 @@ exports.getSubscriptionInvoices = (0, https_1.onCall)({
                 invoiceUrl: data.invoiceUrl,
                 paidAt: data.paidAt,
                 createdAt: data.createdAt,
-                description: data.description || 'DMA Előfizetés'
+                description: data.description || 'DMA Előfizetés',
+                stripePaymentIntentId: data.stripePaymentIntentId || data.paymentIntentId, // For szamlazz.hu invoice lookup
             });
         });
         return {

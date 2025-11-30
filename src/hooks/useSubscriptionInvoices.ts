@@ -12,6 +12,7 @@ interface Invoice {
   description: string
   createdAt: { _seconds: number; _nanoseconds: number }
   paidAt?: { _seconds: number; _nanoseconds: number }
+  stripePaymentIntentId?: string // For szamlazz.hu invoice lookup
 }
 
 interface GetSubscriptionInvoicesResponse {

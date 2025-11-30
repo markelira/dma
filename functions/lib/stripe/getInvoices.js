@@ -155,6 +155,13 @@ exports.getStripeInvoices = (0, https_1.onCall)({
                         v2_1.logger.warn(`[getStripeInvoices] Could not fetch course ${courseId}:`, error);
                     }
                 }
+                // Extract payment intent ID for szamlazz.hu lookup
+                let paymentIntentId;
+                if (invoice.payment_intent) {
+                    paymentIntentId = typeof invoice.payment_intent === 'string'
+                        ? invoice.payment_intent
+                        : invoice.payment_intent.id;
+                }
                 // Build enriched invoice object
                 const enrichedInvoice = {
                     id: invoice.id,
@@ -171,6 +178,7 @@ exports.getStripeInvoices = (0, https_1.onCall)({
                         ? invoice.status_transitions.paid_at * 1000
                         : undefined,
                     number: invoice.number || undefined,
+                    paymentIntentId, // For szamlazz.hu invoice lookup
                 };
                 enrichedInvoices.push(enrichedInvoice);
             }

@@ -1968,6 +1968,14 @@ export { stripeWebhook } from './stripe/webhook';
 export { getStripeInvoices } from './stripe/getInvoices';
 
 // ============================================
+// SZAMLAZZ.HU HUNGARIAN INVOICES
+// ============================================
+
+// Export szamlazz.hu invoice PDF download
+// Uses SzamlaBridge mapping: Stripe Payment Intent ID -> szamlazz.hu invoice
+export { getSzamlazzInvoicePdf } from './invoices/getSzamlazzInvoicePdf';
+
+// ============================================
 // EMAIL VERIFICATION
 // ============================================
 
