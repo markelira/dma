@@ -25,7 +25,7 @@ export function NavDropdownCourseCard({ course, variant, instructors }: NavDropd
   };
 
   const instructorName = getInstructorName();
-  const courseUrl = `/courses/${course.slug || course.id}`;
+  const courseUrl = `/courses/${course.id}`;
 
   if (variant === 'featured') {
     return (

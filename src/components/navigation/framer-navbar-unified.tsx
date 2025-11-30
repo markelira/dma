@@ -76,7 +76,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
             }}
           >
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
+            <Link href={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
               <img
                 src="/images/DMA.hu-logo.png"
                 alt="DMA Logo"

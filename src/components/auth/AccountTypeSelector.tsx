@@ -15,9 +15,9 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-4xl font-bold">Regisztráció</h1>
+        <h1 className="text-4xl font-bold">Kezdj bele a kalandba</h1>
         <p className="text-sm text-gray-600 mt-3">
-          Hogyan szeretnél csatlakozni az DMA platformhoz?
+          Válassz, hogy milyen fiókot szeretnél létrehozni!
         </p>
       </div>
 
