@@ -26,11 +26,20 @@ export function EmailVerificationModal({
   const [resendCooldown, setResendCooldown] = useState(0)
   const [resending, setResending] = useState(false)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
+  const [isReady, setIsReady] = useState(false)
 
   // Set up portal container on mount (client-side only)
   useEffect(() => {
     setPortalContainer(document.body)
     return () => setPortalContainer(null)
+  }, [])
+
+  // Show loading state briefly while email is being sent in background
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true)
+    }, 1500) // Show loading for 1.5 seconds
+    return () => clearTimeout(timer)
   }, [])
 
   
@@ -182,7 +191,7 @@ export function EmailVerificationModal({
             <h2 className="text-3xl font-bold text-white mb-2">
               Erősítsd meg az email címed
             </h2>
-            <p className="text-brand-secondary-light text-sm">
+            <p className="text-white text-sm font-medium">
               {email}
             </p>
           </div>
@@ -278,12 +287,13 @@ export function EmailVerificationModal({
     </div>
   )
 
-  if (!portalContainer) {
+  // Show loading state while portal initializes or while waiting for email to be sent
+  if (!portalContainer || !isReady) {
     return (
       <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
         <div className="text-center">
           <Loader2 className="w-10 h-10 animate-spin text-white mx-auto mb-4" />
-          <p className="text-white text-sm">Betöltés...</p>
+          <p className="text-white text-sm">Email küldése...</p>
         </div>
       </div>
     );
