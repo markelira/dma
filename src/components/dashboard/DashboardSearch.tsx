@@ -8,11 +8,18 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { cn } from '@/lib/utils';
 
-interface DashboardSearchProps {
-  className?: string;
+export interface DashboardFilters {
+  query: string;
+  categoryId: string | null;
+  audienceId: string | null;
 }
 
-export function DashboardSearch({ className }: DashboardSearchProps) {
+interface DashboardSearchProps {
+  className?: string;
+  onFilterChange?: (filters: DashboardFilters) => void;
+}
+
+export function DashboardSearch({ className, onFilterChange }: DashboardSearchProps) {
   const router = useRouter();
   const { data: courses } = useCourses();
   const { data: categories } = useCategories();
@@ -80,14 +87,14 @@ export function DashboardSearch({ className }: DashboardSearchProps) {
   };
 
   const handleSearch = () => {
-    if (query.trim() || selectedCategory || selectedAudience) {
-      const params = new URLSearchParams();
-      if (query.trim()) params.set('search', query);
-      if (selectedCategory) params.set('category', selectedCategory);
-      if (selectedAudience) params.set('audience', selectedAudience);
-      router.push(`/courses?${params.toString()}`);
-    }
+    // Apply filters in-place instead of redirecting
+    onFilterChange?.({
+      query: query.trim(),
+      categoryId: selectedCategory,
+      audienceId: selectedAudience,
+    });
     setIsOpen(false);
+    setShowFilters(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -102,6 +109,12 @@ export function DashboardSearch({ className }: DashboardSearchProps) {
   const clearFilters = () => {
     setSelectedCategory(null);
     setSelectedAudience(null);
+    setQuery('');
+    onFilterChange?.({
+      query: '',
+      categoryId: null,
+      audienceId: null,
+    });
   };
 
   const hasActiveFilters = selectedCategory || selectedAudience;

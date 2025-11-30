@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { Loader2, Building2, Star, Play } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
 import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
-import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
+import { DashboardSearch, DashboardFilters } from '@/components/dashboard/DashboardSearch';
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
@@ -54,6 +54,13 @@ export default function DashboardPage() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<{ name: string; id: string } | null>(null);
+
+  // Filter state for search
+  const [activeFilters, setActiveFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryId: null,
+    audienceId: null,
+  });
 
   // Check if user is company employee
   const isCompanyEmployee = user?.companyId && user?.companyRole === 'employee';
@@ -395,6 +402,49 @@ export default function DashboardPage() {
 
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
+  // Check if any filters are active
+  const hasActiveFilters = activeFilters.query || activeFilters.categoryId || activeFilters.audienceId;
+
+  // Filter courses based on active filters
+  const filteredCourses = useMemo(() => {
+    if (!courses || !hasActiveFilters) return null;
+
+    let results = [...courses];
+
+    // Filter by search query
+    if (activeFilters.query) {
+      const searchLower = activeFilters.query.toLowerCase();
+      results = results.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Filter by category
+    if (activeFilters.categoryId) {
+      results = results.filter(course => {
+        if (course.categoryIds?.includes(activeFilters.categoryId!)) return true;
+        if (course.category?.id === activeFilters.categoryId) return true;
+        if ((course as any).categoryId === activeFilters.categoryId) return true;
+        return false;
+      });
+    }
+
+    // Filter by target audience
+    if (activeFilters.audienceId) {
+      results = results.filter(course =>
+        course.targetAudienceIds?.includes(activeFilters.audienceId!)
+      );
+    }
+
+    return results;
+  }, [courses, hasActiveFilters, activeFilters]);
+
+  // Handle filter change from search component
+  const handleFilterChange = (filters: DashboardFilters) => {
+    setActiveFilters(filters);
+  };
+
   // Don't render for admin users
   if (user?.role === 'ADMIN' || user?.role === 'COMPANY_ADMIN') {
     return (
@@ -467,9 +517,41 @@ export default function DashboardPage() {
         )}
 
         {/* Search Bar */}
-        <DashboardSearch className="my-2" />
+        <DashboardSearch className="my-2" onFilterChange={handleFilterChange} />
 
-        {/* Folytatás - Enrolled courses linking to player */}
+        {/* Filtered Results - shown when filters are active */}
+        {hasActiveFilters && filteredCourses && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">
+                Találatok ({filteredCourses.length})
+              </h2>
+              <button
+                onClick={() => setActiveFilters({ query: '', categoryId: null, audienceId: null })}
+                className="text-sm text-brand-secondary hover:text-brand-secondary/80"
+              >
+                Szűrők törlése
+              </button>
+            </div>
+            {filteredCourses.length > 0 ? (
+              <CourseCarouselRow
+                title=""
+                courses={filteredCourses}
+                categories={categories || []}
+                instructors={instructors || []}
+              />
+            ) : (
+              <div className="text-center py-12 bg-gray-50 rounded-xl">
+                <p className="text-gray-500">Nincs találat a szűrőknek megfelelő tartalom</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Regular content - hidden when filters are active */}
+        {!hasActiveFilters && (
+          <>
+            {/* Folytatás - Enrolled courses linking to player */}
         {enrichedEnrollments.length > 0 && (
           <EnrolledCourseCarousel
             title="Folytatás"
@@ -532,6 +614,8 @@ export default function DashboardPage() {
           <div className="text-center py-16">
             <p className="text-gray-500">Nincs megjeleníthető tartalom</p>
           </div>
+        )}
+          </>
         )}
       </div>
     </>
