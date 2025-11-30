@@ -390,11 +390,11 @@ export default function CoursePlayerPage() {
           <div className="max-w-5xl mx-auto px-12 py-8 space-y-8">
             {/* Back Link */}
             <Link
-              href={`/courses/${courseId}`}
+              href="/dashboard"
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
               <ArrowLeftIcon size={20} />
-              Vissza a tartalomhoz
+              Vissza
             </Link>
 
             {/* Video Player */}
@@ -410,7 +410,7 @@ export default function CoursePlayerPage() {
 
             {/* Lesson Title and Breadcrumb */}
             <div className="space-y-3">
-              <h1 className="text-3xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-xl font-bold text-gray-900 leading-tight">
                 {currentLesson.title}
               </h1>
               {currentModule && !useMasterclassSidebar && (
@@ -452,11 +452,11 @@ export default function CoursePlayerPage() {
         {/* Back Link */}
         <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 bg-white">
           <Link
-            href={`/courses/${courseId}`}
+            href="/dashboard"
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             <ArrowLeftIcon size={20} />
-            Vissza a tartalomhoz
+            Vissza
           </Link>
         </div>
 
