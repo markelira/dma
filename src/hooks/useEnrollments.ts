@@ -87,24 +87,7 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         throw new Error('User not authenticated')
       }
 
-      // 1. Check if user has active subscription (via team or direct)
-      const userRef = doc(db, 'users', user.uid)
-      const userSnap = await getDoc(userRef)
-      const userData = userSnap.exists() ? userSnap.data() : null
-
-      console.log('👤 [useEnrollments] User data:', {
-        hasUserDoc: userSnap.exists(),
-        subscriptionStatus: userData?.subscriptionStatus,
-        companyId: userData?.companyId,
-        role: userData?.role
-      });
-
-      // User has active subscription if subscriptionStatus is 'active' or 'trialing'
-      const hasActiveSubscription =
-        userData?.subscriptionStatus === 'active' ||
-        userData?.subscriptionStatus === 'trialing'
-
-      // 2. Fetch actual enrollments
+      // Fetch actual enrollments from Firestore
       const enrollmentsRef = collection(db, 'enrollments')
       let q = query(enrollmentsRef, where('userId', '==', user.uid))
 
@@ -126,14 +109,10 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         console.log(`  [${i}] ${doc.id}: status=${data.status}, courseId=${data.courseId}`);
       });
 
-      // Track enrolled course IDs to avoid duplicates
-      const enrolledCourseIds = new Set<string>()
-
-      // 3. Fetch course details for each enrollment
+      // Fetch course details for each enrollment
       const enrollmentsWithCourses = await Promise.all(
         enrollmentsSnap.docs.map(async (enrollmentDoc) => {
           const enrollmentData = enrollmentDoc.data()
-          enrolledCourseIds.add(enrollmentData.courseId)
 
           // Fetch course details
           const courseRef = doc(db, 'courses', enrollmentData.courseId)
@@ -197,59 +176,7 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         })
       )
 
-      // 4. If user has active subscription, add ALL courses as virtual enrollments
-      if (hasActiveSubscription) {
-        const coursesRef = collection(db, 'courses')
-        const coursesSnap = await getDocs(coursesRef)
-
-        const virtualEnrollments = await Promise.all(
-          coursesSnap.docs
-            .filter(courseDoc => !enrolledCourseIds.has(courseDoc.id)) // Only add courses not already enrolled
-            .map(async (courseDoc) => {
-              const courseData = courseDoc.data()
-
-              // Fetch instructor name
-              let instructorName = 'Unknown Instructor'
-              if (courseData.instructorId) {
-                try {
-                  const instructorRef = doc(db, 'instructors', courseData.instructorId)
-                  const instructorSnap = await getDoc(instructorRef)
-                  if (instructorSnap.exists()) {
-                    const instructorData = instructorSnap.data()
-                    instructorName = instructorData.name || 'Unknown Instructor'
-                  }
-                } catch (error) {
-                  console.error('Error fetching instructor:', error)
-                }
-              }
-
-              // Get first lesson ID from subcollection
-              const firstLessonId = await getFirstLessonId(courseDoc.id);
-
-              return {
-                id: `sub_${courseDoc.id}`, // Virtual enrollment ID
-                userId: user.uid,
-                courseId: courseDoc.id,
-                status: 'not_started' as const,
-                progress: 0,
-                enrolledAt: new Date(), // Use current date for subscription access
-                lastAccessedAt: undefined,
-                currentLessonId: undefined,
-                firstLessonId,
-                courseName: courseData.title || 'Unknown Course',
-                courseInstructor: instructorName,
-                courseDescription: courseData.description,
-                thumbnailUrl: courseData.thumbnailUrl,
-                courseType: courseData.courseType,
-              } as EnrollmentWithCourse
-            })
-        )
-
-        // Merge actual enrollments with virtual subscription enrollments
-        enrollmentsWithCourses.push(...virtualEnrollments)
-      }
-
-      // 5. Sort by lastAccessedAt (most recent first)
+      // Sort by lastAccessedAt (most recent first)
       enrollmentsWithCourses.sort((a, b) => {
         const dateA = a.lastAccessedAt || a.enrolledAt
         const dateB = b.lastAccessedAt || b.enrolledAt
@@ -258,7 +185,6 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
 
       console.log('✅ [useEnrollments] Final result:', {
         totalEnrollments: enrollmentsWithCourses.length,
-        hasActiveSubscription,
         courses: enrollmentsWithCourses.map(e => ({
           id: e.id,
           courseId: e.courseId,
