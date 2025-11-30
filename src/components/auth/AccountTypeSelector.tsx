@@ -15,7 +15,7 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
     <div className="space-y-6">
       {/* Header */}
       <div className="mb-10">
-        <h1 className="text-4xl font-bold">Válassz fiók típust</h1>
+        <h1 className="text-4xl font-bold">Regisztráció</h1>
         <p className="text-sm text-gray-600 mt-3">
           Hogyan szeretnél csatlakozni az DMA platformhoz?
         </p>
@@ -37,20 +37,28 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
                 Egyéni fiók
               </h3>
               <p className="text-sm text-gray-600 mb-3">
-                Személyes fejlődés és tanulás masterclass programokon keresztül
+                Egyszemélyes utazás - csak egyedül férsz hozzá a tartalmainkhoz
               </p>
               <div className="space-y-1.5">
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Azonnali hozzáférés minden masterclass programhoz</span>
+                  <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Személyre szabott tanulási élmény</span>
+                  <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Haladás követése és tanúsítványok</span>
+                  <span>Hetente frissülő tartalmak</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <span>Bármikor lemondható</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <span>7 napos ingyenes kipróbálás</span>
                 </div>
               </div>
             </div>
@@ -68,27 +76,35 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-1">
-                Vállalati fiók
+                Vállalkozási fiók
               </h3>
               <p className="text-sm text-gray-600 mb-3">
-                Csapatod képzése és fejlesztése központi adminisztrációval
+                Csoportos utazás - több csapattagod is hozzáfér a tartalmainkhoz
               </p>
               <div className="space-y-1.5">
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Alkalmazottak meghívása és kezelése</span>
+                  <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Csapat haladásának nyomon követése</span>
+                  <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>Központi számlázás és riportok</span>
+                  <span>5 munkatárs díjmentes hozzáadása</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
                   <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
-                  <span>14 napos ingyenes próbaidőszak</span>
+                  <span>Hetente frissülő tartalmak</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <span>Bármikor lemondható</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <span>7 napos ingyenes kipróbálás</span>
                 </div>
               </div>
             </div>

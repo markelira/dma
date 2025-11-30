@@ -7,9 +7,9 @@ import { AccountTypeSelector, AccountType } from '@/components/auth/AccountTypeS
 import { CompanyRegisterForm } from '@/components/auth/CompanyRegisterForm';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase';
+import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
-import { Building2 } from 'lucide-react';
+import { Building2, Eye, EyeOff } from 'lucide-react';
 
 interface InviteData {
   valid: boolean;
@@ -37,6 +37,7 @@ function RegisterPageContent() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
@@ -281,16 +282,23 @@ function RegisterPageContent() {
           sessionStorage.removeItem('pendingEmailVerification');
           console.log('[Register Page] Cleared pending verification from sessionStorage');
 
+          // Set flag for welcome popup on first dashboard visit
+          sessionStorage.setItem('showWelcomePopup', 'true');
+          console.log('[Register Page] Set welcome popup flag');
+
           setIsVerifying(false);
           setShowVerificationModal(false);
 
-          // Sign out and redirect to login for fresh authentication
-          // This ensures custom claims are properly loaded on next login
-          await logout();
-          // Preserve redirect_to for invite flows
-          const redirectParam = redirectTo !== '/dashboard' ? `&redirect_to=${encodeURIComponent(redirectTo)}` : '';
-          console.log('[Register Page] Email verified, redirecting to login with redirect_to:', redirectTo);
-          router.push('/login?verified=true&email=' + encodeURIComponent(formData.email) + redirectParam);
+          // Force token refresh to pick up emailVerified: true
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            console.log('[Register Page] Refreshing token for auto-login');
+            await currentUser.getIdToken(true);
+          }
+
+          // Redirect directly to dashboard (user stays logged in)
+          console.log('[Register Page] Email verified, redirecting directly to:', redirectTo);
+          router.push(redirectTo);
         }}
       />
     );
@@ -408,7 +416,7 @@ function RegisterPageContent() {
 
       <div className="mb-10">
         <h1 className="text-4xl font-bold">
-          {inviteData ? 'Regisztráció és csatlakozás' : 'Fiók létrehozása'}
+          {inviteData ? 'Regisztráció és csatlakozás' : 'Regisztráció'}
         </h1>
       </div>
 
@@ -424,25 +432,6 @@ function RegisterPageContent() {
           <div>
             <label
               className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="firstName"
-            >
-              Keresztnév
-            </label>
-            <input
-              id="firstName"
-              name="firstName"
-              className="form-input w-full py-2"
-              type="text"
-              placeholder="János"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
               htmlFor="lastName"
             >
               Vezetéknév
@@ -454,6 +443,25 @@ function RegisterPageContent() {
               type="text"
               placeholder="Kovács"
               value={formData.lastName}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="firstName"
+            >
+              Keresztnév
+            </label>
+            <input
+              id="firstName"
+              name="firstName"
+              className="form-input w-full py-2"
+              type="text"
+              placeholder="János"
+              value={formData.firstName}
               onChange={handleChange}
               required
               disabled={loading}
@@ -491,18 +499,28 @@ function RegisterPageContent() {
             >
               Jelszó
             </label>
-            <input
-              id="password"
-              name="password"
-              className="form-input w-full py-2"
-              type="password"
-              autoComplete="on"
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                className="form-input w-full py-2 pr-10"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="on"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
         <div className="mt-6">

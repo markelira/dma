@@ -16,7 +16,9 @@ import {
   Plus,
   ArrowRight,
   ArrowLeft,
-  ChevronLeft
+  ChevronLeft,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
@@ -111,6 +113,8 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     companySize: '',
     employees: []
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
 
   const updateField = (field: keyof CompanyOnboardingData, value: any) => {
@@ -449,18 +453,6 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Keresztnév *
-                </label>
-                <input
-                  type="text"
-                  value={formData.ownerFirstName}
-                  onChange={(e) => updateField('ownerFirstName', e.target.value)}
-                  className={inputClass}
-                  placeholder="János"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Vezetéknév *
                 </label>
                 <input
@@ -469,6 +461,18 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
                   onChange={(e) => updateField('ownerLastName', e.target.value)}
                   className={inputClass}
                   placeholder="Kovács"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Keresztnév *
+                </label>
+                <input
+                  type="text"
+                  value={formData.ownerFirstName}
+                  onChange={(e) => updateField('ownerFirstName', e.target.value)}
+                  className={inputClass}
+                  placeholder="János"
                 />
               </div>
             </div>
@@ -490,26 +494,46 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Jelszó *
               </label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => updateField('password', e.target.value)}
-                className={inputClass}
-                placeholder="Minimum 6 karakter"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={(e) => updateField('password', e.target.value)}
+                  className={`${inputClass} pr-10`}
+                  placeholder="Minimum 6 karakter"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Jelszó megerősítése *
               </label>
-              <input
-                type="password"
-                value={formData.confirmPassword}
-                onChange={(e) => updateField('confirmPassword', e.target.value)}
-                className={inputClass}
-                placeholder="Írd be újra a jelszót"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={(e) => updateField('confirmPassword', e.target.value)}
+                  className={`${inputClass} pr-10`}
+                  placeholder="Írd be újra a jelszót"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
           </motion.div>
         )}

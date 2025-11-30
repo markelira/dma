@@ -10,6 +10,7 @@ import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
+import { WelcomePopup } from '@/components/dashboard/WelcomePopup';
 import { useTrialPopup } from '@/hooks/useTrialPopup';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { useCourses } from '@/hooks/useCourseQueries';
@@ -395,6 +396,9 @@ export default function DashboardPage() {
 
   return (
     <>
+      {/* Welcome Popup - Shows on first registration */}
+      <WelcomePopup />
+
       {/* Free Trial Modal - Shows BEFORE onboarding */}
       <FreeTrialModal
         open={showTrialModal}

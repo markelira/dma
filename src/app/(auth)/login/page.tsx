@@ -8,7 +8,7 @@ import { useLogin } from '@/hooks/useAuthQueries';
 import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
-import { Mail, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Mail, CheckCircle, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,6 +23,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState(emailParam || '');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [showVerificationSuccess, setShowVerificationSuccess] = useState(isVerified);
 
   // Forgot password states
@@ -201,17 +202,27 @@ export default function LoginPage() {
             >
               Jelszó
             </label>
-            <input
-              id="password"
-              className="form-input w-full py-2"
-              type="password"
-              autoComplete="on"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loginMutation.isPending}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                className="form-input w-full py-2 pr-10"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="on"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                disabled={loginMutation.isPending}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </div>
         <div className="mt-6">

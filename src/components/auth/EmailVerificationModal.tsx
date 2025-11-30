@@ -33,15 +33,7 @@ export function EmailVerificationModal({
     return () => setPortalContainer(null)
   }, [])
 
-  // Mask email for display (e.g., j***@example.com)
-  const maskEmail = (email: string): string => {
-    const [localPart, domain] = email.split('@')
-    if (localPart.length <= 2) {
-      return `${localPart[0]}***@${domain}`
-    }
-    return `${localPart[0]}***${localPart[localPart.length - 1]}@${domain}`
-  }
-
+  
   // Cooldown timer
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -182,7 +174,7 @@ export function EmailVerificationModal({
               Erősítsd meg az email címed
             </h2>
             <p className="text-brand-secondary-light text-sm">
-              {maskEmail(email)}
+              {email}
             </p>
           </div>
 
