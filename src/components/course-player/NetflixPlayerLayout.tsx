@@ -145,7 +145,7 @@ export function NetflixPlayerLayout({
                 <span className="hidden sm:inline">Vissza</span>
               </Link>
               <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-white font-medium truncate">{course.title}</h1>
+              <h1 className="text-white text-sm font-medium truncate">{course.title}</h1>
             </div>
           </div>
 
@@ -217,7 +217,7 @@ export function NetflixPlayerLayout({
                 <span className="hidden sm:inline">Vissza</span>
               </Link>
               <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-white font-medium truncate">{course.title}</h1>
+              <h1 className="text-white text-sm font-medium truncate">{course.title}</h1>
             </div>
           </div>
 
@@ -328,7 +328,7 @@ export function NetflixPlayerLayout({
                 <span className="hidden sm:inline">Vissza</span>
               </Link>
               <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-white font-medium truncate">{course.title}</h1>
+              <h1 className="text-white text-sm font-medium truncate">{course.title}</h1>
             </div>
           </div>
 
@@ -437,7 +437,7 @@ export function NetflixPlayerLayout({
                 <span className="hidden sm:inline">Vissza</span>
               </Link>
               <div className="h-6 w-px bg-white/20" />
-              <h1 className="text-white font-medium truncate">{course.title}</h1>
+              <h1 className="text-white text-sm font-medium truncate">{course.title}</h1>
             </div>
           </div>
 
