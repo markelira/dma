@@ -15,11 +15,11 @@ interface FramerNavbarUnifiedProps {
 const SCROLL_THRESHOLD = 100
 
 // Course type nav items configuration
-const COURSE_TYPE_NAV_ITEMS: { type: CourseType; label: string; color: string }[] = [
-  { type: 'WEBINAR', label: 'Webinárok', color: 'hover:text-purple-600' },
-  { type: 'ACADEMIA', label: 'Akadémia', color: 'hover:text-blue-600' },
-  { type: 'MASTERCLASS', label: 'Masterclass', color: 'hover:text-amber-600' },
-  { type: 'PODCAST', label: 'Podcast', color: 'hover:text-green-600' },
+const COURSE_TYPE_NAV_ITEMS: { type: CourseType; label: string; color: string; url: string }[] = [
+  { type: 'WEBINAR', label: 'Webinárok', color: 'hover:text-purple-600', url: '/webinar' },
+  { type: 'ACADEMIA', label: 'Akadémia', color: 'hover:text-blue-600', url: '/akademia' },
+  { type: 'MASTERCLASS', label: 'Masterclass', color: 'hover:text-amber-600', url: '/masterclass' },
+  { type: 'PODCAST', label: 'Podcast', color: 'hover:text-green-600', url: '/podcast' },
 ]
 
 export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedProps) {
@@ -91,14 +91,15 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
             {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center gap-1 flex-1 justify-center">
               {/* Course Type Dropdowns */}
-              {COURSE_TYPE_NAV_ITEMS.map(({ type, label, color }) => (
+              {COURSE_TYPE_NAV_ITEMS.map(({ type, label, color, url }) => (
                 <div
                   key={type}
                   className="relative"
                   onMouseEnter={() => handleDropdownEnter(type)}
                   onMouseLeave={handleDropdownLeave}
                 >
-                  <button
+                  <Link
+                    href={url}
                     className={`text-gray-700 ${color} font-bold font-inter transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 flex items-center gap-1`}
                     style={{
                       fontSize: scrolled ? '13px' : '14px',
@@ -113,7 +114,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  </button>
+                  </Link>
 
                   <CourseTypeDropdown courseType={type} isOpen={openDropdown === type} />
                 </div>
