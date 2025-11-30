@@ -49,6 +49,9 @@ export default function DashboardPage() {
   const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription } = useTrialPopup();
   const [showTrialModal, setShowTrialModal] = useState(false);
 
+  // Welcome popup state (shows first after registration)
+  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<{ name: string; id: string } | null>(null);
 
@@ -77,13 +80,22 @@ export default function DashboardPage() {
     fetchCompanyInfo();
   }, [user?.companyId, isCompanyEmployee]);
 
-  // Check if trial popup should show (BEFORE onboarding)
+  // Check for welcome popup on mount (shows FIRST after registration)
+  useEffect(() => {
+    const shouldShow = sessionStorage.getItem('showWelcomePopup');
+    if (shouldShow === 'true') {
+      setShowWelcomePopup(true);
+      sessionStorage.removeItem('showWelcomePopup');
+    }
+  }, []);
+
+  // Check if trial popup should show (AFTER welcome popup is dismissed)
   // Company employees bypass trial popup (they have company subscription)
   useEffect(() => {
-    if (shouldShowForAuthUser && !isCompanyEmployee && !hasActiveSubscription) {
+    if (shouldShowForAuthUser && !isCompanyEmployee && !hasActiveSubscription && !showWelcomePopup) {
       setShowTrialModal(true);
     }
-  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription]);
+  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup]);
 
   // Check if onboarding is needed (only if trial modal not showing)
   useEffect(() => {
@@ -127,6 +139,12 @@ export default function DashboardPage() {
     dismissTrial();
     setShowTrialModal(false);
     // Now onboarding can show if needed
+  };
+
+  // Handle welcome popup dismiss - then show trial modal
+  const handleWelcomePopupDismiss = () => {
+    setShowWelcomePopup(false);
+    // Trial modal will show via the useEffect above if conditions are met
   };
 
   // Build hero slides
@@ -396,10 +414,12 @@ export default function DashboardPage() {
 
   return (
     <>
-      {/* Welcome Popup - Shows on first registration */}
-      <WelcomePopup />
+      {/* Welcome Popup - Shows FIRST after registration */}
+      {showWelcomePopup && (
+        <WelcomePopup onDismiss={handleWelcomePopupDismiss} />
+      )}
 
-      {/* Free Trial Modal - Shows BEFORE onboarding */}
+      {/* Free Trial Modal - Shows AFTER welcome popup is dismissed */}
       <FreeTrialModal
         open={showTrialModal}
         onOpenChange={setShowTrialModal}

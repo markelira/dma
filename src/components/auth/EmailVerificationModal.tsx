@@ -146,7 +146,16 @@ export function EmailVerificationModal({
       </div>
     )
 
-    if (!portalContainer) return null
+    if (!portalContainer) {
+      return (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+          <div className="text-center">
+            <Loader2 className="w-10 h-10 animate-spin text-white mx-auto mb-4" />
+            <p className="text-white text-sm">Betöltés...</p>
+          </div>
+        </div>
+      );
+    }
     return createPortal(successModal, portalContainer)
   }
 
@@ -269,6 +278,15 @@ export function EmailVerificationModal({
     </div>
   )
 
-  if (!portalContainer) return null
+  if (!portalContainer) {
+    return (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-900/80 backdrop-blur-sm">
+        <div className="text-center">
+          <Loader2 className="w-10 h-10 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white text-sm">Betöltés...</p>
+        </div>
+      </div>
+    );
+  }
   return createPortal(mainModal, portalContainer)
 }

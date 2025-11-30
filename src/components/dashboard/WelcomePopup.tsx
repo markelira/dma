@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PartyPopper, X } from 'lucide-react';
 
-export function WelcomePopup() {
-  const [show, setShow] = useState(false);
+interface WelcomePopupProps {
+  onDismiss?: () => void;
+}
 
-  useEffect(() => {
-    const shouldShow = sessionStorage.getItem('showWelcomePopup');
-    if (shouldShow === 'true') {
-      setShow(true);
-      sessionStorage.removeItem('showWelcomePopup');
-    }
-  }, []);
+export function WelcomePopup({ onDismiss }: WelcomePopupProps) {
+  const [show, setShow] = useState(true);
+
+  const handleClose = () => {
+    setShow(false);
+    onDismiss?.();
+  };
 
   if (!show) return null;
 
@@ -29,7 +30,7 @@ export function WelcomePopup() {
             className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-4"
           >
             <button
-              onClick={() => setShow(false)}
+              onClick={handleClose}
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -55,7 +56,7 @@ export function WelcomePopup() {
               </p>
 
               <button
-                onClick={() => setShow(false)}
+                onClick={handleClose}
                 className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
               >
                 Kezdjük!
