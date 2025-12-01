@@ -120,16 +120,16 @@ export function NetflixCourseCarousel() {
   }
 
   return (
-    <section className="w-full bg-gray-950 py-12 md:py-16">
+    <section className="w-full bg-[rgb(249,250,251)] py-12 md:py-16">
       <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold text-white">
-            Legújabb tartalmak
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+            Tartalmaink
           </h2>
           <Link
             href="/courses"
-            className="text-gray-400 hover:text-white transition-colors text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
           >
             Összes megtekintése →
           </Link>
@@ -147,7 +147,7 @@ export function NetflixCourseCarousel() {
                 hidden md:flex items-center justify-center
                 hover:bg-black/90 hover:scale-110"
             >
-              <ChevronLeft className="w-6 h-6 text-white" />
+              <ChevronLeft className="w-6 h-6 text-gray-900" />
             </button>
           )}
 
@@ -192,7 +192,7 @@ export function NetflixCourseCarousel() {
                 hidden md:flex items-center justify-center
                 hover:bg-black/90 hover:scale-110"
             >
-              <ChevronRight className="w-6 h-6 text-white" />
+              <ChevronRight className="w-6 h-6 text-gray-900" />
             </button>
           )}
         </div>
@@ -207,10 +207,10 @@ export function NetflixCourseCarousel() {
             <div className="w-16 h-16 rounded-2xl bg-brand-secondary/20 flex items-center justify-center mb-4">
               <Sparkles className="w-8 h-8 text-brand-secondary" />
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Hamarosan érkeznek új tartalmak
             </h3>
-            <p className="text-gray-400 text-center max-w-md">
+            <p className="text-gray-600 text-center max-w-md">
               Kövess minket, hogy értesülj az új kurzusokról!
             </p>
           </motion.div>

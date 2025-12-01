@@ -3,7 +3,14 @@
 import dynamic from 'next/dynamic';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import { NetflixCourseCarousel } from '@/components/home/NetflixCourseCarousel';
-import { CourseTypeShowcase } from '@/components/home/CourseTypeShowcase';
+import { WhyDMASection } from '@/components/home/WhyDMASection';
+import { FeaturesEditorial, TartalmakHeader } from '@/components/home/FeaturesEditorial';
+import { BenefitsEditorial } from '@/components/home/BenefitsEditorial';
+import { StatsSection } from '@/components/home/StatsSection';
+import { AllCoursesShowcase } from '@/components/home/AllCoursesShowcase';
+import { CategoriesEditorial } from '@/components/home/CategoriesEditorial';
+import { PricingEditorial } from '@/components/home/PricingEditorial';
+import { TestimonialsEditorial } from '@/components/home/TestimonialsEditorial';
 import Footer from '@/components/landing-home/ui/footer';
 
 // Loading placeholder for sections
@@ -16,41 +23,10 @@ const MainHero = dynamic(
   { ssr: false, loading: SectionLoader }
 );
 
-const Features = dynamic(
-  () => import('@framer/features').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const Benefits = dynamic(
-  () => import('@framer/benefits').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const Solutions = dynamic(
-  () => import('@framer/solutions').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const Pricing = dynamic(
-  () => import('@framer/pricing').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const Testimonials = dynamic(
-  () => import('@framer/testimonials').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
 const Faq = dynamic(
   () => import('@framer/faq').then(m => m.default.Responsive || m.default),
   { ssr: false, loading: SectionLoader }
 );
-
-const Cta = dynamic(
-  () => import('@framer/cta').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
 
 // Common props for full-width Framer sections
 const fullWidthProps = {
@@ -68,49 +44,24 @@ export function TaskFlowHome() {
         <MainHero {...fullWidthProps} />
         {/* Netflix Course Carousel Section */}
         <NetflixCourseCarousel />
-        <Features {...fullWidthProps} />
-        {/* Masterclass Carousel Section */}
-        <div className="py-12">
-          <CourseTypeShowcase
-            courseType="MASTERCLASS"
-            title="Masterclass-ok"
-            subtitle="Haladó stratégiák iparági vezetőktől és DMA szakértőktől."
-            maxCourses={8}
-          />
-        </div>
-        <Benefits {...fullWidthProps} />
-        {/* Webinar Carousel Section */}
-        <div className="py-12">
-          <CourseTypeShowcase
-            courseType="WEBINAR"
-            title="Webinárok"
-            subtitle="Egy fókusz. Azonnal alkalmazható megoldás."
-            maxCourses={8}
-          />
-        </div>
-        <Solutions {...fullWidthProps} />
-        <Pricing {...fullWidthProps} />
-        {/* Akadémia Carousel Section */}
-        <div className="py-12">
-          <CourseTypeShowcase
-            courseType="ACADEMIA"
-            title="Akadémiák"
-            subtitle="Alapoktól a mesterszintig. Strukturált programok, mélyebb eredmények."
-            maxCourses={8}
-          />
-        </div>
-        <Testimonials {...fullWidthProps} />
-        {/* Podcast Carousel Section */}
-        <div className="py-12">
-          <CourseTypeShowcase
-            courseType="PODCAST"
-            title="Podcastok"
-            subtitle="Fejlődj útközben. Beszélgetések, interjúk, betekintések – bárhol, bármikor."
-            maxCourses={8}
-          />
-        </div>
+        {/* Why DMA Section - Light background feature cards */}
+        <WhyDMASection />
+        {/* Tartalmak Header - separate from Bento Grid */}
+        <TartalmakHeader />
+        <FeaturesEditorial />
+        {/* Stats Section - moved from hero */}
+        <StatsSection />
+        {/* All Courses Carousel - "Tartalmaink" section with all course types */}
+        <AllCoursesShowcase />
+        {/* Benefits Section - "Miért bízz bennünk?" */}
+        <BenefitsEditorial />
+        {/* Categories Section - "A Struktúraépítő streaming platform" */}
+        <CategoriesEditorial />
+        {/* Pricing Section - "Fedezd fel 7 napig teljesen ingyen" */}
+        <PricingEditorial />
+        {/* Testimonials Section - Google Reviews */}
+        <TestimonialsEditorial />
         <Faq {...fullWidthProps} />
-        <Cta {...fullWidthProps} />
         <Footer border={true} />
       </main>
     </div>

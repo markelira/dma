@@ -1029,7 +1029,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-gdpscs, var(--token-2512d5c3-fb46-42ef-a96a-5b1cd92b4a5b, rgb(255, 255, 255)))",
 												}}
 											>
-												{"A holnap kihívásaira ma kell felkészíteni csapatodat"}
+												{"Struktúraépítő streaming platform"}
 											</motion.h1>
 										</React.Fragment>
 									</RichText>
@@ -1059,7 +1059,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												}}
 											>
 												{
-													"Amit 20 év alatt megtanultunk, egy kattintásra. Akár egyedül, akár munkatársaiddal - fix áron, korlátlan hozzáféréssel."
+													"Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek."
 												}
 											</motion.p>
 										</React.Fragment>
@@ -1138,7 +1138,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											scopeId={"S5FkFcOiX"}
 										>
 											{_jsx(stdin_default3, {
-												bL9DUTLS5: "Ingyenes próba indítása",
+												bL9DUTLS5: "Kipróbálom 7 napig ingyen",
 												height: "100%",
 												id: "q03oD5D7d",
 												kI0zFLUtw:
@@ -1160,7 +1160,9 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											})}
 										</SmartComponentScopedContainer>
 									</ComponentViewportProvider>
+									{/* White button hidden - only keeping red CTA */}
 									<ComponentViewportProvider
+										style={{ display: "none" }}
 										height={40}
 										y={
 											(componentViewport?.y || 0) +
@@ -2604,6 +2606,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 								/>
 							</motion.div>
 						</ImageWithFXWithOptimizedAppearEffect>
+						{/* Stats/Metrics section hidden - moved to separate StatsSection component */}
 						<ComponentViewportProvider
 							height={153}
 							width={`min(${componentViewport?.width || "100vw"} - 160px, 1440px)`}
@@ -2614,6 +2617,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 									1512 +
 									32)
 							}
+							style={{ display: "none" }}
 							{...addPropertyOverrides(
 								{
 									abHsb8cMx: {

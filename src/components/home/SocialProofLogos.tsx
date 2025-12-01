@@ -4,18 +4,18 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 
 const logos = [
-  { src: '/images/herocarousel/24hu-logo.png', alt: '24.hu', width: 120, height: 60 },
-  { src: '/images/herocarousel/bizalmi-kor-logo.png', alt: 'Bizalmi Kör', width: 120, height: 60 },
-  { src: '/images/herocarousel/continental-logo.png', alt: 'Continental', width: 120, height: 60 },
-  { src: '/images/herocarousel/forbes-logo.png', alt: 'Forbes', width: 120, height: 60 },
-  { src: '/images/herocarousel/haszon-logo.png', alt: 'Haszon', width: 120, height: 60 },
-  { src: '/images/herocarousel/mapei-logo.png', alt: 'Mapei', width: 120, height: 60 },
-  { src: '/images/herocarousel/minicrm-logo.png', alt: 'MiniCRM', width: 120, height: 60 },
-  { src: '/images/herocarousel/piacesprofit-logo.png', alt: 'Piac és Profit', width: 120, height: 60 },
-  { src: '/images/herocarousel/portfolio-logo.png', alt: 'Portfolio', width: 120, height: 60 },
-  { src: '/images/herocarousel/semsei-logo.png', alt: 'Semsei', width: 120, height: 60 },
-  { src: '/images/herocarousel/szabo-peter-logo.png', alt: 'Szabó Péter', width: 120, height: 60 },
-  { src: '/images/herocarousel/szentkiralyi-logo.png', alt: 'Szentkirályi', width: 120, height: 60 },
+  { src: '/images/herocarousel/24hu-logo.png', alt: '24.hu', width: 240, height: 120 },
+  { src: '/images/herocarousel/bizalmi-kor-logo.png', alt: 'Bizalmi Kör', width: 240, height: 120 },
+  { src: '/images/herocarousel/continental-logo.png', alt: 'Continental', width: 240, height: 120 },
+  { src: '/images/herocarousel/forbes-logo.png', alt: 'Forbes', width: 240, height: 120 },
+  { src: '/images/herocarousel/haszon-logo.png', alt: 'Haszon', width: 240, height: 120 },
+  { src: '/images/herocarousel/mapei-logo.png', alt: 'Mapei', width: 240, height: 120 },
+  { src: '/images/herocarousel/minicrm-logo.png', alt: 'MiniCRM', width: 240, height: 120 },
+  { src: '/images/herocarousel/piacesprofit-logo.png', alt: 'Piac és Profit', width: 240, height: 120 },
+  { src: '/images/herocarousel/portfolio-logo.png', alt: 'Portfolio', width: 240, height: 120 },
+  { src: '/images/herocarousel/semsei-logo.png', alt: 'Semsei', width: 240, height: 120 },
+  { src: '/images/herocarousel/szabo-peter-logo.png', alt: 'Szabó Péter', width: 240, height: 120 },
+  { src: '/images/herocarousel/szentkiralyi-logo.png', alt: 'Szentkirályi', width: 240, height: 120 },
 ]
 
 export function SocialProofLogos() {
@@ -27,7 +27,7 @@ export function SocialProofLogos() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Heading - Z-index ensures visibility above background */}
         <h2 className="text-center text-white text-lg sm:text-xl font-bold mb-8 sm:mb-12 relative z-50">
-          Ahol már találkozhattál velünk
+          Akikkel már együtt dolgoztunk:
         </h2>
 
         {/* True Infinite Horizontal Carousel */}

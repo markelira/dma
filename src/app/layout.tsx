@@ -14,8 +14,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "DMA MasterClass – Magyarország legjobb oktatási platformja",
-  description: "Fedezzen fel hiteles magyarországi egyetemi tartalmakat és szerezzen elismert bizonyítványokat.",
+  title: "DMA Masterclass – Struktúraépítő streaming platform",
+  description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek.",
   keywords: [
     "online képzés",
     "magyar egyetemek",

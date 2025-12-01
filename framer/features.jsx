@@ -293,7 +293,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-1of0zx5, var(--token-05a7cdfd-1e0f-43da-a9f6-b4623556492c, rgb(17, 24, 39)))",
 												}}
 											>
-												{"Négy formátum. Egy cél: eredmény."}
+												{"Fedezd fel, ami máshol nem elérhető!"}
 											</motion.h2>
 										</React.Fragment>
 									</RichText>
@@ -322,7 +322,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 														"var(--extracted-r6o4lv, var(--token-fd483edb-af45-4817-a4ca-cfb10641cc8b, rgb(107, 114, 128)))",
 												}}
 											>
-												{"Válaszd ki, hogyan szeretnéd elsajátítani a tudást. Mindegyik a DMA 20 éves módszertanára épül."}
+												{"Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudsz."}
 											</motion.p>
 										</React.Fragment>
 									</RichText>
@@ -406,7 +406,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												TTDBuDFWn: "Masterclass",
 												variant: "QaMgSgIWy",
 												vVyXB7aUV:
-													"Mélyreható programok a DMA szakértőitől és meghívott iparági vezetőktől. Haladó módszerek azoknak, akik komolyan gondolják.",
+													"Összegyűjtöttük neked a főbb tematikákat, hogy Masterclassokban fedezd fel a cégépítési rendszereket.",
 												width: "100%",
 												zXhcER6Sf: "Felfedezés →",
 											}),
@@ -499,7 +499,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													TTDBuDFWn: "Webinár",
 													variant: "gKNokyV1D",
 													vVyXB7aUV:
-														"90 perces koncentrált alkalmak egy konkrét problémára. Azonnal alkalmazható megoldások, időpazarlás nélkül.",
+														"Szakértő Mentorok folyamatosan ellátnak tartalmakkal, amiket élőben rögzítettünk.",
 													width: "100%",
 													zXhcER6Sf: "Felfedezés →",
 													...addPropertyOverrides(
@@ -598,7 +598,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													TTDBuDFWn: "Akadémia",
 													variant: "gKNokyV1D",
 													vVyXB7aUV:
-														"Átfogó, strukturált programok, amelyek lépésről lépésre építik fel a szükséges készségeket. Nem elmélet – alkalmazható rendszerek.",
+														"Lépésről lépésre fedezheted fel a rendszereket zéró bullshittel.",
 													width: "100%",
 													zXhcER6Sf: "Felfedezés →",
 													...addPropertyOverrides(
@@ -697,7 +697,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 													TTDBuDFWn: "Podcast",
 													variant: "gKNokyV1D",
 													vVyXB7aUV:
-														"Üzleti beszélgetések és interjúk útközben. Valós tapasztalatok, bevált stratégiák – futás, autózás vagy edzés közben.",
+														"A Gondokozz Rendszerben podcast adásainkban kiemelkedő cégvezetőkkel tárunk fel izgalmas témákat, hogy struktúrált céget építhess.",
 													width: "100%",
 													zXhcER6Sf:
 														"Tovább →",
