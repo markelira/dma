@@ -121,14 +121,14 @@ export function TestimonialsEditorial() {
                 <span className="text-xs font-medium text-gray-600">Google Reviews</span>
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
               Amit ügyfeleink
               <br />
               <span className="text-[#E72B36]">mondanak rólunk</span>
             </h2>
           </div>
           <div className="lg:col-span-5 flex items-end">
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed border-l-2 border-gray-300 pl-6">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed border-l-2 border-gray-300 pl-4 sm:pl-6">
               Több száz cégvezető és vállalkozó bízik bennünk. Olvasd el, mit mondanak az együttműködésről.
             </p>
           </div>
@@ -140,7 +140,7 @@ export function TestimonialsEditorial() {
           {canScrollLeft && (
             <button
               onClick={() => scroll('left')}
-              className="absolute -left-4 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+              className="absolute -left-2 sm:-left-4 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
               aria-label="Scroll left"
             >
               <ChevronLeft className="w-5 h-5 text-gray-600" />
@@ -149,7 +149,7 @@ export function TestimonialsEditorial() {
           {canScrollRight && (
             <button
               onClick={() => scroll('right')}
-              className="absolute -right-4 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+              className="absolute -right-2 sm:-right-4 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
               aria-label="Scroll right"
             >
               <ChevronRight className="w-5 h-5 text-gray-600" />
@@ -165,7 +165,7 @@ export function TestimonialsEditorial() {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className="flex-shrink-0 w-[320px] md:w-[380px] bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
+                className="flex-shrink-0 w-[280px] sm:w-[320px] md:w-[380px] bg-white rounded-2xl p-5 sm:p-6 md:p-8 border border-gray-100 shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Stars and Google */}
                 <div className="flex items-center justify-between mb-4">

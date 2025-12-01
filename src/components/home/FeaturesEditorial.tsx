@@ -44,14 +44,14 @@ export function TartalmakHeader() {
             <span className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4 block">
               Tartalmak
             </span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
               Fedezd fel, ami
               <br />
               <span className="text-[#E72B36]">máshol nem elérhető!</span>
             </h2>
           </div>
           <div className="lg:col-span-5 flex items-end">
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed border-l-2 border-gray-300 pl-6">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 leading-relaxed border-l-2 border-gray-300 pl-4 sm:pl-6">
               Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudsz.
             </p>
           </div>
@@ -74,12 +74,12 @@ export function FeaturesEditorial() {
             href={features[0].href}
             className="group md:col-span-2 lg:col-span-2 row-span-1"
           >
-            <div className="h-full bg-gray-900 rounded-2xl p-8 md:p-10 lg:p-12 transition-all duration-300 hover:bg-gray-800 hover:scale-[1.02] flex flex-col justify-between min-h-[320px]">
+            <div className="h-full bg-gray-900 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 transition-all duration-300 hover:bg-gray-800 hover:scale-[1.02] flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
               <div>
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[#E72B36]/20 flex items-center justify-center mb-6 group-hover:bg-[#E72B36]/30 transition-colors">
-                  <Trophy className="w-8 h-8 md:w-10 md:h-10 text-[#E72B36]" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#E72B36]/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#E72B36]/30 transition-colors">
+                  <Trophy className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#E72B36]" />
                 </div>
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-[-0.01em]">
+                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-[-0.01em]">
                   {features[0].title}
                 </h3>
                 <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-md">
@@ -102,10 +102,10 @@ export function FeaturesEditorial() {
             href={features[1].href}
             className="group"
           >
-            <div className="h-full bg-white border border-gray-200 rounded-2xl p-8 md:p-10 transition-all duration-300 hover:border-[#E72B36]/30 hover:shadow-lg hover:scale-[1.02] flex flex-col justify-between min-h-[320px]">
+            <div className="h-full bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 hover:border-[#E72B36]/30 hover:shadow-lg hover:scale-[1.02] flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
               <div>
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-[#E72B36]/10 flex items-center justify-center mb-6 group-hover:bg-[#E72B36]/20 transition-colors">
-                  <Video className="w-7 h-7 md:w-8 md:h-8 text-[#E72B36]" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-[#E72B36]/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#E72B36]/20 transition-colors">
+                  <Video className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#E72B36]" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 tracking-[-0.01em] group-hover:text-[#E72B36] transition-colors">
                   {features[1].title}
@@ -130,10 +130,10 @@ export function FeaturesEditorial() {
             href={features[2].href}
             className="group"
           >
-            <div className="h-full bg-white border border-gray-200 rounded-2xl p-8 md:p-10 transition-all duration-300 hover:border-[#E72B36]/30 hover:shadow-lg hover:scale-[1.02] flex flex-col justify-between min-h-[320px]">
+            <div className="h-full bg-white border border-gray-200 rounded-2xl p-6 sm:p-8 md:p-10 transition-all duration-300 hover:border-[#E72B36]/30 hover:shadow-lg hover:scale-[1.02] flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
               <div>
-                <div className="w-14 h-14 md:w-16 md:h-16 rounded-xl bg-[#E72B36]/10 flex items-center justify-center mb-6 group-hover:bg-[#E72B36]/20 transition-colors">
-                  <GraduationCap className="w-7 h-7 md:w-8 md:h-8 text-[#E72B36]" />
+                <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl bg-[#E72B36]/10 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#E72B36]/20 transition-colors">
+                  <GraduationCap className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-[#E72B36]" />
                 </div>
                 <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 tracking-[-0.01em] group-hover:text-[#E72B36] transition-colors">
                   {features[2].title}
@@ -158,12 +158,12 @@ export function FeaturesEditorial() {
             href={features[3].href}
             className="group md:col-span-2 lg:col-span-2"
           >
-            <div className="h-full bg-gray-900 rounded-2xl p-8 md:p-10 lg:p-12 transition-all duration-300 hover:bg-gray-800 hover:scale-[1.02] flex flex-col justify-between min-h-[320px]">
+            <div className="h-full bg-gray-900 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 transition-all duration-300 hover:bg-gray-800 hover:scale-[1.02] flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
               <div>
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[#E72B36]/20 flex items-center justify-center mb-6 group-hover:bg-[#E72B36]/30 transition-colors">
-                  <Mic className="w-8 h-8 md:w-10 md:h-10 text-[#E72B36]" />
+                <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#E72B36]/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#E72B36]/30 transition-colors">
+                  <Mic className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#E72B36]" />
                 </div>
-                <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-[-0.01em]">
+                <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-[-0.01em]">
                   {features[3].title}
                 </h3>
                 <p className="text-base md:text-lg text-gray-400 leading-relaxed max-w-lg">

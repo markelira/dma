@@ -525,3 +525,91 @@ section[class*="framer-"][class*="framer-"] {
 .framer-full-width [class*="framer-"] a[class*="button"]:hover {
     background-color: var(--brand-primary-hover) !important;
 }
+
+/* ===== MOBILE-FIRST RESPONSIVE OVERRIDES ===== */
+/* Phase 1: Foundation CSS for mobile responsiveness */
+
+/* Mobile Typography Scaling for Framer Components */
+@media (max-width: 639px) {
+    /* Scale down large Framer headings on mobile */
+    [data-framer-component-type="RichText"] h1 {
+        font-size: clamp(1.5rem, 6vw, 2.5rem) !important;
+        line-height: 1.2 !important;
+    }
+
+    [data-framer-component-type="RichText"] h2 {
+        font-size: clamp(1.25rem, 5vw, 2rem) !important;
+        line-height: 1.25 !important;
+    }
+
+    [data-framer-component-type="RichText"] p {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Hide decorative floating elements on mobile to prevent overflow */
+    [data-framer-name*="floating"],
+    [data-framer-name*="Floating"],
+    [data-framer-name*="badge"],
+    [data-framer-name*="Badge"] {
+        display: none !important;
+    }
+
+    /* Reduce Framer section padding on mobile */
+    .framer-full-width > div {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+}
+
+/* Tablet Typography Adjustments */
+@media (min-width: 640px) and (max-width: 1023px) {
+    [data-framer-component-type="RichText"] h1 {
+        font-size: 2rem !important;
+        line-height: 1.2 !important;
+    }
+
+    [data-framer-component-type="RichText"] h2 {
+        font-size: 1.75rem !important;
+        line-height: 1.25 !important;
+    }
+}
+
+/* Touch Target Minimum Size (WCAG 2.1 AA: 44x44px) */
+.touch-target-min {
+    min-height: 44px !important;
+    min-width: 44px !important;
+}
+
+/* Prevent Horizontal Overflow Globally */
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+}
+
+/* Mobile-First Container Padding Scale */
+.mobile-container {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+@media (min-width: 640px) {
+    .mobile-container {
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+}
+
+@media (min-width: 768px) {
+    .mobile-container {
+        padding-left: 26px;
+        padding-right: 26px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mobile-container {
+        padding-left: 80px;
+        padding-right: 80px;
+    }
+}

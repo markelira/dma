@@ -10,14 +10,14 @@ export function WhyDMASection() {
         {/* Header - Asymmetric with pull quote */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 md:mb-32">
           <div className="lg:col-span-7">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
               Még több ok, hogy miért
               <br />
               <span className="text-gray-400">ez lesz életed utazása</span>
             </h2>
           </div>
           <div className="lg:col-span-5 flex items-end">
-            <p className="text-xl md:text-2xl text-gray-500 italic border-l-2 border-gray-300 pl-6">
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-500 italic border-l-2 border-gray-300 pl-4 sm:pl-6">
               "Nem tanfolyamokat adunk, hanem működő rendszereket."
             </p>
           </div>
@@ -26,7 +26,7 @@ export function WhyDMASection() {
         {/* Feature 1 - Left aligned with large number */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20 md:mb-28">
           <div className="lg:col-span-2 flex items-start">
-            <span className="text-8xl md:text-9xl font-bold text-[#E72B36] leading-none select-none tracking-tight">
+            <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#E72B36] leading-none select-none tracking-tight">
               01
             </span>
           </div>
@@ -56,7 +56,7 @@ export function WhyDMASection() {
           </div>
           <div className="lg:col-span-4 lg:col-start-8 flex items-center justify-center lg:justify-end order-1 lg:order-2">
             <div className="relative">
-              <span className="text-7xl md:text-8xl lg:text-9xl font-black text-[#E53935] leading-none">
+              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black text-[#E53935] leading-none">
                 150+
               </span>
               <span className="absolute -bottom-2 right-0 text-sm md:text-base text-gray-500 font-medium">
@@ -68,12 +68,12 @@ export function WhyDMASection() {
 
         {/* Feature 3 - Full width dark accent block */}
         <div className="relative mb-20 md:mb-28">
-          <div className="bg-gray-900 rounded-2xl p-10 md:p-16 lg:p-20">
+          <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 md:p-16 lg:p-20">
             <div className="max-w-3xl">
-              <span className="text-7xl md:text-8xl font-bold text-[#E72B36] leading-none select-none mb-6 block tracking-tight">
+              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#E72B36] leading-none select-none mb-6 block tracking-tight">
                 03
               </span>
-              <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight tracking-[-0.01em]">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight tracking-[-0.01em]">
                 Nincs bullshit.
               </h3>
               <p className="text-lg md:text-xl text-gray-400 leading-relaxed max-w-xl">
