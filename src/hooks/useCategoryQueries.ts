@@ -10,6 +10,9 @@ interface GetCategoriesResponse {
   error?: string
 }
 
+// Fix sorrend a kategóriákhoz
+const CATEGORY_ORDER = ['Ügyvezetés', 'HR', 'Marketing', 'Értékesítés', 'Működés'];
+
 export const useCategories = () => {
   const { authReady } = useAuthStore()
 
@@ -27,7 +30,18 @@ export const useCategories = () => {
           throw new Error(result.data.error || 'Kategóriák betöltése sikertelen')
         }
 
-        return result.data.categories
+        // Sorrendezés a fix sorrend szerint
+        const sorted = [...result.data.categories].sort((a, b) => {
+          const indexA = CATEGORY_ORDER.indexOf(a.name);
+          const indexB = CATEGORY_ORDER.indexOf(b.name);
+          // Ha nincs a listában, a végére kerül
+          if (indexA === -1 && indexB === -1) return 0;
+          if (indexA === -1) return 1;
+          if (indexB === -1) return -1;
+          return indexA - indexB;
+        });
+
+        return sorted
       } catch (error) {
         console.error('[useCategories] Error fetching categories:', error)
         throw error

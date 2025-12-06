@@ -23,11 +23,10 @@ export function CategoryDropdown({ isOpen }: CategoryDropdownProps) {
     ).length;
   };
 
-  // Filter categories that have at least one course and sort by course count
+  // Filter categories that have at least one course (order comes from hook)
   const categoriesWithCourses = categories
     ?.map(cat => ({ ...cat, count: getCourseCount(cat.id) }))
     .filter(cat => cat.count > 0)
-    .sort((a, b) => b.count - a.count)
     .slice(0, 8); // Show top 8 categories
 
   return (

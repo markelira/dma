@@ -6,32 +6,32 @@ import { Users, UserPlus, Megaphone, TrendingUp, Settings } from 'lucide-react'
 const categories = [
   {
     id: 'leadership',
-    title: 'Vezetés és menedzsment',
-    href: '/courses?category=vezetes-es-menedzsment',
+    title: 'Ügyvezetés',
+    href: '/courses?category=SL5khk6HvuvdO9XKUcSH',
     Icon: Users,
   },
   {
     id: 'hr',
-    title: 'HR és csapatépítés',
-    href: '/courses?category=hr-es-csapatepites',
+    title: 'HR',
+    href: '/courses?category=DXd8TxN4QkNxJqe5lqBd',
     Icon: UserPlus,
   },
   {
     id: 'marketing',
-    title: 'Marketing és brandépítés',
-    href: '/courses?category=marketing-es-pr',
+    title: 'Marketing',
+    href: '/courses?category=AMXwQeLARurgpqAAlacV',
     Icon: Megaphone,
   },
   {
     id: 'sales',
-    title: 'Értékesítés és bevételnövelés',
-    href: '/courses?category=ertekesites-es-bevetelnoveles',
+    title: 'Értékesítés',
+    href: '/courses?category=w8GMH52BWDJR1113F0V2',
     Icon: TrendingUp,
   },
   {
     id: 'operations',
-    title: 'Működés és rendszerek',
-    href: '/courses?category=mukodes-es-rendszerek',
+    title: 'Működés',
+    href: '/courses?category=8ODCVj8uNSj01DB5KUIG',
     Icon: Settings,
   },
 ]

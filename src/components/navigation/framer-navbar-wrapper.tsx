@@ -36,91 +36,88 @@ export function FramerNavbarWrapper() {
   return (
     <>
       {/* Unified morphing navbar */}
-      <FramerNavbarUnified onMobileMenuToggle={toggleMobileMenu} />
+      <FramerNavbarUnified onMobileMenuToggle={toggleMobileMenu} isMobileMenuOpen={isMobileMenuOpen} />
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Menu Dropdown - Compact panel below navbar */}
       {isMobileMenuOpen && (
         <>
-          {/* Close button */}
-          <button
-            onClick={closeMobileMenu}
-            className="fixed top-6 right-6 z-[1002] w-10 h-10 flex flex-col items-center justify-center gap-1.5 transition-all duration-300 md:hidden"
-            aria-label="Close menu"
-          >
-            <span className="block w-6 h-0.5 bg-white rounded rotate-45 translate-y-2" />
-            <span className="block w-6 h-0.5 bg-white rounded opacity-0" />
-            <span className="block w-6 h-0.5 bg-white rounded -rotate-45 -translate-y-2" />
-          </button>
-
-          {/* Overlay */}
+          {/* Backdrop to close menu */}
           <div
-            className="fixed inset-0 z-[1001] md:hidden transition-all duration-300"
-            style={{
-              background: 'linear-gradient(to bottom, #16222F 0%, #466C95 100%)',
-            }}
-          >
-            <div className="flex flex-col items-center justify-center h-full px-6 py-20">
-              {/* Logo */}
-              <div className="mb-12">
-                <Link href="/" onClick={closeMobileMenu} className="flex items-center space-x-3">
-                  <img
-                    src="/navbar-icon.png"
-                    alt="DMA Logo"
-                    className="w-10 h-10 object-contain"
-                  />
-                  <span className="text-3xl font-bold text-white">
-                    DMA
-                  </span>
-                </Link>
-              </div>
+            className="fixed inset-0 z-[9998] lg:hidden bg-black/20"
+            onClick={closeMobileMenu}
+          />
 
+          {/* Dropdown Panel - positioned below navbar */}
+          <div className="fixed top-20 left-4 right-4 z-[9999] lg:hidden mt-2">
+            <div
+              className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden max-h-[calc(100vh-120px)] overflow-y-auto"
+            >
               {/* Navigation Links */}
-              <nav className="flex flex-col items-center space-y-6 mb-12">
-                {/* Tartalmak Links */}
-                <div className="text-center space-y-3">
-                  <p className="text-white/60 text-sm uppercase tracking-wider mb-2">Tartalmak</p>
-                  <Link
-                    href="/webinar"
-                    onClick={closeMobileMenu}
-                    className="block text-white text-lg font-medium hover:text-white/80 transition-colors duration-200 py-2 px-6 min-h-[44px]"
-                  >
-                    🎥 Webinárok
-                  </Link>
-                  <Link
-                    href="/akadémia"
-                    onClick={closeMobileMenu}
-                    className="block text-white text-lg font-medium hover:text-white/80 transition-colors duration-200 py-2 px-6 min-h-[44px]"
-                  >
-                    📚 Akadémia
-                  </Link>
-                  <Link
-                    href="/masterclass"
-                    onClick={closeMobileMenu}
-                    className="block text-white text-lg font-medium hover:text-white/80 transition-colors duration-200 py-2 px-6 min-h-[44px]"
-                  >
-                    🎓 Masterclass
-                  </Link>
-                </div>
+              <nav className="p-2">
+                {/* Course Type Links */}
+                <Link
+                  href="/webinar"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
+                >
+                  Webinárok
+                </Link>
+                <Link
+                  href="/akademia"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                >
+                  Akadémia
+                </Link>
+                <Link
+                  href="/masterclass"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-colors min-h-[48px]"
+                >
+                  Masterclass
+                </Link>
+                <Link
+                  href="/podcast"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors min-h-[48px]"
+                >
+                  Podcast
+                </Link>
+
+                {/* Divider */}
+                <div className="h-px bg-gray-100 my-2 mx-4" />
+
+                {/* Secondary Links */}
+                <Link
+                  href="/courses"
+                  onClick={closeMobileMenu}
+                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
+                >
+                  Kategóriák
+                </Link>
                 <Link
                   href="/pricing"
                   onClick={closeMobileMenu}
-                  className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
+                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                 >
                   Árazás
                 </Link>
                 <Link
                   href="/blog"
                   onClick={closeMobileMenu}
-                  className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
+                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                 >
                   Blog
                 </Link>
+
+                {/* User Links (if authenticated) */}
                 {isAuthenticated && user && (
                   <>
+                    <div className="h-px bg-gray-100 my-2 mx-4" />
                     <Link
                       href={user.role === 'INSTRUCTOR' ? '/instructor/dashboard' : user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}
                       onClick={closeMobileMenu}
-                      className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
+                      className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                     >
                       Irányítópult
                     </Link>
@@ -128,7 +125,7 @@ export function FramerNavbarWrapper() {
                       <Link
                         href="/admin"
                         onClick={closeMobileMenu}
-                        className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
+                        className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                       >
                         Admin Felület
                       </Link>
@@ -136,7 +133,7 @@ export function FramerNavbarWrapper() {
                     <Link
                       href="/account"
                       onClick={closeMobileMenu}
-                      className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
+                      className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                     >
                       Fiókom
                     </Link>
@@ -145,23 +142,21 @@ export function FramerNavbarWrapper() {
               </nav>
 
               {/* Auth Button */}
-              <div className="w-full max-w-xs">
+              <div className="p-3 pt-0">
                 {isAuthenticated && user ? (
                   <Button
                     onClick={() => {
                       logout()
                       closeMobileMenu()
                     }}
-                    size="lg"
-                    className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-sm font-medium transition-all duration-200 min-h-[44px]"
+                    className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-medium min-h-[48px]"
                   >
                     Kijelentkezés
                   </Button>
                 ) : (
-                  <Link href="/login" onClick={closeMobileMenu}>
+                  <Link href="/login" onClick={closeMobileMenu} className="block">
                     <Button
-                      size="lg"
-                      className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-sm font-medium transition-all duration-200 min-h-[44px]"
+                      className="w-full bg-[#E72B36] hover:bg-[#d42530] text-white py-3 rounded-xl font-medium min-h-[48px]"
                     >
                       Bejelentkezés
                     </Button>

@@ -1,4 +1,4 @@
-# Framer to Next.js Integration Guide
+ű# Framer to Next.js Integration Guide
 
 A comprehensive step-by-step guide on how to import and integrate Framer website components into a Next.js 15 application.
 

@@ -1,10 +1,13 @@
 'use client';
 
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Play, Calendar } from "lucide-react";
+import { BookOpen, Clock, Star, Play, Bookmark } from "lucide-react";
+// Calendar icon removed - date no longer shown
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
+import { useWishlistStatus, useToggleWishlist } from "@/hooks/useWishlist";
+import { useAuthStore } from "@/stores/authStore";
 
 // Helper function to format date in Hungarian locale
 const formatHungarianDate = (dateString: string): string => {
@@ -59,6 +62,10 @@ interface PremiumCourseCardProps {
 
 export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
+  const { user } = useAuthStore();
+  const { data: wishlistStatus } = useWishlistStatus(course.id);
+  const { toggle: toggleWishlist, isLoading: isWishlistLoading } = useToggleWishlist();
+  const isInWishlist = wishlistStatus?.isInWishlist ?? false;
 
   // Get category display names (supports multiple categories)
   // Courses store categoryId/categoryIds in Firestore, so we need to map to category names
@@ -215,7 +222,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
         onClick={() => router.push(`/courses/${course.id}`)}
       >
         {/* Course Image */}
-        <div className="relative aspect-video bg-gray-100 overflow-hidden">
+        <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
           {course.thumbnailUrl ? (
             <Image
               src={course.thumbnailUrl}
@@ -231,17 +238,38 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
                 background: 'linear-gradient(135deg, rgba(70, 108, 149, 0.1) 0%, rgba(70, 108, 149, 0.05) 100%)'
               }}
             >
-              <BookOpen className="w-12 h-12 text-[#466C95]  opacity-40" />
+              <BookOpen className="w-12 h-12 text-[#466C95] opacity-40" />
             </div>
+          )}
+
+          {/* Wishlist Button */}
+          {user && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleWishlist(course.id, isInWishlist);
+              }}
+              disabled={isWishlistLoading}
+              className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200
+                ${isInWishlist
+                  ? 'bg-brand-secondary text-white shadow-lg'
+                  : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-brand-secondary shadow-md'
+                }
+                ${isWishlistLoading ? 'cursor-wait' : 'cursor-pointer'}
+              `}
+              title={isInWishlist ? 'Eltávolítás a listáról' : 'Hozzáadás a listához'}
+            >
+              <Bookmark className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+            </button>
           )}
         </div>
 
         {/* Content */}
         <div className="flex-1 flex flex-col p-5">
-          {/* Course Type, Category and Level Badges */}
+          {/* Course Type and Category Badges */}
           <div className="flex items-center justify-between gap-2 mb-3">
+            {/* Left: Course Type Badge */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* Course Type Badge */}
               {getCourseTypeLabel(course.courseType) && (
                 <div
                   className="px-2.5 py-1 rounded-md text-xs font-normal"
@@ -254,26 +282,15 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
                   {getCourseTypeLabel(course.courseType)}
                 </div>
               )}
-              {/* Category Badges - supports multiple */}
+            </div>
+            {/* Right: Category Badges */}
+            <div className="flex items-center gap-2 flex-wrap justify-end">
               {getCategoryNames().map((catName, idx) => (
-                <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/5/80 border border-brand-secondary/20/50 text-brand-secondary">
+                <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary">
                   {catName}
                 </div>
               ))}
             </div>
-            {/* Level Badge */}
-            {course.level && (
-              <div
-                className="px-2.5 py-1 rounded-md text-xs font-normal flex-shrink-0"
-                style={{
-                  background: levelColors.bg,
-                  border: `1px solid ${levelColors.border}`,
-                  color: levelColors.text
-                }}
-              >
-                {course.level}
-              </div>
-            )}
           </div>
 
           {/* Title */}
@@ -286,21 +303,15 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             {course.description}
           </p>
 
-          {/* Instructor(s) - supports multiple */}
+          {/* Mentor(s) - supports multiple */}
           {getInstructorNames().length > 0 && (
             <p className="text-xs font-normal text-gray-500 mb-3">
-              {getInstructorNames().length > 1 ? 'Oktatók' : 'Oktató'}: <span className="font-medium">{getInstructorNames().join(', ')}</span>
+              {getInstructorNames().length > 1 ? 'Mentorok' : 'Mentor'}: <span className="font-medium">{getInstructorNames().join(', ')}</span>
             </p>
           )}
 
           {/* Stats */}
           <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
-            {course.contentCreatedAt && (
-              <div className="flex items-center gap-1.5">
-                <Calendar className="w-3.5 h-3.5" />
-                <span>{formatHungarianDate(course.contentCreatedAt)}</span>
-              </div>
-            )}
             {course.duration && (
               <div className="flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5" />

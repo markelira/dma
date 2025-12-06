@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Users, Clock, CheckCircle2, Calendar } from 'lucide-react';
+import { BookOpen, Users, Clock, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 // Helper function to format date in Hungarian locale
@@ -71,7 +71,7 @@ export function CarouselCourseCard({
           </Badge>
         </div>
 
-        <div className="relative w-full aspect-video overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+        <div className="relative w-full aspect-video overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200">
           {thumbnailUrl ? (
             <Image
               src={thumbnailUrl}
@@ -105,12 +105,6 @@ export function CarouselCourseCard({
           </p>
 
           <div className="mt-auto flex items-center flex-wrap gap-3 text-xs font-medium text-gray-500">
-            {contentCreatedAt && (
-              <div className="flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>{formatHungarianDate(contentCreatedAt)}</span>
-              </div>
-            )}
             {duration && (
               <div className="flex items-center gap-1.5">
                 <Clock className="h-3.5 w-3.5" />

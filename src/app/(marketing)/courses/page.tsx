@@ -213,7 +213,17 @@ export default function CoursesPage() {
         const getCategories = httpsCallable(fbFunctions, 'getCategories')
         const result: any = await getCategories()
         if (result.data?.success && result.data?.categories) {
-          setCategories(result.data.categories)
+          // Fix sorrend: Ügyvezetés, HR, Marketing, Értékesítés, Működés
+          const CATEGORY_ORDER = ['Ügyvezetés', 'HR', 'Marketing', 'Értékesítés', 'Működés'];
+          const sorted = [...result.data.categories].sort((a: any, b: any) => {
+            const indexA = CATEGORY_ORDER.indexOf(a.name);
+            const indexB = CATEGORY_ORDER.indexOf(b.name);
+            if (indexA === -1 && indexB === -1) return 0;
+            if (indexA === -1) return 1;
+            if (indexB === -1) return -1;
+            return indexA - indexB;
+          });
+          setCategories(sorted)
         }
       } catch (error) {
         console.error('Error fetching categories:', error)

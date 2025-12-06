@@ -4,12 +4,12 @@ import Link from 'next/link'
 import { Check } from 'lucide-react'
 
 const features = [
-  'Minden tartalom, minden formátum',
-  'Webinárok, akadémiák, mesterkurzusok, podcastok',
-  'Vállalati Térkép módszertan',
-  '20 év tanácsadói tapasztalat',
-  '15+ aktív szakértő',
-  '7 napos ingyenes próba',
+  'Teljes hozzáférés 150+ struktúraépítő tartalomhoz',
+  'Több mint 200 órányi azonnal alkalmazható, működő rendszer',
+  '5 munkatárs díjmentes hozzáadása',
+  'Hetente frissülő tartalmak',
+  'Bármikor lemondható',
+  '7 napos ingyenes kipróbálás',
 ]
 
 export function PricingEditorial() {
@@ -45,7 +45,7 @@ export function PricingEditorial() {
                 {/* Header */}
                 <div className="mb-4 sm:mb-6">
                   <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1">
-                    Teljes Hozzáférés
+                    Teljes hozzáférés
                   </h3>
                   <p className="text-gray-400">
                     Egyéni és céges előfizetés – 1 előfizetéssel 5 kollégát adhatsz hozzá a csapatodhoz, és mindenki hozzáfér az összes tartalomhoz.

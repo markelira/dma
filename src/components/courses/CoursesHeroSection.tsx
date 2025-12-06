@@ -183,7 +183,7 @@ export function CoursesHeroSection({
               transition={{ duration: 0.5, delay: 0.1 }}
               className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-lg p-4 md:p-6"
             >
-              <div className="flex flex-col md:flex-row md:items-center gap-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-4">
                 {/* Filter Icon */}
                 <div className="flex items-center gap-2 text-gray-700">
                   <Filter className="w-5 h-5" />
@@ -191,9 +191,9 @@ export function CoursesHeroSection({
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                <div className="flex flex-col sm:flex-row gap-3">
                   {/* Category Filter */}
-                  <div className="flex-1 max-w-xs">
+                  <div className="min-w-[200px]">
                     <div className="relative">
                       <select
                         value={selectedCategory}

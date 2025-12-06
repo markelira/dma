@@ -36,7 +36,7 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
     >
       <div className="relative rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300">
         {/* Thumbnail */}
-        <div className="relative aspect-video bg-gray-100">
+        <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
           {enrollment.thumbnailUrl ? (
             <img
               src={enrollment.thumbnailUrl}

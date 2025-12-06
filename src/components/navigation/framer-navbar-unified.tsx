@@ -10,6 +10,7 @@ import { CourseType } from '@/types'
 
 interface FramerNavbarUnifiedProps {
   onMobileMenuToggle: () => void
+  isMobileMenuOpen?: boolean
 }
 
 const SCROLL_THRESHOLD = 100
@@ -22,7 +23,7 @@ const COURSE_TYPE_NAV_ITEMS: { type: CourseType; label: string; color: string; u
   { type: 'PODCAST', label: 'Podcast', color: 'hover:text-green-600', url: '/podcast' },
 ]
 
-export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedProps) {
+export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = false }: FramerNavbarUnifiedProps) {
   const [scrolled, setScrolled] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const { isAuthenticated, user, isLoading } = useAuthStore()
@@ -178,16 +179,28 @@ export function FramerNavbarUnified({ onMobileMenuToggle }: FramerNavbarUnifiedP
               )}
             </div>
 
-            {/* Mobile Hamburger Button */}
+            {/* Mobile Hamburger Button - Animates to X */}
             <button
               onClick={onMobileMenuToggle}
-              className="lg:hidden w-10 h-10 flex items-center justify-center"
-              aria-label="Open menu"
+              className="lg:hidden w-11 h-11 flex items-center justify-center"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
-              <div className="w-6 flex flex-col gap-1.5">
-                <span className="block w-full h-0.5 bg-gray-900 rounded transition-all duration-300" />
-                <span className="block w-full h-0.5 bg-gray-900 rounded transition-all duration-300" />
-                <span className="block w-full h-0.5 bg-gray-900 rounded transition-all duration-300" />
+              <div className="w-6 h-5 flex flex-col justify-between relative">
+                <span
+                  className={`block w-full h-0.5 bg-gray-900 rounded transition-all duration-300 origin-center ${
+                    isMobileMenuOpen ? 'rotate-45 translate-y-[9px]' : ''
+                  }`}
+                />
+                <span
+                  className={`block w-full h-0.5 bg-gray-900 rounded transition-all duration-300 ${
+                    isMobileMenuOpen ? 'opacity-0 scale-0' : ''
+                  }`}
+                />
+                <span
+                  className={`block w-full h-0.5 bg-gray-900 rounded transition-all duration-300 origin-center ${
+                    isMobileMenuOpen ? '-rotate-45 -translate-y-[9px]' : ''
+                  }`}
+                />
               </div>
             </button>
           </div>

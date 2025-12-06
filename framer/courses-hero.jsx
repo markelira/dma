@@ -1059,7 +1059,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												}}
 											>
 												{
-													"Akadémiák, webinárok, mestertartalmak és podcastok szakértő mentoroktól. Válaszd ki a számodra legmegfelelőbb tanulási formát."
+													"Webinár, Akadémia, Podcast és Masterclass tartalmak szakértő Mentoroktól - válogass az azonnal alkalmazható és működő rendszereink közül"
 												}
 											</motion.p>
 										</React.Fragment>
