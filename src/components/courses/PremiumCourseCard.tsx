@@ -1,13 +1,15 @@
 'use client';
 
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Play, Bookmark } from "lucide-react";
+import { BookOpen, Clock, Star, Play } from "lucide-react";
 // Calendar icon removed - date no longer shown
+// Bookmark icon removed - wishlist feature disabled (Cloud Functions not deployed)
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
-import { useWishlistStatus, useToggleWishlist } from "@/hooks/useWishlist";
-import { useAuthStore } from "@/stores/authStore";
+// Wishlist hooks disabled - Cloud Functions for wishlist not deployed yet
+// import { useWishlistStatus, useToggleWishlist } from "@/hooks/useWishlist";
+// import { useAuthStore } from "@/stores/authStore";
 
 // Helper function to format date in Hungarian locale
 const formatHungarianDate = (dateString: string): string => {
@@ -62,10 +64,11 @@ interface PremiumCourseCardProps {
 
 export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
-  const { user } = useAuthStore();
-  const { data: wishlistStatus } = useWishlistStatus(course.id);
-  const { toggle: toggleWishlist, isLoading: isWishlistLoading } = useToggleWishlist();
-  const isInWishlist = wishlistStatus?.isInWishlist ?? false;
+  // Wishlist feature disabled - Cloud Functions not deployed yet
+  // const { user } = useAuthStore();
+  // const { data: wishlistStatus } = useWishlistStatus(course.id);
+  // const { toggle: toggleWishlist, isLoading: isWishlistLoading } = useToggleWishlist();
+  // const isInWishlist = wishlistStatus?.isInWishlist ?? false;
 
   // Get category display names (supports multiple categories)
   // Courses store categoryId/categoryIds in Firestore, so we need to map to category names
@@ -203,7 +206,8 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
     }
   };
 
-  const levelColors = getLevelColor(course.level);
+  // Level badge removed - levelColors no longer needed
+  // const levelColors = getLevelColor(course.level);
   const courseTypeColors = getCourseTypeColor(course.courseType);
 
   return (
@@ -242,7 +246,8 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
-          {/* Wishlist Button */}
+          {/* Wishlist Button - Disabled until Cloud Functions are deployed */}
+          {/* TODO: Re-enable when wishlist functions are deployed
           {user && (
             <button
               onClick={(e) => {
@@ -262,6 +267,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
               <Bookmark className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
             </button>
           )}
+          */}
         </div>
 
         {/* Content */}
