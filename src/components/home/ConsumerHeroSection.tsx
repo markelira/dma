@@ -145,7 +145,7 @@ export function ConsumerHeroSection() {
                 className="group bg-primary hover:bg-primary-hover text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
                 onClick={() => router.push('/register')}
               >
-                <span>Próbáld ki ingyen 7 napig</span>
+                <span>Fedezd fel 7 napig ingyen</span>
                 <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">→</span>
               </Button>
               <Button

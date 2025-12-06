@@ -209,7 +209,7 @@ export function Hero2ImmersiveStorytelling({
               >
                 Kezdd el most
               </Button>
-              <p className="text-sm text-white/70">7 napos ingyenes próba</p>
+              <p className="text-sm text-white/70">7 napig teljesen ingyen</p>
             </div>
           </div>
         </motion.div>

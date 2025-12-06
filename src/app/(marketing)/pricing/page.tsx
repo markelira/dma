@@ -68,7 +68,7 @@ export default function PricingPage() {
             <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm text-gray-700">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-teal-600" />
-                <span>7 napos ingyenes próba</span>
+                <span>7 napig teljesen ingyen</span>
               </div>
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-teal-600" />

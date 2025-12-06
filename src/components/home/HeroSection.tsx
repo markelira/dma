@@ -66,7 +66,7 @@ export function HeroSection() {
                 href="/register"
                 className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-bold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300 text-lg"
               >
-                Próbáld ki ingyen 7 napig
+                Fedezd fel 7 napig ingyen
               </Link>
               <Link
                 href="/pricing"

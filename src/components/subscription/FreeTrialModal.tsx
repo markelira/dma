@@ -123,7 +123,7 @@ export function FreeTrialModal({
                     transition={{ delay: 0.2 }}
                     className="text-2xl font-bold text-white tracking-tight mb-2"
                   >
-                    PRÓBÁLD KI INGYEN 7 NAPIG
+                    FEDEZD FEL 7 NAPIG INGYEN
                   </motion.h2>
 
                   {/* Subheadline */}
@@ -166,7 +166,7 @@ export function FreeTrialModal({
                       onClick={handleStartTrial}
                       className="w-full h-14 text-lg font-bold bg-brand-secondary hover:bg-brand-secondary-hover shadow-lg shadow-brand-secondary/30 hover:shadow-brand-secondary/40 transition-all tracking-tight"
                     >
-                      KEZDD EL INGYEN
+                      FEDEZD FEL INGYEN
                     </Button>
                   </motion.div>
 

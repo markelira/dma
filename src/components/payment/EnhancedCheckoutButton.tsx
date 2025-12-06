@@ -278,7 +278,7 @@ export function EnhancedCheckoutButton({
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              {mode === 'subscription' ? 'Előfizetés indítása' : 'Vásárlás most'}
+              {mode === 'subscription' ? 'Fedezd fel 7 napig ingyen' : 'Vásárlás most'}
             </>
           )}
         </Button>
