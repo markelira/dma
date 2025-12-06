@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -42,6 +42,10 @@ export default function CoursePlayerPage() {
   // State
   const [currentLessonId, setCurrentLessonId] = useState(lessonId);
   const [mobileTab, setMobileTab] = useState<MobileTab>('video');
+
+  // Refs for beforeunload progress saving
+  const currentTimeRef = useRef(0);
+  const durationRef = useRef(0);
 
   // Fetch data
   const { data: playerData, isLoading: isLoadingPlayer, error: playerError } = usePlayerData(courseId, currentLessonId);
@@ -180,11 +184,16 @@ export default function CoursePlayerPage() {
   }, [nextLesson, handleLessonClick]);
 
   const handleProgress = useCallback((currentTime: number, duration: number, percentage: number) => {
+    // Update refs for beforeunload handler
+    currentTimeRef.current = currentTime;
+    durationRef.current = duration;
+
     if (percentage < 5) return;
     progressMutation.mutate({
       lessonId: currentLessonId,
       watchPercentage: percentage,
       timeSpent: currentTime,
+      resumePosition: currentTime, // ✅ Save resume position!
       courseId,
     });
   }, [currentLessonId, courseId, progressMutation]);
@@ -243,6 +252,50 @@ export default function CoursePlayerPage() {
       setCurrentLessonId(lessonId);
     }
   }, [lessonId, currentLessonId]);
+
+  // Save progress on page visibility change (user switching tabs, closing page)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden' && currentTimeRef.current > 0 && durationRef.current > 0) {
+        const percentage = (currentTimeRef.current / durationRef.current) * 100;
+        if (percentage >= 5) {
+          progressMutation.mutate({
+            lessonId: currentLessonId,
+            watchPercentage: percentage,
+            timeSpent: currentTimeRef.current,
+            resumePosition: currentTimeRef.current,
+            courseId,
+          });
+        }
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      if (currentTimeRef.current > 0 && durationRef.current > 0) {
+        const percentage = (currentTimeRef.current / durationRef.current) * 100;
+        if (percentage >= 5) {
+          // Use synchronous XHR for beforeunload (sendBeacon alternative)
+          progressMutation.mutate({
+            lessonId: currentLessonId,
+            watchPercentage: percentage,
+            timeSpent: currentTimeRef.current,
+            resumePosition: currentTimeRef.current,
+            courseId,
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+    };
+  }, [currentLessonId, courseId, progressMutation]);
 
   // Check auth status first
   if (!authReady) {

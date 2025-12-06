@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Play, RotateCcw } from 'lucide-react';
 
 // Dynamically import MuxPlayer to avoid SSR issues
 const MuxPlayer = dynamic(
@@ -43,6 +43,13 @@ const extractMuxPlaybackId = (url: string): string | null => {
  * Uses MuxPlayer for HLS streaming support across all browsers
  * Features: HLS playback, progress tracking, resume position
  */
+// Format seconds to MM:SS
+const formatTime = (seconds: number): string => {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 export function NewVideoPlayer({
   src,
   poster,
@@ -54,6 +61,10 @@ export function NewVideoPlayer({
 }: NewVideoPlayerProps) {
   const playerRef = useRef<any>(null);
   const lastReportedTimeRef = useRef(0);
+
+  // Resume overlay state - show if user has significant progress (> 10 seconds)
+  const [showResumeOverlay, setShowResumeOverlay] = useState(initialTime > 10);
+  const [startFromBeginning, setStartFromBeginning] = useState(false);
 
   // Extract Mux playback ID from URL if it's a Mux stream
   const playbackId = extractMuxPlaybackId(src);
@@ -70,8 +81,8 @@ export function NewVideoPlayer({
     const currentTime = video.currentTime;
     const duration = video.duration;
 
-    // Report progress every 10 seconds
-    if (currentTime - lastReportedTimeRef.current >= 10) {
+    // Report progress every 5 seconds
+    if (currentTime - lastReportedTimeRef.current >= 5) {
       const percentage = (currentTime / duration) * 100;
       onProgress?.(currentTime, duration, Math.min(100, percentage));
       lastReportedTimeRef.current = currentTime;
@@ -110,18 +121,40 @@ export function NewVideoPlayer({
     );
   }
 
+  // Calculate effective start time
+  const effectiveStartTime = startFromBeginning ? 0 : initialTime;
+
+  // Handler for resume choice
+  const handleResume = () => {
+    setShowResumeOverlay(false);
+    // Player will use initialTime
+  };
+
+  const handleStartOver = () => {
+    setStartFromBeginning(true);
+    setShowResumeOverlay(false);
+    // Reset player to beginning
+    if (playerRef.current) {
+      try {
+        playerRef.current.currentTime = 0;
+      } catch (e) {
+        console.warn('[NewVideoPlayer] Failed to reset time:', e);
+      }
+    }
+  };
+
   return (
-    <div className="w-full rounded-lg overflow-hidden">
+    <div className="w-full rounded-lg overflow-hidden relative">
       <MuxPlayer
         ref={playerRef}
         playbackId={playbackId || undefined}
         src={useSrc || undefined}
         streamType="on-demand"
-        autoPlay={autoPlay}
+        autoPlay={autoPlay && !showResumeOverlay}
         poster={poster}
         onTimeUpdate={handleTimeUpdate}
         onEnded={onEnded}
-        startTime={initialTime}
+        startTime={effectiveStartTime}
         metadata={{
           video_title: 'Lecke videó',
         }}
@@ -138,6 +171,39 @@ export function NewVideoPlayer({
           '--media-control-hover-background': 'rgba(255,255,255,0.1)',
         } as React.CSSProperties}
       />
+
+      {/* Resume Overlay */}
+      {showResumeOverlay && (
+        <div className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
+          <div className="bg-white rounded-2xl p-8 text-center max-w-sm mx-4 shadow-2xl">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Play className="w-8 h-8 text-blue-600 ml-1" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Folytasd onnan, ahol abbahagytad
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Legutóbb itt tartottál: <span className="font-semibold text-gray-900">{formatTime(initialTime)}</span>
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={handleStartOver}
+                className="flex items-center gap-2 px-5 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+              >
+                <RotateCcw className="w-4 h-4" />
+                Elölről
+              </button>
+              <button
+                onClick={handleResume}
+                className="flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-lg"
+              >
+                <Play className="w-4 h-4" />
+                Folytatás
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
