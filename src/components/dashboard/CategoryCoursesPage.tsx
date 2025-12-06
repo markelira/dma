@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
 import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
-import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
+import { DashboardSearch, DashboardFilters } from '@/components/dashboard/DashboardSearch';
 import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
@@ -35,11 +35,57 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
   const { data: instructors, isLoading: instructorsLoading } = useInstructors();
   const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
 
-  // Filter courses by type
+  // Filter state
+  const [filters, setFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryId: null,
+    audienceId: null,
+    courseType: null,
+    instructorId: null,
+  });
+
+  // Filter courses by type and user filters
   const filteredCourses = useMemo(() => {
     if (!courses) return [];
-    return courses.filter(course => course.courseType === courseType);
-  }, [courses, courseType]);
+
+    let result = courses.filter(course => course.courseType === courseType);
+
+    // Apply search query
+    if (filters.query) {
+      const searchLower = filters.query.toLowerCase();
+      result = result.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply category filter
+    if (filters.categoryId) {
+      result = result.filter(course => {
+        if (course.categoryIds?.includes(filters.categoryId!)) return true;
+        if (course.category?.id === filters.categoryId) return true;
+        if ((course as any).categoryId === filters.categoryId) return true;
+        return false;
+      });
+    }
+
+    // Apply target audience filter
+    if (filters.audienceId) {
+      result = result.filter(course =>
+        course.targetAudienceIds?.includes(filters.audienceId!)
+      );
+    }
+
+    // Apply instructor filter
+    if (filters.instructorId) {
+      result = result.filter(course =>
+        (course as any).instructorId === filters.instructorId ||
+        (course as any).instructorIds?.includes(filters.instructorId)
+      );
+    }
+
+    return result;
+  }, [courses, courseType, filters]);
 
   // Build hero slides from filtered courses
   const heroSlides = useMemo(() => {
@@ -103,6 +149,15 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
 
   const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;
 
+  // Check if any filters are active
+  const hasActiveFilters = filters.query || filters.categoryId || filters.audienceId || filters.instructorId;
+
+  // Check if there are any courses of this type at all (before user filters)
+  const allCoursesOfType = useMemo(() => {
+    if (!courses) return [];
+    return courses.filter(course => course.courseType === courseType);
+  }, [courses, courseType]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
@@ -111,7 +166,8 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
     );
   }
 
-  if (filteredCourses.length === 0) {
+  // No courses of this type at all
+  if (allCoursesOfType.length === 0) {
     return (
       <div className="space-y-6">
         <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
@@ -129,7 +185,15 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       )}
 
       {/* Search Bar */}
-      <DashboardSearch className="my-2" />
+      <DashboardSearch className="my-2" onFilterChange={setFilters} />
+
+      {/* No results message when filters are active but no matches */}
+      {hasActiveFilters && filteredCourses.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+          <p className="text-gray-500 mb-2">Nincs találat a megadott szűrőkkel</p>
+          <p className="text-sm text-gray-400">Próbálj más szűrőket választani</p>
+        </div>
+      )}
 
       {/* Popular in this category */}
       {popularCourses.length > 0 && (
