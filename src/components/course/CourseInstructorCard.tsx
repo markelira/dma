@@ -30,8 +30,6 @@ export function CourseInstructorCard({
   title,
   bio,
   imageUrl,
-  stats,
-  expertise,
   roleLabel = 'Oktató',
   instructorRole,
   darkMode = false
@@ -49,9 +47,6 @@ export function CourseInstructorCard({
   const headingClass = darkMode ? 'text-white' : 'text-gray-900';
   const titleClass = darkMode ? 'text-gray-400' : 'text-gray-600';
   const bioClass = darkMode ? 'text-gray-300' : 'text-gray-700';
-  const tagClass = darkMode
-    ? 'bg-gray-800 text-gray-300'
-    : 'bg-gray-100 text-gray-700';
 
   return (
     <motion.section
@@ -87,20 +82,7 @@ export function CourseInstructorCard({
           <h3 className={`text-xl font-bold ${headingClass}`}>{name}</h3>
           {title && <p className={`${titleClass} mb-3`}>{title}</p>}
 
-          <p className={`${bioClass} mb-4`}>{bio}</p>
-
-          {expertise && expertise.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {expertise.map((skill, index) => (
-                <span
-                  key={index}
-                  className={`px-3 py-1 ${tagClass} rounded-full text-sm`}
-                >
-                  {skill}
-                </span>
-              ))}
-            </div>
-          )}
+          <p className={`${bioClass}`}>{bio}</p>
         </div>
       </div>
     </motion.section>

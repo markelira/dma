@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { Play, Info, Clock, BookOpen, Video, GraduationCap, Mic } from 'lucide-react';
+import { Play, Info, Clock, BookOpen, Video, GraduationCap, Mic, ChevronDown } from 'lucide-react';
 
 interface Instructor {
   id: string;
@@ -100,6 +100,7 @@ export function NetflixStyleHero({
 }: NetflixStyleHeroProps) {
   const config = getCourseTypeConfig(courseType);
   const Icon = config.icon;
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   // Calculate total duration and lesson count
   const stats = useMemo(() => {
@@ -176,14 +177,25 @@ export function NetflixStyleHero({
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight line-clamp-2">
               {title}
             </h1>
 
             {/* Description */}
-            <p className="text-gray-300 text-lg mb-6 line-clamp-3">
-              {description}
-            </p>
+            <div className="mb-6">
+              <p className={`text-gray-300 text-lg ${isDescriptionExpanded ? '' : 'line-clamp-3'}`}>
+                {description}
+              </p>
+              {description.length > 200 && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="flex items-center gap-1 text-sm text-gray-400 hover:text-white mt-2 transition-colors"
+                >
+                  {isDescriptionExpanded ? 'Kevesebb' : 'Több...'}
+                  <ChevronDown className={`w-4 h-4 transition-transform ${isDescriptionExpanded ? 'rotate-180' : ''}`} />
+                </button>
+              )}
+            </div>
 
             {/* Instructors */}
             {instructors.length > 0 && (
@@ -204,12 +216,12 @@ export function NetflixStyleHero({
                         {instructor.name.charAt(0)}
                       </div>
                     )}
-                    <div>
-                      <p className="text-white font-medium">{instructor.name}</p>
+                    <p className="text-white font-medium">
+                      {instructor.name}
                       {instructor.title && (
-                        <p className="text-gray-400 text-sm">{instructor.title}</p>
+                        <span className="text-gray-400 font-normal"> · {instructor.title}</span>
                       )}
-                    </div>
+                    </p>
                   </div>
                 ))}
               </div>

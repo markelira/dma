@@ -79,20 +79,17 @@ export function RelatedCoursesSection({
         </button>
       </div>
 
-      {/* Horizontal scrolling carousel */}
-      <div className="overflow-x-auto pb-4 -mx-2 px-2">
-        <div className="flex gap-6 min-w-min">
-          {courses.slice(0, 6).map((course, index) => (
-            <div key={course.id} className="flex-shrink-0 w-80">
-              <PremiumCourseCard
-                course={course}
-                index={index}
-                categories={categories}
-                instructors={instructors}
-              />
-            </div>
-          ))}
-        </div>
+      {/* Fixed grid - no carousel */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {courses.slice(0, 4).map((course, index) => (
+          <PremiumCourseCard
+            key={course.id}
+            course={course}
+            index={index}
+            categories={categories}
+            instructors={instructors}
+          />
+        ))}
       </div>
     </motion.section>
   );
