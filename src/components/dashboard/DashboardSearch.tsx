@@ -27,9 +27,10 @@ export interface DashboardFilters {
 interface DashboardSearchProps {
   className?: string;
   onFilterChange?: (filters: DashboardFilters) => void;
+  courseType?: 'MASTERCLASS' | 'WEBINAR' | 'ACADEMIA' | 'PODCAST';
 }
 
-export function DashboardSearch({ className, onFilterChange }: DashboardSearchProps) {
+export function DashboardSearch({ className, onFilterChange, courseType }: DashboardSearchProps) {
   const router = useRouter();
   const { data: courses } = useCourses();
   const { data: categories } = useCategories();
@@ -332,7 +333,7 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
             {/* Instructor Filter */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">
-                Oktató
+                {courseType === 'PODCAST' ? 'Szereplő' : 'Mentor'}
               </label>
               <div className="relative">
                 <select
@@ -340,7 +341,7 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
                   onChange={(e) => setSelectedInstructor(e.target.value || null)}
                   className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
                 >
-                  <option value="">Összes oktató</option>
+                  <option value="">{courseType === 'PODCAST' ? 'Összes szereplő' : 'Összes mentor'}</option>
                   {instructors?.map(instructor => (
                     <option key={instructor.id} value={instructor.id}>
                       {instructor.name}

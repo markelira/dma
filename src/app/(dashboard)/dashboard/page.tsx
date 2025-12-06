@@ -18,6 +18,7 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useGamificationData, useSaveUserPreferences } from '@/hooks/useGamification';
+import { useWatchlist } from '@/hooks/useWatchlist';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import type { UserPreferences, Course } from '@/types';
 
@@ -44,6 +45,9 @@ export default function DashboardPage() {
 
   const { preferences } = useGamificationData();
   const savePreferences = useSaveUserPreferences();
+
+  // Watchlist hook
+  const { watchlist, isLoading: watchlistLoading } = useWatchlist();
 
   // Trial popup state
   const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription } = useTrialPopup();
@@ -154,23 +158,9 @@ export default function DashboardPage() {
     // Trial modal will show via the useEffect above if conditions are met
   };
 
-  // Build hero slides
+  // Build hero slides - 5 random courses
   const heroSlides = useMemo(() => {
-    if (!courses) return [];
-
-    const slides: Array<{
-      id: string;
-      title: string;
-      description?: string;
-      thumbnailUrl?: string;
-      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
-      instructorName?: string;
-      duration?: string;
-      progress?: number;
-      isEnrolled?: boolean;
-      currentLessonId?: string;
-      firstLessonId?: string;
-    }> = [];
+    if (!courses || courses.length === 0) return [];
 
     // Helper to get first lesson ID from course (flat lessons array)
     const getFirstLessonId = (course: Course): string | undefined => {
@@ -191,111 +181,33 @@ export default function DashboardPage() {
       return instructor?.name;
     };
 
-    // 1. Latest opened course (first enrollment)
-    if (enrollments && enrollments.length > 0) {
-      const latestEnrollment = enrollments[0];
-      const enrolledCourse = courses.find(c => c.id === latestEnrollment.courseId);
-      if (enrolledCourse) {
-        slides.push({
-          id: enrolledCourse.id,
-          title: enrolledCourse.title,
-          description: enrolledCourse.description,
-          thumbnailUrl: enrolledCourse.thumbnailUrl,
-          courseType: enrolledCourse.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-          instructorName: getInstructorName(enrolledCourse),
-          duration: enrolledCourse.duration,
-          progress: latestEnrollment.progress,
-          isEnrolled: true,
-          currentLessonId: latestEnrollment.currentLessonId,
-          firstLessonId: latestEnrollment.firstLessonId || getFirstLessonId(enrolledCourse),
-        });
-      }
+    // Shuffle courses using Fisher-Yates algorithm (seeded with date for daily consistency)
+    const shuffled = [...courses];
+    const today = new Date().toDateString();
+    let seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      seed = (seed * 9301 + 49297) % 233280;
+      const j = Math.floor((seed / 233280) * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
-    // Sort courses by createdAt (newest first)
-    const sortedCourses = [...courses].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA;
+    // Take first 5 random courses
+    return shuffled.slice(0, 5).map(course => {
+      const enrollment = enrollments?.find(e => e.courseId === course.id);
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        thumbnailUrl: course.thumbnailUrl,
+        courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
+        instructorName: getInstructorName(course),
+        duration: course.duration,
+        progress: enrollment?.progress,
+        isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
+      };
     });
-
-    // 2. Latest MASTERCLASS
-    const latestMasterclass = sortedCourses.find(c => c.courseType === 'MASTERCLASS');
-    if (latestMasterclass && !slides.some(s => s.id === latestMasterclass.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestMasterclass.id);
-      slides.push({
-        id: latestMasterclass.id,
-        title: latestMasterclass.title,
-        description: latestMasterclass.description,
-        thumbnailUrl: latestMasterclass.thumbnailUrl,
-        courseType: 'MASTERCLASS',
-        instructorName: getInstructorName(latestMasterclass),
-        duration: latestMasterclass.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestMasterclass),
-      });
-    }
-
-    // 3. Latest WEBINAR
-    const latestWebinar = sortedCourses.find(c => c.courseType === 'WEBINAR');
-    if (latestWebinar && !slides.some(s => s.id === latestWebinar.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestWebinar.id);
-      slides.push({
-        id: latestWebinar.id,
-        title: latestWebinar.title,
-        description: latestWebinar.description,
-        thumbnailUrl: latestWebinar.thumbnailUrl,
-        courseType: 'WEBINAR',
-        instructorName: getInstructorName(latestWebinar),
-        duration: latestWebinar.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestWebinar),
-      });
-    }
-
-    // 4. Latest ACADEMIA
-    const latestAcademia = sortedCourses.find(c => c.courseType === 'ACADEMIA');
-    if (latestAcademia && !slides.some(s => s.id === latestAcademia.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestAcademia.id);
-      slides.push({
-        id: latestAcademia.id,
-        title: latestAcademia.title,
-        description: latestAcademia.description,
-        thumbnailUrl: latestAcademia.thumbnailUrl,
-        courseType: 'ACADEMIA',
-        instructorName: getInstructorName(latestAcademia),
-        duration: latestAcademia.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestAcademia),
-      });
-    }
-
-    // 5. Latest PODCAST
-    const latestPodcast = sortedCourses.find(c => c.courseType === 'PODCAST');
-    if (latestPodcast && !slides.some(s => s.id === latestPodcast.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestPodcast.id);
-      slides.push({
-        id: latestPodcast.id,
-        title: latestPodcast.title,
-        description: latestPodcast.description,
-        thumbnailUrl: latestPodcast.thumbnailUrl,
-        courseType: 'PODCAST',
-        instructorName: getInstructorName(latestPodcast),
-        duration: latestPodcast.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestPodcast),
-      });
-    }
-
-    return slides;
   }, [courses, enrollments, instructors]);
 
   // Build enrolled courses list (Saját listám)
@@ -440,6 +352,12 @@ export default function DashboardPage() {
     return results;
   }, [courses, hasActiveFilters, activeFilters]);
 
+  // Build watchlist courses
+  const watchlistCourses = useMemo(() => {
+    if (!watchlist || watchlist.length === 0 || !courses) return [];
+    return courses.filter(course => watchlist.includes(course.id));
+  }, [watchlist, courses]);
+
   // Handle filter change from search component
   const handleFilterChange = (filters: DashboardFilters) => {
     setActiveFilters(filters);
@@ -488,29 +406,6 @@ export default function DashboardPage() {
       )}
 
       <div className="space-y-8">
-        {/* Company Employee Banner */}
-        {isCompanyEmployee && companyInfo && (
-          <div className="rounded-xl bg-gradient-to-r from-brand-secondary/5 to-purple-50/80 border border-brand-secondary/20 p-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-secondary to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
-                <Building2 className="w-5 h-5 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900">
-                  Vállalati fiók
-                </p>
-                <p className="text-sm font-normal text-gray-600">
-                  A(z) <span className="font-medium text-brand-secondary">{companyInfo.name}</span> tagjaként hozzáférsz az összes tartalomhoz
-                </p>
-              </div>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-normal bg-brand-secondary/10 text-brand-secondary">
-                <Star className="w-3 h-3 mr-1" />
-                Prémium
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Hero Carousel */}
         {heroSlides.length > 0 && (
           <DashboardHeroCarousel slides={heroSlides} />
@@ -559,6 +454,17 @@ export default function DashboardPage() {
             enrollments={enrichedEnrollments}
             categories={categories || []}
             instructors={instructors || []}
+          />
+        )}
+
+        {/* Saját listám - Watchlist courses */}
+        {watchlistCourses.length > 0 && (
+          <CourseCarouselRow
+            title="Saját listám"
+            courses={watchlistCourses}
+            categories={categories || []}
+            instructors={instructors || []}
+            viewAllLink="/dashboard/my-list"
           />
         )}
 

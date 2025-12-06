@@ -185,7 +185,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       )}
 
       {/* Search Bar */}
-      <DashboardSearch className="my-2" onFilterChange={setFilters} />
+      <DashboardSearch className="my-2" onFilterChange={setFilters} courseType={courseType} />
 
       {/* No results message when filters are active but no matches */}
       {hasActiveFilters && filteredCourses.length === 0 && (

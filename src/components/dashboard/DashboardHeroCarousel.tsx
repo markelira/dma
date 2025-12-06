@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
@@ -77,7 +77,20 @@ const getCourseTypeConfig = (type?: string) => {
 
 export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const router = useRouter();
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-advance slides every 5 seconds
+  useEffect(() => {
+    if (!slides || slides.length <= 1 || isPaused) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [slides.length, isPaused]);
 
   if (!slides || slides.length === 0) {
     return null;
@@ -117,7 +130,12 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
   };
 
   return (
-    <div className="relative h-[50vh] min-h-[400px] max-h-[500px] rounded-2xl overflow-hidden">
+    <div
+      ref={containerRef}
+      className="relative h-[50vh] min-h-[400px] max-h-[500px] rounded-2xl overflow-hidden"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       {/* Background Image with Animation */}
       <AnimatePresence mode="wait">
         <motion.div

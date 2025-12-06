@@ -29,7 +29,8 @@ function RegisterPageContent() {
     firstName: '',
     lastName: '',
     email: '',
-    password: ''
+    password: '',
+    phone: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -182,6 +183,11 @@ function RegisterPageContent() {
       setLoading(false);
       return;
     }
+    if (!formData.phone.trim()) {
+      setError('A telefonszám megadása kötelező');
+      setLoading(false);
+      return;
+    }
 
     try {
       // Set verifying flag to prevent auto-redirect
@@ -189,7 +195,8 @@ function RegisterPageContent() {
 
       const userCredential = await registerUser(formData.email, formData.password, {
         firstName: formData.firstName,
-        lastName: formData.lastName
+        lastName: formData.lastName,
+        phone: formData.phone
       });
 
       console.log('[Register Page] Auth success');
@@ -491,6 +498,25 @@ function RegisterPageContent() {
                 A meghívóhoz tartozó email cím nem módosítható
               </p>
             )}
+          </div>
+          <div>
+            <label
+              className="mb-1 block text-sm font-medium text-gray-700"
+              htmlFor="phone"
+            >
+              Telefonszám
+            </label>
+            <input
+              id="phone"
+              name="phone"
+              className="form-input w-full py-2"
+              type="tel"
+              placeholder="+36 30 123 4567"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
           </div>
           <div>
             <label

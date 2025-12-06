@@ -1,13 +1,14 @@
 'use client';
 
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Play, UserPlus, CheckCircle2 } from "lucide-react";
+import { BookOpen, Clock, Star, Play, UserPlus, CheckCircle2, Bookmark, BookmarkCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
 import { useEnrollmentStatus } from "@/hooks/useEnrollmentStatus";
 import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
+import { useWatchlist } from "@/hooks/useWatchlist";
 import { toast } from "sonner";
 
 // Helper function to format date in Hungarian locale
@@ -66,9 +67,11 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const { user } = useAuthStore();
   const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
   const enrollMutation = useEnrollInCourse();
+  const { isInWatchlist, toggleWatchlist, isToggling } = useWatchlist();
 
   const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
   const isEnrolling = enrollMutation.isPending;
+  const inWatchlist = isInWatchlist(course.id);
 
   const handleEnroll = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
@@ -86,6 +89,17 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
     } catch (error) {
       toast.error('Hiba történt a beiratkozáskor');
     }
+  };
+
+  const handleToggleWatchlist = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click navigation
+
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    toggleWatchlist(course.id);
   };
 
   // Get category display names (supports multiple categories)
@@ -264,26 +278,49 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
-          {/* Enrollment Button */}
+          {/* Action Buttons */}
           {user && (
-            <button
-              onClick={handleEnroll}
-              disabled={isEnrolling || isEnrolled}
-              className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200
-                ${isEnrolled
-                  ? 'bg-green-500 text-white shadow-lg cursor-default'
-                  : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-brand-secondary hover:text-white shadow-md'
-                }
-                ${isEnrolling ? 'cursor-wait animate-pulse' : ''}
-              `}
-              title={isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
-            >
-              {isEnrolled ? (
-                <CheckCircle2 className="w-4 h-4" />
-              ) : (
-                <UserPlus className="w-4 h-4" />
-              )}
-            </button>
+            <div className="absolute top-3 right-3 flex gap-2">
+              {/* Watchlist Button */}
+              <button
+                onClick={handleToggleWatchlist}
+                disabled={isToggling}
+                className={`p-2 rounded-full transition-all duration-200
+                  ${inWatchlist
+                    ? 'bg-brand-secondary text-white shadow-lg'
+                    : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-brand-secondary hover:text-white shadow-md'
+                  }
+                  ${isToggling ? 'cursor-wait animate-pulse' : ''}
+                `}
+                title={inWatchlist ? 'Eltávolítás a listámból' : 'Hozzáadás a listámhoz'}
+              >
+                {inWatchlist ? (
+                  <BookmarkCheck className="w-4 h-4" />
+                ) : (
+                  <Bookmark className="w-4 h-4" />
+                )}
+              </button>
+
+              {/* Enrollment Button */}
+              <button
+                onClick={handleEnroll}
+                disabled={isEnrolling || isEnrolled}
+                className={`p-2 rounded-full transition-all duration-200
+                  ${isEnrolled
+                    ? 'bg-green-500 text-white shadow-lg cursor-default'
+                    : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-brand-secondary hover:text-white shadow-md'
+                  }
+                  ${isEnrolling ? 'cursor-wait animate-pulse' : ''}
+                `}
+                title={isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
+              >
+                {isEnrolled ? (
+                  <CheckCircle2 className="w-4 h-4" />
+                ) : (
+                  <UserPlus className="w-4 h-4" />
+                )}
+              </button>
+            </div>
           )}
         </div>
 

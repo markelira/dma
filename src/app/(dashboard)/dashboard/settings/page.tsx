@@ -1,16 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
-import { Save, Loader2 } from 'lucide-react'
+import { Save, Loader2, Upload, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { updateProfile as updateAuthProfile } from 'firebase/auth'
-import { auth, db } from '@/lib/firebase'
-import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore'
+import { auth, db, storage } from '@/lib/firebase'
+import { doc, updateDoc, getDoc } from 'firebase/firestore'
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import Image from 'next/image'
 
 export default function SettingsPage() {
   const { user, setUser } = useAuthStore()
@@ -19,9 +21,12 @@ export default function SettingsPage() {
   const [firstName, setFirstName] = useState(user?.firstName || '')
   const [lastName, setLastName] = useState(user?.lastName || '')
   const [email, setEmail] = useState(user?.email || '')
-  const [bio, setBio] = useState('')
   const [phone, setPhone] = useState('')
+  const [companyName, setCompanyName] = useState('')
+  const [logoUrl, setLogoUrl] = useState('')
+  const [logoUploading, setLogoUploading] = useState(false)
   const [profileSaving, setProfileSaving] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Load user settings on mount
   useEffect(() => {
@@ -34,14 +39,95 @@ export default function SettingsPage() {
     if (!user?.uid) return
 
     try {
-      const settingsDoc = await getDoc(doc(db, 'userSettings', user.uid))
-      if (settingsDoc.exists()) {
-        const data = settingsDoc.data()
-        setBio(data.bio || '')
+      // Load from users collection (phone, companyName, logoUrl)
+      const userDoc = await getDoc(doc(db, 'users', user.uid))
+      if (userDoc.exists()) {
+        const data = userDoc.data()
         setPhone(data.phone || '')
+        setCompanyName(data.companyName || '')
+        setLogoUrl(data.logoUrl || '')
       }
     } catch (error) {
       console.error('Error loading settings:', error)
+    }
+  }
+
+  // Handle logo upload
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user?.uid) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Csak képfájl tölthető fel')
+      return
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('A fájl mérete maximum 2MB lehet')
+      return
+    }
+
+    setLogoUploading(true)
+    try {
+      // Upload to Firebase Storage
+      const ext = file.name.split('.').pop()
+      const logoRef = ref(storage, `users/${user.uid}/logo.${ext}`)
+      await uploadBytes(logoRef, file)
+      const downloadUrl = await getDownloadURL(logoRef)
+
+      // Update Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        logoUrl: downloadUrl,
+        updatedAt: new Date().toISOString()
+      })
+
+      setLogoUrl(downloadUrl)
+      toast.success('Logó sikeresen feltöltve')
+    } catch (error) {
+      console.error('Error uploading logo:', error)
+      toast.error('Hiba történt a feltöltés során')
+    } finally {
+      setLogoUploading(false)
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  // Handle logo removal
+  const handleLogoRemove = async () => {
+    if (!user?.uid || !logoUrl) return
+
+    setLogoUploading(true)
+    try {
+      // Delete from Storage (try common extensions)
+      const extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp']
+      for (const ext of extensions) {
+        try {
+          const logoRef = ref(storage, `users/${user.uid}/logo.${ext}`)
+          await deleteObject(logoRef)
+          break
+        } catch {
+          // File with this extension doesn't exist, try next
+        }
+      }
+
+      // Update Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        logoUrl: '',
+        updatedAt: new Date().toISOString()
+      })
+
+      setLogoUrl('')
+      toast.success('Logó sikeresen törölve')
+    } catch (error) {
+      console.error('Error removing logo:', error)
+      toast.error('Hiba történt a törlés során')
+    } finally {
+      setLogoUploading(false)
     }
   }
 
@@ -62,15 +148,10 @@ export default function SettingsPage() {
       await updateDoc(doc(db, 'users', user.uid), {
         firstName,
         lastName,
+        phone,
+        companyName,
         updatedAt: new Date().toISOString()
       })
-      
-      // Update additional profile data in userSettings
-      await setDoc(doc(db, 'userSettings', user.uid), {
-        bio,
-        phone,
-        updatedAt: new Date().toISOString()
-      }, { merge: true })
       
       // Update local user state
       setUser({
@@ -103,16 +184,55 @@ export default function SettingsPage() {
       <div className="max-w-6xl">
             <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
                 <div className="p-10 space-y-7">
-                  {/* Profile Picture */}
+                  {/* Logo Upload */}
                   <div className="flex items-center gap-5 pb-7 border-b border-gray-200">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary/50 to-brand-secondary flex items-center justify-center">
-                      <span className="text-white text-2xl font-bold">
-                        {firstName?.[0]?.toUpperCase() || 'U'}{lastName?.[0]?.toUpperCase() || ''}
-                      </span>
+                    <div className="relative">
+                      {logoUrl ? (
+                        <div className="relative w-24 h-24">
+                          <Image
+                            src={logoUrl}
+                            alt="Céges logó"
+                            fill
+                            className="object-cover rounded-lg border border-gray-200"
+                          />
+                          <button
+                            onClick={handleLogoRemove}
+                            disabled={logoUploading}
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-md transition-colors"
+                            title="Logó törlése"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 rounded-lg bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center">
+                          <Upload className="w-8 h-8 text-gray-400" />
+                        </div>
+                      )}
+                      {logoUploading && (
+                        <div className="absolute inset-0 bg-white/80 rounded-lg flex items-center justify-center">
+                          <Loader2 className="w-6 h-6 animate-spin text-brand-secondary" />
+                        </div>
+                      )}
                     </div>
                     <div>
-                      <p className="text-base font-medium text-gray-900">Profilkép</p>
-                      <p className="text-sm text-gray-500 mt-1">JPG, PNG max. 2MB</p>
+                      <p className="text-base font-medium text-gray-900">Céges logó</p>
+                      <p className="text-sm text-gray-500 mt-1">JPG, PNG max. 2MB (200x200px ajánlott)</p>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        id="logo-upload"
+                      />
+                      <label
+                        htmlFor="logo-upload"
+                        className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 text-sm font-medium text-brand-secondary bg-brand-secondary/10 hover:bg-brand-secondary/20 rounded-lg cursor-pointer transition-colors"
+                      >
+                        <Upload className="w-4 h-4" />
+                        {logoUrl ? 'Új logó feltöltése' : 'Logó feltöltése'}
+                      </label>
                     </div>
                   </div>
 
@@ -175,18 +295,17 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                {/* Bio */}
+                {/* Company Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="bio" className="text-sm font-medium text-gray-900">
-                    Bemutatkozás <span className="text-gray-400 font-normal">(opcionális)</span>
+                  <Label htmlFor="companyName" className="text-sm font-medium text-gray-900">
+                    Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
                   </Label>
-                  <textarea
-                    id="bio"
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-white border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-brand-secondary transition-all text-sm text-gray-900 placeholder:text-gray-400"
-                    rows={4}
-                    placeholder="Írjon magáról pár mondatot..."
+                  <Input
+                    id="companyName"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
+                    placeholder="Példa Kft."
                   />
                 </div>
 
