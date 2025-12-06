@@ -1,15 +1,14 @@
 'use client';
 
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Play } from "lucide-react";
-// Calendar icon removed - date no longer shown
-// Bookmark icon removed - wishlist feature disabled (Cloud Functions not deployed)
+import { BookOpen, Clock, Star, Play, UserPlus, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
-// Wishlist hooks disabled - Cloud Functions for wishlist not deployed yet
-// import { useWishlistStatus, useToggleWishlist } from "@/hooks/useWishlist";
-// import { useAuthStore } from "@/stores/authStore";
+import { useEnrollmentStatus } from "@/hooks/useEnrollmentStatus";
+import { useEnrollInCourse } from "@/hooks/useCourseQueries";
+import { useAuthStore } from "@/stores/authStore";
+import { toast } from "sonner";
 
 // Helper function to format date in Hungarian locale
 const formatHungarianDate = (dateString: string): string => {
@@ -64,11 +63,30 @@ interface PremiumCourseCardProps {
 
 export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
-  // Wishlist feature disabled - Cloud Functions not deployed yet
-  // const { user } = useAuthStore();
-  // const { data: wishlistStatus } = useWishlistStatus(course.id);
-  // const { toggle: toggleWishlist, isLoading: isWishlistLoading } = useToggleWishlist();
-  // const isInWishlist = wishlistStatus?.isInWishlist ?? false;
+  const { user } = useAuthStore();
+  const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
+  const enrollMutation = useEnrollInCourse();
+
+  const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
+  const isEnrolling = enrollMutation.isPending;
+
+  const handleEnroll = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click navigation
+
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    if (isEnrolled) return;
+
+    try {
+      await enrollMutation.mutateAsync(course.id);
+      toast.success('Sikeresen beiratkoztál a kurzusra!');
+    } catch (error) {
+      toast.error('Hiba történt a beiratkozáskor');
+    }
+  };
 
   // Get category display names (supports multiple categories)
   // Courses store categoryId/categoryIds in Firestore, so we need to map to category names
@@ -246,28 +264,27 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
-          {/* Wishlist Button - Disabled until Cloud Functions are deployed */}
-          {/* TODO: Re-enable when wishlist functions are deployed
+          {/* Enrollment Button */}
           {user && (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleWishlist(course.id, isInWishlist);
-              }}
-              disabled={isWishlistLoading}
+              onClick={handleEnroll}
+              disabled={isEnrolling || isEnrolled}
               className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200
-                ${isInWishlist
-                  ? 'bg-brand-secondary text-white shadow-lg'
-                  : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-brand-secondary shadow-md'
+                ${isEnrolled
+                  ? 'bg-green-500 text-white shadow-lg cursor-default'
+                  : 'bg-white/90 text-gray-600 opacity-0 group-hover:opacity-100 hover:bg-brand-secondary hover:text-white shadow-md'
                 }
-                ${isWishlistLoading ? 'cursor-wait' : 'cursor-pointer'}
+                ${isEnrolling ? 'cursor-wait animate-pulse' : ''}
               `}
-              title={isInWishlist ? 'Eltávolítás a listáról' : 'Hozzáadás a listához'}
+              title={isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
             >
-              <Bookmark className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
+              {isEnrolled ? (
+                <CheckCircle2 className="w-4 h-4" />
+              ) : (
+                <UserPlus className="w-4 h-4" />
+              )}
             </button>
           )}
-          */}
         </div>
 
         {/* Content */}
