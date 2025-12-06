@@ -377,13 +377,13 @@ export default function InstructorsPage() {
                   <SelectItem value="SZEREPLŐ">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-purple-500" />
-                      Szereplő (Podcast)
+                      Vendég (Podcast)
                     </div>
                   </SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500 mt-1">
-                A mentor megjelölés minden tartalomtípusnál, a szereplő csak podcastoknál jelenik meg.
+                A mentor megjelölés minden tartalomtípusnál, a vendég csak podcastoknál jelenik meg.
               </p>
             </div>
 

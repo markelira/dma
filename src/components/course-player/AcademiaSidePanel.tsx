@@ -112,7 +112,7 @@ export function AcademiaSidePanel({
                       <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
                     )}
                     <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor'}
+                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
                     </span>
                     <p className="text-xs text-gray-500 mt-2">
                       {selectedInstructorIndex + 1} / {instructors.length} oktató
@@ -149,7 +149,7 @@ export function AcademiaSidePanel({
                       <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
                     )}
                     <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor'}
+                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
                     </span>
                   </div>
                 </>

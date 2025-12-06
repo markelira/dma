@@ -70,7 +70,7 @@ export function PodcastSidePanel({
                 <p className="text-sm text-gray-400 mt-1">{instructor.title}</p>
               )}
               <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                Szereplő
+                Vendég
               </span>
             </div>
 

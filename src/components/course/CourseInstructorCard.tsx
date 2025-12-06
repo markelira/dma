@@ -17,7 +17,7 @@ interface CourseInstructorCardProps {
     reviews: number;
   };
   expertise?: string[];
-  /** Role label based on course type (e.g., "Mentor", "Szereplő") */
+  /** Role label based on course type (e.g., "Mentor", "Vendég") */
   roleLabel?: string;
   /** Instructor's role from the instructors collection */
   instructorRole?: 'MENTOR' | 'SZEREPLŐ';
@@ -38,7 +38,7 @@ export function CourseInstructorCard({
 }: CourseInstructorCardProps) {
   // Use instructor's actual role if available, otherwise use the passed roleLabel
   const displayRole = instructorRole
-    ? (instructorRole === 'SZEREPLŐ' ? 'Szereplő' : 'Mentor')
+    ? (instructorRole === 'SZEREPLŐ' ? 'Vendég' : 'Mentor')
     : roleLabel;
 
   // Dark mode styles
