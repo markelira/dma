@@ -19,14 +19,24 @@ interface Course {
   thumbnailUrl?: string;
 }
 
+interface Instructor {
+  id: string;
+  name: string;
+}
+
 interface CoursesHeroSectionProps {
   courses: Course[];
   categories: Array<{ id: string; name: string }>;
   targetAudiences: Array<{ id: string; name: string }>;
+  instructors?: Instructor[];
   selectedCategory: string;
   selectedTargetAudience: string;
+  selectedCourseType: string;
+  selectedInstructor: string;
   onCategoryChange: (id: string) => void;
   onTargetAudienceChange: (id: string) => void;
+  onCourseTypeChange: (type: string) => void;
+  onInstructorChange: (id: string) => void;
   onClearFilters: () => void;
 }
 
@@ -41,17 +51,22 @@ export function CoursesHeroSection({
   courses,
   categories,
   targetAudiences,
+  instructors = [],
   selectedCategory,
   selectedTargetAudience,
+  selectedCourseType,
+  selectedInstructor,
   onCategoryChange,
   onTargetAudienceChange,
+  onCourseTypeChange,
+  onInstructorChange,
   onClearFilters,
 }: CoursesHeroSectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const hasActiveFilters = !!selectedCategory;
+  const hasActiveFilters = !!selectedCategory || !!selectedTargetAudience || !!selectedCourseType || !!selectedInstructor;
 
   // Filter suggestions based on search query
   const suggestions = searchQuery.length >= 2
@@ -191,9 +206,9 @@ export function CoursesHeroSection({
                 </div>
 
                 {/* Filters */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                   {/* Category Filter */}
-                  <div className="min-w-[200px]">
+                  <div className="min-w-0">
                     <div className="relative">
                       <select
                         value={selectedCategory}
@@ -204,6 +219,62 @@ export function CoursesHeroSection({
                         {categories.map((category) => (
                           <option key={category.id} value={category.id}>
                             {category.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Course Type Filter */}
+                  <div className="min-w-0">
+                    <div className="relative">
+                      <select
+                        value={selectedCourseType}
+                        onChange={(e) => onCourseTypeChange(e.target.value)}
+                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
+                      >
+                        <option value="">Összes típus</option>
+                        <option value="ACADEMIA">Akadémia</option>
+                        <option value="WEBINAR">Webinár</option>
+                        <option value="MASTERCLASS">Masterclass</option>
+                        <option value="PODCAST">Podcast</option>
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Target Audience Filter */}
+                  <div className="min-w-0">
+                    <div className="relative">
+                      <select
+                        value={selectedTargetAudience}
+                        onChange={(e) => onTargetAudienceChange(e.target.value)}
+                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
+                      >
+                        <option value="">Összes célközönség</option>
+                        {targetAudiences.map((audience) => (
+                          <option key={audience.id} value={audience.id}>
+                            {audience.name}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
+                    </div>
+                  </div>
+
+                  {/* Instructor Filter */}
+                  <div className="min-w-0">
+                    <div className="relative">
+                      <select
+                        value={selectedInstructor}
+                        onChange={(e) => onInstructorChange(e.target.value)}
+                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
+                      >
+                        <option value="">Összes oktató</option>
+                        {instructors.map((instructor) => (
+                          <option key={instructor.id} value={instructor.id}>
+                            {instructor.name}
                           </option>
                         ))}
                       </select>
@@ -246,6 +317,54 @@ export function CoursesHeroSection({
                         <button
                           onClick={() => onCategoryChange('')}
                           className="hover:bg-brand-secondary/20 rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.span>
+                    )}
+
+                    {selectedCourseType && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
+                      >
+                        {COURSE_TYPE_LABELS[selectedCourseType]}
+                        <button
+                          onClick={() => onCourseTypeChange('')}
+                          className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.span>
+                    )}
+
+                    {selectedTargetAudience && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"
+                      >
+                        {targetAudiences.find(t => t.id === selectedTargetAudience)?.name}
+                        <button
+                          onClick={() => onTargetAudienceChange('')}
+                          className="hover:bg-teal-200 rounded-full p-0.5 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </motion.span>
+                    )}
+
+                    {selectedInstructor && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium"
+                      >
+                        {instructors.find(i => i.id === selectedInstructor)?.name}
+                        <button
+                          onClick={() => onInstructorChange('')}
+                          className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>

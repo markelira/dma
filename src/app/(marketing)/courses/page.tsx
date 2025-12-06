@@ -204,6 +204,8 @@ export default function CoursesPage() {
   const [targetAudiences, setTargetAudiences] = useState<Array<{ id: string; name: string }>>([])
   const [selectedCategory, setSelectedCategory] = useState('')
   const [selectedTargetAudience, setSelectedTargetAudience] = useState('')
+  const [selectedCourseType, setSelectedCourseType] = useState('')
+  const [selectedInstructor, setSelectedInstructor] = useState('')
   const { data: instructors = [] } = useInstructors()
 
   // Fetch categories
@@ -303,13 +305,26 @@ export default function CoursesPage() {
       )
     }
 
+    // Apply course type filter
+    if (selectedCourseType) {
+      filtered = filtered.filter(c => c.courseType === selectedCourseType)
+    }
+
+    // Apply instructor filter
+    if (selectedInstructor) {
+      filtered = filtered.filter(c =>
+        c.instructorId === selectedInstructor ||
+        c.instructorIds?.includes(selectedInstructor)
+      )
+    }
+
     return {
       ACADEMIA: filtered.filter(c => c.courseType === 'ACADEMIA'),
       WEBINAR: filtered.filter(c => c.courseType === 'WEBINAR'),
       MASTERCLASS: filtered.filter(c => c.courseType === 'MASTERCLASS'),
       PODCAST: filtered.filter(c => c.courseType === 'PODCAST'),
     }
-  }, [courses, selectedCategory, selectedTargetAudience])
+  }, [courses, selectedCategory, selectedTargetAudience, selectedCourseType, selectedInstructor])
 
   // Check if all filtered sections are empty
   const hasFilteredResults = useMemo(() => {
@@ -321,7 +336,7 @@ export default function CoursesPage() {
     )
   }, [filteredCoursesByType])
 
-  const hasActiveFilters = selectedCategory || selectedTargetAudience
+  const hasActiveFilters = selectedCategory || selectedTargetAudience || selectedCourseType || selectedInstructor
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -359,13 +374,20 @@ export default function CoursesPage() {
           courses={courses}
           categories={categories}
           targetAudiences={targetAudiences}
+          instructors={instructors}
           selectedCategory={selectedCategory}
           selectedTargetAudience={selectedTargetAudience}
+          selectedCourseType={selectedCourseType}
+          selectedInstructor={selectedInstructor}
           onCategoryChange={setSelectedCategory}
           onTargetAudienceChange={setSelectedTargetAudience}
+          onCourseTypeChange={setSelectedCourseType}
+          onInstructorChange={setSelectedInstructor}
           onClearFilters={() => {
             setSelectedCategory('')
             setSelectedTargetAudience('')
+            setSelectedCourseType('')
+            setSelectedInstructor('')
           }}
         />
 
