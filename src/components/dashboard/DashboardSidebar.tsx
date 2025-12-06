@@ -42,7 +42,7 @@ const navigationSections = {
       title: 'Fő navigáció',
       items: [
         { title: 'Kezdőlap', href: '/dashboard', icon: Home },
-        { title: 'Saját tartalmaim', href: '/dashboard/courses', icon: BookOpen },
+        { title: 'Saját listám', href: '/dashboard/courses', icon: BookOpen },
         { title: 'Összes tartalom', href: '/courses', icon: GraduationCap },
       ]
     },
