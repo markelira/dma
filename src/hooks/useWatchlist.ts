@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
@@ -15,16 +15,16 @@ async function fetchWatchlist(userId: string): Promise<string[]> {
 
 // Add course to watchlist
 async function addToWatchlist(userId: string, courseId: string): Promise<void> {
-  await updateDoc(doc(db, 'users', userId), {
+  await setDoc(doc(db, 'users', userId), {
     watchlist: arrayUnion(courseId),
-  });
+  }, { merge: true });
 }
 
 // Remove course from watchlist
 async function removeFromWatchlist(userId: string, courseId: string): Promise<void> {
-  await updateDoc(doc(db, 'users', userId), {
+  await setDoc(doc(db, 'users', userId), {
     watchlist: arrayRemove(courseId),
-  });
+  }, { merge: true });
 }
 
 export function useWatchlist() {
