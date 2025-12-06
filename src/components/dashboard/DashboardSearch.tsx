@@ -6,12 +6,22 @@ import { Search, X, ChevronDown, Filter } from 'lucide-react';
 import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
+import { useInstructors } from '@/hooks/useInstructorQueries';
 import { cn } from '@/lib/utils';
+
+const COURSE_TYPE_OPTIONS = [
+  { value: 'ACADEMIA', label: 'Akadémia' },
+  { value: 'WEBINAR', label: 'Webinár' },
+  { value: 'MASTERCLASS', label: 'Masterclass' },
+  { value: 'PODCAST', label: 'Podcast' },
+];
 
 export interface DashboardFilters {
   query: string;
   categoryId: string | null;
   audienceId: string | null;
+  courseType: string | null;
+  instructorId: string | null;
 }
 
 interface DashboardSearchProps {
@@ -24,12 +34,15 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
   const { data: courses } = useCourses();
   const { data: categories } = useCategories();
   const { data: targetAudiences } = useTargetAudiences();
+  const { data: instructors } = useInstructors();
 
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedAudience, setSelectedAudience] = useState<string | null>(null);
+  const [selectedCourseType, setSelectedCourseType] = useState<string | null>(null);
+  const [selectedInstructor, setSelectedInstructor] = useState<string | null>(null);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -77,8 +90,21 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
       );
     }
 
+    // Filter by course type
+    if (selectedCourseType) {
+      results = results.filter(course => course.courseType === selectedCourseType);
+    }
+
+    // Filter by instructor
+    if (selectedInstructor) {
+      results = results.filter(course =>
+        (course as any).instructorId === selectedInstructor ||
+        (course as any).instructorIds?.includes(selectedInstructor)
+      );
+    }
+
     return results.slice(0, 8); // Limit to 8 results
-  }, [courses, query, selectedCategory, selectedAudience]);
+  }, [courses, query, selectedCategory, selectedAudience, selectedCourseType, selectedInstructor]);
 
   const handleSelect = (courseId: string) => {
     setIsOpen(false);
@@ -92,6 +118,8 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
       query: query.trim(),
       categoryId: selectedCategory,
       audienceId: selectedAudience,
+      courseType: selectedCourseType,
+      instructorId: selectedInstructor,
     });
     setIsOpen(false);
     setShowFilters(false);
@@ -109,18 +137,24 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
   const clearFilters = () => {
     setSelectedCategory(null);
     setSelectedAudience(null);
+    setSelectedCourseType(null);
+    setSelectedInstructor(null);
     setQuery('');
     onFilterChange?.({
       query: '',
       categoryId: null,
       audienceId: null,
+      courseType: null,
+      instructorId: null,
     });
   };
 
-  const hasActiveFilters = selectedCategory || selectedAudience;
+  const hasActiveFilters = selectedCategory || selectedAudience || selectedCourseType || selectedInstructor;
 
   const selectedCategoryName = categories?.find(c => c.id === selectedCategory)?.name;
   const selectedAudienceName = targetAudiences?.find(a => a.id === selectedAudience)?.name;
+  const selectedCourseTypeName = COURSE_TYPE_OPTIONS.find(t => t.value === selectedCourseType)?.label;
+  const selectedInstructorName = instructors?.find(i => i.id === selectedInstructor)?.name;
 
   return (
     <div ref={containerRef} className={cn('relative w-full max-w-2xl mx-auto', className)}>
@@ -153,9 +187,19 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
                   {selectedCategoryName}
                 </span>
               )}
-              {selectedAudienceName && (
+              {selectedCourseTypeName && (
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                  {selectedCourseTypeName}
+                </span>
+              )}
+              {selectedAudienceName && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
                   {selectedAudienceName}
+                </span>
+              )}
+              {selectedInstructorName && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                  {selectedInstructorName}
                 </span>
               )}
             </div>
@@ -188,7 +232,7 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
             <span className="hidden sm:inline">Szűrők</span>
             {hasActiveFilters && (
               <span className="w-5 h-5 rounded-full bg-brand-secondary text-white text-xs flex items-center justify-center">
-                {(selectedCategory ? 1 : 0) + (selectedAudience ? 1 : 0)}
+                {(selectedCategory ? 1 : 0) + (selectedAudience ? 1 : 0) + (selectedCourseType ? 1 : 0) + (selectedInstructor ? 1 : 0)}
               </span>
             )}
           </button>
@@ -218,7 +262,7 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Category Filter */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">
@@ -241,6 +285,28 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
               </div>
             </div>
 
+            {/* Course Type Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">
+                Típus
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedCourseType || ''}
+                  onChange={(e) => setSelectedCourseType(e.target.value || null)}
+                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
+                >
+                  <option value="">Összes típus</option>
+                  {COURSE_TYPE_OPTIONS.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
             {/* Target Audience Filter */}
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-2">
@@ -256,6 +322,28 @@ export function DashboardSearch({ className, onFilterChange }: DashboardSearchPr
                   {targetAudiences?.map(audience => (
                     <option key={audience.id} value={audience.id}>
                       {audience.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Instructor Filter */}
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">
+                Oktató
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedInstructor || ''}
+                  onChange={(e) => setSelectedInstructor(e.target.value || null)}
+                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
+                >
+                  <option value="">Összes oktató</option>
+                  {instructors?.map(instructor => (
+                    <option key={instructor.id} value={instructor.id}>
+                      {instructor.name}
                     </option>
                   ))}
                 </select>
