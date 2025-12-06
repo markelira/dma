@@ -130,8 +130,6 @@ export function NetflixStyleHero({
     return { durationText, lessonCount, moduleCount: modules.length };
   }, [modules]);
 
-  const instructor = instructors[0];
-
   return (
     <div className="relative h-[70vh] min-h-[500px] max-h-[700px]">
       {/* Background Image */}
@@ -187,29 +185,33 @@ export function NetflixStyleHero({
               {description}
             </p>
 
-            {/* Instructor */}
-            {instructor && (
-              <div className="flex items-center gap-3 mb-4">
-                {instructor.profilePictureUrl ? (
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden">
-                    <Image
-                      src={instructor.profilePictureUrl}
-                      alt={instructor.name}
-                      fill
-                      className="object-cover"
-                    />
+            {/* Instructors */}
+            {instructors.length > 0 && (
+              <div className="flex items-center gap-4 mb-4 flex-wrap">
+                {instructors.map((instructor, idx) => (
+                  <div key={instructor.id || idx} className="flex items-center gap-3">
+                    {instructor.profilePictureUrl ? (
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                        <Image
+                          src={instructor.profilePictureUrl}
+                          alt={instructor.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className={`w-10 h-10 rounded-full ${config.bgColor} flex items-center justify-center text-white font-bold`}>
+                        {instructor.name.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-white font-medium">{instructor.name}</p>
+                      {instructor.title && (
+                        <p className="text-gray-400 text-sm">{instructor.title}</p>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <div className={`w-10 h-10 rounded-full ${config.bgColor} flex items-center justify-center text-white font-bold`}>
-                    {instructor.name.charAt(0)}
-                  </div>
-                )}
-                <div>
-                  <p className="text-white font-medium">{instructor.name}</p>
-                  {instructor.title && (
-                    <p className="text-gray-400 text-sm">{instructor.title}</p>
-                  )}
-                </div>
+                ))}
               </div>
             )}
 

@@ -66,8 +66,6 @@ export function Hero3CleanEfficient({
     }
   };
 
-  const instructor = instructors[0];
-
   // Truncate description to 2 lines max (~160 chars)
   const shortDescription = description.length > 160
     ? description.substring(0, 157) + '...'
@@ -151,27 +149,31 @@ export function Hero3CleanEfficient({
               </div>
             </div>
 
-            {/* Instructor Inline - Minimal */}
-            {instructor && (
-              <div className="flex items-center gap-3">
-                {instructor.profilePictureUrl ? (
-                  <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={instructor.profilePictureUrl}
-                      alt={instructor.name}
-                      fill
-                      className="object-cover"
-                    />
+            {/* Instructors Inline - Minimal */}
+            {instructors.length > 0 && (
+              <div className="flex items-center gap-4 flex-wrap">
+                {instructors.map((instructor, idx) => (
+                  <div key={instructor.id || idx} className="flex items-center gap-3">
+                    {instructor.profilePictureUrl ? (
+                      <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                        <Image
+                          src={instructor.profilePictureUrl}
+                          alt={instructor.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                        {instructor.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-900">{instructor.name}</span>
+                      <span className="text-gray-600"> · Mentor</span>
+                    </div>
                   </div>
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                    {instructor.name.charAt(0)}
-                  </div>
-                )}
-                <div className="text-sm">
-                  <span className="font-medium text-gray-900">{instructor.name}</span>
-                  <span className="text-gray-600"> · Oktató</span>
-                </div>
+                ))}
               </div>
             )}
 

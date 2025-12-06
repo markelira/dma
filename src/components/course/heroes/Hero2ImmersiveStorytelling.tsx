@@ -62,8 +62,6 @@ export function Hero2ImmersiveStorytelling({
     }
   };
 
-  const instructor = instructors[0];
-
   const defaultTransformation = transformationStatement ||
     `Válj ${courseType === 'MASTERCLASS' ? 'szakértővé' : 'profivá'} ${lessons > 20 ? '12' : '8'} hét alatt`;
 
@@ -143,29 +141,33 @@ export function Hero2ImmersiveStorytelling({
               {defaultTransformation}
             </p>
 
-            {/* Instructor Section - Centered */}
-            {instructor && (
-              <div className="flex flex-col items-center gap-4 py-6">
-                {instructor.profilePictureUrl ? (
-                  <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white/20">
-                    <Image
-                      src={instructor.profilePictureUrl}
-                      alt={instructor.name}
-                      fill
-                      className="object-cover"
-                    />
+            {/* Instructors Section - Centered */}
+            {instructors.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-8 py-6">
+                {instructors.map((instructor, idx) => (
+                  <div key={instructor.id || idx} className="flex flex-col items-center gap-4">
+                    {instructor.profilePictureUrl ? (
+                      <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white/20">
+                        <Image
+                          src={instructor.profilePictureUrl}
+                          alt={instructor.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white/20">
+                        {instructor.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <p className="text-2xl font-bold text-white">{instructor.name}</p>
+                      {instructor.title && (
+                        <p className="text-sm text-white/80 mt-1">{instructor.title}</p>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-500 flex items-center justify-center text-white text-3xl font-bold ring-4 ring-white/20">
-                    {instructor.name.charAt(0)}
-                  </div>
-                )}
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-white">{instructor.name}</p>
-                  {instructor.title && (
-                    <p className="text-sm text-white/80 mt-1">{instructor.title}</p>
-                  )}
-                </div>
+                ))}
               </div>
             )}
 

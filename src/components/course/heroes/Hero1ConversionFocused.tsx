@@ -120,8 +120,6 @@ export function Hero1ConversionFocused({
     'Életre szóló tudás és készségek'
   ];
 
-  const instructor = instructors[0];
-
   return (
     <div className="bg-white">
       {/* Main Hero Section */}
@@ -182,30 +180,34 @@ export function Hero1ConversionFocused({
               </div>
             )}
 
-            {/* Instructor Mini Card */}
-            {instructor && (
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                {instructor.profilePictureUrl ? (
-                  <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
-                    <Image
-                      src={instructor.profilePictureUrl}
-                      alt={instructor.name}
-                      fill
-                      className="object-cover"
-                    />
+            {/* Instructor Mini Cards */}
+            {instructors.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                {instructors.map((instructor, idx) => (
+                  <div key={instructor.id || idx} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    {instructor.profilePictureUrl ? (
+                      <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
+                        <Image
+                          src={instructor.profilePictureUrl}
+                          alt={instructor.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                        {instructor.name.charAt(0)}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-gray-600">{instructors.length > 1 ? 'Mentor' : 'Mentor'}</p>
+                      <p className="font-bold text-gray-900">{instructor.name}</p>
+                      {instructor.title && (
+                        <p className="text-sm text-gray-600 truncate">{instructor.title}</p>
+                      )}
+                    </div>
                   </div>
-                ) : (
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-brand-secondary to-brand-secondary/50 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-                    {instructor.name.charAt(0)}
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-600">Oktató</p>
-                  <p className="font-bold text-gray-900">{instructor.name}</p>
-                  {instructor.title && (
-                    <p className="text-sm text-gray-600 truncate">{instructor.title}</p>
-                  )}
-                </div>
+                ))}
               </div>
             )}
 
