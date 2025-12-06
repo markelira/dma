@@ -162,13 +162,16 @@ export function NewVideoPlayer({
           width: '100%',
           aspectRatio: '16/9',
           borderRadius: '0.5rem',
-          // YouTube-style controls using correct MuxPlayer CSS variables
+          // Transparent controls - no black background
           '--media-primary-color': '#FFFFFF',
-          '--media-secondary-color': 'rgba(0,0,0,0.75)',
+          '--media-secondary-color': 'transparent',
           '--media-range-bar-color': '#FF0000',
           '--media-range-thumb-background': '#FF0000',
           '--media-control-background': 'transparent',
           '--media-control-hover-background': 'rgba(255,255,255,0.1)',
+          '--media-control-bar-background': 'transparent',
+          '--controls-backdrop-color': 'transparent',
+          '--bottom-controls-background': 'transparent',
         } as React.CSSProperties}
       />
 
