@@ -19,6 +19,7 @@ import {
   LogOut,
   Building2,
   CreditCard,
+  FolderOpen,
   Star,
   Video,
   Mic
