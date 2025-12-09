@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import Link from 'next/link';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
 
 // Enrollment type for progress tracking
@@ -81,15 +80,6 @@ export function CourseCarouselRow({
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-        {viewAllLink && (
-          <Link
-            href={viewAllLink}
-            className="text-sm font-medium text-brand-secondary hover:text-brand-secondary/80 flex items-center gap-1 transition-colors"
-          >
-            Összes
-            <ChevronRight className="w-4 h-4" />
-          </Link>
-        )}
       </div>
 
       {/* Carousel */}
