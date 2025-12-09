@@ -87,7 +87,7 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
 
         {/* Content */}
         <div className="p-4">
-          <h3 className="font-semibold text-gray-900 line-clamp-2 mb-1 group-hover:text-brand-secondary transition-colors">
+          <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-brand-secondary transition-colors">
             {enrollment.courseName}
           </h3>
 
