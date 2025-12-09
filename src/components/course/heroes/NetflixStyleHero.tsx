@@ -223,7 +223,7 @@ export function NetflixStyleHero({
                         <span className="text-gray-400 font-normal">
                           {' | '}
                           {instructor.bio && instructor.title
-                            ? `${instructor.bio}, ${instructor.title}`
+                            ? `${instructor.bio} | ${instructor.title}`
                             : instructor.bio || instructor.title}
                         </span>
                       )}
