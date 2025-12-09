@@ -201,11 +201,11 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     for (let i = 0; i < formData.employees.length; i++) {
       const emp = formData.employees[i];
       if (!emp.firstName.trim() || !emp.lastName.trim() || !emp.email.trim()) {
-        setError(`Kérlek töltsd ki az összes kötelező mezőt a(z) ${i + 1}. alkalmazottnál`);
+        setError(`Kérlek töltsd ki az összes kötelező mezőt a(z) ${i + 1}. munkatársnál`);
         return false;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emp.email)) {
-        setError(`Érvénytelen email cím a(z) ${i + 1}. alkalmazottnál`);
+        setError(`Érvénytelen email cím a(z) ${i + 1}. munkatársnál`);
         return false;
       }
     }
@@ -622,20 +622,20 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
             className="space-y-4"
           >
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Alkalmazottak hozzáadása</h3>
-              <p className="text-sm text-gray-600">Meghívhatod a csapattagjaidat (opcionális)</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Munkatársak hozzáadása</h3>
+              <p className="text-sm text-gray-600">Később is hozzáadhatod őket, nem kötelező lépés</p>
             </div>
 
             {formData.employees.length === 0 ? (
               <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-xl">
                 <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 mb-4">Még nem adtál hozzá alkalmazottakat</p>
+                <p className="text-sm text-gray-500 mb-4">Még nem adtál hozzá munkatársakat</p>
                 <button
                   onClick={addEmployee}
                   className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Első alkalmazott hozzáadása
+                  Első munkatárs hozzáadása
                 </button>
               </div>
             ) : (
@@ -710,7 +710,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
                   className="w-full py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-all flex items-center justify-center"
                 >
                   <Plus className="w-5 h-5 mr-2" />
-                  <span className="font-medium">Újabb alkalmazott hozzáadása</span>
+                  <span className="font-medium">Újabb munkatárs hozzáadása</span>
                 </button>
               </div>
             )}
@@ -759,10 +759,10 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
               <div className="p-5 bg-gray-50 border border-gray-200 rounded-lg">
                 <h4 className="font-bold text-gray-900 text-sm mb-3 flex items-center">
                   <Users className="w-4 h-4 mr-2" />
-                  Alkalmazottak
+                  Munkatársak
                 </h4>
                 {formData.employees.length === 0 ? (
-                  <p className="text-sm text-gray-500">Később adhatsz hozzá alkalmazottakat</p>
+                  <p className="text-sm text-gray-500">Később adhatsz hozzá munkatársakat</p>
                 ) : (
                   <div className="space-y-2">
                     {formData.employees.map((emp, index) => (
