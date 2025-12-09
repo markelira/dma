@@ -18,7 +18,6 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useGamificationData, useSaveUserPreferences } from '@/hooks/useGamification';
-import { useWatchlist } from '@/hooks/useWatchlist';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import type { UserPreferences, Course } from '@/types';
 
@@ -45,9 +44,6 @@ export default function DashboardPage() {
 
   const { preferences } = useGamificationData();
   const savePreferences = useSaveUserPreferences();
-
-  // Watchlist hook
-  const { watchlist, isLoading: watchlistLoading } = useWatchlist();
 
   // Trial popup state
   const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription } = useTrialPopup();
@@ -376,14 +372,6 @@ export default function DashboardPage() {
     return results.sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
   }, [courses, hasActiveFilters, activeFilters]);
 
-  // Build watchlist courses
-  const watchlistCourses = useMemo(() => {
-    if (!watchlist || watchlist.length === 0 || !courses) return [];
-    return courses
-      .filter(course => watchlist.includes(course.id))
-      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
-  }, [watchlist, courses]);
-
   // Handle filter change from search component
   const handleFilterChange = (filters: DashboardFilters) => {
     setActiveFilters(filters);
@@ -481,18 +469,6 @@ export default function DashboardPage() {
             enrollments={enrichedEnrollments}
             categories={categories || []}
             instructors={instructors || []}
-          />
-        )}
-
-        {/* Saját listám - Watchlist courses */}
-        {watchlistCourses.length > 0 && (
-          <CourseCarouselRow
-            title="Saját listám"
-            courses={watchlistCourses}
-            categories={categories || []}
-            instructors={instructors || []}
-            enrollments={enrollments || []}
-            viewAllLink="/dashboard/my-list"
           />
         )}
 

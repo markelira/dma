@@ -3,7 +3,7 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Star, Users, Clock, BookOpen, Play, Award, TrendingUp, Bookmark, Share, ExternalLink, DollarSign, GraduationCap, Heart } from 'lucide-react'
+import { Star, Users, Clock, BookOpen, Play, Award, TrendingUp, Share, ExternalLink, DollarSign, GraduationCap, Heart } from 'lucide-react'
 
 // Enhanced Course interface for Universal Card
 interface Course {
@@ -36,7 +36,6 @@ interface Course {
   completionRate?: number
   progress?: number
   isEnrolled?: boolean
-  isBookmarked?: boolean
   createdAt?: string
   updatedAt?: string
 }
@@ -45,7 +44,7 @@ interface UniversalCourseCardProps {
   course: Course
   variant?: 'default' | 'compact' | 'featured' | 'list' | 'minimal'
   context?: 'dashboard' | 'university' | 'search' | 'recommendations' | 'home'
-  actions?: ('enroll' | 'continue' | 'bookmark' | 'share' | 'details' | 'purchase')[]
+  actions?: ('enroll' | 'continue' | 'share' | 'details' | 'purchase')[]
   showElements?: ('rating' | 'price' | 'instructor' | 'duration' | 'students' | 'category' | 'university' | 'progress' | 'difficulty')[]
   onAction?: (action: string, course: Course) => void
   className?: string
@@ -88,7 +87,7 @@ const getContextDefaults = (context: string) => {
     case 'search':
       return {
         variant: 'list' as const,
-        actions: ['enroll', 'bookmark'] as const,
+        actions: ['enroll'] as const,
         showElements: ['rating', 'price', 'category', 'university'] as const
       }
     case 'recommendations':
@@ -100,7 +99,7 @@ const getContextDefaults = (context: string) => {
     case 'home':
       return {
         variant: 'default' as const,
-        actions: ['enroll', 'details', 'bookmark'] as const,
+        actions: ['enroll', 'details'] as const,
         showElements: ['rating', 'price', 'instructor', 'category'] as const
       }
     default:
@@ -122,7 +121,6 @@ export function UniversalCourseCard({
   className = '',
   priority = false
 }: UniversalCourseCardProps) {
-  const [isBookmarked, setIsBookmarked] = useState(course.isBookmarked || false)
   const [imageError, setImageError] = useState(false)
 
   // Apply context defaults if props not provided
@@ -132,9 +130,6 @@ export function UniversalCourseCard({
   const finalShowElements = showElements || defaults.showElements
 
   const handleAction = (action: string) => {
-    if (action === 'bookmark') {
-      setIsBookmarked(!isBookmarked)
-    }
     onAction?.(action, course)
   }
 
@@ -363,21 +358,6 @@ export function UniversalCourseCard({
               >
                 Részletek
               </Link>
-            )
-
-          case 'bookmark':
-            return (
-              <button
-                key={action}
-                onClick={() => handleAction('bookmark')}
-                className={`p-2 rounded-lg border transition-colors ${
-                  isBookmarked
-                    ? 'bg-yellow-900/30 border-yellow-700 text-yellow-400'
-                    : 'border-gray-700 text-gray-400 hover:bg-gray-800'
-                }`}
-              >
-                <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-current' : ''}`} />
-              </button>
             )
 
           case 'share':

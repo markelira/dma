@@ -65,9 +65,6 @@ export const CourseCard: React.FC<Props> = ({
         const href = trialMode ? `${urlPath}?trial=true` : urlPath
         window.location.href = href
         break
-      case 'bookmark':
-        toast.info('Könyvjelző funkció hamarosan elérhető')
-        break
       case 'share':
         if (navigator.share) {
           navigator.share({
@@ -134,15 +131,14 @@ export const CourseCard: React.FC<Props> = ({
     certificateType: course.certificateEnabled ? 'Tanúsítvány' : undefined,
     completionRate: course.enrollmentCount ? Math.floor(Math.random() * 20) + 75 : undefined,
     isEnrolled: enrollmentData?.enrolled || false,
-    isBookmarked: false, // Would need to check bookmark status
     createdAt: course.publishDate,
     updatedAt: course.updatedAt
   }
 
   // Determine actions based on enrollment status
-  const actions: ("details" | "share" | "enroll" | "continue" | "bookmark")[] = enrollmentData?.enrolled 
-    ? ['details', 'bookmark', 'share'] // Already enrolled - no enroll button
-    : ['enroll', 'details', 'bookmark', 'share']; // Not enrolled - show enroll button
+  const actions: ("details" | "share" | "enroll" | "continue")[] = enrollmentData?.enrolled
+    ? ['details', 'share'] // Already enrolled - no enroll button
+    : ['enroll', 'details', 'share']; // Not enrolled - show enroll button
 
   return (
     <UniversalCourseCard
