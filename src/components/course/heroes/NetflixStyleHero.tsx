@@ -9,6 +9,7 @@ interface Instructor {
   id: string;
   name: string;
   title?: string;
+  company?: string;
   profilePictureUrl?: string;
 }
 
@@ -177,7 +178,7 @@ export function NetflixStyleHero({
             </div>
 
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight line-clamp-2">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight line-clamp-2">
               {title}
             </h1>
 
@@ -218,8 +219,13 @@ export function NetflixStyleHero({
                     )}
                     <p className="text-white font-medium">
                       {instructor.name}
-                      {instructor.title && (
-                        <span className="text-gray-400 font-normal"> · {instructor.title}</span>
+                      {(instructor.company || instructor.title) && (
+                        <span className="text-gray-400 font-normal">
+                          {' | '}
+                          {instructor.company && instructor.title
+                            ? `${instructor.company}, ${instructor.title}`
+                            : instructor.company || instructor.title}
+                        </span>
                       )}
                     </p>
                   </div>

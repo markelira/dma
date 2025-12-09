@@ -108,6 +108,7 @@ export interface Instructor {
   id: string;
   name: string;                    // Required - full display name
   title?: string;                  // Optional - role/position (e.g., "Lead Marketing Instructor")
+  company?: string;                // Optional - company name for "Name | Company, Title" format
   bio?: string;                    // Optional - instructor description/background
   profilePictureUrl?: string;      // Optional - instructor photo URL
   role: InstructorRole;            // Required - display role (Mentor/Szereplő)
