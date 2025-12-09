@@ -343,6 +343,7 @@ export default function CompanyDashboardPage() {
           courses={popularCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
           viewAllLink="/company/dashboard/courses"
         />
       )}
@@ -355,6 +356,7 @@ export default function CompanyDashboardPage() {
           courses={categoryCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
           viewAllLink={`/company/dashboard/courses?category=${category.id}`}
         />
       ))}
@@ -366,6 +368,7 @@ export default function CompanyDashboardPage() {
           courses={courses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
           viewAllLink="/company/dashboard/courses"
         />
       )}
@@ -378,6 +381,7 @@ export default function CompanyDashboardPage() {
           courses={audienceCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
           viewAllLink={`/company/dashboard/courses?audience=${audience.id}`}
         />
       ))}

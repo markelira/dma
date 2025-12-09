@@ -159,18 +159,31 @@ export const useLessonProgress = () => {
             }
 
             if (totalLessons > 0) {
-              // Count completed lessons for this user in this course
+              // Get ALL lesson progress for this user in this course
               const progressQuery = query(
                 collection(db, 'lessonProgress'),
                 where('userId', '==', user.uid),
-                where('courseId', '==', courseId),
-                where('completed', '==', true)
+                where('courseId', '==', courseId)
               )
-              const completedSnapshot = await getDocs(progressQuery)
-              const completedCount = completedSnapshot.size
+              const progressSnapshot = await getDocs(progressQuery)
 
-              // Calculate progress percentage using utility
-              const progressPercentage = calculateCourseProgress(completedCount, totalLessons)
+              // Calculate progress based on actual watch progress
+              // For each lesson, use the watch percentage (capped at 100)
+              let totalProgress = 0
+              progressSnapshot.docs.forEach(doc => {
+                const data = doc.data()
+                // Handle NaN and undefined values
+                const watchPct = data.watchPercentage
+                const lessonProgress = (typeof watchPct === 'number' && !isNaN(watchPct))
+                  ? Math.min(watchPct, 100)
+                  : 0
+                totalProgress += lessonProgress
+              })
+
+              // Overall progress = average of all lesson progress
+              // For single-lesson courses, this shows partial progress
+              // For multi-lesson courses, this shows weighted progress
+              const progressPercentage = Math.round(totalProgress / totalLessons)
               const enrollmentStatus = getStatusFromProgress(progressPercentage)
 
               // Update enrollment document
@@ -188,8 +201,9 @@ export const useLessonProgress = () => {
 
               console.log('📈 Enrollment progress updated:', {
                 courseId,
-                completedLessons: completedCount,
+                lessonsWithProgress: progressSnapshot.size,
                 totalLessons,
+                totalProgress: Math.round(totalProgress),
                 progressPercentage,
                 status: enrollmentStatus
               })

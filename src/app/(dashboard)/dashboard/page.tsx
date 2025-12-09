@@ -258,15 +258,17 @@ export default function DashboardPage() {
 
     return categories
       .map(category => {
-        const categoryCourses = courses.filter(course => {
-          // Check array format (categoryIds)
-          if (course.categoryIds?.includes(category.id)) return true;
-          // Check nested object format (category.id)
-          if (course.category?.id === category.id) return true;
-          // Check string format (categoryId) - fallback for older data
-          if ((course as any).categoryId === category.id) return true;
-          return false;
-        });
+        const categoryCourses = courses
+          .filter(course => {
+            // Check array format (categoryIds)
+            if (course.categoryIds?.includes(category.id)) return true;
+            // Check nested object format (category.id)
+            if (course.category?.id === category.id) return true;
+            // Check string format (categoryId) - fallback for older data
+            if ((course as any).categoryId === category.id) return true;
+            return false;
+          })
+          .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
         return {
           category,
           courses: categoryCourses,
@@ -295,9 +297,9 @@ export default function DashboardPage() {
     if (!targetAudiences || !courses) return [];
 
     const audienceCounts = targetAudiences.map(audience => {
-      const audienceCourses = courses.filter(course =>
-        course.targetAudienceIds?.includes(audience.id)
-      );
+      const audienceCourses = courses
+        .filter(course => course.targetAudienceIds?.includes(audience.id))
+        .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
       return {
         audience,
         courses: audienceCourses,
@@ -349,13 +351,16 @@ export default function DashboardPage() {
       );
     }
 
-    return results;
+    // Sort by enrollment count (most popular first)
+    return results.sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
   }, [courses, hasActiveFilters, activeFilters]);
 
   // Build watchlist courses
   const watchlistCourses = useMemo(() => {
     if (!watchlist || watchlist.length === 0 || !courses) return [];
-    return courses.filter(course => watchlist.includes(course.id));
+    return courses
+      .filter(course => watchlist.includes(course.id))
+      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
   }, [watchlist, courses]);
 
   // Handle filter change from search component
@@ -434,6 +439,7 @@ export default function DashboardPage() {
                 courses={filteredCourses}
                 categories={categories || []}
                 instructors={instructors || []}
+                enrollments={enrollments || []}
               />
             ) : (
               <div className="text-center py-12 bg-gray-50 rounded-xl">
@@ -464,6 +470,7 @@ export default function DashboardPage() {
             courses={watchlistCourses}
             categories={categories || []}
             instructors={instructors || []}
+            enrollments={enrollments || []}
             viewAllLink="/dashboard/my-list"
           />
         )}
@@ -475,6 +482,7 @@ export default function DashboardPage() {
             courses={popularCourses}
             categories={categories || []}
             instructors={instructors || []}
+            enrollments={enrollments || []}
             viewAllLink="/courses"
           />
         )}
@@ -487,6 +495,7 @@ export default function DashboardPage() {
             courses={categoryCourses}
             categories={categories || []}
             instructors={instructors || []}
+            enrollments={enrollments || []}
             viewAllLink={`/courses?category=${category.id}`}
           />
         ))}
@@ -495,9 +504,10 @@ export default function DashboardPage() {
         {showFallbackSection && courses && (
           <CourseCarouselRow
             title="Felfedezés"
-            courses={courses}
+            courses={[...courses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))}
             categories={categories || []}
             instructors={instructors || []}
+            enrollments={enrollments || []}
             viewAllLink="/courses"
           />
         )}
@@ -510,6 +520,7 @@ export default function DashboardPage() {
             courses={audienceCourses}
             categories={categories || []}
             instructors={instructors || []}
+            enrollments={enrollments || []}
             viewAllLink={`/courses?audience=${audience.id}`}
           />
         ))}

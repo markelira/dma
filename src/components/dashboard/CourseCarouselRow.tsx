@@ -5,6 +5,12 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
 
+// Enrollment type for progress tracking
+interface Enrollment {
+  courseId: string;
+  progress?: number;
+}
+
 // Course type that's compatible with both the global Course type and PremiumCourseCard
 // Using a permissive type to accept any course-like object
 interface CourseCarouselRowProps {
@@ -13,6 +19,7 @@ interface CourseCarouselRowProps {
   courses: any[];
   categories?: Array<{ id: string; name: string }>;
   instructors?: Array<{ id: string; name: string; title?: string; profilePictureUrl?: string }>;
+  enrollments?: Enrollment[];
   viewAllLink?: string;
   emptyMessage?: string;
 }
@@ -22,6 +29,7 @@ export function CourseCarouselRow({
   courses,
   categories = [],
   instructors = [],
+  enrollments = [],
   viewAllLink,
   emptyMessage = 'Nincs megjeleníthető tartalom'
 }: CourseCarouselRowProps) {
@@ -114,40 +122,47 @@ export function CourseCarouselRow({
           className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
           style={{ scrollSnapType: 'x mandatory' }}
         >
-          {courses.map((course, index) => (
-            <div
-              key={course.id}
-              className="flex-shrink-0 w-[280px] md:w-[320px]"
-              style={{ scrollSnapAlign: 'start' }}
-            >
-              <PremiumCourseCard
-                course={{
-                  id: course.id,
-                  title: course.title,
-                  description: course.description,
-                  instructorId: course.instructorId,
-                  instructorIds: course.instructorIds,
-                  instructorName: course.instructorName,
-                  category: course.category,
-                  categoryId: course.categoryId,
-                  categoryIds: course.categoryIds,
-                  level: course.level || 'Beginner',
-                  duration: course.duration || '',
-                  rating: course.rating,
-                  students: course.students,
-                  enrollmentCount: course.enrollmentCount,
-                  price: course.price,
-                  thumbnailUrl: course.thumbnailUrl,
-                  lessons: course.lessons,
-                  courseType: course.courseType,
-                  contentCreatedAt: course.contentCreatedAt,
-                }}
-                index={index}
-                categories={categories}
-                instructors={instructors}
-              />
-            </div>
-          ))}
+          {courses.map((course, index) => {
+            // Find enrollment for this course to get progress
+            const enrollment = enrollments.find(e => e.courseId === course.id);
+            const progress = enrollment?.progress;
+
+            return (
+              <div
+                key={course.id}
+                className="flex-shrink-0 w-[280px] md:w-[320px]"
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <PremiumCourseCard
+                  course={{
+                    id: course.id,
+                    title: course.title,
+                    description: course.description,
+                    instructorId: course.instructorId,
+                    instructorIds: course.instructorIds,
+                    instructorName: course.instructorName,
+                    category: course.category,
+                    categoryId: course.categoryId,
+                    categoryIds: course.categoryIds,
+                    level: course.level || 'Beginner',
+                    duration: course.duration || '',
+                    rating: course.rating,
+                    students: course.students,
+                    enrollmentCount: course.enrollmentCount,
+                    price: course.price,
+                    thumbnailUrl: course.thumbnailUrl,
+                    lessons: course.lessons,
+                    courseType: course.courseType,
+                    contentCreatedAt: course.contentCreatedAt,
+                    progress: progress,
+                  }}
+                  index={index}
+                  categories={categories}
+                  instructors={instructors}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

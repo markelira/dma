@@ -45,6 +45,7 @@ interface Course {
   lessons?: number;
   courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
   contentCreatedAt?: string; // Content creation date (YYYY-MM-DD)
+  progress?: number; // 0-100, user's progress in the course
 }
 
 interface Instructor {
@@ -320,6 +321,18 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
                   <UserPlus className="w-4 h-4" />
                 )}
               </button>
+            </div>
+          )}
+
+          {/* Progress Bar */}
+          {course.progress !== undefined && course.progress > 0 && (
+            <div className="absolute bottom-0 left-0 right-0">
+              <div className="w-full bg-gray-800/80 h-1">
+                <div
+                  className="bg-brand-secondary h-1 transition-all duration-300"
+                  style={{ width: `${course.progress}%` }}
+                />
+              </div>
             </div>
           )}
         </div>

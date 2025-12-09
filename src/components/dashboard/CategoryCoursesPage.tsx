@@ -202,6 +202,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
           courses={popularCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
         />
       )}
 
@@ -213,6 +214,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
           courses={categoryCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
         />
       ))}
 
@@ -223,6 +225,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
           courses={filteredCourses}
           categories={categories || []}
           instructors={instructors || []}
+          enrollments={enrollments || []}
         />
       )}
     </div>
