@@ -1467,7 +1467,9 @@ export { getSignedUploadUrl } from './fileActions';
  * Auto-creates default categories if none exist
  */
 export const getCategories = onCall({
+  cors: true,
   region: 'us-central1',
+  minInstances: 1,
 }, async (request) => {
   try {
     logger.info('[getCategories] Called');
@@ -1923,6 +1925,13 @@ export {
   getSubscriptionInvoices,
   applyPromoCode,
 } from './subscription';
+
+// ============================================
+// BILLING PORTAL
+// ============================================
+
+// Export billing portal function for Stripe Customer Portal
+export { createBillingPortalSession } from './billing/createBillingPortalSession';
 
 // ============================================
 // PROMO CODE MANAGEMENT

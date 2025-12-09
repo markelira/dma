@@ -18,7 +18,7 @@ import {
   Users,
   LogOut,
   Building2,
-  FolderOpen,
+  CreditCard,
   Star,
   Video,
   Mic
@@ -57,7 +57,7 @@ const navigationSections = {
     {
       title: 'Eszközök',
       items: [
-        { title: 'Fizetések', href: '/dashboard/invoices', icon: FolderOpen },
+        { title: 'Számlázás', href: '/dashboard/billing', icon: CreditCard },
         { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
       ]
     }
