@@ -133,9 +133,9 @@ export function NetflixStyleHero({
   }, [modules]);
 
   return (
-    <div className="relative h-[70vh] min-h-[500px] max-h-[700px]">
-      {/* Background Image */}
-      <div className="absolute inset-0">
+    <div className="relative min-h-[500px]">
+      {/* Background Image - fixed height */}
+      <div className="absolute inset-0 h-[70vh] min-h-[500px]">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -153,8 +153,8 @@ export function NetflixStyleHero({
       </div>
 
       {/* Content */}
-      <div className="relative h-full flex items-end">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-16 w-full">
+      <div className="relative pt-[35vh] pb-16">
+        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -182,18 +182,30 @@ export function NetflixStyleHero({
               {title}
             </h1>
 
-            {/* Description */}
+            {/* Description with smooth expand animation */}
             <div className="mb-6">
-              <p className={`text-gray-300 text-lg ${isDescriptionExpanded ? '' : 'line-clamp-3'}`}>
-                {description}
-              </p>
+              <motion.div
+                className="overflow-hidden"
+                initial={false}
+                animate={{ height: 'auto' }}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+              >
+                <p className={`text-gray-300 text-lg ${isDescriptionExpanded ? '' : 'line-clamp-3'}`}>
+                  {description}
+                </p>
+              </motion.div>
               {description.length > 200 && (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
                   className="flex items-center gap-1 text-sm text-gray-400 hover:text-white mt-2 transition-colors"
                 >
                   {isDescriptionExpanded ? 'Kevesebb' : 'Több...'}
-                  <ChevronDown className={`w-4 h-4 transition-transform ${isDescriptionExpanded ? 'rotate-180' : ''}`} />
+                  <motion.span
+                    animate={{ rotate: isDescriptionExpanded ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </motion.span>
                 </button>
               )}
             </div>
