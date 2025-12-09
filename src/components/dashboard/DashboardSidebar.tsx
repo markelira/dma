@@ -240,13 +240,24 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
       {/* User Profile Section */}
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center space-x-3 mb-4">
-          <motion.div
-            className="w-8 h-8 rounded-full flex items-center justify-center bg-brand-secondary"
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.2 }}
-          >
-            <User className="w-4 h-4 text-white" />
-          </motion.div>
+          {user?.profilePictureUrl ? (
+            <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-brand-secondary flex-shrink-0">
+              <Image
+                src={user.profilePictureUrl}
+                alt={`${user.firstName} ${user.lastName}`}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <motion.div
+              className="w-8 h-8 rounded-full flex items-center justify-center bg-brand-secondary flex-shrink-0"
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <User className="w-4 h-4 text-white" />
+            </motion.div>
+          )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
               {user?.firstName} {user?.lastName}
