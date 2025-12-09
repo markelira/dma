@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +17,7 @@ import Image from 'next/image'
 
 export default function SettingsPage() {
   const { user, setUser } = useAuthStore()
+  const { refreshUser } = useAuth()
 
   // Profile states
   const [firstName, setFirstName] = useState(user?.firstName || '')
@@ -92,6 +94,9 @@ export default function SettingsPage() {
         profilePictureUrl: downloadUrl
       })
 
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
+
       toast.success('Profilkép sikeresen feltöltve')
     } catch (error) {
       console.error('Error uploading profile picture:', error)
@@ -136,6 +141,9 @@ export default function SettingsPage() {
         profilePictureUrl: undefined
       })
 
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
+
       toast.success('Profilkép sikeresen törölve')
     } catch (error) {
       console.error('Error removing profile picture:', error)
@@ -174,6 +182,9 @@ export default function SettingsPage() {
         firstName,
         lastName
       })
+
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
 
       toast.success('Profil sikeresen mentve')
     } catch (error) {

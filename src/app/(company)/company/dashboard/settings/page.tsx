@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -42,6 +43,7 @@ const COMPANY_SIZE_OPTIONS = [
 
 export default function CompanySettingsPage() {
   const { user, setUser } = useAuthStore()
+  const { refreshUser } = useAuth()
   const [activeTab, setActiveTab] = useState<'profile' | 'company'>('profile')
 
   // Profile states
@@ -142,6 +144,8 @@ export default function CompanySettingsPage() {
 
       setProfilePictureUrl(downloadUrl)
       setUser({ ...user, profilePictureUrl: downloadUrl })
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
       toast.success('Profilkép sikeresen feltöltve')
     } catch (error) {
       console.error('Error uploading profile picture:', error)
@@ -174,6 +178,8 @@ export default function CompanySettingsPage() {
 
       setProfilePictureUrl(null)
       setUser({ ...user, profilePictureUrl: undefined })
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
       toast.success('Profilkép sikeresen törölve')
     } catch (error) {
       console.error('Error removing profile picture:', error)
@@ -273,6 +279,8 @@ export default function CompanySettingsPage() {
       })
 
       setUser({ ...user, firstName, lastName })
+      // Refresh AuthContext so sidebar updates
+      await refreshUser()
       toast.success('Profil sikeresen mentve')
     } catch (error) {
       console.error('Error saving profile:', error)

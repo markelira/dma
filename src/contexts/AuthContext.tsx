@@ -34,6 +34,13 @@ interface AuthUser extends User {
   companyRole?: string;
   teamId?: string;
   isTeamOwner?: boolean;
+  // Custom user fields from Firestore
+  firstName?: string;
+  lastName?: string;
+  profilePictureUrl?: string;
+  title?: string;
+  bio?: string;
+  phone?: string;
 }
 
 interface AuthContextType {
@@ -114,7 +121,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           companyId: userData.companyId || (customClaims.companyId as string | undefined),
           companyRole: userData.companyRole || (customClaims.companyRole as string | undefined),
           teamId: userData.teamId,
-          isTeamOwner: userData.isTeamOwner ?? false
+          isTeamOwner: userData.isTeamOwner ?? false,
+          // Custom user fields from Firestore
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profilePictureUrl: userData.profilePictureUrl,
+          title: userData.title,
+          bio: userData.bio,
+          phone: userData.phone
         };
       } else {
         // If no Firestore document, fall back to custom claims
