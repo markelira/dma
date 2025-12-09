@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { Play, Clock, CheckCircle } from 'lucide-react';
 
@@ -20,6 +21,7 @@ interface EnrolledCourseCardProps {
 }
 
 export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCardProps) {
+  const [imageError, setImageError] = useState(false);
   const isCompleted = enrollment.status === 'completed' || enrollment.progress === 100;
   const isInProgress = enrollment.progress > 0 && enrollment.progress < 100;
 
@@ -37,11 +39,12 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
       <div className="relative rounded-xl overflow-hidden bg-white border border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all duration-300">
         {/* Thumbnail */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
-          {enrollment.thumbnailUrl ? (
+          {enrollment.thumbnailUrl && !imageError ? (
             <img
               src={enrollment.thumbnailUrl}
               alt={enrollment.courseName}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={() => setImageError(true)}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

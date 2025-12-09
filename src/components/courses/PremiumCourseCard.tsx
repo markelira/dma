@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from "motion/react";
 import { BookOpen, Clock, Star, Play, UserPlus, CheckCircle2, Bookmark, BookmarkCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -69,6 +70,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
   const enrollMutation = useEnrollInCourse();
   const { isInWatchlist, toggleWatchlist, isToggling } = useWatchlist();
+  const [imageError, setImageError] = useState(false);
 
   const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
   const isEnrolling = enrollMutation.isPending;
@@ -260,13 +262,14 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
       >
         {/* Course Image */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
-          {course.thumbnailUrl ? (
+          {course.thumbnailUrl && !imageError ? (
             <Image
               src={course.thumbnailUrl}
               alt={course.title}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              onError={() => setImageError(true)}
             />
           ) : (
             <div

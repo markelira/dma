@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Users, Clock, CheckCircle2 } from 'lucide-react';
@@ -59,6 +59,8 @@ export function CarouselCourseCard({
   progress,
   contentCreatedAt,
 }: CarouselCourseCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   return (
     <Link href={`/courses/${id}`}>
       <div className="group relative rounded-xl bg-white shadow-md border border-gray-100 overflow-hidden hover:shadow-lg hover:border-gray-200 transition-all duration-300 h-full flex flex-col">
@@ -72,12 +74,13 @@ export function CarouselCourseCard({
         </div>
 
         <div className="relative w-full aspect-video overflow-hidden rounded-t-xl bg-gradient-to-br from-gray-100 to-gray-200">
-          {thumbnailUrl ? (
+          {thumbnailUrl && !imageError ? (
             <Image
               src={thumbnailUrl}
               alt={title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={() => setImageError(true)}
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
