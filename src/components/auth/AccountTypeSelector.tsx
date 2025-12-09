@@ -41,23 +41,23 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
               </p>
               <div className="space-y-1.5">
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Hetente frissülő tartalmak</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Bármikor lemondható</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>7 napos ingyenes kipróbálás</span>
                 </div>
               </div>
@@ -83,27 +83,27 @@ export const AccountTypeSelector: React.FC<AccountTypeSelectorProps> = ({ onSele
               </p>
               <div className="space-y-1.5">
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>5 munkatárs díjmentes hozzáadása</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Hetente frissülő tartalmak</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>Bármikor lemondható</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-600">
-                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400" />
+                  <CheckCircle2 className="w-4 h-4 mr-2 text-gray-400 flex-shrink-0" />
                   <span>7 napos ingyenes kipróbálás</span>
                 </div>
               </div>
