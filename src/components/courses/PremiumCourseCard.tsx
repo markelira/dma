@@ -253,7 +253,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
               src={course.thumbnailUrl}
               alt={course.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={() => setImageError(true)}
             />
@@ -343,13 +343,6 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           <p className="text-sm font-normal text-gray-600 line-clamp-2 mb-4 flex-1">
             {course.description}
           </p>
-
-          {/* Mentor(s) - supports multiple */}
-          {getInstructorNames().length > 0 && (
-            <p className="text-xs font-normal text-gray-500 mb-3">
-              {getInstructorNames().length > 1 ? 'Mentorok' : 'Mentor'}: <span className="font-medium">{getInstructorNames().join(', ')}</span>
-            </p>
-          )}
 
           {/* Stats */}
           <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
