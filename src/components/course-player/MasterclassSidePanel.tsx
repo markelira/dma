@@ -232,7 +232,7 @@ export function MasterclassSidePanel({
 
                   {/* Lesson Info */}
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium truncate ${
+                    <p className={`text-sm font-medium ${
                       isCurrent ? 'text-white' : 'text-gray-300'
                     }`}>
                       {lesson.title}
