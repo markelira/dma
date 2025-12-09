@@ -19,7 +19,6 @@ import {
   LogOut,
   Building2,
   FolderOpen,
-  BarChart3,
   Star,
   Video,
   Mic
@@ -58,7 +57,6 @@ const navigationSections = {
     {
       title: 'Eszközök',
       items: [
-        { title: 'Haladás', href: '/dashboard/vezerlopult', icon: BarChart3 },
         { title: 'Fizetések', href: '/dashboard/invoices', icon: FolderOpen },
         { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
       ]
