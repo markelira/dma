@@ -9,7 +9,7 @@ export default function Logo() {
         alt="DMA Logo"
         width={50}
         height={18}
-        className="h-4 w-auto"
+        className="h-6 w-auto"
       />
     </Link>
   );
