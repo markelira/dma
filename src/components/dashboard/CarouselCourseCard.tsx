@@ -96,7 +96,7 @@ export function CarouselCourseCard({
         </div>
 
         <div className="p-5 flex flex-col flex-1">
-          <h3 className="text-base font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-brand-secondary transition-colors leading-tight">
+          <h3 className="text-base font-bold text-gray-900 mb-2 group-hover:text-brand-secondary transition-colors leading-tight">
             {title}
           </h3>
 

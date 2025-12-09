@@ -367,7 +367,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-gray-900 line-clamp-2 mb-2 group-hover:text-brand-secondary transition-colors duration-200">
+          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand-secondary transition-colors duration-200">
             {course.title}
           </h3>
 
