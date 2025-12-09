@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, X, ChevronDown, Filter } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import Link from 'next/link';
+import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 
 // Dynamic import of CoursesHero Framer component
 const CoursesHero = dynamic(
@@ -29,16 +30,23 @@ interface CoursesHeroSectionProps {
   categories: Array<{ id: string; name: string }>;
   targetAudiences: Array<{ id: string; name: string }>;
   instructors?: Instructor[];
-  selectedCategory: string;
-  selectedTargetAudience: string;
-  selectedCourseType: string;
-  selectedInstructor: string;
-  onCategoryChange: (id: string) => void;
-  onTargetAudienceChange: (id: string) => void;
-  onCourseTypeChange: (type: string) => void;
-  onInstructorChange: (id: string) => void;
+  selectedCategories: string[];
+  selectedTargetAudiences: string[];
+  selectedCourseTypes: string[];
+  selectedInstructors: string[];
+  onCategoriesChange: (ids: string[]) => void;
+  onTargetAudiencesChange: (ids: string[]) => void;
+  onCourseTypesChange: (types: string[]) => void;
+  onInstructorsChange: (ids: string[]) => void;
   onClearFilters: () => void;
 }
+
+const COURSE_TYPE_OPTIONS = [
+  { value: 'WEBINAR', label: 'Webinár' },
+  { value: 'ACADEMIA', label: 'Akadémia' },
+  { value: 'MASTERCLASS', label: 'Masterclass' },
+  { value: 'PODCAST', label: 'Podcast' },
+];
 
 const COURSE_TYPE_LABELS: Record<string, string> = {
   ACADEMIA: 'Akadémia',
@@ -52,21 +60,21 @@ export function CoursesHeroSection({
   categories,
   targetAudiences,
   instructors = [],
-  selectedCategory,
-  selectedTargetAudience,
-  selectedCourseType,
-  selectedInstructor,
-  onCategoryChange,
-  onTargetAudienceChange,
-  onCourseTypeChange,
-  onInstructorChange,
+  selectedCategories,
+  selectedTargetAudiences,
+  selectedCourseTypes,
+  selectedInstructors,
+  onCategoriesChange,
+  onTargetAudiencesChange,
+  onCourseTypesChange,
+  onInstructorsChange,
   onClearFilters,
 }: CoursesHeroSectionProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const hasActiveFilters = !!selectedCategory || !!selectedTargetAudience || !!selectedCourseType || !!selectedInstructor;
+  const hasActiveFilters = selectedCategories.length > 0 || selectedTargetAudiences.length > 0 || selectedCourseTypes.length > 0 || selectedInstructors.length > 0;
 
   // Filter suggestions based on search query
   const suggestions = searchQuery.length >= 2
@@ -87,6 +95,14 @@ export function CoursesHeroSection({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Prepare options for dropdowns
+  const categoryOptions = categories.map(c => ({ value: c.id, label: c.name }));
+  const audienceOptions = targetAudiences.map(a => ({ value: a.id, label: a.name }));
+  const instructorOptions = instructors.map(i => ({ value: i.id, label: i.name }));
+
+  // Get selected names for badges
+  const activeFilterCount = selectedCategories.length + selectedTargetAudiences.length + selectedCourseTypes.length + selectedInstructors.length;
 
   return (
     <div>
@@ -198,89 +214,55 @@ export function CoursesHeroSection({
               transition={{ duration: 0.5, delay: 0.1 }}
               className="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200 shadow-lg p-4 md:p-6"
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-4">
+              <div className="flex flex-col md:flex-row md:items-start md:justify-center gap-4">
                 {/* Filter Icon */}
-                <div className="flex items-center gap-2 text-gray-700">
+                <div className="flex items-center gap-2 text-gray-700 md:pt-6">
                   <Filter className="w-5 h-5" />
                   <span className="font-medium text-sm">Szűrők</span>
+                  {hasActiveFilters && (
+                    <span className="w-5 h-5 rounded-full bg-brand-secondary text-white text-xs flex items-center justify-center">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </div>
 
                 {/* Filters */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {/* Category Filter */}
-                  <div className="min-w-0">
-                    <div className="relative">
-                      <select
-                        value={selectedCategory}
-                        onChange={(e) => onCategoryChange(e.target.value)}
-                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
-                      >
-                        <option value="">Összes kategória</option>
-                        {categories.map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 flex-1">
+                  {/* Category Filter - now "Területek" */}
+                  <MultiSelectDropdown
+                    label="Területek"
+                    placeholder="Összes terület"
+                    options={categoryOptions}
+                    selected={selectedCategories}
+                    onChange={onCategoriesChange}
+                  />
 
-                  {/* Course Type Filter */}
-                  <div className="min-w-0">
-                    <div className="relative">
-                      <select
-                        value={selectedCourseType}
-                        onChange={(e) => onCourseTypeChange(e.target.value)}
-                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
-                      >
-                        <option value="">Összes típus</option>
-                        <option value="ACADEMIA">Akadémia</option>
-                        <option value="WEBINAR">Webinár</option>
-                        <option value="MASTERCLASS">Masterclass</option>
-                        <option value="PODCAST">Podcast</option>
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
+                  {/* Course Type Filter - now "Tartalmak" */}
+                  <MultiSelectDropdown
+                    label="Tartalmak"
+                    placeholder="Összes tartalom"
+                    options={COURSE_TYPE_OPTIONS}
+                    selected={selectedCourseTypes}
+                    onChange={onCourseTypesChange}
+                  />
 
                   {/* Target Audience Filter */}
-                  <div className="min-w-0">
-                    <div className="relative">
-                      <select
-                        value={selectedTargetAudience}
-                        onChange={(e) => onTargetAudienceChange(e.target.value)}
-                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
-                      >
-                        <option value="">Összes célközönség</option>
-                        {targetAudiences.map((audience) => (
-                          <option key={audience.id} value={audience.id}>
-                            {audience.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
+                  <MultiSelectDropdown
+                    label="Célközönség"
+                    placeholder="Összes célközönség"
+                    options={audienceOptions}
+                    selected={selectedTargetAudiences}
+                    onChange={onTargetAudiencesChange}
+                  />
 
-                  {/* Instructor Filter */}
-                  <div className="min-w-0">
-                    <div className="relative">
-                      <select
-                        value={selectedInstructor}
-                        onChange={(e) => onInstructorChange(e.target.value)}
-                        className="w-full appearance-none bg-white border border-gray-200 rounded-xl px-4 py-3 pr-10 text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 transition-all cursor-pointer text-sm"
-                      >
-                        <option value="">Összes oktató</option>
-                        {instructors.map((instructor) => (
-                          <option key={instructor.id} value={instructor.id}>
-                            {instructor.name}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
+                  {/* Instructor Filter - now "Mentorok" */}
+                  <MultiSelectDropdown
+                    label="Mentorok"
+                    placeholder="Összes mentor"
+                    options={instructorOptions}
+                    selected={selectedInstructors}
+                    onChange={onInstructorsChange}
+                  />
                 </div>
 
                 {/* Clear Filters */}
@@ -289,10 +271,10 @@ export function CoursesHeroSection({
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
                     onClick={onClearFilters}
-                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all"
+                    className="flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all md:mt-5"
                   >
                     <X className="w-4 h-4" />
-                    Szűrők törlése
+                    Törlés
                   </motion.button>
                 )}
               </div>
@@ -307,70 +289,85 @@ export function CoursesHeroSection({
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm text-gray-600">Aktív szűrők:</span>
 
-                    {selectedCategory && (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-secondary/10 text-brand-secondary rounded-full text-sm font-medium"
-                      >
-                        {categories.find(c => c.id === selectedCategory)?.name}
-                        <button
-                          onClick={() => onCategoryChange('')}
-                          className="hover:bg-brand-secondary/20 rounded-full p-0.5 transition-colors"
+                    {selectedCategories.map(catId => {
+                      const cat = categories.find(c => c.id === catId);
+                      if (!cat) return null;
+                      return (
+                        <motion.span
+                          key={catId}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-secondary/10 text-brand-secondary rounded-full text-sm font-medium"
                         >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </motion.span>
-                    )}
+                          {cat.name}
+                          <button
+                            onClick={() => onCategoriesChange(selectedCategories.filter(id => id !== catId))}
+                            className="hover:bg-brand-secondary/20 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </motion.span>
+                      );
+                    })}
 
-                    {selectedCourseType && (
+                    {selectedCourseTypes.map(type => (
                       <motion.span
+                        key={type}
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium"
                       >
-                        {COURSE_TYPE_LABELS[selectedCourseType]}
+                        {COURSE_TYPE_LABELS[type]}
                         <button
-                          onClick={() => onCourseTypeChange('')}
+                          onClick={() => onCourseTypesChange(selectedCourseTypes.filter(t => t !== type))}
                           className="hover:bg-purple-200 rounded-full p-0.5 transition-colors"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </motion.span>
-                    )}
+                    ))}
 
-                    {selectedTargetAudience && (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"
-                      >
-                        {targetAudiences.find(t => t.id === selectedTargetAudience)?.name}
-                        <button
-                          onClick={() => onTargetAudienceChange('')}
-                          className="hover:bg-teal-200 rounded-full p-0.5 transition-colors"
+                    {selectedTargetAudiences.map(audId => {
+                      const aud = targetAudiences.find(a => a.id === audId);
+                      if (!aud) return null;
+                      return (
+                        <motion.span
+                          key={audId}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium"
                         >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </motion.span>
-                    )}
+                          {aud.name}
+                          <button
+                            onClick={() => onTargetAudiencesChange(selectedTargetAudiences.filter(id => id !== audId))}
+                            className="hover:bg-teal-200 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </motion.span>
+                      );
+                    })}
 
-                    {selectedInstructor && (
-                      <motion.span
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium"
-                      >
-                        {instructors.find(i => i.id === selectedInstructor)?.name}
-                        <button
-                          onClick={() => onInstructorChange('')}
-                          className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                    {selectedInstructors.map(instId => {
+                      const inst = instructors.find(i => i.id === instId);
+                      if (!inst) return null;
+                      return (
+                        <motion.span
+                          key={instId}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium"
                         >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </motion.span>
-                    )}
-
+                          {inst.name}
+                          <button
+                            onClick={() => onInstructorsChange(selectedInstructors.filter(id => id !== instId))}
+                            className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </motion.span>
+                      );
+                    })}
                   </div>
                 </motion.div>
               )}

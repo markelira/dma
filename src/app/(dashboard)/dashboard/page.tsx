@@ -59,11 +59,13 @@ export default function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [companyInfo, setCompanyInfo] = useState<{ name: string; id: string } | null>(null);
 
-  // Filter state for search
+  // Filter state for search - now with arrays for multi-select
   const [activeFilters, setActiveFilters] = useState<DashboardFilters>({
     query: '',
-    categoryId: null,
-    audienceId: null,
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
   });
 
   // Check if user is company employee
@@ -316,10 +318,10 @@ export default function DashboardPage() {
 
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
-  // Check if any filters are active
-  const hasActiveFilters = activeFilters.query || activeFilters.categoryId || activeFilters.audienceId;
+  // Check if any filters are active (now with arrays)
+  const hasActiveFilters = activeFilters.query || activeFilters.categoryIds.length > 0 || activeFilters.audienceIds.length > 0 || activeFilters.courseTypes.length > 0 || activeFilters.instructorIds.length > 0;
 
-  // Filter courses based on active filters
+  // Filter courses based on active filters (with multi-select OR logic)
   const filteredCourses = useMemo(() => {
     if (!courses || !hasActiveFilters) return null;
 
@@ -334,20 +336,39 @@ export default function DashboardPage() {
       );
     }
 
-    // Filter by category
-    if (activeFilters.categoryId) {
+    // Filter by categories (OR logic for multi-select)
+    if (activeFilters.categoryIds.length > 0) {
       results = results.filter(course => {
-        if (course.categoryIds?.includes(activeFilters.categoryId!)) return true;
-        if (course.category?.id === activeFilters.categoryId) return true;
-        if ((course as any).categoryId === activeFilters.categoryId) return true;
-        return false;
+        return activeFilters.categoryIds.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if (course.category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
       });
     }
 
-    // Filter by target audience
-    if (activeFilters.audienceId) {
+    // Filter by target audiences (OR logic for multi-select)
+    if (activeFilters.audienceIds.length > 0) {
       results = results.filter(course =>
-        course.targetAudienceIds?.includes(activeFilters.audienceId!)
+        activeFilters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
+      );
+    }
+
+    // Filter by course types (OR logic for multi-select)
+    if (activeFilters.courseTypes.length > 0) {
+      results = results.filter(course =>
+        activeFilters.courseTypes.includes(course.courseType)
+      );
+    }
+
+    // Filter by instructors (OR logic for multi-select)
+    if (activeFilters.instructorIds.length > 0) {
+      results = results.filter(course =>
+        activeFilters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
       );
     }
 

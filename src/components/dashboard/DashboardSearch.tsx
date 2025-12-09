@@ -2,26 +2,27 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, ChevronDown, Filter } from 'lucide-react';
+import { Search, X, Filter } from 'lucide-react';
 import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
+import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 import { cn } from '@/lib/utils';
 
 const COURSE_TYPE_OPTIONS = [
-  { value: 'ACADEMIA', label: 'Akadémia' },
   { value: 'WEBINAR', label: 'Webinár' },
+  { value: 'ACADEMIA', label: 'Akadémia' },
   { value: 'MASTERCLASS', label: 'Masterclass' },
   { value: 'PODCAST', label: 'Podcast' },
 ];
 
 export interface DashboardFilters {
   query: string;
-  categoryId: string | null;
-  audienceId: string | null;
-  courseType: string | null;
-  instructorId: string | null;
+  categoryIds: string[];
+  audienceIds: string[];
+  courseTypes: string[];
+  instructorIds: string[];
 }
 
 interface DashboardSearchProps {
@@ -40,10 +41,10 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedAudience, setSelectedAudience] = useState<string | null>(null);
-  const [selectedCourseType, setSelectedCourseType] = useState<string | null>(null);
-  const [selectedInstructor, setSelectedInstructor] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedAudiences, setSelectedAudiences] = useState<string[]>([]);
+  const [selectedCourseTypes, setSelectedCourseTypes] = useState<string[]>([]);
+  const [selectedInstructors, setSelectedInstructors] = useState<string[]>([]);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -74,38 +75,44 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
       );
     }
 
-    // Filter by category
-    if (selectedCategory) {
+    // Filter by categories (OR logic)
+    if (selectedCategories.length > 0) {
       results = results.filter(course => {
-        if (course.categoryIds?.includes(selectedCategory)) return true;
-        if (course.category?.id === selectedCategory) return true;
-        if ((course as any).categoryId === selectedCategory) return true;
-        return false;
+        return selectedCategories.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if (course.category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
       });
     }
 
-    // Filter by target audience
-    if (selectedAudience) {
+    // Filter by target audiences (OR logic)
+    if (selectedAudiences.length > 0) {
       results = results.filter(course =>
-        course.targetAudienceIds?.includes(selectedAudience)
+        selectedAudiences.some(audId => course.targetAudienceIds?.includes(audId))
       );
     }
 
-    // Filter by course type
-    if (selectedCourseType) {
-      results = results.filter(course => course.courseType === selectedCourseType);
+    // Filter by course types (OR logic)
+    if (selectedCourseTypes.length > 0) {
+      results = results.filter(course =>
+        selectedCourseTypes.includes(course.courseType)
+      );
     }
 
-    // Filter by instructor
-    if (selectedInstructor) {
+    // Filter by instructors (OR logic)
+    if (selectedInstructors.length > 0) {
       results = results.filter(course =>
-        (course as any).instructorId === selectedInstructor ||
-        (course as any).instructorIds?.includes(selectedInstructor)
+        selectedInstructors.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
       );
     }
 
     return results.slice(0, 8); // Limit to 8 results
-  }, [courses, query, selectedCategory, selectedAudience, selectedCourseType, selectedInstructor]);
+  }, [courses, query, selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors]);
 
   const handleSelect = (courseId: string) => {
     setIsOpen(false);
@@ -117,10 +124,10 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
     // Apply filters in-place instead of redirecting
     onFilterChange?.({
       query: query.trim(),
-      categoryId: selectedCategory,
-      audienceId: selectedAudience,
-      courseType: selectedCourseType,
-      instructorId: selectedInstructor,
+      categoryIds: selectedCategories,
+      audienceIds: selectedAudiences,
+      courseTypes: selectedCourseTypes,
+      instructorIds: selectedInstructors,
     });
     setIsOpen(false);
     setShowFilters(false);
@@ -136,26 +143,33 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
   };
 
   const clearFilters = () => {
-    setSelectedCategory(null);
-    setSelectedAudience(null);
-    setSelectedCourseType(null);
-    setSelectedInstructor(null);
+    setSelectedCategories([]);
+    setSelectedAudiences([]);
+    setSelectedCourseTypes([]);
+    setSelectedInstructors([]);
     setQuery('');
     onFilterChange?.({
       query: '',
-      categoryId: null,
-      audienceId: null,
-      courseType: null,
-      instructorId: null,
+      categoryIds: [],
+      audienceIds: [],
+      courseTypes: [],
+      instructorIds: [],
     });
   };
 
-  const hasActiveFilters = selectedCategory || selectedAudience || selectedCourseType || selectedInstructor;
+  const hasActiveFilters = selectedCategories.length > 0 || selectedAudiences.length > 0 || selectedCourseTypes.length > 0 || selectedInstructors.length > 0;
+  const activeFilterCount = selectedCategories.length + selectedAudiences.length + selectedCourseTypes.length + selectedInstructors.length;
 
-  const selectedCategoryName = categories?.find(c => c.id === selectedCategory)?.name;
-  const selectedAudienceName = targetAudiences?.find(a => a.id === selectedAudience)?.name;
-  const selectedCourseTypeName = COURSE_TYPE_OPTIONS.find(t => t.value === selectedCourseType)?.label;
-  const selectedInstructorName = instructors?.find(i => i.id === selectedInstructor)?.name;
+  // Get selected names for badges
+  const selectedCategoryNames = selectedCategories.map(id => categories?.find(c => c.id === id)?.name).filter(Boolean);
+  const selectedAudienceNames = selectedAudiences.map(id => targetAudiences?.find(a => a.id === id)?.name).filter(Boolean);
+  const selectedCourseTypeNames = selectedCourseTypes.map(type => COURSE_TYPE_OPTIONS.find(t => t.value === type)?.label).filter(Boolean);
+  const selectedInstructorNames = selectedInstructors.map(id => instructors?.find(i => i.id === id)?.name).filter(Boolean);
+
+  // Prepare options for dropdowns
+  const categoryOptions = categories?.map(c => ({ value: c.id, label: c.name })) || [];
+  const audienceOptions = targetAudiences?.map(a => ({ value: a.id, label: a.name })) || [];
+  const instructorOptions = instructors?.map(i => ({ value: i.id, label: i.name })) || [];
 
   return (
     <div ref={containerRef} className={cn('relative w-full max-w-2xl mx-auto', className)}>
@@ -183,24 +197,19 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
           {/* Active filter badges */}
           {hasActiveFilters && (
             <div className="flex items-center gap-1 mr-2">
-              {selectedCategoryName && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary">
-                  {selectedCategoryName}
+              {selectedCategoryNames.slice(0, 1).map((name, i) => (
+                <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary">
+                  {name}
                 </span>
-              )}
-              {selectedCourseTypeName && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
-                  {selectedCourseTypeName}
+              ))}
+              {selectedCourseTypeNames.slice(0, 1).map((name, i) => (
+                <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700">
+                  {name}
                 </span>
-              )}
-              {selectedAudienceName && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">
-                  {selectedAudienceName}
-                </span>
-              )}
-              {selectedInstructorName && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
-                  {selectedInstructorName}
+              ))}
+              {activeFilterCount > 2 && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                  +{activeFilterCount - 2}
                 </span>
               )}
             </div>
@@ -233,7 +242,7 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
             <span className="hidden sm:inline">Szűrők</span>
             {hasActiveFilters && (
               <span className="w-5 h-5 rounded-full bg-brand-secondary text-white text-xs flex items-center justify-center">
-                {(selectedCategory ? 1 : 0) + (selectedAudience ? 1 : 0) + (selectedCourseType ? 1 : 0) + (selectedInstructor ? 1 : 0)}
+                {activeFilterCount}
               </span>
             )}
           </button>
@@ -264,93 +273,41 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Category Filter */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                Kategória
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedCategory || ''}
-                  onChange={(e) => setSelectedCategory(e.target.value || null)}
-                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
-                >
-                  <option value="">Összes kategória</option>
-                  {categories?.map(category => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
+            {/* Category Filter - now "Területek" */}
+            <MultiSelectDropdown
+              label="Területek"
+              placeholder="Összes terület"
+              options={categoryOptions}
+              selected={selectedCategories}
+              onChange={setSelectedCategories}
+            />
 
-            {/* Course Type Filter */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                Típus
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedCourseType || ''}
-                  onChange={(e) => setSelectedCourseType(e.target.value || null)}
-                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
-                >
-                  <option value="">Összes típus</option>
-                  {COURSE_TYPE_OPTIONS.map(type => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
+            {/* Course Type Filter - now "Tartalmak" */}
+            <MultiSelectDropdown
+              label="Tartalmak"
+              placeholder="Összes tartalom"
+              options={COURSE_TYPE_OPTIONS}
+              selected={selectedCourseTypes}
+              onChange={setSelectedCourseTypes}
+            />
 
             {/* Target Audience Filter */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                Célközönség
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedAudience || ''}
-                  onChange={(e) => setSelectedAudience(e.target.value || null)}
-                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
-                >
-                  <option value="">Összes célközönség</option>
-                  {targetAudiences?.map(audience => (
-                    <option key={audience.id} value={audience.id}>
-                      {audience.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
+            <MultiSelectDropdown
+              label="Célközönség"
+              placeholder="Összes célközönség"
+              options={audienceOptions}
+              selected={selectedAudiences}
+              onChange={setSelectedAudiences}
+            />
 
-            {/* Instructor Filter */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
-                {courseType === 'PODCAST' ? 'Vendég' : 'Mentor'}
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedInstructor || ''}
-                  onChange={(e) => setSelectedInstructor(e.target.value || null)}
-                  className="w-full px-3 py-2 pr-8 text-sm bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary"
-                >
-                  <option value="">{courseType === 'PODCAST' ? 'Összes vendég' : 'Összes mentor'}</option>
-                  {instructors?.map(instructor => (
-                    <option key={instructor.id} value={instructor.id}>
-                      {instructor.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              </div>
-            </div>
+            {/* Instructor Filter - now "Mentorok" */}
+            <MultiSelectDropdown
+              label={courseType === 'PODCAST' ? 'Vendégek' : 'Mentorok'}
+              placeholder={courseType === 'PODCAST' ? 'Összes vendég' : 'Összes mentor'}
+              options={instructorOptions}
+              selected={selectedInstructors}
+              onChange={setSelectedInstructors}
+            />
           </div>
         </div>
       )}

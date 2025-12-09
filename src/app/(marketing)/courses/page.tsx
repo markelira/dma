@@ -202,10 +202,11 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
   const [targetAudiences, setTargetAudiences] = useState<Array<{ id: string; name: string }>>([])
-  const [selectedCategory, setSelectedCategory] = useState('')
-  const [selectedTargetAudience, setSelectedTargetAudience] = useState('')
-  const [selectedCourseType, setSelectedCourseType] = useState('')
-  const [selectedInstructor, setSelectedInstructor] = useState('')
+  // Multi-select state - arrays instead of single strings
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedTargetAudiences, setSelectedTargetAudiences] = useState<string[]>([])
+  const [selectedCourseTypes, setSelectedCourseTypes] = useState<string[]>([])
+  const [selectedInstructors, setSelectedInstructors] = useState<string[]>([])
   const { data: instructors = [] } = useInstructors()
 
   // Fetch categories
@@ -283,38 +284,40 @@ export default function CoursesPage() {
     return () => unsubscribe()
   }, [])
 
-  // Apply filters and organize courses by type
+  // Apply filters and organize courses by type (with multi-select OR logic)
   const filteredCoursesByType = useMemo(() => {
     let filtered = courses
 
-    // Apply category filter
-    if (selectedCategory) {
+    // Apply category filter (OR logic for multi-select)
+    if (selectedCategories.length > 0) {
       filtered = filtered.filter(c => {
-        // Check categoryIds array
-        if (c.categoryIds?.includes(selectedCategory)) return true
-        // Check categoryId field
-        if (c.categoryId === selectedCategory) return true
-        return false
+        return selectedCategories.some(catId => {
+          if (c.categoryIds?.includes(catId)) return true
+          if (c.categoryId === catId) return true
+          return false
+        })
       })
     }
 
-    // Apply target audience filter
-    if (selectedTargetAudience) {
+    // Apply target audience filter (OR logic for multi-select)
+    if (selectedTargetAudiences.length > 0) {
       filtered = filtered.filter(c =>
-        c.targetAudienceIds?.includes(selectedTargetAudience)
+        selectedTargetAudiences.some(audId => c.targetAudienceIds?.includes(audId))
       )
     }
 
-    // Apply course type filter
-    if (selectedCourseType) {
-      filtered = filtered.filter(c => c.courseType === selectedCourseType)
+    // Apply course type filter (OR logic for multi-select)
+    if (selectedCourseTypes.length > 0) {
+      filtered = filtered.filter(c => selectedCourseTypes.includes(c.courseType))
     }
 
-    // Apply instructor filter
-    if (selectedInstructor) {
+    // Apply instructor filter (OR logic for multi-select)
+    if (selectedInstructors.length > 0) {
       filtered = filtered.filter(c =>
-        c.instructorId === selectedInstructor ||
-        c.instructorIds?.includes(selectedInstructor)
+        selectedInstructors.some(instId =>
+          c.instructorId === instId ||
+          c.instructorIds?.includes(instId)
+        )
       )
     }
 
@@ -324,7 +327,7 @@ export default function CoursesPage() {
       MASTERCLASS: filtered.filter(c => c.courseType === 'MASTERCLASS'),
       PODCAST: filtered.filter(c => c.courseType === 'PODCAST'),
     }
-  }, [courses, selectedCategory, selectedTargetAudience, selectedCourseType, selectedInstructor])
+  }, [courses, selectedCategories, selectedTargetAudiences, selectedCourseTypes, selectedInstructors])
 
   // Check if all filtered sections are empty
   const hasFilteredResults = useMemo(() => {
@@ -336,7 +339,7 @@ export default function CoursesPage() {
     )
   }, [filteredCoursesByType])
 
-  const hasActiveFilters = selectedCategory || selectedTargetAudience || selectedCourseType || selectedInstructor
+  const hasActiveFilters = selectedCategories.length > 0 || selectedTargetAudiences.length > 0 || selectedCourseTypes.length > 0 || selectedInstructors.length > 0
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -375,19 +378,19 @@ export default function CoursesPage() {
           categories={categories}
           targetAudiences={targetAudiences}
           instructors={instructors}
-          selectedCategory={selectedCategory}
-          selectedTargetAudience={selectedTargetAudience}
-          selectedCourseType={selectedCourseType}
-          selectedInstructor={selectedInstructor}
-          onCategoryChange={setSelectedCategory}
-          onTargetAudienceChange={setSelectedTargetAudience}
-          onCourseTypeChange={setSelectedCourseType}
-          onInstructorChange={setSelectedInstructor}
+          selectedCategories={selectedCategories}
+          selectedTargetAudiences={selectedTargetAudiences}
+          selectedCourseTypes={selectedCourseTypes}
+          selectedInstructors={selectedInstructors}
+          onCategoriesChange={setSelectedCategories}
+          onTargetAudiencesChange={setSelectedTargetAudiences}
+          onCourseTypesChange={setSelectedCourseTypes}
+          onInstructorsChange={setSelectedInstructors}
           onClearFilters={() => {
-            setSelectedCategory('')
-            setSelectedTargetAudience('')
-            setSelectedCourseType('')
-            setSelectedInstructor('')
+            setSelectedCategories([])
+            setSelectedTargetAudiences([])
+            setSelectedCourseTypes([])
+            setSelectedInstructors([])
           }}
         />
 
@@ -396,6 +399,17 @@ export default function CoursesPage() {
           {/* Show carousels only if there are filtered results */}
           {hasFilteredResults ? (
             <>
+              {/* Webinar Carousel - now first based on new order */}
+              <CourseCarouselSection
+                title={COURSE_TYPE_LABELS.WEBINAR}
+                description={COURSE_TYPE_DESCRIPTIONS.WEBINAR}
+                courses={filteredCoursesByType.WEBINAR}
+                courseType="WEBINAR"
+                categories={categories}
+                instructors={instructors}
+                viewAllLink="/webinar"
+              />
+
               {/* Academia Carousel */}
               <CourseCarouselSection
                 title={COURSE_TYPE_LABELS.ACADEMIA}
@@ -405,17 +419,6 @@ export default function CoursesPage() {
                 categories={categories}
                 instructors={instructors}
                 viewAllLink="/akadémia"
-              />
-
-              {/* Webinar Carousel */}
-              <CourseCarouselSection
-                title={COURSE_TYPE_LABELS.WEBINAR}
-                description={COURSE_TYPE_DESCRIPTIONS.WEBINAR}
-                courses={filteredCoursesByType.WEBINAR}
-                courseType="WEBINAR"
-                categories={categories}
-                instructors={instructors}
-                viewAllLink="/webinar"
               />
 
               {/* Masterclass Carousel */}
@@ -465,8 +468,10 @@ export default function CoursesPage() {
                 {hasActiveFilters && (
                   <button
                     onClick={() => {
-                      setSelectedCategory('')
-                      setSelectedTargetAudience('')
+                      setSelectedCategories([])
+                      setSelectedTargetAudiences([])
+                      setSelectedCourseTypes([])
+                      setSelectedInstructors([])
                     }}
                     className="px-6 py-2 text-sm font-medium text-brand-secondary hover:text-brand-secondary-hover bg-brand-secondary/10 hover:bg-brand-secondary/20 rounded-lg transition-all"
                   >

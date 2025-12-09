@@ -35,13 +35,13 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
   const { data: instructors, isLoading: instructorsLoading } = useInstructors();
   const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
 
-  // Filter state
+  // Filter state - now with arrays for multi-select
   const [filters, setFilters] = useState<DashboardFilters>({
     query: '',
-    categoryId: null,
-    audienceId: null,
-    courseType: null,
-    instructorId: null,
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
   });
 
   // Filter courses by type and user filters
@@ -59,28 +59,32 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       );
     }
 
-    // Apply category filter
-    if (filters.categoryId) {
+    // Apply category filter (OR logic for multi-select)
+    if (filters.categoryIds.length > 0) {
       result = result.filter(course => {
-        if (course.categoryIds?.includes(filters.categoryId!)) return true;
-        if (course.category?.id === filters.categoryId) return true;
-        if ((course as any).categoryId === filters.categoryId) return true;
-        return false;
+        return filters.categoryIds.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if (course.category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
       });
     }
 
-    // Apply target audience filter
-    if (filters.audienceId) {
+    // Apply target audience filter (OR logic for multi-select)
+    if (filters.audienceIds.length > 0) {
       result = result.filter(course =>
-        course.targetAudienceIds?.includes(filters.audienceId!)
+        filters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
       );
     }
 
-    // Apply instructor filter
-    if (filters.instructorId) {
+    // Apply instructor filter (OR logic for multi-select)
+    if (filters.instructorIds.length > 0) {
       result = result.filter(course =>
-        (course as any).instructorId === filters.instructorId ||
-        (course as any).instructorIds?.includes(filters.instructorId)
+        filters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
       );
     }
 
@@ -150,7 +154,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
   const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;
 
   // Check if any filters are active
-  const hasActiveFilters = filters.query || filters.categoryId || filters.audienceId || filters.instructorId;
+  const hasActiveFilters = filters.query || filters.categoryIds.length > 0 || filters.audienceIds.length > 0 || filters.instructorIds.length > 0;
 
   // Check if there are any courses of this type at all (before user filters)
   const allCoursesOfType = useMemo(() => {
