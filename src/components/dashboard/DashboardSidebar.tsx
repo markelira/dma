@@ -271,17 +271,6 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
         {/* Quick Actions */}
         <div className="space-y-1">
           <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
-            <Link
-              href="/dashboard/settings"
-              onClick={onNavigate}
-              className="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <Settings className="w-4 h-4 mr-3" />
-              Profil beállítások
-            </Link>
-          </motion.div>
-
-          <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
             <button
               onClick={handleLogout}
               className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
