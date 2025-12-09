@@ -20,11 +20,12 @@ interface CourseFeaturesSectionProps {
 }
 
 const offerFeatures = [
-  '50+ tartalom korlátlan hozzáférése',
-  'Letölthető anyagok és segédletek',
-  'Közösségi hozzáférés',
-  'Mobilon is elérhető',
+  'Teljes hozzáférés 150+ struktúraépítő tartalomhoz',
+  'Több mint 200 órányi azonnal alkalmazható, működő rendszer',
+  '5 munkatárs díjmentes hozzáadása',
+  'Hetente frissülő tartalmak',
   'Bármikor lemondható',
+  '7 napos ingyenes kipróbálás',
 ];
 
 export function CourseFeaturesSection({ darkMode = false }: CourseFeaturesSectionProps) {

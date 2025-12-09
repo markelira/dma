@@ -9,7 +9,7 @@ interface Instructor {
   id: string;
   name: string;
   title?: string;
-  company?: string;
+  bio?: string;
   profilePictureUrl?: string;
 }
 
@@ -219,12 +219,12 @@ export function NetflixStyleHero({
                     )}
                     <p className="text-white font-medium">
                       {instructor.name}
-                      {(instructor.company || instructor.title) && (
+                      {(instructor.bio || instructor.title) && (
                         <span className="text-gray-400 font-normal">
                           {' | '}
-                          {instructor.company && instructor.title
-                            ? `${instructor.company}, ${instructor.title}`
-                            : instructor.company || instructor.title}
+                          {instructor.bio && instructor.title
+                            ? `${instructor.bio}, ${instructor.title}`
+                            : instructor.bio || instructor.title}
                         </span>
                       )}
                     </p>
