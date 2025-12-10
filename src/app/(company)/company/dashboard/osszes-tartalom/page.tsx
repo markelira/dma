@@ -106,10 +106,25 @@ export default function CompanyAllContentPage() {
   const heroSlides = useMemo(() => {
     if (!filteredCourses.length) return [];
 
-    const getInstructorName = (course: Course) => {
-      if (!instructors || !course.instructorId) return undefined;
-      const instructor = instructors.find(i => i.id === course.instructorId);
-      return instructor?.name;
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return [];
+      const names: string[] = [];
+
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId);
+        if (instructor?.name) names.push(instructor.name);
+      }
+
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id);
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name);
+          }
+        });
+      }
+
+      return names;
     };
 
     // Sort by createdAt (newest first) and take top 5
@@ -127,7 +142,7 @@ export default function CompanyAllContentPage() {
         description: course.description,
         thumbnailUrl: course.thumbnailUrl,
         courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-        instructorName: getInstructorName(course),
+        instructorNames: getInstructorNames(course),
         duration: course.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,

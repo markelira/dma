@@ -95,10 +95,25 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
   const heroSlides = useMemo(() => {
     if (!filteredCourses.length) return [];
 
-    const getInstructorName = (course: Course) => {
-      if (!instructors || !course.instructorId) return undefined;
-      const instructor = instructors.find(i => i.id === course.instructorId);
-      return instructor?.name;
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return [];
+      const names: string[] = [];
+
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId);
+        if (instructor?.name) names.push(instructor.name);
+      }
+
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id);
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name);
+          }
+        });
+      }
+
+      return names;
     };
 
     // Sort by createdAt (newest first) and take top 5
@@ -116,7 +131,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
         description: course.description,
         thumbnailUrl: course.thumbnailUrl,
         courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-        instructorName: getInstructorName(course),
+        instructorNames: getInstructorNames(course),
         duration: course.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
@@ -148,6 +163,14 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
     if (!filteredCourses.length) return [];
     return [...filteredCourses]
       .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
+      .slice(0, 10);
+  }, [filteredCourses]);
+
+  // Newest courses in this category
+  const newestCourses = useMemo(() => {
+    if (!filteredCourses.length) return [];
+    return [...filteredCourses]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10);
   }, [filteredCourses]);
 
@@ -204,6 +227,17 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
         <CourseCarouselRow
           title={`Népszerű ${title.toLowerCase()} tartalmak`}
           courses={popularCourses}
+          categories={categories || []}
+          instructors={instructors || []}
+          enrollments={enrollments || []}
+        />
+      )}
+
+      {/* Newest in this category */}
+      {newestCourses.length > 0 && (
+        <CourseCarouselRow
+          title={`Legújabb ${title.toLowerCase()} tartalmak`}
+          courses={newestCourses}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}

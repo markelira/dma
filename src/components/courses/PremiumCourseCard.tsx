@@ -85,7 +85,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
 
     try {
       await enrollMutation.mutateAsync(course.id);
-      toast.success('Sikeresen beiratkoztál a kurzusra!');
+      toast.success('Sikeresen elmentetted a saját listádra!');
     } catch (error) {
       toast.error('Hiba történt a beiratkozáskor');
     }

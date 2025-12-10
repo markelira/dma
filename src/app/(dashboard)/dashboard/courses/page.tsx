@@ -123,12 +123,6 @@ export default function DashboardCoursesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Saját tartalmaim</h1>
-        <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
-      </div>
-
       {/* Hero - Continue Watching */}
       {mostRecentCourse && mostRecentCourse.course && (
         <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800">
@@ -208,7 +202,7 @@ export default function DashboardCoursesPage() {
       {/* In Progress Courses */}
       {inProgressCourses.length > 0 && (
         <EnrolledCourseCarousel
-          title="Folyamatban"
+          title="Folytatás"
           icon={<Clock className="w-5 h-5 text-brand-secondary" />}
           enrollments={inProgressCourses}
           categories={categories}
@@ -219,7 +213,7 @@ export default function DashboardCoursesPage() {
       {/* Not Started Courses */}
       {notStartedCourses.length > 0 && (
         <EnrolledCourseCarousel
-          title="Még nem kezdett"
+          title="Saját listám"
           icon={<BookOpen className="w-5 h-5 text-gray-500" />}
           enrollments={notStartedCourses}
           categories={categories}

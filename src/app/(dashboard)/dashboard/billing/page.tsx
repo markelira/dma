@@ -289,7 +289,7 @@ export default function BillingPage() {
           <h1 className="text-3xl font-bold text-gray-900">Számlázás</h1>
         </div>
         <p className="text-gray-500">
-          Kezelje előfizetését és tekintse meg számláit
+          Kezeld az előfizetésedet és tekintsd meg a számláidat
         </p>
       </div>
 

@@ -12,7 +12,7 @@ interface HeroSlide {
   description?: string;
   thumbnailUrl?: string;
   courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
-  instructorName?: string;
+  instructorNames?: string[];
   instructorImageUrl?: string;
   duration?: string;
   progress?: number; // 0-100, only for enrolled courses
@@ -203,12 +203,6 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 <span className={`${config.textColor} font-medium text-sm uppercase tracking-wider`}>
                   {config.label}
                 </span>
-                {currentSlide.isEnrolled && (
-                  <>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-green-400 text-sm">Beiratkozva</span>
-                  </>
-                )}
               </div>
 
               {/* Title */}
@@ -225,8 +219,8 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
 
               {/* Instructor & Stats */}
               <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
-                {currentSlide.instructorName && (
-                  <span>{currentSlide.instructorName}</span>
+                {currentSlide.instructorNames && currentSlide.instructorNames.length > 0 && (
+                  <span>{currentSlide.instructorNames.join(', ')}</span>
                 )}
                 {currentSlide.duration && (
                   <div className="flex items-center gap-1">

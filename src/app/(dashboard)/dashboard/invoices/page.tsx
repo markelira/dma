@@ -142,14 +142,6 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Számlák és fizetések</h1>
-        <p className="text-gray-500">
-          Itt láthatod az összes korábbi fizetésed és számládat
-        </p>
-      </div>
-
       {/* Empty State */}
       {invoices.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-12 text-center shadow-sm">

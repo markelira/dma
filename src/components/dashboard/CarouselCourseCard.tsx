@@ -34,8 +34,8 @@ export interface CarouselCourseCardProps {
 }
 
 const courseTypeLabels: Record<string, string> = {
-  webinar: 'Webinar',
-  akademia: 'Akademia',
+  webinar: 'Webinár',
+  akademia: 'Akadémia',
   masterclass: 'Masterclass',
   podcast: 'Podcast',
 };

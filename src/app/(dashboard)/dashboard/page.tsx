@@ -172,11 +172,28 @@ export default function DashboardPage() {
       return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
     };
 
-    // Get instructor name helper
-    const getInstructorName = (course: Course) => {
-      if (!instructors || !course.instructorId) return undefined;
-      const instructor = instructors.find(i => i.id === course.instructorId);
-      return instructor?.name;
+    // Get instructor names helper (returns array for multiple instructors)
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return [];
+      const names: string[] = [];
+
+      // Check single instructorId
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId);
+        if (instructor?.name) names.push(instructor.name);
+      }
+
+      // Check instructorIds array
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id);
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name);
+          }
+        });
+      }
+
+      return names;
     };
 
     // Shuffle courses using Fisher-Yates algorithm (seeded with date for daily consistency)
@@ -198,7 +215,7 @@ export default function DashboardPage() {
         description: course.description,
         thumbnailUrl: course.thumbnailUrl,
         courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-        instructorName: getInstructorName(course),
+        instructorNames: getInstructorNames(course),
         duration: course.duration,
         progress: enrollment?.progress,
         isEnrolled: !!enrollment,
@@ -281,6 +298,14 @@ export default function DashboardPage() {
     // Sort by enrollment count and take top 10
     return [...courses]
       .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
+      .slice(0, 10);
+  }, [courses]);
+
+  // Newest courses (for "Legújabb tartalmak" section)
+  const newestCourses = useMemo(() => {
+    if (!courses) return [];
+    return [...courses]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 10);
   }, [courses]);
 
@@ -484,6 +509,17 @@ export default function DashboardPage() {
           />
         )}
 
+        {/* Legújabb tartalmak */}
+        {newestCourses.length > 0 && (
+          <CourseCarouselRow
+            title="Legújabb tartalmak"
+            courses={newestCourses}
+            categories={categories || []}
+            instructors={instructors || []}
+            enrollments={enrollments || []}
+          />
+        )}
+
         {/* Category Carousels */}
         {categoryRows.map(({ category, courses: categoryCourses }) => (
           <CourseCarouselRow
@@ -522,6 +558,30 @@ export default function DashboardPage() {
           />
         ))}
 
+        {/* Course Type Carousels */}
+        {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
+          const typeCourses = courses.filter(c => c.courseType === type);
+          if (typeCourses.length === 0) return null;
+
+          const typeLabels: Record<string, string> = {
+            'WEBINAR': 'Webinár',
+            'ACADEMIA': 'Akadémia',
+            'MASTERCLASS': 'Masterclass',
+            'PODCAST': 'Podcast'
+          };
+
+          return (
+            <CourseCarouselRow
+              key={type}
+              title={typeLabels[type]}
+              courses={typeCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+              viewAllLink={`/dashboard/${type.toLowerCase()}`}
+            />
+          );
+        })}
 
         {/* Empty State */}
         {heroSlides.length === 0 && enrolledCourses.length === 0 && (!courses || courses.length === 0) && (

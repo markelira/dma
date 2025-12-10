@@ -201,7 +201,7 @@ export default function SettingsPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Profil beállítások</h1>
         <p className="text-gray-500">
-          Frissítse profil adatait
+          Frissítsd a profil adataidat
         </p>
       </div>
 
