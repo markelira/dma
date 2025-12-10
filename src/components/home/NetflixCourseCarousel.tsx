@@ -10,6 +10,7 @@ import { httpsCallable } from 'firebase/functions'
 import { functions as fbFunctions } from '@/lib/firebase'
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
 import { useInstructors } from '@/hooks/useInstructorQueries'
+import { shuffleArray } from '@/lib/utils'
 
 interface Course {
   id: string
@@ -78,7 +79,7 @@ export function NetflixCourseCarousel() {
         ...doc.data()
       })) as Course[]
 
-      setCourses(coursesData)
+      setCourses(shuffleArray(coursesData))
       setLoading(false)
     }, (error) => {
       console.error('Error fetching courses:', error)

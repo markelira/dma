@@ -16,6 +16,7 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import type { Course } from '@/types';
+import { shuffleArray } from '@/lib/utils';
 
 /**
  * Company Dashboard - Netflix-Style Content Browser
@@ -196,7 +197,7 @@ export default function CompanyDashboardPage() {
       });
     }
 
-    return slides;
+    return shuffleArray(slides);
   }, [courses, enrollments, instructors]);
 
   // Build enrolled courses list (Saját listám)
@@ -258,7 +259,7 @@ export default function CompanyDashboardPage() {
         });
         return {
           category,
-          courses: categoryCourses,
+          courses: shuffleArray(categoryCourses),
         };
       })
       .filter(row => row.courses.length > 0);
@@ -267,18 +268,18 @@ export default function CompanyDashboardPage() {
   // Always prepare a "Népszerű" section with top courses
   const popularCourses = useMemo(() => {
     if (!courses) return [];
-    // Sort by enrollment count and take top 10
-    return [...courses]
+    // Sort by enrollment count, take top 10, then shuffle
+    return shuffleArray([...courses]
       .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
-      .slice(0, 10);
+      .slice(0, 10));
   }, [courses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
     if (!courses) return [];
-    return [...courses]
+    return shuffleArray([...courses]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10);
+      .slice(0, 10));
   }, [courses]);
 
   // Check if we need to show a fallback "Felfedezés" section
@@ -297,7 +298,7 @@ export default function CompanyDashboardPage() {
       );
       return {
         audience,
-        courses: audienceCourses,
+        courses: shuffleArray(audienceCourses),
         count: audienceCourses.length,
       };
     });
@@ -424,7 +425,7 @@ export default function CompanyDashboardPage() {
 
       {/* Course Type Carousels */}
       {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
-        const typeCourses = courses.filter(c => c.courseType === type);
+        const typeCourses = shuffleArray(courses.filter(c => c.courseType === type));
         if (typeCourses.length === 0) return null;
 
         const typeLabels: Record<string, string> = {

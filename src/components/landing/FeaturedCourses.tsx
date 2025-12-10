@@ -11,6 +11,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { CourseCard } from '@/components/course/CourseCard'
 import { Course } from '@/types'
 import { mockCourses } from '@/lib/mockCourses'
+import { shuffleArray } from '@/lib/utils'
 
 interface UserProgress {
   enrolledCourses: string[]
@@ -37,8 +38,8 @@ async function fetchFeaturedCourses(): Promise<Course[]> {
       throw new Error(result.data.error || 'Hiba a kiemelt tartalmak betöltésekor')
     }
     
-    // Limit to 6 courses and sort by popularity (for now, just take first 6)
-    return result.data.courses.slice(0, 6) || []
+    // Shuffle and limit to 6 courses
+    return shuffleArray(result.data.courses).slice(0, 6) || []
   } catch (error) {
     console.error('Error fetching featured courses:', error)
     return []
@@ -63,7 +64,7 @@ async function fetchPersonalizedCourses(userId: string): Promise<Course[]> {
       throw new Error(result.data.error || 'Hiba a személyre szabott tartalmak betöltésekor')
     }
     
-    return result.data.courses.slice(0, 6) || []
+    return shuffleArray(result.data.courses).slice(0, 6) || []
   } catch (error) {
     console.error('Error fetching personalized courses:', error)
     return []
@@ -130,7 +131,7 @@ async function fetchRecommendedCourses(categoryIds: string[]): Promise<Course[]>
       )
     }
     
-    return courses.slice(0, 6) || []
+    return shuffleArray(courses).slice(0, 6) || []
   } catch (error) {
     console.error('Error fetching recommended courses:', error)
     return []

@@ -8,6 +8,7 @@ import { collection, query, orderBy, limit, where, onSnapshot } from 'firebase/f
 import { httpsCallable } from 'firebase/functions';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
 import { useInstructors } from '@/hooks/useInstructorQueries';
+import { shuffleArray } from '@/lib/utils';
 
 interface Course {
   id: string;
@@ -84,7 +85,7 @@ export function CourseTypeShowcase({
           ...doc.data(),
         })) as Course[];
 
-        setCourses(coursesData);
+        setCourses(shuffleArray(coursesData));
         setLoading(false);
       },
       (error) => {

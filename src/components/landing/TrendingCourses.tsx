@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
+import { shuffleArray } from '@/lib/utils'
 
 interface Course {
   id: string
@@ -50,8 +51,8 @@ export function TrendingCourses() {
           id: doc.id,
           ...doc.data()
         })) as Course[]
-        
-        setCourses(coursesData)
+
+        setCourses(shuffleArray(coursesData))
         setLoading(false)
       },
       (error) => {
@@ -68,8 +69,8 @@ export function TrendingCourses() {
             id: doc.id,
             ...doc.data()
           })) as Course[]
-          
-          setCourses(coursesData)
+
+          setCourses(shuffleArray(coursesData))
           setLoading(false)
         })
         

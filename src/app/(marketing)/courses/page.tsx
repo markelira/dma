@@ -11,6 +11,7 @@ import Footer from '@/components/landing-home/ui/footer'
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
 import { CoursesHeroSection } from '@/components/courses/CoursesHeroSection'
 import { useInstructors } from '@/hooks/useInstructorQueries'
+import { shuffleArray } from '@/lib/utils'
 
 const COURSE_TYPE_ICONS: Record<string, any> = {
   ACADEMIA: GraduationCap,
@@ -322,10 +323,10 @@ export default function CoursesPage() {
     }
 
     return {
-      ACADEMIA: filtered.filter(c => c.courseType === 'ACADEMIA'),
-      WEBINAR: filtered.filter(c => c.courseType === 'WEBINAR'),
-      MASTERCLASS: filtered.filter(c => c.courseType === 'MASTERCLASS'),
-      PODCAST: filtered.filter(c => c.courseType === 'PODCAST'),
+      ACADEMIA: shuffleArray(filtered.filter(c => c.courseType === 'ACADEMIA')),
+      WEBINAR: shuffleArray(filtered.filter(c => c.courseType === 'WEBINAR')),
+      MASTERCLASS: shuffleArray(filtered.filter(c => c.courseType === 'MASTERCLASS')),
+      PODCAST: shuffleArray(filtered.filter(c => c.courseType === 'PODCAST')),
     }
   }, [courses, selectedCategories, selectedTargetAudiences, selectedCourseTypes, selectedInstructors])
 
