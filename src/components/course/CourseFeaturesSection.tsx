@@ -17,6 +17,7 @@ interface CourseFeaturesSectionProps {
   features?: string[];
   course?: CourseData;
   darkMode?: boolean;
+  isSubscriber?: boolean;
 }
 
 const offerFeatures = [
@@ -28,7 +29,12 @@ const offerFeatures = [
   '7 napos ingyenes kipróbálás',
 ];
 
-export function CourseFeaturesSection({ darkMode = false }: CourseFeaturesSectionProps) {
+export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }: CourseFeaturesSectionProps) {
+  // Hide sales section for subscribers
+  if (isSubscriber) {
+    return null;
+  }
+
   const containerClass = darkMode
     ? 'py-6 border-b border-gray-800'
     : 'bg-white/60 backdrop-blur-xl border border-white/20 rounded-xl shadow-lg p-6 lg:p-8';

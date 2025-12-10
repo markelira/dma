@@ -465,7 +465,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                 </motion.section>
               )}
 
-              {/* Course Features Section */}
+              {/* Course Features Section - Hidden for subscribers */}
               <CourseFeaturesSection
                 course={{
                   certificateEnabled: c.certificateEnabled,
@@ -475,6 +475,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                   contentCreatedAt: c.contentCreatedAt
                 }}
                 darkMode={true}
+                isSubscriber={subscription?.isActive || false}
               />
 
               {/* Instructor Card(s) - Supports multiple instructors */}
