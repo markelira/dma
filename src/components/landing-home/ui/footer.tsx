@@ -88,6 +88,22 @@ export default function Footer({ border = false }: { border?: boolean }) {
                   Rólunk
                 </a>
               </li>
+              <li>
+                <Link
+                  className="text-gray-600 transition hover:text-gray-900"
+                  href="/privacy"
+                >
+                  Adatvédelem
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className="text-gray-600 transition hover:text-gray-900"
+                  href="/terms"
+                >
+                  ÁSZF
+                </Link>
+              </li>
             </ul>
           </div>
 

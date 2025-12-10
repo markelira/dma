@@ -191,14 +191,14 @@ export function Footer({ className }: FooterProps) {
               <Phone className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">Telefon</p>
-                <p className="text-sm text-gray-600">+36 1 234 5678</p>
+                <p className="text-sm text-gray-600">+36 70 421 8100</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <MapPin className="w-5 h-5 text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900">Cím</p>
-                <p className="text-sm text-gray-600">Budapest, Magyarország</p>
+                <p className="text-sm text-gray-600">3527 Miskolc, Bajcsy-Zsilinszky Endre u. 17.</p>
               </div>
             </div>
           </div>
