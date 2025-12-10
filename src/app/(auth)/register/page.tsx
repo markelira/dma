@@ -7,9 +7,10 @@ import { AccountTypeSelector, AccountType } from '@/components/auth/AccountTypeS
 import { CompanyRegisterForm } from '@/components/auth/CompanyRegisterForm';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 import { httpsCallable } from 'firebase/functions';
+import { fetchSignInMethodsForEmail } from 'firebase/auth';
 import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
-import { Building2, Eye, EyeOff } from 'lucide-react';
+import { Building2, Eye, EyeOff, Loader2 } from 'lucide-react';
 
 interface InviteData {
   valid: boolean;
@@ -39,6 +40,7 @@ function RegisterPageContent() {
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
@@ -187,6 +189,23 @@ function RegisterPageContent() {
       setError('A telefonszám megadása kötelező');
       setLoading(false);
       return;
+    }
+
+    // Check if email is already in use (unless coming from invite where email is verified)
+    if (!inviteData) {
+      setCheckingEmail(true);
+      try {
+        const methods = await fetchSignInMethodsForEmail(auth, formData.email.trim().toLowerCase());
+        if (methods.length > 0) {
+          setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
+          setCheckingEmail(false);
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.error('Email check error:', err);
+      }
+      setCheckingEmail(false);
     }
 
     try {
@@ -553,9 +572,14 @@ function RegisterPageContent() {
           <button
             type="submit"
             className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
-            disabled={loading}
+            disabled={loading || checkingEmail}
           >
-            {loading ? 'Regisztráció...' : 'Regisztráció'}
+            {checkingEmail ? (
+              <span className="flex items-center justify-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Ellenőrzés...
+              </span>
+            ) : loading ? 'Regisztráció...' : 'Regisztráció'}
           </button>
         </div>
       </form>

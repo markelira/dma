@@ -20,7 +20,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -115,6 +115,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
 
   const updateField = (field: keyof CompanyOnboardingData, value: any) => {
@@ -145,7 +146,7 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     }));
   };
 
-  const validateStep1 = () => {
+  const validateStep1 = async (): Promise<boolean> => {
     if (!formData.ownerFirstName.trim()) {
       setError('Kérlek add meg a keresztneved');
       return false;
@@ -170,6 +171,22 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
       setError('A jelszavak nem egyeznek');
       return false;
     }
+
+    // Check if email is already in use
+    setCheckingEmail(true);
+    try {
+      const methods = await fetchSignInMethodsForEmail(auth, formData.ownerEmail.trim().toLowerCase());
+      if (methods.length > 0) {
+        setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
+        setCheckingEmail(false);
+        return false;
+      }
+    } catch (err) {
+      // If error checking email, allow to proceed (will fail at registration)
+      console.error('Email check error:', err);
+    }
+    setCheckingEmail(false);
+
     return true;
   };
 
@@ -212,10 +229,13 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
     return true;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setError('');
 
-    if (currentStep === 1 && !validateStep1()) return;
+    if (currentStep === 1) {
+      const isValid = await validateStep1();
+      if (!isValid) return;
+    }
     if (currentStep === 2 && !validateStep2()) return;
     if (currentStep === 3 && !validateStep3()) return;
 
@@ -798,11 +818,20 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
           {currentStep < 4 ? (
             <button
               onClick={handleNext}
-              disabled={loading}
+              disabled={loading || checkingEmail}
               className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
-              Tovább
-              <ArrowRight className="w-4 h-4 ml-2" />
+              {checkingEmail ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Ellenőrzés...
+                </>
+              ) : (
+                <>
+                  Tovább
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </>
+              )}
             </button>
           ) : (
             <button
