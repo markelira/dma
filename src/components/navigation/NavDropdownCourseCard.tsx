@@ -10,21 +10,7 @@ interface NavDropdownCourseCardProps {
   instructors?: Instructor[];
 }
 
-export function NavDropdownCourseCard({ course, variant, instructors }: NavDropdownCourseCardProps) {
-  // Get instructor name
-  const getInstructorName = () => {
-    if (course.instructorIds && course.instructorIds.length > 0 && instructors) {
-      const instructor = instructors.find(i => i.id === course.instructorIds![0]);
-      if (instructor) return instructor.name;
-    }
-    if (course.instructorId && instructors) {
-      const instructor = instructors.find(i => i.id === course.instructorId);
-      if (instructor) return instructor.name;
-    }
-    return null;
-  };
-
-  const instructorName = getInstructorName();
+export function NavDropdownCourseCard({ course, variant }: NavDropdownCourseCardProps) {
   const courseUrl = `/courses/${course.id}`;
 
   if (variant === 'featured') {
@@ -52,9 +38,6 @@ export function NavDropdownCourseCard({ course, variant, instructors }: NavDropd
             <h4 className="font-semibold text-gray-900 text-sm line-clamp-2 group-hover:text-blue-600 transition-colors">
               {course.title}
             </h4>
-            {instructorName && (
-              <p className="text-xs text-gray-500 mt-1">{instructorName}</p>
-            )}
             {course.description && (
               <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                 {course.description}
@@ -89,9 +72,6 @@ export function NavDropdownCourseCard({ course, variant, instructors }: NavDropd
           <h4 className="font-medium text-gray-900 text-xs line-clamp-2 group-hover:text-blue-600 transition-colors">
             {course.title}
           </h4>
-          {instructorName && (
-            <p className="text-xs text-gray-500 mt-0.5 truncate">{instructorName}</p>
-          )}
         </div>
       </div>
     </Link>

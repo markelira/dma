@@ -160,7 +160,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
                       fontSize: scrolled ? '13px' : '14px',
                     }}
                   >
-                    Irányítópult
+                    Kezdőlap
                   </Button>
                 </Link>
               ) : (
