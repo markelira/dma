@@ -20,6 +20,7 @@ interface CourseEnrollmentCardProps {
   courseTitle?: string;
   courseType?: CourseType;
   darkMode?: boolean;
+  isSubscriber?: boolean;
 }
 
 export function CourseEnrollmentCard({
@@ -35,7 +36,8 @@ export function CourseEnrollmentCard({
   thumbnailUrl,
   courseTitle,
   courseType,
-  darkMode = false
+  darkMode = false,
+  isSubscriber = false
 }: CourseEnrollmentCardProps) {
   const isFree = price === 0;
   const hasDiscount = originalPrice && originalPrice > price;
@@ -67,6 +69,67 @@ export function CourseEnrollmentCard({
     ? 'bg-gradient-to-br from-gray-800 to-gray-700'
     : 'bg-gradient-to-br from-brand-secondary/10/50 to-purple-100/30';
 
+  // Subscriber view - simplified, no sales content
+  if (isSubscriber) {
+    return (
+      <div className="sticky top-24">
+        <div className={containerClass}>
+          {/* Course Thumbnail */}
+          {thumbnailUrl && (
+            <div className="relative aspect-video bg-gray-800 overflow-hidden">
+              <Image
+                src={thumbnailUrl}
+                alt={courseTitle || 'Course thumbnail'}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 400px"
+              />
+            </div>
+          )}
+          {!thumbnailUrl && (
+            <div className={`relative aspect-video ${placeholderBg} flex items-center justify-center`}>
+              <BookOpen className={`w-16 h-16 ${darkMode ? 'text-gray-600' : 'text-brand-secondary'} opacity-40`} />
+            </div>
+          )}
+
+          {/* Course Info for Subscribers */}
+          <div className="p-6 space-y-4">
+            <div className="space-y-3">
+              {duration && (
+                <div className={`flex items-center gap-3 ${textClass}`}>
+                  <Clock className="w-5 h-5 text-brand-secondary" />
+                  <span>{duration} tartalom</span>
+                </div>
+              )}
+              {lessons > 0 && (
+                <div className={`flex items-center gap-3 ${textClass}`}>
+                  <Play className="w-5 h-5 text-brand-secondary" />
+                  <span>{lessons} lecke</span>
+                </div>
+              )}
+              <div className={`flex items-center gap-3 ${textClass}`}>
+                <Infinity className="w-5 h-5 text-brand-secondary" />
+                <span>Korlátlan hozzáférés</span>
+              </div>
+            </div>
+
+            {/* Direct Play Button for Subscribers */}
+            <div className="pt-4">
+              <Button
+                onClick={onEnroll}
+                className="w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/80 hover:shadow-xl text-white font-bold py-7 text-lg rounded-xl transition-all hover:scale-[1.02]"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                {getCtaText()}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Non-subscriber view - full sales content
   return (
     <div className="sticky top-24">
       <div className={containerClass}>

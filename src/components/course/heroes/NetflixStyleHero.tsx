@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
-import { Play, Info, Clock, BookOpen, Video, GraduationCap, Mic, ChevronDown } from 'lucide-react';
+import { Play, Clock, BookOpen, Video, GraduationCap, Mic, ChevronDown } from 'lucide-react';
 
 interface Instructor {
   id: string;
@@ -264,7 +264,7 @@ export function NetflixStyleHero({
               )}
             </div>
 
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <div className="flex items-center gap-3">
               <button
                 onClick={onEnroll}
@@ -272,13 +272,6 @@ export function NetflixStyleHero({
               >
                 <Play className="w-5 h-5 fill-current" />
                 {config.ctaLabel}
-              </button>
-              <button
-                onClick={onScrollToDetails}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-700/80 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
-              >
-                <Info className="w-5 h-5" />
-                Részletek
               </button>
             </div>
           </motion.div>

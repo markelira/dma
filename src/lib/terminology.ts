@@ -39,7 +39,7 @@ export function getCourseTypeTerminology(courseType: CourseType): CourseTypeTerm
       return {
         instructorLabel: 'Szereplő',
         instructorsLabel: 'Szereplők',
-        outcomesLabel: 'Miért fogod imádni ezt a podcastot?',
+        outcomesLabel: 'Miért fogod imádni ezt a Podcastot?',
         contentLabel: 'Tartalom',
         lessonLabel: 'Epizód',
         lessonsLabel: 'Epizódok',
@@ -51,7 +51,7 @@ export function getCourseTypeTerminology(courseType: CourseType): CourseTypeTerm
       return {
         instructorLabel: 'Mentor',
         instructorsLabel: 'Mentorok',
-        outcomesLabel: 'Miért fogod imádni ezt a webinárt?',
+        outcomesLabel: 'Miért fogod imádni ezt a Webinárt?',
         contentLabel: 'Tartalom',
         lessonLabel: 'Előadás',
         lessonsLabel: 'Előadások',
@@ -63,7 +63,7 @@ export function getCourseTypeTerminology(courseType: CourseType): CourseTypeTerm
       return {
         instructorLabel: 'Mentor',
         instructorsLabel: 'Mentorok',
-        outcomesLabel: 'Miért fogod imádni ezt a masterclasst?',
+        outcomesLabel: 'Miért fogod imádni ezt a Masterclasst?',
         contentLabel: 'Tartalom',
         lessonLabel: 'Lecke',
         lessonsLabel: 'Leckék',
@@ -76,7 +76,7 @@ export function getCourseTypeTerminology(courseType: CourseType): CourseTypeTerm
       return {
         instructorLabel: 'Mentor',
         instructorsLabel: 'Mentorok',
-        outcomesLabel: 'Miért fogod imádni ezt az akadémiát?',
+        outcomesLabel: 'Miért fogod imádni ezt az Akadémiát?',
         contentLabel: 'Tartalom',
         lessonLabel: 'Lecke',
         lessonsLabel: 'Leckék',

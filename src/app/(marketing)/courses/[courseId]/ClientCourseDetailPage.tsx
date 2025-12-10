@@ -558,6 +558,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                 courseTitle={c.title}
                 courseType={courseType}
                 darkMode={true}
+                isSubscriber={subscription?.isActive || false}
               />
             </div>
           </div>

@@ -170,7 +170,7 @@ export default function MasterclassPage() {
                     {featuredCourse.description}
                   </p>
 
-                  {/* CTA Buttons */}
+                  {/* CTA Button */}
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/courses/${featuredCourse.id}`}
@@ -178,13 +178,6 @@ export default function MasterclassPage() {
                     >
                       <Play className="w-5 h-5 fill-current" />
                       Megtekintés
-                    </Link>
-                    <Link
-                      href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gray-700/80 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors"
-                    >
-                      <Info className="w-5 h-5" />
-                      Részletek
                     </Link>
                   </div>
                 </motion.div>

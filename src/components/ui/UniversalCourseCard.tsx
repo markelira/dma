@@ -75,13 +75,13 @@ const getContextDefaults = (context: string) => {
     case 'dashboard':
       return {
         variant: 'default' as const,
-        actions: ['continue', 'details'] as const,
+        actions: ['continue'] as const,
         showElements: ['rating', 'progress', 'duration'] as const
       }
     case 'university':
       return {
         variant: 'default' as const,
-        actions: ['enroll', 'details'] as const,
+        actions: ['enroll'] as const,
         showElements: ['rating', 'price', 'instructor', 'students'] as const
       }
     case 'search':
@@ -93,19 +93,19 @@ const getContextDefaults = (context: string) => {
     case 'recommendations':
       return {
         variant: 'minimal' as const,
-        actions: ['details'] as const,
+        actions: ['enroll'] as const,
         showElements: ['rating', 'price'] as const
       }
     case 'home':
       return {
         variant: 'default' as const,
-        actions: ['enroll', 'details'] as const,
+        actions: ['enroll'] as const,
         showElements: ['rating', 'price', 'instructor', 'category'] as const
       }
     default:
       return {
         variant: 'default' as const,
-        actions: ['enroll', 'details'] as const,
+        actions: ['enroll'] as const,
         showElements: ['rating', 'price', 'duration'] as const
       }
   }
@@ -349,17 +349,6 @@ export function UniversalCourseCard({
               </button>
             )
 
-          case 'details':
-            return (
-              <Link
-                key={action}
-                href={courseUrl}
-                className="px-4 py-2 border border-gray-700 text-gray-300 rounded-lg font-bold hover:bg-gray-800 hover:text-white transition-colors text-center"
-              >
-                Részletek
-              </Link>
-            )
-
           case 'share':
             return (
               <button
@@ -483,12 +472,6 @@ export function UniversalCourseCard({
           >
             Beiratkozás Most
           </button>
-          <Link
-            href={courseUrl}
-            className="px-8 py-4 border border-gray-700 text-gray-300 rounded-xl font-bold text-lg hover:bg-gray-800 hover:text-white transition-colors"
-          >
-            Tudj meg többet
-          </Link>
         </div>
       </div>
     </div>
