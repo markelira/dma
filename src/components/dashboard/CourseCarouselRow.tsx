@@ -117,13 +117,6 @@ export function CourseCarouselRow({
             const enrollment = enrollments.find(e => e.courseId === course.id);
             const progress = enrollment?.progress;
 
-            // Determine card position for popup
-            const getCardPosition = (): 'left' | 'center' | 'right' => {
-              if (index === 0) return 'left';
-              if (index === courses.length - 1) return 'right';
-              return 'center';
-            };
-
             return (
               <div
                 key={course.id}
@@ -156,8 +149,6 @@ export function CourseCarouselRow({
                   index={index}
                   categories={categories}
                   instructors={instructors}
-                  showHoverPopup={true}
-                  cardPosition={getCardPosition()}
                 />
               </div>
             );

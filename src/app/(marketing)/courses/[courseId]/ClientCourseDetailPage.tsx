@@ -577,30 +577,36 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           </div>
         )}
 
-        {/* Free Trial Modal - Proactive subscription prompt */}
-        <FreeTrialModal
-          open={showTrialModal}
-          onOpenChange={setShowTrialModal}
-          variant={trialVariant}
-          courseName={c.title}
-          onStartTrial={handleTrialStart}
-          onDismiss={handleTrialDismiss}
-        />
+        {/* Free Trial Modal - Only for non-subscribers */}
+        {!subscription?.isActive && (
+          <FreeTrialModal
+            open={showTrialModal}
+            onOpenChange={setShowTrialModal}
+            variant={trialVariant}
+            courseName={c.title}
+            onStartTrial={handleTrialStart}
+            onDismiss={handleTrialDismiss}
+          />
+        )}
 
         {/* Subscription Required Modal - Fallback for errors */}
-        <SubscriptionRequiredModal
-          open={showSubscriptionModal}
-          onOpenChange={setShowSubscriptionModal}
-          courseName={c.title}
-          returnTo={`/courses/${id}`}
-        />
+        {!subscription?.isActive && (
+          <SubscriptionRequiredModal
+            open={showSubscriptionModal}
+            onOpenChange={setShowSubscriptionModal}
+            courseName={c.title}
+            returnTo={`/courses/${id}`}
+          />
+        )}
 
-        {/* Sticky Bottom CTA (Mobile) */}
-        <StickyBottomCTA
-          courseTitle={c.title}
-          onEnroll={handleEnroll}
-          isEnrolled={false}
-        />
+        {/* Sticky Bottom CTA (Mobile) - Only for non-subscribers */}
+        {!subscription?.isActive && (
+          <StickyBottomCTA
+            courseTitle={c.title}
+            onEnroll={handleEnroll}
+            isEnrolled={false}
+          />
+        )}
       </div>
 
       <Footer border={true} />

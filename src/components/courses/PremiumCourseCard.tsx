@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { motion } from "motion/react";
 import { BookOpen, Clock, Star, Bookmark, BookmarkCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,6 @@ import { useEnrollmentStatus } from "@/hooks/useEnrollmentStatus";
 import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
-import { CourseHoverPopup } from "@/components/dashboard/CourseHoverPopup";
 
 // Helper function to format date in Hungarian locale
 const formatHungarianDate = (dateString: string): string => {
@@ -62,59 +61,17 @@ interface PremiumCourseCardProps {
   index: number;
   categories?: Array<{ id: string; name: string }>;
   instructors?: Instructor[]; // Optional instructors array
-  showHoverPopup?: boolean; // Enable Netflix-style hover popup
-  cardPosition?: 'left' | 'center' | 'right'; // Position hint for popup
 }
 
-export function PremiumCourseCard({
-  course,
-  index,
-  categories,
-  instructors,
-  showHoverPopup = false,
-  cardPosition = 'center'
-}: PremiumCourseCardProps) {
+export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
   const router = useRouter();
   const { user } = useAuthStore();
   const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
   const isEnrolling = enrollMutation.isPending;
-
-  // Handle hover with delay to prevent accidental popups
-  const handleMouseEnter = () => {
-    if (!showHoverPopup) return;
-    hoverTimeoutRef.current = setTimeout(() => {
-      setIsHovered(true);
-    }, 300); // 300ms delay before showing popup
-  };
-
-  const handleMouseLeave = () => {
-    if (hoverTimeoutRef.current) {
-      clearTimeout(hoverTimeoutRef.current);
-    }
-    setIsHovered(false);
-  };
-
-  // Get instructor name for popup
-  const getInstructorName = (): string | undefined => {
-    if (course.instructorName) return course.instructorName;
-    if (course.instructorId && instructors) {
-      const instructor = instructors.find(i => i.id === course.instructorId);
-      if (instructor) return instructor.name;
-    }
-    if (course.instructorIds && course.instructorIds.length > 0 && instructors) {
-      const names = course.instructorIds
-        .map(id => instructors.find(i => i.id === id)?.name)
-        .filter(Boolean);
-      if (names.length > 0) return names.join(', ');
-    }
-    return undefined;
-  };
 
   const handleEnroll = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
@@ -284,30 +241,7 @@ export function PremiumCourseCard({
         ease: [0.16, 1, 0.3, 1]
       }}
       whileHover={{ y: -4 }}
-      className="relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
-      {/* Netflix-style Hover Popup */}
-      {showHoverPopup && (
-        <CourseHoverPopup
-          course={{
-            id: course.id,
-            title: course.title,
-            description: course.description,
-            thumbnailUrl: course.thumbnailUrl,
-            duration: course.duration,
-            lessons: course.lessons,
-            courseType: course.courseType,
-            instructorName: getInstructorName()
-          }}
-          isVisible={isHovered}
-          position={cardPosition}
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={handleMouseLeave}
-        />
-      )}
-
       <div
         className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
         onClick={() => router.push(`/courses/${course.id}`)}
