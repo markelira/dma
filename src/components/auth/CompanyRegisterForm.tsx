@@ -20,10 +20,11 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
-import { createUserWithEmailAndPassword, updateProfile, fetchSignInMethodsForEmail } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { useAuth } from '@/contexts/AuthContext';
+import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
 
 interface CompanyOnboardingData {
   // Step 1: Account owner
@@ -172,11 +173,15 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
       return false;
     }
 
-    // Check if email is already in use
+    // Check if email is already in use (using cloud function)
     setCheckingEmail(true);
     try {
-      const methods = await fetchSignInMethodsForEmail(auth, formData.ownerEmail.trim().toLowerCase());
-      if (methods.length > 0) {
+      const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
+        functions,
+        'checkEmailAvailability'
+      );
+      const result = await checkEmail({ email: formData.ownerEmail.trim().toLowerCase() });
+      if (!result.data.available) {
         setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
         setCheckingEmail(false);
         return false;
@@ -366,27 +371,19 @@ export const CompanyRegisterForm: React.FC<CompanyRegisterFormProps> = ({ onSucc
       }
     } catch (err: any) {
       console.error('❌ [Company Registration] ERROR occurred:', err);
-      console.error('❌ [Company Registration] Error details:', {
-        message: err.message,
-        code: err.code,
-        stack: err.stack,
-        fullError: JSON.stringify(err, null, 2)
-      });
 
-      if (err.code === 'auth/email-already-in-use') {
-        setError('Ez az email cím már használatban van');
-        setCurrentStep(1);
-      } else if (err.code === 'auth/weak-password') {
-        setError('A jelszó túl gyenge');
-        setCurrentStep(1);
+      // Handle auth errors - go back to step 1 if email/password related
+      if (err.code?.startsWith('auth/')) {
+        setError(getAuthErrorMessage(err));
+        if (err.code === 'auth/email-already-in-use' || err.code === 'auth/weak-password') {
+          setCurrentStep(1);
+        }
       } else if (err.code === 'functions/not-found') {
-        console.error('❌ [Company Registration] Cloud Function not found! Is the emulator running?');
-        setError('A rendszer nem elérhető. Kérjük, próbálja újra később. (Cloud Function not found)');
+        setError('A rendszer nem elérhető. Kérjük, próbáld újra később.');
       } else if (err.code === 'functions/internal') {
-        console.error('❌ [Company Registration] Cloud Function internal error:', err.details);
-        setError(`Belső hiba történt: ${err.message}`);
+        setError('Belső hiba történt. Kérjük, próbáld újra.');
       } else {
-        setError(err.message || 'Hiba történt a regisztráció során');
+        setError(getAuthErrorMessage(err));
       }
       setLoading(false);
     }

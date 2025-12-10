@@ -4,6 +4,55 @@ import { functions, auth } from '@/lib/firebase'
 import { useAuthStore, User, AuthResponse } from '@/stores/authStore'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 
+/**
+ * Translate Firebase Auth error codes to Hungarian user-friendly messages
+ */
+export function getAuthErrorMessage(error: any): string {
+  const code = error?.code || '';
+
+  switch (code) {
+    // Login errors
+    case 'auth/invalid-credential':
+      return 'Hibás email cím vagy jelszó. Kérjük, ellenőrizd az adatokat.';
+    case 'auth/user-not-found':
+      return 'Nem található felhasználó ezzel az email címmel.';
+    case 'auth/wrong-password':
+      return 'Hibás jelszó. Kérjük, próbáld újra.';
+    case 'auth/invalid-email':
+      return 'Érvénytelen email cím formátum.';
+    case 'auth/user-disabled':
+      return 'Ez a fiók le van tiltva. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal.';
+    case 'auth/too-many-requests':
+      return 'Túl sok sikertelen kísérlet. Kérjük, próbáld újra később.';
+
+    // Registration errors
+    case 'auth/email-already-in-use':
+      return 'Ez az email cím már használatban van.';
+    case 'auth/operation-not-allowed':
+      return 'A művelet jelenleg nem elérhető.';
+    case 'auth/weak-password':
+      return 'A jelszó túl gyenge. Használj legalább 6 karaktert.';
+
+    // Network errors
+    case 'auth/network-request-failed':
+      return 'Hálózati hiba történt. Kérjük, ellenőrizd az internetkapcsolatot.';
+
+    // Other errors
+    case 'auth/popup-closed-by-user':
+      return 'A bejelentkezési ablak bezárult. Kérjük, próbáld újra.';
+    case 'auth/requires-recent-login':
+      return 'Biztonsági okokból újra be kell jelentkezned.';
+
+    default:
+      // If it has a custom message without code, pass it through
+      if (error?.message && !code) {
+        return error.message;
+      }
+      // Generic fallback
+      return 'Hiba történt. Kérjük, próbáld újra.';
+  }
+}
+
 export function useLogin() {
   const qc = useQueryClient()
   const { setAuth, clearAuth } = useAuthStore()
@@ -98,9 +147,9 @@ export function useLogin() {
         const firebaseLogin = httpsCallable(functions, 'firebaseLogin')
         const result: any = await firebaseLogin({ idToken })
         return result.data as AuthResponse
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Login mutation error:', error)
-        throw error
+        throw new Error(getAuthErrorMessage(error))
       }
     },
     onSuccess: (data) => {
@@ -195,25 +244,7 @@ export function useRegister() {
         return mockResponse
       } catch (error: any) {
         console.error('Registration error:', error)
-        
-        // Check if it's our custom password validation error
-        if (error.message && error.message.includes('jelszónak legalább 8 karakter')) {
-          throw error
-        }
-        
-        // Handle Firebase Auth error codes with Hungarian messages
-        if (error.code === 'auth/email-already-in-use') {
-          throw new Error('Ez az email cím már foglalt.')
-        } else if (error.code === 'auth/invalid-email') {
-          throw new Error('Érvénytelen email cím.')
-        } else if (error.code === 'auth/operation-not-allowed') {
-          throw new Error('A regisztráció jelenleg nem elérhető.')
-        } else if (error.code === 'auth/weak-password') {
-          throw new Error('A jelszónak legalább 8 karakter hosszúnak kell lennie, tartalmaznia kell legalább egy nagybetűt és egy számot.')
-        } else {
-          // For other errors, use a generic message instead of the technical error
-          throw new Error('Regisztrációs hiba történt. Kérjük próbálja újra.')
-        }
+        throw new Error(getAuthErrorMessage(error))
       }
     },
     onSuccess: (data) => {

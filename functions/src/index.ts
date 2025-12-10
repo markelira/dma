@@ -98,6 +98,43 @@ export const healthCheck = onRequest({
   });
 });
 
+/**
+ * Check if an email is already in use
+ * This is needed because Firebase deprecated fetchSignInMethodsForEmail for security reasons
+ */
+export const checkEmailAvailability = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    const { email } = request.data as { email: string };
+
+    if (!email || typeof email !== 'string') {
+      return { available: false, error: 'Email is required' };
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Try to get user by email - if found, email is taken
+    try {
+      await auth.getUserByEmail(normalizedEmail);
+      // User exists - email is not available
+      return { available: false };
+    } catch (error: any) {
+      // If error is 'user-not-found', email is available
+      if (error.code === 'auth/user-not-found') {
+        return { available: true };
+      }
+      // For other errors, log and assume not available (safer)
+      logger.error('Error checking email availability:', error);
+      return { available: false, error: 'Unable to check email' };
+    }
+  } catch (error) {
+    logger.error('checkEmailAvailability error:', error);
+    return { available: false, error: 'Internal error' };
+  }
+});
+
 export const echo = onCall({
   cors: true,
   region: 'us-central1',

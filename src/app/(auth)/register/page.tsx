@@ -7,10 +7,10 @@ import { AccountTypeSelector, AccountType } from '@/components/auth/AccountTypeS
 import { CompanyRegisterForm } from '@/components/auth/CompanyRegisterForm';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 import { httpsCallable } from 'firebase/functions';
-import { fetchSignInMethodsForEmail } from 'firebase/auth';
 import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
 import { Building2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
 
 interface InviteData {
   valid: boolean;
@@ -195,8 +195,12 @@ function RegisterPageContent() {
     if (!inviteData) {
       setCheckingEmail(true);
       try {
-        const methods = await fetchSignInMethodsForEmail(auth, formData.email.trim().toLowerCase());
-        if (methods.length > 0) {
+        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
+          functions,
+          'checkEmailAvailability'
+        );
+        const result = await checkEmail({ email: formData.email.trim().toLowerCase() });
+        if (!result.data.available) {
           setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
           setCheckingEmail(false);
           setLoading(false);
@@ -255,15 +259,7 @@ function RegisterPageContent() {
       // Reset verification flag on error
       setIsVerifying(false);
 
-      if (err.code === 'auth/email-already-in-use') {
-        setError('Ez az email cím már használatban van');
-      } else if (err.code === 'auth/invalid-email') {
-        setError('Érvénytelen email cím');
-      } else if (err.code === 'auth/weak-password') {
-        setError('A jelszó túl gyenge');
-      } else {
-        setError('Regisztráció sikertelen. Kérjük, próbálja újra.');
-      }
+      setError(getAuthErrorMessage(err));
       setLoading(false);
     }
     // Note: Don't set loading to false if verification modal is shown

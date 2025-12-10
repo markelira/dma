@@ -36,9 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getSignedUploadUrl = exports.restoreSoftDeletedCourses = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.getCompanyEnrolledCourses = exports.enrollCompanyInCourse = exports.removeEmployee = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.healthCheck = void 0;
-exports.saveUserPreferences = exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = void 0;
-exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = void 0;
+exports.restoreSoftDeletedCourses = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.getCompanyEnrolledCourses = exports.enrollCompanyInCourse = exports.removeEmployee = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.checkEmailAvailability = exports.healthCheck = void 0;
+exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = void 0;
+exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -126,6 +126,41 @@ exports.healthCheck = (0, https_1.onRequest)({
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV
     });
+});
+/**
+ * Check if an email is already in use
+ * This is needed because Firebase deprecated fetchSignInMethodsForEmail for security reasons
+ */
+exports.checkEmailAvailability = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        const { email } = request.data;
+        if (!email || typeof email !== 'string') {
+            return { available: false, error: 'Email is required' };
+        }
+        const normalizedEmail = email.trim().toLowerCase();
+        // Try to get user by email - if found, email is taken
+        try {
+            await auth.getUserByEmail(normalizedEmail);
+            // User exists - email is not available
+            return { available: false };
+        }
+        catch (error) {
+            // If error is 'user-not-found', email is available
+            if (error.code === 'auth/user-not-found') {
+                return { available: true };
+            }
+            // For other errors, log and assume not available (safer)
+            v2_1.logger.error('Error checking email availability:', error);
+            return { available: false, error: 'Unable to check email' };
+        }
+    }
+    catch (error) {
+        v2_1.logger.error('checkEmailAvailability error:', error);
+        return { available: false, error: 'Internal error' };
+    }
 });
 exports.echo = (0, https_1.onCall)({
     cors: true,
