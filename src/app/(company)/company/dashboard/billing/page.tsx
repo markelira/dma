@@ -75,6 +75,9 @@ export default function CompanyBillingPage() {
     ? Math.max(0, Math.ceil((new Date((subscription as any).trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0
 
+  // Only show trial banner if actually trialing AND days remaining > 0
+  const showTrialBanner = isOnTrial && trialDaysRemaining > 0
+
   const handleCancelClick = () => {
     setShowCancelModal(true)
     if (hasActiveSubscription && !isOnTrial) {
@@ -291,7 +294,7 @@ export default function CompanyBillingPage() {
           </p>
         </div>
 
-        <div className="max-w-4xl">
+        <div className="space-y-6">
           {/* Employee Notice */}
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-8 text-center">
             <div className="flex flex-col items-center">
@@ -321,9 +324,9 @@ export default function CompanyBillingPage() {
                     <span className="text-sm font-medium text-green-600">Aktív vállalati előfizetés</span>
                   </div>
                   <h2 className="text-xl font-bold text-gray-900">
-                    DMA Vállalati Előfizetés
+                    Korlátlan hozzáférés
                   </h2>
-                  <p className="text-gray-600 mt-1">Korlátlan hozzáférés az összes tartalomhoz</p>
+                  <p className="text-gray-600 mt-1">Hozzáférés az összes tartalomhoz</p>
                 </div>
               </div>
             </div>
@@ -347,7 +350,7 @@ export default function CompanyBillingPage() {
         </p>
       </div>
 
-      <div className="max-w-4xl space-y-6">
+      <div className="space-y-6">
         {/* Admin Badge */}
         <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-4">
           <div className="flex items-center gap-3">
@@ -362,7 +365,7 @@ export default function CompanyBillingPage() {
         </div>
 
         {/* Trial Banner */}
-        {isOnTrial && (
+        {showTrialBanner && (
           <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
             <div className="flex items-start gap-4">
               <Clock className="w-6 h-6 text-brand-secondary flex-shrink-0 mt-1" />
@@ -375,7 +378,7 @@ export default function CompanyBillingPage() {
                 </p>
                 <div className="bg-brand-secondary/10 rounded-lg p-3 text-sm text-brand-secondary-hover">
                   <p className="font-medium mb-1">Próbaidőszak után:</p>
-                  <p>Automatikus megújítás a vállalati díjszabás szerint</p>
+                  <p>14 990 Ft / hónap, automatikus megújítással</p>
                 </div>
               </div>
             </div>
@@ -420,9 +423,9 @@ export default function CompanyBillingPage() {
                   )}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {subscription?.planName || 'DMA Vállalati Előfizetés'}
+                  Korlátlan hozzáférés
                 </h2>
-                <p className="text-gray-600 mt-1">Korlátlan hozzáférés az összes tartalomhoz</p>
+                <p className="text-gray-600 mt-1">Hozzáférés az összes tartalomhoz</p>
               </div>
             </div>
 
@@ -481,30 +484,6 @@ export default function CompanyBillingPage() {
                   Előfizetés lemondása
                 </Button>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* What's Included */}
-        {(hasActiveSubscription || isOnTrial) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Mit tartalmaz a vállalati előfizetés
-            </h3>
-            <div className="grid md:grid-cols-2 gap-3">
-              {[
-                'Korlátlan hozzáférés az összes tartalomhoz',
-                'Munkatársak korlátlan hozzáadása',
-                'Haladás nyomon követése',
-                'Új tartalmak automatikusan hozzáférhetők',
-                'Tanúsítványok minden befejezett tartalomhoz',
-                'Prioritási támogatás'
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-700">{item}</p>
-                </div>
-              ))}
             </div>
           </div>
         )}

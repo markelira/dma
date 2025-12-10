@@ -66,13 +66,17 @@ export default function BillingPage() {
 
   const hasActiveSubscription = subscriptionData?.hasActiveSubscription || false
   const subscription = subscriptionData?.subscription
-  const isOnTrial = subscription?.isTrialing || false
+  const isOnTrial = (subscription as any)?.isTrialing || false
   const cancelAtPeriodEnd = subscription?.cancelAtPeriodEnd || false
 
   // Calculate trial days remaining
-  const trialDaysRemaining = subscription?.trialEnd
-    ? Math.max(0, Math.ceil((new Date(subscription.trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+  const trialDaysRemaining = (subscription as any)?.trialEnd
+    ? Math.max(0, Math.ceil((new Date((subscription as any).trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0
+
+  // Only show trial banner if actually trialing AND days remaining > 0
+  // If trial ended but subscription active, just show active subscription
+  const showTrialBanner = isOnTrial && trialDaysRemaining > 0
 
   const handleCancelClick = () => {
     setShowCancelModal(true)
@@ -289,9 +293,9 @@ export default function BillingPage() {
         </p>
       </div>
 
-      <div className="max-w-4xl space-y-6">
+      <div className="space-y-6">
         {/* Trial Banner */}
-        {isOnTrial && (
+        {showTrialBanner && (
           <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
             <div className="flex items-start gap-4">
               <Clock className="w-6 h-6 text-brand-secondary flex-shrink-0 mt-1" />
@@ -304,7 +308,7 @@ export default function BillingPage() {
                 </p>
                 <div className="bg-brand-secondary/10 rounded-lg p-3 text-sm text-brand-secondary-hover">
                   <p className="font-medium mb-1">Próbaidőszak után:</p>
-                  <p>15 000 Ft / hónap, automatikus megújítással</p>
+                  <p>14 990 Ft / hónap, automatikus megújítással</p>
                 </div>
               </div>
             </div>
@@ -349,12 +353,12 @@ export default function BillingPage() {
                   )}
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {subscription?.planName || 'DMA Havi Előfizetés'}
+                  Korlátlan hozzáférés
                 </h2>
-                <p className="text-gray-600 mt-1">Korlátlan hozzáférés az összes tartalomhoz</p>
+                <p className="text-gray-600 mt-1">Hozzáférés az összes tartalomhoz</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-gray-900">15 000 Ft</p>
+                <p className="text-3xl font-bold text-gray-900">14 990 Ft</p>
                 <p className="text-sm text-gray-600">havonta</p>
               </div>
             </div>
@@ -414,30 +418,6 @@ export default function BillingPage() {
                   Előfizetés lemondása
                 </Button>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* What's Included */}
-        {(hasActiveSubscription || isOnTrial) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Mit tartalmaz az előfizetés
-            </h3>
-            <div className="grid md:grid-cols-2 gap-3">
-              {[
-                'Korlátlan hozzáférés az összes tartalomhoz',
-                'Új tartalmak automatikusan hozzáférhetők',
-                'Tanúsítványok minden befejezett tartalomhoz',
-                'Csapattagok korlátlan hozzáadása',
-                'Prioritási támogatás',
-                '30 napos pénzvisszafizetési garancia'
-              ].map((item, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-gray-700">{item}</p>
-                </div>
-              ))}
             </div>
           </div>
         )}
