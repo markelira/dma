@@ -44,7 +44,7 @@ export function UltraMinimalHero() {
               size="lg"
               variant="ghost"
               className="text-gray-700 hover:text-gray-900 font-bold px-10 py-7 text-lg"
-              onClick={() => router.push('/pricing')}
+              onClick={() => router.push('/register')}
             >
               Árak megtekintése
             </Button>

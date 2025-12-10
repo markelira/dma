@@ -152,7 +152,7 @@ export function ConsumerHeroSection() {
                 size="lg"
                 variant="outline"
                 className="border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-lg rounded-full"
-                onClick={() => router.push('/pricing')}
+                onClick={() => router.push('/register')}
               >
                 Árak megtekintése
               </Button>

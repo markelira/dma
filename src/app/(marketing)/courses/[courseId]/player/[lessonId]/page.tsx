@@ -318,7 +318,7 @@ export default function CoursePlayerPage() {
   // Check subscription status
   if (subStatus && !hasSub) {
     const returnUrl = `/courses/${courseId}/player/${lessonId}`;
-    router.push(`/pricing?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
+    router.push(`/register?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
         <div className="text-center text-foreground">

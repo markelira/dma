@@ -138,7 +138,7 @@ export const sendEmployeeReminder = https.onCall(
 );
 
 /**
- * Send reminder email via SendGrid
+ * Send reminder email via SendGrid using base template
  */
 async function sendReminderEmail(
   to: string,
@@ -149,137 +149,67 @@ async function sendReminderEmail(
     dashboardUrl: string;
   }
 ) {
-  const sgMail = require('@sendgrid/mail');
+  const { sendEmail } = require('../email/emailService');
+  const {
+    wrapInBaseTemplate,
+    createHeading,
+    createParagraph,
+    createButtonRow,
+    createAlertBox,
+    generatePlainText,
+  } = require('../email/templates/base');
 
-  // Get SendGrid API key from environment variable (Firebase Functions v2)
-  const sendgridApiKey = process.env.SENDGRID_API_KEY;
+  const subject = `Emlékeztető: Folytasd a(z) ${data.masterclassTitle} tartalmakat`;
 
-  if (!sendgridApiKey) {
-    console.error('SendGrid API key not configured (SENDGRID_API_KEY)');
-    throw new Error('Email service not configured');
-  }
+  // Build email content using base template
+  const content = `
+    ${createHeading('Emlékeztető', 2)}
+    ${createParagraph(`Szia <strong>${data.firstName}</strong>,`)}
+    ${createParagraph(`A(z) <strong>${data.companyName}</strong> csapata észrevette, hogy egy ideje nem tekinted meg a <strong>${data.masterclassTitle}</strong> tartalmakat.`)}
 
-  sgMail.setApiKey(sendgridApiKey);
+    ${createAlertBox('<strong>Tipp:</strong> Napi 15 perc elég ahhoz, hogy lendületben maradj és a lehető legtöbbet hozd ki a programból!', 'info')}
 
-  const subject = `🔔 Emlékeztető: Folytasd a ${data.masterclassTitle} tanulását`;
+    ${createParagraph('Folytasd ott, ahol abbahagytad:')}
 
-  const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tanulási emlékeztető</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
-    <tr>
-      <td style="padding: 40px 20px;">
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+    ${createButtonRow({ text: 'Tovább a platformra', url: data.dashboardUrl, variant: 'primary' })}
 
-          <!-- Header -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">
-                🔔 Tanulási Emlékeztető
-              </h1>
-            </td>
-          </tr>
+    ${createParagraph('Tudjuk, hogy elfoglalt vagy, de az időbefektetés megéri - a csapat számít rád!', { muted: true })}
+  `;
 
-          <!-- Content -->
-          <tr>
-            <td style="padding: 30px;">
-              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
-                Szia <strong>${data.firstName}</strong>,
-              </p>
+  const htmlContent = wrapInBaseTemplate(content, {
+    showUnsubscribe: true, // Marketing email - can unsubscribe
+    preheader: `${data.companyName} csapata emlékeztet a ${data.masterclassTitle} tartalmakra`,
+  });
 
-              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
-                A(z) <strong>${data.companyName}</strong> csapata észrevette, hogy egy ideje nem dolgoztál a <strong>${data.masterclassTitle}</strong> képzésen.
-              </p>
-
-              <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 16px 20px; margin: 25px 0; border-radius: 4px;">
-                <p style="margin: 0; color: #856404; font-size: 15px; line-height: 1.6;">
-                  <strong>💡 Tipp:</strong> Csak napi 15 perc elég ahhoz, hogy lendületben maradj és a lehető legtöbbet hozd ki a képzésből!
-                </p>
-              </div>
-
-              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
-                Folytasd ott, ahol abbahagytad:
-              </p>
-
-              <!-- CTA Button -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 30px 0;">
-                <tr>
-                  <td style="text-align: center;">
-                    <a href="${data.dashboardUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);">
-                      Folytatom a tanulást →
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 25px 0 0; color: #666666; font-size: 14px; line-height: 1.6;">
-                Tudjuk, hogy elfoglalt vagy, de az időbefektetés megéri - a csapat számít rád! 💪
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
-              <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                Üdvözlettel,<br>
-                <strong>${data.companyName} & Az DMA csapata</strong>
-              </p>
-              <p style="margin: 15px 0 0; color: #999999; font-size: 12px;">
-                © ${new Date().getFullYear()} DMA. Minden jog fenntartva.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `.trim();
-
-  const textContent = `
-Szia ${data.firstName},
-
-A(z) ${data.companyName} csapata észrevette, hogy egy ideje nem dolgoztál a ${data.masterclassTitle} képzésen.
-
-💡 Tipp: Csak napi 15 perc elég ahhoz, hogy lendületben maradj és a lehető legtöbbet hozd ki a képzésből!
-
-Folytasd ott, ahol abbahagytad:
-${data.dashboardUrl}
-
-Tudjuk, hogy elfoglalt vagy, de az időbefektetés megéri - a csapat számít rád! 💪
-
-Üdvözlettel,
-${data.companyName} & Az DMA csapata
-  `.trim();
+  const textContent = generatePlainText({
+    greeting: `Szia ${data.firstName},`,
+    paragraphs: [
+      `A(z) ${data.companyName} csapata észrevette, hogy egy ideje nem tekinted meg a ${data.masterclassTitle} tartalmakat.`,
+      'Tipp: Napi 15 perc elég ahhoz, hogy lendületben maradj és a lehető legtöbbet hozd ki a programból!',
+      'Folytasd ott, ahol abbahagytad.',
+      'Tudjuk, hogy elfoglalt vagy, de az időbefektetés megéri - a csapat számít rád!',
+    ],
+    ctaText: 'Tovább a platformra',
+    ctaUrl: data.dashboardUrl,
+    signOff: `Üdvözlettel, ${data.companyName} & A DMA csapat`,
+  });
 
   try {
-    await sgMail.send({
+    const result = await sendEmail({
       to,
-      from: {
-        email: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
-        name: 'DMA Masterclass',
-      },
       subject,
-      text: textContent,
       html: htmlContent,
+      text: textContent,
     });
 
-    console.log(`Reminder email sent successfully to ${to}`);
-    return { success: true };
+    if (result.success) {
+      console.log(`Reminder email sent successfully to ${to}`);
+      return { success: true };
+    } else {
+      throw new Error(result.error || 'Failed to send email');
+    }
   } catch (error: any) {
     console.error('Error sending reminder email:', error);
-    if (error.response) {
-      console.error('SendGrid error details:', error.response.body);
-    }
     throw new Error(`Failed to send reminder email: ${error.message}`);
   }
 }

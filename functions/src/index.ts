@@ -1499,6 +1499,106 @@ export { deleteAllCourses, restoreSoftDeletedCourses } from './dataCleanup';
 // Export file actions
 export { getSignedUploadUrl } from './fileActions';
 
+// Export scheduled functions
+export { sendTrialReminders } from './scheduled/trialReminder';
+
+// Export email-related functions
+import { sendWelcomeEmail as sendWelcomeEmailTemplate } from './email/templates/welcome';
+import { sendNewCourseEmail, sendNewCourseToSubscribers } from './email/templates/newCourse';
+
+/**
+ * Send Welcome Email - Called after registration
+ */
+export const sendWelcomeEmail = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    const { email, firstName } = request.data as { email: string; firstName: string };
+
+    if (!email) {
+      throw new Error('Email cím szükséges');
+    }
+
+    const result = await sendWelcomeEmailTemplate({
+      firstName: firstName || 'Felhasználó',
+      email,
+    });
+
+    return result;
+  } catch (error: any) {
+    logger.error('[sendWelcomeEmail] Error:', error);
+    throw new Error(error.message || 'Üdvözlő email küldése sikertelen');
+  }
+});
+
+/**
+ * Send New Content Notification - Admin function
+ * Sends notification to all active subscribers about new content
+ */
+export const notifyNewContent = onCall({
+  cors: true,
+  region: 'us-central1',
+}, async (request) => {
+  try {
+    // Check admin permission
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+    const userData = userDoc.data();
+    if (userData?.role !== 'ADMIN') {
+      throw new Error('Admin jogosultság szükséges');
+    }
+
+    const { contentTitle, contentType, description, instructorName, contentUrl, thumbnailUrl } = request.data as {
+      contentTitle: string;
+      contentType: string;
+      description?: string;
+      instructorName?: string;
+      contentUrl: string;
+      thumbnailUrl?: string;
+    };
+
+    if (!contentTitle || !contentUrl) {
+      throw new Error('Tartalom cím és URL szükséges');
+    }
+
+    // Get all active subscribers
+    const usersSnapshot = await firestore
+      .collection('users')
+      .where('subscriptionStatus', 'in', ['active', 'trialing'])
+      .get();
+
+    const subscribers = usersSnapshot.docs.map(doc => ({
+      email: doc.data().email,
+      firstName: doc.data().firstName || 'Felhasználó',
+    })).filter(u => u.email);
+
+    logger.info('[notifyNewContent] Sending to subscribers', { count: subscribers.length });
+
+    const result = await sendNewCourseToSubscribers(subscribers, {
+      contentTitle,
+      contentType: contentType || 'tartalom',
+      description,
+      instructorName,
+      contentUrl,
+      thumbnailUrl,
+    });
+
+    return {
+      success: true,
+      sent: result.sent,
+      failed: result.failed,
+      total: subscribers.length,
+    };
+  } catch (error: any) {
+    logger.error('[notifyNewContent] Error:', error);
+    throw new Error(error.message || 'Értesítés küldése sikertelen');
+  }
+});
+
 /**
  * Get all categories
  * Auto-creates default categories if none exist

@@ -66,10 +66,7 @@ export function Navbar() {
                 <Link href="/courses" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
                   Tartalmak
                 </Link>
-                <Link href="/pricing" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
-                  Árazás
-                </Link>
-                <Link href="/blog" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
+                                <Link href="/blog" className="text-gray-700 hover:text-gray-900 transition-colors duration-200">
                   Blog
                 </Link>
               </nav>
@@ -157,14 +154,7 @@ export function Navbar() {
               >
                 Tartalmak
               </Link>
-              <Link
-                href="/pricing"
-                onClick={closeMenu}
-                className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
-              >
-                Árazás
-              </Link>
-              <Link
+                            <Link
                 href="/blog"
                 onClick={closeMenu}
                 className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"

@@ -78,7 +78,7 @@ export function PricingEditorial() {
 
                 {/* CTA Button */}
                 <Link
-                  href="/pricing"
+                  href="/register"
                   className="block w-full py-4 px-6 bg-white text-gray-900 font-semibold text-center rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   Kezdd el ingyen

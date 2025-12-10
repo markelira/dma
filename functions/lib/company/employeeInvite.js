@@ -407,169 +407,72 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
  * Exported for use in completeOnboarding
  */
 async function sendInvitationEmail(to, data) {
-    const sgMail = require('@sendgrid/mail');
-    // Get SendGrid API key from environment variable (Firebase Functions v2)
-    const sendgridApiKey = process.env.SENDGRID_API_KEY;
-    if (!sendgridApiKey) {
-        console.warn('SendGrid API key not configured (SENDGRID_API_KEY) - skipping email');
-        return { success: false, message: 'Email service not configured' };
-    }
-    sgMail.setApiKey(sendgridApiKey);
-    const subject = `${data.companyName} meghívott az DMA Masterclass-ra`;
-    const htmlContent = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meghívás az DMA Masterclass-ra</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f5f5f5;">
+    const { sendEmail } = require('../email/emailService');
+    const { wrapInBaseTemplate, createHeading, createParagraph, createButtonRow, createFeatureList, createAlertBox, generatePlainText, } = require('../email/templates/base');
+    const subject = `${data.companyName} meghívott a DMA Masterclass-ra`;
+    // Build email content using base template
+    const content = `
+    ${createHeading('Csatlakozz a csapathoz!', 2)}
+    ${createParagraph(`Szia <strong>${data.firstName}</strong>,`)}
+    ${createParagraph(`A(z) <strong>${data.companyName}</strong> meghívott, hogy csatlakozz hozzájuk a DMA Masterclass platformon.`)}
+
     <tr>
-      <td style="padding: 40px 20px;">
-        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-
-          <!-- Header with Gradient -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                Meghívás
-              </h1>
-              <p style="margin: 10px 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px;">
-                DMA Masterclass
-              </p>
-            </td>
-          </tr>
-
-          <!-- Company Badge -->
-          <tr>
-            <td style="padding: 30px 30px 20px; text-align: center;">
-              <div style="display: inline-block; background-color: #f0f4ff; border-radius: 8px; padding: 12px 24px; margin-bottom: 20px;">
-                <p style="margin: 0; color: #667eea; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                  ${data.companyName}
-                </p>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Main Content -->
-          <tr>
-            <td style="padding: 0 30px 30px;">
-              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
-                Szia <strong>${data.firstName}</strong>,
-              </p>
-
-              <p style="margin: 0 0 20px; color: #333333; font-size: 16px; line-height: 1.6;">
-                A(z) <strong>${data.companyName}</strong> meghívott, hogy csatlakozz hozzájuk az DMA Masterclass képzésen.
-              </p>
-
-              <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 16px 20px; margin: 25px 0; border-radius: 4px;">
-                <p style="margin: 0; color: #555555; font-size: 15px; line-height: 1.6;">
-                  <strong>Mit kapsz:</strong>
-                </p>
-                <ul style="margin: 10px 0 0; padding-left: 20px; color: #555555; font-size: 15px; line-height: 1.8;">
-                  <li>Hozzáférés az összes kurzusanyaghoz</li>
-                  <li>Interaktív gyakorlatok és feladatok</li>
-                  <li>Szakértői támogatás</li>
-                  <li>Tanúsítvány a sikeres befejezés után</li>
-                </ul>
-              </div>
-
-              <!-- CTA Button -->
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 30px 0;">
-                <tr>
-                  <td style="text-align: center;">
-                    <a href="${data.inviteUrl}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3); transition: transform 0.2s;">
-                      Regisztrálj és csatlakozz
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 25px 0 0; color: #666666; font-size: 14px; line-height: 1.6; text-align: center;">
-                vagy másold be ezt a linket a böngésződbe:
-              </p>
-              <p style="margin: 10px 0 0; color: #667eea; font-size: 13px; word-break: break-all; text-align: center;">
-                ${data.inviteUrl}
-              </p>
-            </td>
-          </tr>
-
-          <!-- Warning Box -->
-          <tr>
-            <td style="padding: 0 30px 30px;">
-              <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; text-align: center;">
-                <p style="margin: 0; color: #856404; font-size: 14px; line-height: 1.5;">
-                  ⏰ Ez a meghívó <strong>7 napon belül</strong> jár le
-                </p>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e9ecef;">
-              <p style="margin: 0 0 10px; color: #666666; font-size: 14px;">
-                Üdvözlettel,<br>
-                <strong>Az DMA csapata</strong>
-              </p>
-              <p style="margin: 15px 0 0; color: #999999; font-size: 12px;">
-                © ${new Date().getFullYear()} DMA. Minden jog fenntartva.
-              </p>
-              <p style="margin: 10px 0 0; color: #999999; font-size: 12px;">
-                Ha nem te kérted ezt a meghívót, egyszerűen figyelmen kívül hagyhatod ezt az emailt.
-              </p>
-            </td>
-          </tr>
-
-        </table>
+      <td style="padding: 16px 0;">
+        <p style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
+          Mit kapsz:
+        </p>
       </td>
     </tr>
-  </table>
-</body>
-</html>
-  `.trim();
-    const textContent = `
-Szia ${data.firstName},
+    ${createFeatureList([
+        'Hozzáférés az összes prémium tartalomhoz',
+        'Interaktív gyakorlatok és feladatok',
+        'Szakértői támogatás',
+        'Tanúsítvány a sikeres befejezés után',
+    ])}
 
-A(z) ${data.companyName} meghívott, hogy csatlakozz hozzájuk az DMA Masterclass képzésen.
+    ${createButtonRow({ text: 'Regisztrálj és csatlakozz', url: data.inviteUrl, variant: 'primary' })}
 
-Mit kapsz:
-- Hozzáférés az összes kurzusanyaghoz
-- Interaktív gyakorlatok és feladatok
-- Szakértői támogatás
-- Tanúsítvány a sikeres befejezés után
+    ${createAlertBox('Ez a meghívó <strong>7 napon belül</strong> jár le.', 'warning')}
 
-Regisztrálj és csatlakozz az alábbi linkre kattintva:
-${data.inviteUrl}
-
-Ez a meghívó 7 napon belül jár le.
-
-Üdvözlettel,
-Az DMA csapata
-
-Ha nem te kérted ezt a meghívót, egyszerűen figyelmen kívül hagyhatod ezt az emailt.
-  `.trim();
+    ${createParagraph('Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.', { muted: true })}
+  `;
+    const htmlContent = wrapInBaseTemplate(content, {
+        showUnsubscribe: false, // Transactional email
+        preheader: `${data.companyName} meghívott a DMA Masterclass platformra`,
+    });
+    const textContent = generatePlainText({
+        greeting: `Szia ${data.firstName},`,
+        paragraphs: [
+            `A(z) ${data.companyName} meghívott, hogy csatlakozz hozzájuk a DMA Masterclass platformon.`,
+            'Mit kapsz:',
+            '- Hozzáférés az összes prémium tartalomhoz',
+            '- Interaktív gyakorlatok és feladatok',
+            '- Szakértői támogatás',
+            '- Tanúsítvány a sikeres befejezés után',
+            'Ez a meghívó 7 napon belül jár le.',
+            'Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.',
+        ],
+        ctaText: 'Regisztrálj és csatlakozz',
+        ctaUrl: data.inviteUrl,
+        signOff: 'Üdvözlettel, A DMA csapat',
+    });
     try {
-        await sgMail.send({
+        const result = await sendEmail({
             to,
-            from: {
-                email: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
-                name: 'DMA Masterclass',
-            },
             subject,
-            text: textContent,
             html: htmlContent,
+            text: textContent,
         });
-        console.log(`Invitation email sent successfully to ${to}`);
-        return { success: true };
+        if (result.success) {
+            console.log(`Invitation email sent successfully to ${to}`);
+            return { success: true };
+        }
+        else {
+            throw new Error(result.error || 'Failed to send email');
+        }
     }
     catch (error) {
         console.error('Error sending invitation email:', error);
-        if (error.response) {
-            console.error('SendGrid error details:', error.response.body);
-        }
         throw new Error(`Failed to send invitation email: ${error.message}`);
     }
 }

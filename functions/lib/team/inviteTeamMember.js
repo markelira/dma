@@ -43,7 +43,6 @@ exports.inviteTeamMember = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
-const nodemailer = __importStar(require("nodemailer"));
 const team_1 = require("../types/team");
 const firestore = admin.firestore();
 /**
@@ -233,146 +232,58 @@ exports.inviteTeamMember = (0, https_1.onCall)({
     }
 });
 /**
- * Send team invitation email
+ * Send team invitation email using unified email service
  */
 async function sendInvitationEmail(data) {
+    const { sendEmail } = require('../email/emailService');
+    const { wrapInBaseTemplate, createHeading, createParagraph, createButtonRow, createAlertBox, generatePlainText, } = require('../email/templates/base');
+    const subject = `Meghívás: Csatlakozz a(z) "${data.teamName}" csapatához`;
+    // Build email content using base template
+    const content = `
+    ${createHeading('Csapat meghívó', 2)}
+    ${createParagraph('Szia!')}
+    ${createParagraph(`<strong>${data.inviterName}</strong> meghívott, hogy csatlakozz a(z) <strong>"${data.teamName}"</strong> csapatához a DMA Masterclass platformon.`)}
+    ${createParagraph('Csapattagként <strong>korlátlan hozzáférést</strong> kapsz az összes prémium tartalomhoz - teljesen ingyen!')}
+
+    ${createButtonRow({ text: 'Meghívás elfogadása', url: data.inviteLink, variant: 'primary' })}
+
+    ${createAlertBox(`Ez a meghívó <strong>${data.expiryDays} napig</strong> érvényes.`, 'info')}
+
+    ${createParagraph('Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.', { muted: true })}
+  `;
+    const htmlContent = wrapInBaseTemplate(content, {
+        showUnsubscribe: false, // Transactional email
+        preheader: `${data.inviterName} meghívott a(z) ${data.teamName} csapatába`,
+    });
+    const textContent = generatePlainText({
+        greeting: 'Szia!',
+        paragraphs: [
+            `${data.inviterName} meghívott, hogy csatlakozz a(z) "${data.teamName}" csapatához a DMA Masterclass platformon.`,
+            'Csapattagként korlátlan hozzáférést kapsz az összes prémium tartalomhoz - teljesen ingyen!',
+            `Ez a meghívó ${data.expiryDays} napig érvényes.`,
+            'Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.',
+        ],
+        ctaText: 'Meghívás elfogadása',
+        ctaUrl: data.inviteLink,
+        signOff: 'Üdvözlettel, A DMA csapat',
+    });
     try {
-        const transporter = await createEmailTransporter();
-        const htmlContent = `
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Csapat meghívó - DMA.hu</title>
-</head>
-<body style="font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, sans-serif; background-color: #f5f5f5; margin: 0; padding: 0;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <!-- Header -->
-          <tr>
-            <td style="background-color: #2C3E54; padding: 40px 30px; text-align: center;">
-              <h1 style="color: #ffffff; font-size: 28px; margin: 0; font-weight: 700;">
-                Csapat meghívó
-              </h1>
-            </td>
-          </tr>
-
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px 30px;">
-              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-                Szia!
-              </p>
-
-              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 20px;">
-                <strong>${data.inviterName}</strong> meghívott, hogy csatlakozz a(z) <strong>"${data.teamName}"</strong> csapatához a DMA.hu platformon.
-              </p>
-
-              <p style="color: #333333; font-size: 16px; line-height: 1.6; margin: 0 0 30px;">
-                Csapattagként <strong>korlátlan hozzáférést</strong> kapsz az összes videókurzushoz és tartalomhoz. Teljesen ingyen, nincs plusz költség!
-              </p>
-
-              <!-- CTA Button -->
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center" style="padding: 20px 0;">
-                    <a href="${data.inviteLink}" style="background-color: #2C3E54; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; display: inline-block;">
-                      Meghívás elfogadása
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 30px 0 0; text-align: center;">
-                Ez a meghívó <strong>${data.expiryDays} napig</strong> érvényes.
-              </p>
-
-              <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 20px 0 0; text-align: center; border-top: 1px solid #eeeeee; padding-top: 20px;">
-                Ha a gomb nem működik, másold be ezt a linket a böngésződbe:<br>
-                <a href="${data.inviteLink}" style="color: #2C3E54; word-break: break-all;">${data.inviteLink}</a>
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #f8f9fa; padding: 30px; text-align: center;">
-              <p style="color: #666666; font-size: 14px; margin: 0 0 10px;">
-                Üdvözlettel,<br>
-                <strong>DMA.hu csapata</strong>
-              </p>
-              <p style="color: #999999; font-size: 12px; margin: 0;">
-                © 2024 DMA.hu. Minden jog fenntartva.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-    `;
-        const textContent = `
-Szia!
-
-${data.inviterName} meghívott, hogy csatlakozz a(z) "${data.teamName}" csapatához a DMA.hu platformon.
-
-Csapattagként korlátlan hozzáférést kapsz az összes videókurzushoz és tartalomhoz.
-
-Kattints az alábbi linkre a meghívás elfogadásához:
-${data.inviteLink}
-
-Ez a meghívó ${data.expiryDays} napig érvényes.
-
-Üdvözlettel,
-DMA.hu csapata
-    `;
-        await transporter.sendMail({
-            from: process.env.FROM_EMAIL || 'noreply@dma.hu',
+        const result = await sendEmail({
             to: data.to,
-            subject: `Meghívás: Csatlakozz a(z) "${data.teamName}" csapatához`,
-            text: textContent,
+            subject,
             html: htmlContent,
+            text: textContent,
         });
-        v2_1.logger.info('[sendInvitationEmail] Email sent successfully', { to: data.to });
+        if (result.success) {
+            v2_1.logger.info('[sendInvitationEmail] Email sent successfully', { to: data.to });
+        }
+        else {
+            throw new Error(result.error || 'Failed to send email');
+        }
     }
     catch (error) {
         v2_1.logger.error('[sendInvitationEmail] Error sending email:', error);
         throw new Error(`Failed to send invitation email: ${error.message}`);
     }
-}
-/**
- * Create email transporter
- */
-async function createEmailTransporter() {
-    const brevoUser = process.env.BREVO_SMTP_USER;
-    const brevoKey = process.env.BREVO_SMTP_KEY;
-    if (brevoUser && brevoKey) {
-        return nodemailer.createTransport({
-            host: 'smtp-relay.brevo.com',
-            port: 587,
-            secure: false,
-            auth: {
-                user: brevoUser,
-                pass: brevoKey,
-            },
-        });
-    }
-    const gmailUser = process.env.GMAIL_USER;
-    const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
-    if (gmailUser && gmailAppPassword) {
-        return nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: gmailUser,
-                pass: gmailAppPassword,
-            },
-        });
-    }
-    throw new Error('No email service configured');
 }
 //# sourceMappingURL=inviteTeamMember.js.map

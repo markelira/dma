@@ -17,6 +17,11 @@ import {
   calculateTrialEndDate,
 } from '../types/team';
 import { handlePaymentSuccess } from '../payment/handlePaymentSuccess';
+// Email templates
+import { sendSubscriptionStartedEmail } from '../email/templates/subscriptionStarted';
+import { sendSubscriptionCanceledEmail } from '../email/templates/subscriptionCanceled';
+import { sendPaymentSuccessEmail } from '../email/templates/paymentSuccess';
+import { sendPaymentFailedEmail } from '../email/templates/paymentFailed';
 
 const firestore = admin.firestore();
 
@@ -386,6 +391,31 @@ async function handleIndividualSubscription(params: {
       status: subscriptionStatus,
     });
 
+    // Send subscription started email (non-blocking)
+    try {
+      const userDoc = await firestore.collection('users').doc(userId).get();
+      const userData = userDoc.data();
+      if (userData?.email) {
+        const trialEndFormatted = trialEndDate.toLocaleDateString('hu-HU', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+
+        await sendSubscriptionStartedEmail({
+          firstName: userData.firstName || 'Felhasználó',
+          email: userData.email,
+          planName: `DMA ${subscriptionPlan}`,
+          isTrialing: subscriptionStatus === 'trialing',
+          trialEndDate: subscriptionStatus === 'trialing' ? trialEndFormatted : undefined,
+        });
+        logger.info('[handleIndividualSubscription] Subscription started email sent');
+      }
+    } catch (emailError: any) {
+      logger.error('[handleIndividualSubscription] Failed to send email:', emailError.message);
+      // Don't throw - subscription was created successfully
+    }
+
   } catch (error: any) {
     logger.error('[handleIndividualSubscription] Error:', error);
     throw error;
@@ -474,6 +504,31 @@ async function handleCompanySubscription(params: {
       subscriptionId,
       status: subscriptionStatus,
     });
+
+    // Send subscription started email (non-blocking)
+    try {
+      const userDoc = await firestore.collection('users').doc(userId).get();
+      const userData = userDoc.data();
+      if (userData?.email) {
+        const trialEndFormatted = trialEndDate.toLocaleDateString('hu-HU', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        });
+
+        await sendSubscriptionStartedEmail({
+          firstName: userData.firstName || 'Felhasználó',
+          email: userData.email,
+          planName: `DMA ${subscriptionPlan} (Céges)`,
+          isTrialing: subscriptionStatus === 'trialing',
+          trialEndDate: subscriptionStatus === 'trialing' ? trialEndFormatted : undefined,
+        });
+        logger.info('[handleCompanySubscription] Subscription started email sent');
+      }
+    } catch (emailError: any) {
+      logger.error('[handleCompanySubscription] Failed to send email:', emailError.message);
+      // Don't throw - subscription was created successfully
+    }
 
   } catch (error: any) {
     logger.error('[handleCompanySubscription] Error:', error);
@@ -680,6 +735,37 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
       subscriptionId: subscription.id,
     });
 
+    // Send subscription canceled email (non-blocking)
+    try {
+      if (!subscriptionsSnapshot.empty) {
+        const subscriptionData = subscriptionsSnapshot.docs[0].data();
+        if (subscriptionData.userId) {
+          const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+          const userData = userDoc.data();
+          if (userData?.email) {
+            // Calculate access until date (end of current period)
+            const accessUntil = subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toLocaleDateString('hu-HU', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : 'azonnal';
+
+            await sendSubscriptionCanceledEmail({
+              firstName: userData.firstName || 'Felhasználó',
+              email: userData.email,
+              planName: subscriptionData.planName || 'DMA Előfizetés',
+              accessUntil,
+            });
+            logger.info('[handleSubscriptionDeleted] Cancellation email sent');
+          }
+        }
+      }
+    } catch (emailError: any) {
+      logger.error('[handleSubscriptionDeleted] Failed to send email:', emailError.message);
+    }
+
   } catch (error: any) {
     logger.error('[handleSubscriptionDeleted] Error:', error);
   }
@@ -711,6 +797,46 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, stripe: St
       subscriptionId: subscription.id,
     });
 
+    // Send payment success email (non-blocking)
+    try {
+      // Get user from subscription
+      const subscriptionsSnapshot = await firestore
+        .collection('subscriptions')
+        .where('stripeSubscriptionId', '==', subscription.id)
+        .limit(1)
+        .get();
+
+      if (!subscriptionsSnapshot.empty) {
+        const subscriptionData = subscriptionsSnapshot.docs[0].data();
+        if (subscriptionData.userId) {
+          const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+          const userData = userDoc.data();
+          if (userData?.email && invoice.amount_paid) {
+            const periodEnd = subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000).toLocaleDateString('hu-HU', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : undefined;
+
+            await sendPaymentSuccessEmail({
+              firstName: userData.firstName || 'Felhasználó',
+              email: userData.email,
+              amount: invoice.amount_paid / 100, // Convert from cents
+              currency: invoice.currency || 'huf',
+              planName: subscriptionData.planName || 'DMA Előfizetés',
+              invoiceUrl: invoice.hosted_invoice_url || undefined,
+              periodEnd,
+            });
+            logger.info('[handleInvoicePaymentSucceeded] Payment success email sent');
+          }
+        }
+      }
+    } catch (emailError: any) {
+      logger.error('[handleInvoicePaymentSucceeded] Failed to send email:', emailError.message);
+    }
+
   } catch (error: any) {
     logger.error('[handleInvoicePaymentSucceeded] Error:', error);
   }
@@ -737,6 +863,46 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void
     logger.info('[handleInvoicePaymentFailed] Subscription marked as past_due', {
       subscriptionId: invoice.subscription,
     });
+
+    // Send payment failed email (non-blocking)
+    try {
+      // Get user from subscription
+      const subscriptionsSnapshot = await firestore
+        .collection('subscriptions')
+        .where('stripeSubscriptionId', '==', invoice.subscription)
+        .limit(1)
+        .get();
+
+      if (!subscriptionsSnapshot.empty) {
+        const subscriptionData = subscriptionsSnapshot.docs[0].data();
+        if (subscriptionData.userId) {
+          const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+          const userData = userDoc.data();
+          if (userData?.email && invoice.amount_due) {
+            // Calculate retry date (typically 3-7 days)
+            const retryDate = invoice.next_payment_attempt
+              ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('hu-HU', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })
+              : undefined;
+
+            await sendPaymentFailedEmail({
+              firstName: userData.firstName || 'Felhasználó',
+              email: userData.email,
+              amount: invoice.amount_due / 100, // Convert from cents
+              currency: invoice.currency || 'huf',
+              planName: subscriptionData.planName || 'DMA Előfizetés',
+              retryDate,
+            });
+            logger.info('[handleInvoicePaymentFailed] Payment failed email sent');
+          }
+        }
+      }
+    } catch (emailError: any) {
+      logger.error('[handleInvoicePaymentFailed] Failed to send email:', emailError.message);
+    }
 
   } catch (error: any) {
     logger.error('[handleInvoicePaymentFailed] Error:', error);

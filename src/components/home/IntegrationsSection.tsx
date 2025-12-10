@@ -187,7 +187,7 @@ export function IntegrationsSection() {
           transition={{ delay: 0.5 }}
         >
           <a
-            href="/pricing"
+            href="/register"
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[rgb(231,43,54)] text-white font-bold text-base transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:-translate-y-0.5 hover:shadow-[0_0_40px_rgba(231,43,54,0.3)]"
           >
             Csatlakozz most

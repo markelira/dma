@@ -19,7 +19,6 @@ const footerLinks = {
   segitseg: [
     { label: 'GYIK', href: '/faq' },
     { label: 'Súgó', href: '/help' },
-    { label: 'Árazás', href: '/pricing' },
     { label: 'Támogatás', href: '/support' },
   ],
   jogi: [

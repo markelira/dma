@@ -140,7 +140,7 @@ export function MinimalistPricingSection() {
             variant="outline"
             size="lg"
             className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-6 text-base rounded-lg"
-            onClick={() => router.push('/pricing')}
+            onClick={() => router.push('/register')}
           >
             Részletes árazás
             <ArrowRight className="w-5 h-5 ml-2" />

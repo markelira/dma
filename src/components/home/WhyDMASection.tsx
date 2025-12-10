@@ -86,7 +86,7 @@ export function WhyDMASection() {
         {/* CTA */}
         <div className="flex justify-center">
           <Link
-            href="/pricing"
+            href="/register"
             className="group inline-flex items-center gap-3 px-10 py-5 text-lg font-semibold text-white bg-[#E53935] hover:bg-[#C62828] rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02]"
           >
             Fedezd fel 7 napig ingyen

@@ -19,10 +19,7 @@ export default function Header() {
             <Link href="/universities" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               Egyetemek
             </Link>
-            <Link href="/pricing" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
-              Árak
-            </Link>
-            <Link href="/trending" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                        <Link href="/trending" className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
               Trending
             </Link>
           </nav>

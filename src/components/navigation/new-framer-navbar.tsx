@@ -216,14 +216,7 @@ export function NewFramerNavbar() {
                     Masterclass
                   </Link>
                 </div>
-                <Link
-                  href="/pricing"
-                  onClick={closeMobileMenu}
-                  className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"
-                >
-                  Árazás
-                </Link>
-                <Link
+                                <Link
                   href="/blog"
                   onClick={closeMobileMenu}
                   className="text-white text-2xl font-medium hover:text-white/80 transition-colors duration-200 py-3 px-6 inline-block min-h-[44px]"

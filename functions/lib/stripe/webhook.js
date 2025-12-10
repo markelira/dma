@@ -50,6 +50,11 @@ const stripe_1 = __importDefault(require("stripe"));
 const createTeam_1 = require("../team/createTeam");
 const team_1 = require("../types/team");
 const handlePaymentSuccess_1 = require("../payment/handlePaymentSuccess");
+// Email templates
+const subscriptionStarted_1 = require("../email/templates/subscriptionStarted");
+const subscriptionCanceled_1 = require("../email/templates/subscriptionCanceled");
+const paymentSuccess_1 = require("../email/templates/paymentSuccess");
+const paymentFailed_1 = require("../email/templates/paymentFailed");
 const firestore = admin.firestore();
 // Lazy Stripe initialization - will be initialized on first request
 let stripe = null;
@@ -357,6 +362,30 @@ async function handleIndividualSubscription(params) {
             subscriptionId,
             status: subscriptionStatus,
         });
+        // Send subscription started email (non-blocking)
+        try {
+            const userDoc = await firestore.collection('users').doc(userId).get();
+            const userData = userDoc.data();
+            if (userData?.email) {
+                const trialEndFormatted = trialEndDate.toLocaleDateString('hu-HU', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+                await (0, subscriptionStarted_1.sendSubscriptionStartedEmail)({
+                    firstName: userData.firstName || 'Felhasználó',
+                    email: userData.email,
+                    planName: `DMA ${subscriptionPlan}`,
+                    isTrialing: subscriptionStatus === 'trialing',
+                    trialEndDate: subscriptionStatus === 'trialing' ? trialEndFormatted : undefined,
+                });
+                v2_1.logger.info('[handleIndividualSubscription] Subscription started email sent');
+            }
+        }
+        catch (emailError) {
+            v2_1.logger.error('[handleIndividualSubscription] Failed to send email:', emailError.message);
+            // Don't throw - subscription was created successfully
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleIndividualSubscription] Error:', error);
@@ -418,6 +447,30 @@ async function handleCompanySubscription(params) {
             subscriptionId,
             status: subscriptionStatus,
         });
+        // Send subscription started email (non-blocking)
+        try {
+            const userDoc = await firestore.collection('users').doc(userId).get();
+            const userData = userDoc.data();
+            if (userData?.email) {
+                const trialEndFormatted = trialEndDate.toLocaleDateString('hu-HU', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                });
+                await (0, subscriptionStarted_1.sendSubscriptionStartedEmail)({
+                    firstName: userData.firstName || 'Felhasználó',
+                    email: userData.email,
+                    planName: `DMA ${subscriptionPlan} (Céges)`,
+                    isTrialing: subscriptionStatus === 'trialing',
+                    trialEndDate: subscriptionStatus === 'trialing' ? trialEndFormatted : undefined,
+                });
+                v2_1.logger.info('[handleCompanySubscription] Subscription started email sent');
+            }
+        }
+        catch (emailError) {
+            v2_1.logger.error('[handleCompanySubscription] Failed to send email:', emailError.message);
+            // Don't throw - subscription was created successfully
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleCompanySubscription] Error:', error);
@@ -596,6 +649,36 @@ async function handleSubscriptionDeleted(subscription) {
         v2_1.logger.info('[handleSubscriptionDeleted] Subscription canceled', {
             subscriptionId: subscription.id,
         });
+        // Send subscription canceled email (non-blocking)
+        try {
+            if (!subscriptionsSnapshot.empty) {
+                const subscriptionData = subscriptionsSnapshot.docs[0].data();
+                if (subscriptionData.userId) {
+                    const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+                    const userData = userDoc.data();
+                    if (userData?.email) {
+                        // Calculate access until date (end of current period)
+                        const accessUntil = subscription.current_period_end
+                            ? new Date(subscription.current_period_end * 1000).toLocaleDateString('hu-HU', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })
+                            : 'azonnal';
+                        await (0, subscriptionCanceled_1.sendSubscriptionCanceledEmail)({
+                            firstName: userData.firstName || 'Felhasználó',
+                            email: userData.email,
+                            planName: subscriptionData.planName || 'DMA Előfizetés',
+                            accessUntil,
+                        });
+                        v2_1.logger.info('[handleSubscriptionDeleted] Cancellation email sent');
+                    }
+                }
+            }
+        }
+        catch (emailError) {
+            v2_1.logger.error('[handleSubscriptionDeleted] Failed to send email:', emailError.message);
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleSubscriptionDeleted] Error:', error);
@@ -622,6 +705,44 @@ async function handleInvoicePaymentSucceeded(invoice, stripe) {
         v2_1.logger.info('[handleInvoicePaymentSucceeded] Subscription reactivated', {
             subscriptionId: subscription.id,
         });
+        // Send payment success email (non-blocking)
+        try {
+            // Get user from subscription
+            const subscriptionsSnapshot = await firestore
+                .collection('subscriptions')
+                .where('stripeSubscriptionId', '==', subscription.id)
+                .limit(1)
+                .get();
+            if (!subscriptionsSnapshot.empty) {
+                const subscriptionData = subscriptionsSnapshot.docs[0].data();
+                if (subscriptionData.userId) {
+                    const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+                    const userData = userDoc.data();
+                    if (userData?.email && invoice.amount_paid) {
+                        const periodEnd = subscription.current_period_end
+                            ? new Date(subscription.current_period_end * 1000).toLocaleDateString('hu-HU', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })
+                            : undefined;
+                        await (0, paymentSuccess_1.sendPaymentSuccessEmail)({
+                            firstName: userData.firstName || 'Felhasználó',
+                            email: userData.email,
+                            amount: invoice.amount_paid / 100, // Convert from cents
+                            currency: invoice.currency || 'huf',
+                            planName: subscriptionData.planName || 'DMA Előfizetés',
+                            invoiceUrl: invoice.hosted_invoice_url || undefined,
+                            periodEnd,
+                        });
+                        v2_1.logger.info('[handleInvoicePaymentSucceeded] Payment success email sent');
+                    }
+                }
+            }
+        }
+        catch (emailError) {
+            v2_1.logger.error('[handleInvoicePaymentSucceeded] Failed to send email:', emailError.message);
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleInvoicePaymentSucceeded] Error:', error);
@@ -645,6 +766,44 @@ async function handleInvoicePaymentFailed(invoice) {
         v2_1.logger.info('[handleInvoicePaymentFailed] Subscription marked as past_due', {
             subscriptionId: invoice.subscription,
         });
+        // Send payment failed email (non-blocking)
+        try {
+            // Get user from subscription
+            const subscriptionsSnapshot = await firestore
+                .collection('subscriptions')
+                .where('stripeSubscriptionId', '==', invoice.subscription)
+                .limit(1)
+                .get();
+            if (!subscriptionsSnapshot.empty) {
+                const subscriptionData = subscriptionsSnapshot.docs[0].data();
+                if (subscriptionData.userId) {
+                    const userDoc = await firestore.collection('users').doc(subscriptionData.userId).get();
+                    const userData = userDoc.data();
+                    if (userData?.email && invoice.amount_due) {
+                        // Calculate retry date (typically 3-7 days)
+                        const retryDate = invoice.next_payment_attempt
+                            ? new Date(invoice.next_payment_attempt * 1000).toLocaleDateString('hu-HU', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })
+                            : undefined;
+                        await (0, paymentFailed_1.sendPaymentFailedEmail)({
+                            firstName: userData.firstName || 'Felhasználó',
+                            email: userData.email,
+                            amount: invoice.amount_due / 100, // Convert from cents
+                            currency: invoice.currency || 'huf',
+                            planName: subscriptionData.planName || 'DMA Előfizetés',
+                            retryDate,
+                        });
+                        v2_1.logger.info('[handleInvoicePaymentFailed] Payment failed email sent');
+                    }
+                }
+            }
+        }
+        catch (emailError) {
+            v2_1.logger.error('[handleInvoicePaymentFailed] Failed to send email:', emailError.message);
+        }
     }
     catch (error) {
         v2_1.logger.error('[handleInvoicePaymentFailed] Error:', error);

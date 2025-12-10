@@ -326,7 +326,7 @@ export default function BillingPage() {
               Indítson el egy előfizetést az összes tartalomhoz való hozzáféréshez
             </p>
             <Button
-              onClick={() => router.push('/pricing')}
+              onClick={() => router.push('/register')}
               className="bg-brand-secondary hover:bg-brand-secondary-hover"
             >
               Előfizetés indítása

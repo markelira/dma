@@ -287,7 +287,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
                   <p className="text-gray-600 mb-6">
                     {t('subscription.message')}
                   </p>
-                  <Button onClick={() => router.push('/pricing')}>
+                  <Button onClick={() => router.push('/register')}>
                     {t('subscription.viewPlans')}
                   </Button>
                 </div>

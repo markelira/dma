@@ -69,7 +69,7 @@ export function HeroSection() {
                 Fedezd fel 7 napig ingyen
               </Link>
               <Link
-                href="/pricing"
+                href="/register"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-dma-navy font-bold rounded-full border-2 border-dma-navy hover:bg-dma-navy hover:text-white transition-all duration-300 text-lg"
               >
                 Árak megtekintése

@@ -37,13 +37,7 @@ export function FramerNavbarInitial({ onMobileMenuToggle }: FramerNavbarInitialP
             >
               Tartalmak
             </Link>
-            <Link
-              href="/pricing"
-              className="text-gray-700 hover:text-gray-900 text-base font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
-            >
-              Árazás
-            </Link>
-            <Link
+                        <Link
               href="/blog"
               className="text-gray-700 hover:text-gray-900 text-base font-medium transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/20"
             >

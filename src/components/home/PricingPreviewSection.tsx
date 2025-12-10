@@ -216,7 +216,7 @@ export function PricingPreviewSection() {
             variant="outline"
             size="lg"
             className="group border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-base"
-            onClick={() => router.push('/pricing')}
+            onClick={() => router.push('/register')}
           >
             Részletes árazás megtekintése
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

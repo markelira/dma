@@ -85,12 +85,7 @@ export function NewFooterSection() {
                   Tartalmak
                 </Link>
               </li>
-              <li>
-                <Link href="/pricing" className="hover:text-white transition-colors">
-                  Árazás
-                </Link>
-              </li>
-              <li>
+                            <li>
                 <Link href="/blog" className="hover:text-white transition-colors">
                   Blog
                 </Link>

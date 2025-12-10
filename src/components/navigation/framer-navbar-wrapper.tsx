@@ -95,14 +95,7 @@ export function FramerNavbarWrapper() {
                 >
                   Kategóriák
                 </Link>
-                <Link
-                  href="/pricing"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Árazás
-                </Link>
-                <Link
+                                <Link
                   href="/blog"
                   onClick={closeMobileMenu}
                   className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"

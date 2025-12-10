@@ -67,7 +67,7 @@ export default function HeroSection() {
               Tartalmak felfedezése
             </Link>
             <Link
-              href="/pricing"
+              href="/register"
               className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",

@@ -36,7 +36,7 @@ export function CtaEditorial() {
 
           {/* CTA Button */}
           <Link
-            href="/pricing"
+            href="/register"
             className="inline-flex items-center gap-3 px-8 py-4 bg-[#E72B36] text-white font-semibold text-lg rounded-xl hover:bg-[#c9242e] transition-all duration-200 shadow-lg shadow-[#E72B36]/30 hover:shadow-[#E72B36]/50 hover:scale-105"
           >
             Kezdd el most – 7 nap ingyen

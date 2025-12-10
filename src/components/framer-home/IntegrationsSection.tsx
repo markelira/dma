@@ -116,7 +116,7 @@ export default function IntegrationsSection() {
               Böngészd a tartalmakat
             </Link>
             <Link
-              href="/pricing"
+              href="/register"
               className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",
@@ -161,7 +161,6 @@ export default function IntegrationsSection() {
             <div className="flex flex-wrap justify-center gap-6">
               {[
                 { label: "Tartalmak", href: "/courses" },
-                { label: "Árak", href: "/pricing" },
                 { label: "GYIK", href: "/faq" },
                 { label: "Kapcsolat", href: "/contact" },
               ].map((link) => (

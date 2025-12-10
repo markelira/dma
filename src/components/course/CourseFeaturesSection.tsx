@@ -70,7 +70,7 @@ export function CourseFeaturesSection({ darkMode = false }: CourseFeaturesSectio
       </ul>
 
       <Link
-        href="/pricing"
+        href="/register"
         className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-secondary text-white rounded-lg font-semibold hover:bg-brand-secondary/90 transition-colors"
       >
         Fedezd fel 7 napig ingyen

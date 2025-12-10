@@ -37,8 +37,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.restoreSoftDeletedCourses = exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.getCompanyEnrolledCourses = exports.enrollCompanyInCourse = exports.removeEmployee = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.checkEmailAvailability = exports.healthCheck = void 0;
-exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.getSignedUploadUrl = void 0;
-exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = void 0;
+exports.getTargetAudiences = exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.notifyNewContent = exports.sendWelcomeEmail = exports.sendTrialReminders = exports.getSignedUploadUrl = void 0;
+exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -1389,6 +1389,87 @@ Object.defineProperty(exports, "restoreSoftDeletedCourses", { enumerable: true, 
 // Export file actions
 var fileActions_1 = require("./fileActions");
 Object.defineProperty(exports, "getSignedUploadUrl", { enumerable: true, get: function () { return fileActions_1.getSignedUploadUrl; } });
+// Export scheduled functions
+var trialReminder_1 = require("./scheduled/trialReminder");
+Object.defineProperty(exports, "sendTrialReminders", { enumerable: true, get: function () { return trialReminder_1.sendTrialReminders; } });
+// Export email-related functions
+const welcome_1 = require("./email/templates/welcome");
+const newCourse_1 = require("./email/templates/newCourse");
+/**
+ * Send Welcome Email - Called after registration
+ */
+exports.sendWelcomeEmail = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        const { email, firstName } = request.data;
+        if (!email) {
+            throw new Error('Email cím szükséges');
+        }
+        const result = await (0, welcome_1.sendWelcomeEmail)({
+            firstName: firstName || 'Felhasználó',
+            email,
+        });
+        return result;
+    }
+    catch (error) {
+        v2_1.logger.error('[sendWelcomeEmail] Error:', error);
+        throw new Error(error.message || 'Üdvözlő email küldése sikertelen');
+    }
+});
+/**
+ * Send New Content Notification - Admin function
+ * Sends notification to all active subscribers about new content
+ */
+exports.notifyNewContent = (0, https_1.onCall)({
+    cors: true,
+    region: 'us-central1',
+}, async (request) => {
+    try {
+        // Check admin permission
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
+        const userData = userDoc.data();
+        if (userData?.role !== 'ADMIN') {
+            throw new Error('Admin jogosultság szükséges');
+        }
+        const { contentTitle, contentType, description, instructorName, contentUrl, thumbnailUrl } = request.data;
+        if (!contentTitle || !contentUrl) {
+            throw new Error('Tartalom cím és URL szükséges');
+        }
+        // Get all active subscribers
+        const usersSnapshot = await firestore
+            .collection('users')
+            .where('subscriptionStatus', 'in', ['active', 'trialing'])
+            .get();
+        const subscribers = usersSnapshot.docs.map(doc => ({
+            email: doc.data().email,
+            firstName: doc.data().firstName || 'Felhasználó',
+        })).filter(u => u.email);
+        v2_1.logger.info('[notifyNewContent] Sending to subscribers', { count: subscribers.length });
+        const result = await (0, newCourse_1.sendNewCourseToSubscribers)(subscribers, {
+            contentTitle,
+            contentType: contentType || 'tartalom',
+            description,
+            instructorName,
+            contentUrl,
+            thumbnailUrl,
+        });
+        return {
+            success: true,
+            sent: result.sent,
+            failed: result.failed,
+            total: subscribers.length,
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[notifyNewContent] Error:', error);
+        throw new Error(error.message || 'Értesítés küldése sikertelen');
+    }
+});
 /**
  * Get all categories
  * Auto-creates default categories if none exist

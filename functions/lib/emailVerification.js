@@ -32,9 +32,6 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = void 0;
 /**
@@ -47,24 +44,9 @@ const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
-const mail_1 = __importDefault(require("@sendgrid/mail"));
+const emailService_1 = require("./email/emailService");
+const base_1 = require("./email/templates/base");
 const firestore = admin.firestore();
-// Lazy SendGrid initialization
-let sendGridInitialized = false;
-function initializeSendGrid() {
-    if (!sendGridInitialized) {
-        const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-        if (SENDGRID_API_KEY) {
-            mail_1.default.setApiKey(SENDGRID_API_KEY);
-            sendGridInitialized = true;
-            v2_1.logger.info('SendGrid initialized for verification emails');
-            return true;
-        }
-        v2_1.logger.warn('SENDGRID_API_KEY not set, email sending will fail');
-        return false;
-    }
-    return true;
-}
 /**
  * Generate a 4-digit verification code
  */
@@ -72,95 +54,20 @@ function generateVerificationCode() {
     return Math.floor(1000 + Math.random() * 9000).toString();
 }
 /**
- * Create verification email HTML template
+ * Create verification email HTML template using base template
  */
-function createVerificationEmailTemplate(code, email) {
-    return `
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email megerősítés - DMA Platform</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F9FAFB; font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <!-- Main container -->
-        <table width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);">
-
-          <!-- Header with DMA Navy -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #2C3E54 0%, #3d5269 100%); padding: 48px 32px; text-align: center; border-radius: 16px 16px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">
-                DMA Platform
-              </h1>
-              <p style="margin: 12px 0 0 0; color: #E5E7EB; font-size: 16px; font-weight: 400;">
-                Digital Marketing Academy
-              </p>
-            </td>
-          </tr>
-
-          <!-- Content -->
-          <tr>
-            <td style="padding: 48px 32px;">
-              <h2 style="margin: 0 0 16px 0; color: #111827; font-size: 28px; font-weight: 700; text-align: center;">
-                Erősítsd meg az email címed
-              </h2>
-              <p style="margin: 0 0 32px 0; color: #6B7280; font-size: 16px; line-height: 24px; text-align: center;">
-                A regisztrációd befejezéséhez add meg az alábbi 4 jegyű kódot:
-              </p>
-
-              <!-- 4-digit code display -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td align="center" style="padding: 32px 0;">
-                    <div style="display: inline-block; background: linear-gradient(to top, #2563eb, #3b82f6); padding: 24px 64px; border-radius: 12px; box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);">
-                      <span style="color: #ffffff; font-size: 48px; font-weight: 700; letter-spacing: 12px; font-family: 'Courier New', monospace;">
-                        ${code}
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 32px 0 0 0; color: #6B7280; font-size: 14px; line-height: 20px; text-align: center;">
-                Ez a kód <strong style="color: #111827;">15 percig</strong> érvényes.
-              </p>
-              <p style="margin: 16px 0 0 0; color: #9CA3AF; font-size: 14px; line-height: 20px; text-align: center;">
-                Ha nem te kezdeményezted ezt a regisztrációt, kérjük hagyd figyelmen kívül ezt az emailt.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Divider -->
-          <tr>
-            <td style="padding: 0 32px;">
-              <div style="height: 1px; background-color: #E5E7EB;"></div>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="padding: 32px; text-align: center;">
-              <p style="margin: 0 0 8px 0; color: #6B7280; font-size: 14px;">
-                Email cím: <strong style="color: #111827;">${email}</strong>
-              </p>
-              <p style="margin: 0; color: #9CA3AF; font-size: 12px; line-height: 18px;">
-                © 2025 DMA Platform. Minden jog fenntartva.<br/>
-                Digital Marketing Academy - Professzionális online képzések
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
+function createVerificationEmailTemplate(code) {
+    const content = `
+    ${(0, base_1.createHeading)('Erősítsd meg az email címed', 2)}
+    ${(0, base_1.createParagraph)('A regisztrációd befejezéséhez add meg az alábbi 4 jegyű kódot:')}
+    ${(0, base_1.createCodeDisplay)(code)}
+    ${(0, base_1.createAlertBox)('Ez a kód <strong>15 percig</strong> érvényes.', 'info')}
+    ${(0, base_1.createParagraph)('Ha nem te kezdeményezted ezt a regisztrációt, kérjük hagyd figyelmen kívül ezt az emailt.', { muted: true })}
   `;
+    return (0, base_1.wrapInBaseTemplate)(content, {
+        showUnsubscribe: false, // Transactional email
+        preheader: `A megerősítő kódod: ${code}`,
+    });
 }
 /**
  * Send Email Verification Code
@@ -250,18 +157,15 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
             .collection('emailVerificationCodes')
             .add(verificationCodeData);
         v2_1.logger.info(`Verification code created for user ${userId}: ${verificationCodeRef.id}`);
-        // Send email with verification code
-        const sendGridReady = initializeSendGrid();
-        if (sendGridReady) {
-            try {
-                const emailContent = createVerificationEmailTemplate(code, email);
-                const msg = {
-                    to: email,
-                    from: process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu',
-                    subject: 'Email megerősítés - DMA Platform',
-                    html: emailContent
-                };
-                await mail_1.default.send(msg);
+        // Send email with verification code using unified email service
+        try {
+            const emailContent = createVerificationEmailTemplate(code);
+            const result = await (0, emailService_1.sendEmail)({
+                to: email,
+                subject: 'Email megerősítés - DMA Masterclass',
+                html: emailContent,
+            });
+            if (result.success) {
                 v2_1.logger.info(`Verification email sent to ${email}`);
                 return {
                     success: true,
@@ -270,10 +174,9 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
                     expiresAt: expiresAt.toISOString()
                 };
             }
-            catch (emailError) {
-                v2_1.logger.error('SendGrid error:', emailError);
+            else {
+                v2_1.logger.error('Email send failed:', result.error);
                 // Even if email fails, code is stored in Firestore
-                // User can still use it if they somehow get the code
                 return {
                     success: true,
                     warning: 'Kód generálva, de email küldés sikertelen',
@@ -282,14 +185,14 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
                 };
             }
         }
-        else {
-            // SendGrid not configured, but code is still stored
-            v2_1.logger.warn('SendGrid not configured, code stored but email not sent');
+        catch (emailError) {
+            v2_1.logger.error('Email service error:', emailError);
+            // Code is still stored, return with warning
             return {
                 success: true,
-                warning: 'SendGrid nincs konfigurálva',
+                warning: 'Email szolgáltatás hiba',
                 codeId: verificationCodeRef.id,
-                code: code, // Include code in response for emulator testing
+                code: process.env.NODE_ENV === 'development' ? code : undefined, // Only show code in dev
                 expiresAt: expiresAt.toISOString()
             };
         }
