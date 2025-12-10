@@ -72,6 +72,7 @@ const deleteInstructorSchema = zod_1.z.object({
 exports.getInstructors = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    minInstances: 1,
 }, async (request) => {
     try {
         v2_1.logger.info('[getInstructors] Called');

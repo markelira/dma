@@ -46,10 +46,10 @@ export function CourseFeaturesSection({ darkMode = false }: CourseFeaturesSectio
       transition={{ duration: 0.5, delay: 0.1 }}
     >
       <h2 className={`text-2xl font-bold ${headingClass} mb-2`}>
-        Teljes hozzáférés
+        Fedezd fel 7 napig teljesen ingyen
       </h2>
       <p className={`${textClass} mb-6`}>
-        Előfizetéssel az összes tartalmunkhoz hozzáférsz
+        Vágj bele a kalandba és fedezd fel a 150+ cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.
       </p>
 
       <div className="flex items-baseline gap-1 mb-6">
@@ -73,7 +73,7 @@ export function CourseFeaturesSection({ darkMode = false }: CourseFeaturesSectio
         href="/pricing"
         className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-secondary text-white rounded-lg font-semibold hover:bg-brand-secondary/90 transition-colors"
       >
-        Előfizetés
+        Fedezd fel 7 napig ingyen
       </Link>
     </motion.section>
   );

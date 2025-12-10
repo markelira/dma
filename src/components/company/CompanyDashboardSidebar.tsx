@@ -33,19 +33,19 @@ import {
 
 const navigationSections = [
   {
-    title: 'Fő navigáció',
+    title: null, // No section header for main navigation
     items: [
       { title: 'Kezdőlap', href: '/company/dashboard', icon: Home },
       { title: 'Saját tartalmaim', href: '/company/dashboard/my-courses', icon: BookOpen },
-      { title: 'Összes tartalom', href: '/company/dashboard/courses', icon: GraduationCap },
+      { title: 'Összes tartalom', href: '/company/dashboard/osszes-tartalom', icon: GraduationCap },
     ]
   },
   {
     title: 'Kategóriák',
     items: [
-      { title: 'Masterclass', href: '/company/dashboard/masterclass', icon: Star },
       { title: 'Webinár', href: '/company/dashboard/webinar', icon: Video },
       { title: 'Akadémia', href: '/company/dashboard/academia', icon: GraduationCap },
+      { title: 'Masterclass', href: '/company/dashboard/masterclass', icon: Star },
       { title: 'Podcast', href: '/company/dashboard/podcast', icon: Mic },
     ]
   },
@@ -176,9 +176,11 @@ export function CompanyDashboardSidebar({ companyName, onNavigate }: CompanyDash
         <nav className="space-y-6 px-4">
           {navigationSections.map((section, sectionIndex) => (
             <div key={sectionIndex}>
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-                {section.title}
-              </h3>
+              {section.title && (
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                  {section.title}
+                </h3>
+              )}
               <div className="space-y-1">
                 {section.items.map((item) => (
                   <NavigationItem
@@ -217,7 +219,7 @@ export function CompanyDashboardSidebar({ companyName, onNavigate }: CompanyDash
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.firstName} {user?.lastName}
+              Szia, {user?.firstName}!
             </p>
             <p className="text-xs text-gray-500 truncate">
               {user?.email}

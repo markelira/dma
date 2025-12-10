@@ -39,24 +39,24 @@ import { brandGradient } from '@/lib/design-tokens'
 const navigationSections = {
   STUDENT: [
     {
-      title: 'Fő navigáció',
+      title: null, // No section header for main navigation
       items: [
         { title: 'Kezdőlap', href: '/dashboard', icon: Home },
         { title: 'Saját listám', href: '/dashboard/courses', icon: BookOpen },
-        { title: 'Összes tartalom', href: '/courses', icon: GraduationCap },
+        { title: 'Összes tartalom', href: '/dashboard/osszes-tartalom', icon: GraduationCap },
       ]
     },
     {
       title: 'Kategóriák',
       items: [
-        { title: 'Masterclass', href: '/dashboard/masterclass', icon: Star },
         { title: 'Webinár', href: '/dashboard/webinar', icon: Video },
         { title: 'Akadémia', href: '/dashboard/academia', icon: GraduationCap },
+        { title: 'Masterclass', href: '/dashboard/masterclass', icon: Star },
         { title: 'Podcast', href: '/dashboard/podcast', icon: Mic },
       ]
     },
     {
-      title: 'Eszközök',
+      title: 'Egyéb',
       items: [
         { title: 'Számlázás', href: '/dashboard/billing', icon: CreditCard },
         { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
@@ -220,9 +220,11 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
         <nav className="space-y-6 px-4">
           {sections.map((section, sectionIndex) => (
             <div key={sectionIndex}>
-              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
-                {section.title}
-              </h3>
+              {section.title && (
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-2">
+                  {section.title}
+                </h3>
+              )}
               <div className="space-y-1">
                 {section.items.map((item) => (
                   <NavigationItem
@@ -261,7 +263,7 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
           )}
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
-              {user?.firstName} {user?.lastName}
+              Szia, {user?.firstName}!
             </p>
             <p className="text-xs text-gray-500 truncate">
               {user?.email}

@@ -65,6 +65,7 @@ const deleteTargetAudienceSchema = zod_1.z.object({
 exports.getTargetAudiences = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    minInstances: 1,
 }, async () => {
     try {
         v2_1.logger.info('[getTargetAudiences] Called');

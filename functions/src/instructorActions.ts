@@ -43,6 +43,7 @@ const deleteInstructorSchema = z.object({
 export const getInstructors = onCall({
   cors: true,
   region: 'us-central1',
+  minInstances: 1,
 }, async (request) => {
   try {
     logger.info('[getInstructors] Called');

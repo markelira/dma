@@ -70,6 +70,7 @@ function getStripeInstance() {
 exports.getSubscriptionStatus = (0, https_1.onCall)({
     cors: true,
     region: 'us-central1',
+    minInstances: 1,
 }, async (request) => {
     try {
         if (!request.auth) {

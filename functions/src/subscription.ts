@@ -35,6 +35,7 @@ function getStripeInstance(): Stripe {
 export const getSubscriptionStatus = onCall({
   cors: true,
   region: 'us-central1',
+  minInstances: 1,
 }, async (request) => {
   try {
     if (!request.auth) {
