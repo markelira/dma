@@ -358,7 +358,7 @@ export default function BillingPage() {
                 <p className="text-gray-600 mt-1">Hozzáférés az összes tartalomhoz</p>
               </div>
               <div className="text-right">
-                <p className="text-3xl font-bold text-gray-900">14 990 Ft</p>
+                <p className="text-3xl font-bold text-gray-900">{formatAmount(1499000, 'HUF')}</p>
                 <p className="text-sm text-gray-600">havonta</p>
               </div>
             </div>
