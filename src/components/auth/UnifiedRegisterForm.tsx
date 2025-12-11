@@ -270,6 +270,22 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         await userCredential.user.reload();
         console.log('[Unified Registration] ✅ Token refreshed');
 
+        // Send verification email BEFORE showing modal
+        console.log('[Unified Registration] Sending email verification code...');
+        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+        try {
+          const verificationResult = await sendEmailVerificationCode({}) as any;
+          console.log('[Unified Registration] ✅ Verification email sent:', verificationResult.data);
+
+          // In emulator mode, log the code for testing
+          if (verificationResult.data.code) {
+            console.log('🔐 VERIFICATION CODE (emulator):', verificationResult.data.code);
+          }
+        } catch (emailError: any) {
+          console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
+          // Don't block registration - user can use resend button
+        }
+
         // Notify parent component to show verification modal
         if (onRegistrationComplete) {
           console.log('[Unified Registration] Notifying parent component...');
