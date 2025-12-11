@@ -60,6 +60,23 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Auto-apply filters when any filter selection changes
+  useEffect(() => {
+    // Skip initial mount
+    if (selectedCategories.length === 0 && selectedAudiences.length === 0 &&
+        selectedCourseTypes.length === 0 && selectedInstructors.length === 0) {
+      return;
+    }
+
+    onFilterChange?.({
+      query: query.trim(),
+      categoryIds: selectedCategories,
+      audienceIds: selectedAudiences,
+      courseTypes: selectedCourseTypes,
+      instructorIds: selectedInstructors,
+    });
+  }, [selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors]);
+
   // Filter courses based on query and filters
   const filteredCourses = useMemo(() => {
     if (!courses) return [];
