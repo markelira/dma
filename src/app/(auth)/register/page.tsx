@@ -3,13 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
-import { AccountTypeSelector, AccountType } from '@/components/auth/AccountTypeSelector';
-import { CompanyRegisterForm } from '@/components/auth/CompanyRegisterForm';
+import { UnifiedRegisterForm } from '@/components/auth/UnifiedRegisterForm';
 import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
 import { httpsCallable } from 'firebase/functions';
 import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
-import { Building2, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
 
 interface InviteData {
@@ -25,22 +24,10 @@ function RegisterPageContent() {
   const searchParams = useSearchParams();
   const { user, loading: authLoading, register: registerUser, logout } = useAuth();
 
-  const [accountType, setAccountType] = useState<AccountType | null>(null);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: ''
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [isCompanyRegistering, setIsCompanyRegistering] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [checkingEmail, setCheckingEmail] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
@@ -52,12 +39,6 @@ function RegisterPageContent() {
   const inviteToken = searchParams?.get('invite');
   const inviteEmail = searchParams?.get('email');
 
-  // Set flag when company account type is selected
-  useEffect(() => {
-    if (accountType === 'company') {
-      setIsCompanyRegistering(true);
-    }
-  }, [accountType]);
 
   // Verify invite token and prefill email when present
   useEffect(() => {
@@ -129,142 +110,16 @@ function RegisterPageContent() {
   }, []); // Run once on mount
 
   useEffect(() => {
-    // If user is already authenticated, redirect based on role
-    // BUT: Don't redirect if we're in the middle of company registration OR email verification
-    // (CompanyRegisterForm handles its own redirect after claims propagate)
-    // (EmailVerificationModal handles redirect after verification)
-
-    // Also check sessionStorage for pending verification - don't redirect if pending
+    // If user is already authenticated, redirect to company dashboard
+    // Don't redirect if we're verifying email
     const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
 
-    if (user && !authLoading && !isCompanyRegistering && !isVerifying && !pendingVerification) {
-      if (user.role === 'company_admin' || user.role === 'COMPANY_ADMIN') {
-        console.log('[Register Page] COMPANY_ADMIN user authenticated, redirecting to /company/dashboard');
-        router.push('/company/dashboard');
-      } else if (user.role === 'company_employee' || user.role === 'COMPANY_EMPLOYEE') {
-        console.log('[Register Page] COMPANY_EMPLOYEE user authenticated, redirecting to /company/dashboard');
-        router.push('/company/dashboard');
-      } else {
-        console.log('[Register Page] User authenticated, redirecting to:', redirectTo);
-        router.push(redirectTo);
-      }
+    if (user && !authLoading && !isVerifying && !pendingVerification) {
+      console.log('[Register Page] User authenticated, redirecting to /company/dashboard');
+      router.push('/company/dashboard');
     }
-  }, [user, authLoading, redirectTo, router, isCompanyRegistering, isVerifying]);
+  }, [user, authLoading, router, isVerifying]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-
-    // Validation
-    if (!formData.firstName.trim() || formData.firstName.length < 2) {
-      setError('A keresztnév legalább 2 karakter hosszú kell legyen');
-      setLoading(false);
-      return;
-    }
-    if (!formData.lastName.trim() || formData.lastName.length < 2) {
-      setError('A vezetéknév legalább 2 karakter hosszú kell legyen');
-      setLoading(false);
-      return;
-    }
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError('Érvényes email címet adj meg');
-      setLoading(false);
-      return;
-    }
-    if (formData.password.length < 6) {
-      setError('A jelszónak legalább 6 karakter hosszúnak kell lennie');
-      setLoading(false);
-      return;
-    }
-    if (!formData.phone.trim()) {
-      setError('A telefonszám megadása kötelező');
-      setLoading(false);
-      return;
-    }
-
-    // Check if email is already in use (unless coming from invite where email is verified)
-    if (!inviteData) {
-      setCheckingEmail(true);
-      try {
-        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
-          functions,
-          'checkEmailAvailability'
-        );
-        const result = await checkEmail({ email: formData.email.trim().toLowerCase() });
-        if (!result.data.available) {
-          setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
-          setCheckingEmail(false);
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.error('Email check error:', err);
-      }
-      setCheckingEmail(false);
-    }
-
-    try {
-      // Set verifying flag to prevent auto-redirect
-      setIsVerifying(true);
-
-      const userCredential = await registerUser(formData.email, formData.password, {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone
-      });
-
-      console.log('[Register Page] Auth success');
-      console.log('[Register Page] User ID:', userCredential.user.uid);
-      console.log('[Register Page] Email:', formData.email);
-
-      // Store user ID for verification modal
-      setRegisteredUserId(userCredential.user.uid);
-
-      // Save to sessionStorage BEFORE showing modal (survives page refresh)
-      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
-        userId: userCredential.user.uid,
-        email: formData.email
-      }));
-      console.log('[Register Page] Saved pending verification to sessionStorage');
-
-      // Show verification modal IMMEDIATELY - don't wait for email
-      console.log('[Register Page] Showing verification modal instantly');
-      setShowVerificationModal(true);
-
-      // Send verification email in BACKGROUND (fire and forget)
-      const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
-      sendEmailVerificationCode({})
-        .then((result: any) => {
-          console.log('[Register Page] Verification email sent in background:', result.data);
-          if (result.data.code) {
-            console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
-          }
-        })
-        .catch((emailError: any) => {
-          console.error('[Register Page] Background email send failed:', emailError);
-          // User can use "resend" button in modal if needed
-        });
-    } catch (err: any) {
-      console.error('Registration error:', err);
-
-      // Reset verification flag on error
-      setIsVerifying(false);
-
-      setError(getAuthErrorMessage(err));
-      setLoading(false);
-    }
-    // Note: Don't set loading to false if verification modal is shown
-    // The modal will handle the flow
-  };
 
   if (authLoading || inviteLoading) {
     return (
@@ -290,12 +145,11 @@ function RegisterPageContent() {
     console.log('[Register Page] Rendering EmailVerificationModal component');
     console.log('[Register Page] Modal state - showVerificationModal:', showVerificationModal);
     console.log('[Register Page] Modal state - registeredUserId:', registeredUserId);
-    console.log('[Register Page] Modal state - email:', formData.email);
-    console.log('[Register Page] Modal state - accountType:', accountType);
+    console.log('[Register Page] Modal state - email:', registeredEmail);
 
     return (
       <EmailVerificationModal
-        email={formData.email}
+        email={registeredEmail}
         userId={registeredUserId}
         onVerified={async () => {
           console.log('[Register Page] Email verified successfully');
@@ -318,36 +172,26 @@ function RegisterPageContent() {
             await currentUser.getIdToken(true);
           }
 
-          // Redirect directly to dashboard (user stays logged in)
-          console.log('[Register Page] Email verified, redirecting directly to:', redirectTo);
-          router.push(redirectTo);
+          // Redirect to company dashboard (all users)
+          console.log('[Register Page] Email verified, redirecting to /company/dashboard');
+          router.push('/company/dashboard');
         }}
       />
     );
   }
 
-  // Show account type selector if no type selected (and no invite)
-  if (!accountType && !inviteToken) {
-    return (
-      <AccountTypeSelector
-        onSelect={(type) => setAccountType(type)}
-        onBack={() => router.push('/login')}
-      />
-    );
-  }
-
   // Show invite error if present
-  if (inviteError && !accountType) {
+  if (inviteError) {
     return (
       <div className="text-center">
         <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-700">{inviteError}</p>
         </div>
         <p className="text-gray-600 mb-4">
-          Továbbra is regisztrálhatsz egyéni fiókkal:
+          Továbbra is regisztrálhatsz:
         </p>
         <button
-          onClick={() => setAccountType('individual')}
+          onClick={() => setInviteError('')}
           className="btn bg-gray-900 text-white px-6 py-2"
         >
           Regisztráció folytatása
@@ -361,23 +205,19 @@ function RegisterPageContent() {
     );
   }
 
-  // Show company registration form if company type selected
-  if (accountType === 'company') {
-    return (
-      <CompanyRegisterForm
-        onVerificationStart={() => {
-          console.log('[Register Page] Company verification starting');
-          // Set isVerifying flag to prevent any redirects during verification
-          setIsVerifying(true);
-        }}
+  // Show unified registration form
+  return (
+    <>
+      <UnifiedRegisterForm
+        inviteData={inviteData}
         onRegistrationComplete={(userId: string, email: string) => {
-          console.log('[Register Page] Company registration complete, showing verification modal');
+          console.log('[Register Page] Registration complete, showing verification modal');
           console.log('[Register Page] User ID:', userId);
           console.log('[Register Page] Email:', email);
 
           // Store the userId and email for modal
           setRegisteredUserId(userId);
-          setFormData(prev => ({ ...prev, email }));
+          setRegisteredEmail(email);
 
           // Save to sessionStorage (survives page refresh)
           sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
@@ -385,202 +225,15 @@ function RegisterPageContent() {
             email
           }));
 
+          // Set verifying flag to prevent redirect
+          setIsVerifying(true);
+
           // Show verification modal
           setShowVerificationModal(true);
         }}
-        onSuccess={() => {
-          console.log('[Register Page] Company registration success');
-          // CompanyRegisterForm handles its own redirect to /company/dashboard
-          // Keep isCompanyRegistering=true to prevent register page redirect
-        }}
-        onBack={() => {
-          setAccountType(null);
-          setIsCompanyRegistering(false);
-        }}
       />
-    );
-  }
 
-  // Show individual registration form (accountType === 'individual')
-  return (
-    <>
-      {/* Back button - hide when invited */}
-      {!inviteData && (
-        <div className="mb-6">
-          <button
-            onClick={() => setAccountType(null)}
-            className="text-sm text-gray-700 hover:text-gray-900 flex items-center"
-            type="button"
-          >
-            ← Vissza a fiók típushoz
-          </button>
-        </div>
-      )}
-
-      {/* Company Invite Banner */}
-      {inviteData && (
-        <div className="mb-6 p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-brand-secondary/10 rounded-full">
-              <Building2 className="w-5 h-5 text-brand-secondary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-brand-secondary-hover">
-                Csatlakozás: {inviteData.companyName}
-              </p>
-              <p className="text-xs text-brand-secondary-hover">
-                Regisztrálj, hogy hozzáférj a cég tartalmaihoz
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold">
-          {inviteData ? 'Regisztráció és csatlakozás' : 'Regisztráció'}
-        </h1>
-      </div>
-
-      {/* Form */}
-      <form onSubmit={handleSubmit}>
-        {error && (
-          <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-4">
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="lastName"
-            >
-              Vezetéknév
-            </label>
-            <input
-              id="lastName"
-              name="lastName"
-              className="form-input w-full py-2"
-              type="text"
-              placeholder="Kovács"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="firstName"
-            >
-              Keresztnév
-            </label>
-            <input
-              id="firstName"
-              name="firstName"
-              className="form-input w-full py-2"
-              type="text"
-              placeholder="János"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="email"
-            >
-              Email cím
-            </label>
-            <input
-              id="email"
-              name="email"
-              className={`form-input w-full py-2 ${inviteData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-              type="email"
-              placeholder="pelda@email.com"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              disabled={loading || !!inviteData}
-              readOnly={!!inviteData}
-            />
-            {inviteData && (
-              <p className="mt-1 text-xs text-gray-500">
-                A meghívóhoz tartozó email cím nem módosítható
-              </p>
-            )}
-          </div>
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="phone"
-            >
-              Telefonszám
-            </label>
-            <input
-              id="phone"
-              name="phone"
-              className="form-input w-full py-2"
-              type="tel"
-              placeholder="+36 30 123 4567"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              disabled={loading}
-            />
-          </div>
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium text-gray-700"
-              htmlFor="password"
-            >
-              Jelszó
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                name="password"
-                className="form-input w-full py-2 pr-10"
-                type={showPassword ? 'text' : 'password'}
-                autoComplete="on"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="mt-6">
-          <button
-            type="submit"
-            className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"
-            disabled={loading || checkingEmail}
-          >
-            {checkingEmail ? (
-              <span className="flex items-center justify-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Ellenőrzés...
-              </span>
-            ) : loading ? 'Regisztráció...' : 'Regisztráció'}
-          </button>
-        </div>
-      </form>
-
-      {/* Bottom link */}
+      {/* Bottom links */}
       <div className="mt-6 text-center">
         <p className="text-sm text-gray-500">
           A regisztrációval elfogadod az{' '}

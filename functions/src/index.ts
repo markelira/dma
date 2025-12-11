@@ -1464,6 +1464,7 @@ export {
 export { enrollEmployeesInMasterclass } from './company/enrollEmployees';
 export { createCompanyMasterclass } from './company/createMasterclass';
 export { completeCompanyOnboarding } from './company/completeOnboarding';
+export { completeUnifiedRegistration } from './company/completeUnifiedRegistration';
 export {
   assignEmployeeToMasterclass,
   unassignEmployeeFromMasterclass,

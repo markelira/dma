@@ -14,7 +14,7 @@ const APP_URL = process.env.APP_URL || 'https://academion.hu';
 async function sendSubscriptionCanceledEmail(data) {
     const { firstName, email, planName, accessUntil, reactivateUrl } = data;
     const subject = 'Előfizetésed lemondva';
-    const resubscribeUrl = reactivateUrl || `${APP_URL}/pricing`;
+    const resubscribeUrl = reactivateUrl || `${APP_URL}/register`;
     const content = `
     ${(0, base_1.createHeading)('Előfizetésed lemondva', 2)}
     ${(0, base_1.createParagraph)(`Szia <strong>${firstName}</strong>,`)}
