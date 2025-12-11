@@ -427,7 +427,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           {/* Email */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
-              Email cím
+              Email cím {inviteData && <span className="text-gray-500 text-xs font-normal">(meghívóból)</span>}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -538,7 +538,15 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           {currentStep === 1 && (
             <motion.button
               type="button"
-              onClick={handleNext}
+              onClick={() => {
+                if (inviteData) {
+                  // For invited employees, skip Step 2 and complete registration
+                  handleComplete();
+                } else {
+                  // For regular users, go to Step 2
+                  handleNext();
+                }
+              }}
               disabled={loading || checkingEmail}
               className="w-full py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
               whileTap={{ scale: 0.98 }}
@@ -548,6 +556,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Ellenőrzés...
                 </>
+              ) : inviteData ? (
+                'Regisztráció befejezése'
               ) : (
                 <>
                   Tovább
@@ -559,8 +569,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         </div>
       </div>
 
-      {/* Step 2: Optional Company Details */}
-      {currentStep === 2 && (
+      {/* Step 2: Optional Company Details - Hidden for invited employees */}
+      {!inviteData && currentStep === 2 && (
         <motion.div
           ref={step2Ref}
           initial={{ opacity: 0, y: 20 }}

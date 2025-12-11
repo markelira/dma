@@ -159,11 +159,26 @@ function RegisterPageContent() {
           if (currentUser) {
             console.log('[Register Page] Refreshing token for auto-login');
             await currentUser.getIdToken(true);
-          }
 
-          // Redirect to company dashboard (all users)
-          console.log('[Register Page] Email verified, redirecting to /company/dashboard');
-          router.push('/company/dashboard');
+            // Role-based redirect after email verification
+            const tokenResult = await currentUser.getIdTokenResult(true);
+            const userRole = tokenResult.claims.role as string;
+
+            console.log('[Register Page] Email verified, redirecting based on role:', userRole);
+
+            if (userRole === 'company_admin' || userRole === 'COMPANY_ADMIN') {
+              console.log('[Register Page] Redirecting COMPANY_ADMIN to /company/dashboard');
+              router.push('/company/dashboard');
+            } else {
+              // COMPANY_EMPLOYEE, STUDENT, or any other role → regular dashboard
+              console.log('[Register Page] Redirecting employee/student to /dashboard');
+              router.push('/dashboard');
+            }
+          } else {
+            // Fallback if no user
+            console.log('[Register Page] No current user, redirecting to /dashboard');
+            router.push('/dashboard');
+          }
         }}
       />
     );

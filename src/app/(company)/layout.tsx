@@ -23,14 +23,23 @@ export default function CompanyLayout({
   const [companyName, setCompanyName] = useState<string | undefined>()
 
   // Company admin is determined by role === COMPANY_ADMIN or companyId + companyRole === 'owner' or 'admin'
-  const isCompanyAdmin = user?.role === 'COMPANY_ADMIN' ||
+  const isCompanyAdmin =
+    user?.role === 'COMPANY_ADMIN' ||
+    user?.role === 'company_admin' || // Support both cases
     (user?.companyId && (user?.companyRole === 'owner' || user?.companyRole === 'admin'))
+
+  // Check if user is a company employee (should use student dashboard)
+  const isCompanyEmployee = user?.role === 'COMPANY_EMPLOYEE' && user?.companyRole === 'employee'
 
   useEffect(() => {
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [CompanyLayout] No user found, redirecting to login')
         router.replace('/login?redirect_to=/company/dashboard')
+      } else if (isCompanyEmployee) {
+        // Employee safety net: redirect to student dashboard
+        console.log('ℹ️ [CompanyLayout] Employee detected, redirecting to student dashboard')
+        router.replace('/dashboard')
       } else if (!isCompanyAdmin) {
         // VALIDATION LOG 6: Auth check before redirect
         console.log('🔍 [VALIDATION] CompanyLayout AUTH CHECK:', {
@@ -46,7 +55,7 @@ export default function CompanyLayout({
         router.replace('/dashboard')
       }
     }
-  }, [user, isLoading, authReady, router, isCompanyAdmin])
+  }, [user, isLoading, authReady, router, isCompanyAdmin, isCompanyEmployee])
 
   // Fetch company name
   useEffect(() => {
