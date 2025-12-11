@@ -131,7 +131,6 @@ function CourseCarouselSection({
           </div>
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
-            <p className="text-sm font-normal text-gray-600 mt-1">{description}</p>
           </div>
         </div>
         <a
