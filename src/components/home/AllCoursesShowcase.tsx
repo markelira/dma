@@ -284,6 +284,17 @@ export function AllCoursesShowcase() {
           courseType="PODCAST"
           title="Podcastok"
         />
+
+        {/* Mobile "View All" button */}
+        <div className="md:hidden flex justify-center mt-12">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+          >
+            Összes megtekintése
+            <span className="text-lg">→</span>
+          </Link>
+        </div>
       </div>
     </section>
   );
