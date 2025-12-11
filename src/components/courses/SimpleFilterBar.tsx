@@ -64,7 +64,7 @@ export function SimpleFilterBar({
             id="category-filter"
             value={selectedCategory}
             onChange={(e) => onCategoryChange(e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 font-medium ${typeConfig.border} ${typeConfig.focus} ${
+            className={`w-full min-h-[56px] px-4 py-3 rounded-lg border-2 transition-all duration-200 font-medium text-sm sm:text-base ${typeConfig.border} ${typeConfig.focus} ${
               isDark
                 ? 'bg-gray-900/80 text-white border-white/20 hover:border-white/40 focus:bg-gray-900'
                 : 'bg-white/80 text-gray-900 border-gray-200 hover:border-gray-300 focus:bg-white'
@@ -90,7 +90,7 @@ export function SimpleFilterBar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Keresés cím vagy leírás alapján..."
-            className={`w-full px-4 py-3 pr-10 rounded-lg border-2 transition-all duration-200 ${typeConfig.border} ${typeConfig.focus} ${
+            className={`w-full min-h-[56px] px-4 py-3 pr-10 rounded-lg border-2 transition-all duration-200 text-sm sm:text-base ${typeConfig.border} ${typeConfig.focus} ${
               isDark
                 ? 'bg-gray-900/80 text-white placeholder-gray-400 border-white/20 hover:border-white/40 focus:bg-gray-900'
                 : 'bg-white/80 text-gray-900 placeholder-gray-500 border-gray-200 hover:border-gray-300 focus:bg-white'

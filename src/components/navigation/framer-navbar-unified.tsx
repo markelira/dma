@@ -49,9 +49,12 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full">
       <nav
-        className="w-full transition-all duration-500 ease-in-out"
+        className="w-full transition-all duration-500 ease-in-out px-4 py-4 sm:px-6 md:px-8 lg:px-12"
         style={{
-          padding: scrolled ? '16px 24px' : '16px 48px',
+          ...(scrolled && {
+            paddingLeft: '24px',
+            paddingRight: '24px',
+          }),
         }}
       >
         {/* Container that morphs from full-width to centered pill */}
@@ -64,11 +67,14 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
         >
           {/* Inner content with morphing background and height */}
           <div
-            className="flex items-center justify-between transition-all duration-500 ease-in-out"
+            className="flex items-center justify-between transition-all duration-500 ease-in-out px-4 sm:px-5 md:px-6 lg:px-8"
             style={{
-              height: '64px',
-              padding: scrolled ? '0 24px' : '0 32px',
-              borderRadius: '24px',
+              height: '56px', // Reduced from 64px for better mobile fit
+              ...(scrolled && {
+                paddingLeft: '24px',
+                paddingRight: '24px',
+              }),
+              borderRadius: '20px', // Slightly smaller on mobile
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               backdropFilter: 'blur(10px)',
               WebkitBackdropFilter: 'blur(10px)',
@@ -81,9 +87,9 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
               <img
                 src="/images/DMA.hu-logo.png"
                 alt="DMA Logo"
-                className="transition-all duration-500"
+                className="transition-all duration-500 h-[14px] sm:h-[15px] md:h-[16px]"
                 style={{
-                  height: scrolled ? '14px' : '17px',
+                  ...(scrolled && { height: '14px' }),
                   width: 'auto',
                 }}
               />
