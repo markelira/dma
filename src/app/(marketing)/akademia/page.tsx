@@ -140,7 +140,7 @@ export default function AkademiaPage() {
 
             {/* Content */}
             <div className="relative h-full flex items-end">
-              <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-16 w-full">
+              <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-12 sm:pb-14 md:pb-16">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -148,8 +148,8 @@ export default function AkademiaPage() {
                   className="max-w-2xl"
                 >
                   {/* Type Badge */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-brand-secondary flex items-center justify-center">
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-brand-secondary flex items-center justify-center">
                       <BookOpen className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-brand-secondary font-medium text-sm uppercase tracking-wider">
@@ -160,12 +160,12 @@ export default function AkademiaPage() {
                   </div>
 
                   {/* Title */}
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
                     {featuredCourse.title}
                   </h1>
 
                   {/* Description */}
-                  <p className="text-gray-300 text-lg mb-6 line-clamp-3">
+                  <p className="text-gray-300 text-base sm:text-lg mb-5 sm:mb-6 line-clamp-2 sm:line-clamp-3">
                     {featuredCourse.description}
                   </p>
 
@@ -173,7 +173,7 @@ export default function AkademiaPage() {
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center gap-2 min-h-[48px] px-6 py-3 bg-white text-gray-900 rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-200 transition-colors"
                     >
                       <Play className="w-5 h-5 fill-current" />
                       Megtekintés
@@ -186,11 +186,11 @@ export default function AkademiaPage() {
         )}
 
         {/* Course Sections */}
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12 space-y-12">
+        <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-10 sm:py-12 space-y-10 sm:space-y-12">
           {/* Felkapott Akadémiák */}
           {popularCourses.length > 0 && (
             <section>
-              <h2 className="text-2xl font-bold text-white mb-6">Felkapott Akadémiák</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-5 sm:mb-6">Felkapott Akadémiák</h2>
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {popularCourses.map((course, index) => (
                   <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
@@ -202,7 +202,7 @@ export default function AkademiaPage() {
           {/* Legújabb Akadémiák */}
           {newestCourses.length > 0 && (
             <section>
-              <h2 className="text-2xl font-bold text-white mb-6">Legújabb Akadémiák</h2>
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-5 sm:mb-6">Legújabb Akadémiák</h2>
               <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 {newestCourses.map((course, index) => (
                   <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
