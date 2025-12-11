@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from "motion/react"
 import { BookOpen } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
@@ -39,6 +40,7 @@ interface Course {
 }
 
 export default function CoursesPage() {
+  const searchParams = useSearchParams()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
@@ -49,6 +51,18 @@ export default function CoursesPage() {
   const [selectedCourseTypes, setSelectedCourseTypes] = useState<string[]>([])
   const [selectedInstructors, setSelectedInstructors] = useState<string[]>([])
   const { data: instructors = [] } = useInstructors()
+
+  // Auto-select category from URL query parameter
+  useEffect(() => {
+    const categoryParam = searchParams.get('category')
+    if (categoryParam && categories.length > 0) {
+      // Check if the category ID exists in our categories
+      const categoryExists = categories.find(c => c.id === categoryParam)
+      if (categoryExists && !selectedCategories.includes(categoryParam)) {
+        setSelectedCategories([categoryParam])
+      }
+    }
+  }, [searchParams, categories, selectedCategories])
 
   // Fetch categories
   useEffect(() => {
