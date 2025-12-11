@@ -163,7 +163,7 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             phone: phone.trim(),
-            role: 'COMPANY_ADMIN',
+            role: 'company_admin',
             companyId: companyId,
             companyRole: 'owner',
             profilePictureUrl: null,
@@ -186,7 +186,7 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         console.log('✅ [completeUnifiedRegistration] User document written successfully');
         // Step 4: Set custom claims
         const customClaims = {
-            role: 'COMPANY_ADMIN',
+            role: 'company_admin',
             companyId: companyId,
             companyRole: 'owner',
         };
