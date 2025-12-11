@@ -19,25 +19,21 @@ export function CourseSidebar({ courseData, ctaLabel, onCtaClick, isEnrolling }:
   const totalStudents = courseData.stats?.students || 0
   
   const courseFeatures = [
-    { 
-      icon: Play, 
-      text: `${Math.round(totalDuration / 60)} óra on-demand videó` 
+    {
+      icon: Play,
+      text: `${Math.round(totalDuration / 60)} óra on-demand videó`
     },
-    { 
-      icon: Book, 
-      text: `${totalLessons} lecke ${totalModules} modulban` 
+    {
+      icon: Book,
+      text: `${totalLessons} lecke ${totalModules} modulban`
     },
-    { 
-      icon: Download, 
-      text: `${courseData.resourcesCount || 0} letölthető erőforrás` 
+    {
+      icon: Download,
+      text: `${courseData.resourcesCount || 0} letölthető erőforrás`
     },
-    { 
-      icon: GraduationCap, 
-      text: courseData.certificate ? "Befejeztési tanúsítvány" : "Nincs tanúsítvány" 
-    },
-    { 
-      icon: Clock, 
-      text: "Korlátlan hozzáférés" 
+    {
+      icon: GraduationCap,
+      text: courseData.certificate ? "Befejeztési tanúsítvány" : "Nincs tanúsítvány"
     }
   ]
 

@@ -264,7 +264,7 @@ export function CoursePaymentSection({
           <TabsContent value="subscription" className="space-y-4 mt-4">
             <div className="space-y-4">
               <div className="text-center space-y-2">
-                <h3 className="font-bold">Korlátlan hozzáférés</h3>
+                <h3 className="font-bold">Előfizetés</h3>
                 <p className="text-sm text-muted-foreground">
                   Hozzáférés az összes tartalomhoz és prémium funkciókhoz
                 </p>
@@ -297,7 +297,7 @@ export function CoursePaymentSection({
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start space-x-2">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Korlátlan tartalom hozzáférés</span>
+                    <span>Teljes tartalom hozzáférés</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />

@@ -107,10 +107,6 @@ export function CourseEnrollmentCard({
                   <span>{lessons} lecke</span>
                 </div>
               )}
-              <div className={`flex items-center gap-3 ${textClass}`}>
-                <Infinity className="w-5 h-5 text-brand-secondary" />
-                <span>Korlátlan hozzáférés</span>
-              </div>
             </div>
 
             {/* Direct Play Button for Subscribers */}
@@ -171,9 +167,6 @@ export function CourseEnrollmentCard({
               </span>
             </div>
           )}
-          <p className="text-white/90 text-sm">
-            Korlátlan tanulás, mindenhez hozzáférés
-          </p>
         </div>
 
         {/* Course Info */}
@@ -191,10 +184,6 @@ export function CourseEnrollmentCard({
                 <span>{lessons} lecke</span>
               </div>
             )}
-            <div className={`flex items-center gap-3 ${textClass}`}>
-              <Infinity className="w-5 h-5 text-brand-secondary" />
-              <span>Korlátlan hozzáférés</span>
-            </div>
           </div>
 
           {/* CTA Button */}

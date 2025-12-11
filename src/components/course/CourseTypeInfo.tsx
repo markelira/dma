@@ -151,6 +151,8 @@ export function CourseTypeInfo({
 
   // MASTERCLASS type info
   if (courseType === 'MASTERCLASS') {
+    if (!certificateEnabled && !isPlus) return null;
+
     return (
       <motion.div
         className={containerClass}
@@ -159,12 +161,6 @@ export function CourseTypeInfo({
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <div className="flex flex-wrap items-center gap-4 md:gap-6">
-          {/* Expert Badge */}
-          <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-amber-400" />
-            <span className="text-sm text-amber-400 font-medium">Szakértői kurzus</span>
-          </div>
-
           {/* Certificate if available */}
           {certificateEnabled && (
             <div className="flex items-center gap-2">
@@ -186,25 +182,7 @@ export function CourseTypeInfo({
 
   // PODCAST type info
   if (courseType === 'PODCAST') {
-    return (
-      <motion.div
-        className={containerClass}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: 0.1 }}
-      >
-        <div className="flex flex-wrap items-center gap-4 md:gap-6">
-          {/* Podcast Badge */}
-          <div className="flex items-center gap-2">
-            <Mic className="w-4 h-4 text-green-400" />
-            <span className="text-sm text-green-400 font-medium">Podcast sorozat</span>
-          </div>
-
-          {/* Listen Anywhere */}
-          <span className={`text-sm ${mutedClass}`}>Hallgasd bárhol, bármikor</span>
-        </div>
-      </motion.div>
-    );
+    return null;
   }
 
   return null;
