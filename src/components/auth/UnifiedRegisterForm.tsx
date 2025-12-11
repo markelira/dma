@@ -255,6 +255,15 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
       console.log('[Unified Registration] Calling Cloud Function with input:', functionInput);
 
+      // VALIDATION LOG 1: Check custom claims BEFORE Cloud Function
+      const preCloudFunctionToken = await userCredential.user.getIdTokenResult(false);
+      console.log('🔍 [VALIDATION] PRE-CLOUD-FUNCTION STATE:', {
+        userId: userCredential.user.uid,
+        customClaims: preCloudFunctionToken.claims,
+        hasCompanyId: !!preCloudFunctionToken.claims.companyId,
+        timestamp: Date.now()
+      });
+
       const result = await completeRegistration(functionInput);
 
       console.log('[Unified Registration] ✅ Cloud Function returned:', result);
@@ -269,6 +278,17 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         await userCredential.user.getIdToken(true);
         await userCredential.user.reload();
         console.log('[Unified Registration] ✅ Token refreshed');
+
+        // VALIDATION LOG 2: Check custom claims AFTER token refresh
+        const refreshedToken = await userCredential.user.getIdTokenResult(true);
+        console.log('🔍 [VALIDATION] POST-TOKEN-REFRESH:', {
+          customClaims: refreshedToken.claims,
+          hasCompanyId: !!refreshedToken.claims.companyId,
+          companyId: refreshedToken.claims.companyId,
+          role: refreshedToken.claims.role,
+          companyRole: refreshedToken.claims.companyRole,
+          timestamp: Date.now()
+        });
 
         // Send verification email BEFORE showing modal
         console.log('[Unified Registration] Sending email verification code...');
@@ -285,6 +305,16 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
           // Don't block registration - user can use resend button
         }
+
+        // VALIDATION LOG 3: Check auth state BEFORE showing modal
+        const currentUser = auth.currentUser;
+        const currentToken = await currentUser?.getIdTokenResult(false);
+        console.log('🔍 [VALIDATION] AUTH STATE BEFORE MODAL:', {
+          firebaseAuthHasUser: !!currentUser,
+          tokenCompanyId: currentToken?.claims.companyId,
+          tokenRole: currentToken?.claims.role,
+          timestamp: Date.now()
+        });
 
         // Notify parent component to show verification modal
         if (onRegistrationComplete) {

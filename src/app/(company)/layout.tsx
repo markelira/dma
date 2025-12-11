@@ -32,6 +32,16 @@ export default function CompanyLayout({
         console.log('❌ [CompanyLayout] No user found, redirecting to login')
         router.replace('/login?redirect_to=/company/dashboard')
       } else if (!isCompanyAdmin) {
+        // VALIDATION LOG 6: Auth check before redirect
+        console.log('🔍 [VALIDATION] CompanyLayout AUTH CHECK:', {
+          hasUser: !!user,
+          role: user?.role,
+          companyId: user?.companyId,
+          companyRole: user?.companyRole,
+          willRedirect: !isCompanyAdmin,
+          timestamp: Date.now()
+        });
+
         console.log('❌ [CompanyLayout] User is not company owner, redirecting. companyId:', user.companyId, 'companyRole:', user.companyRole)
         router.replace('/dashboard')
       }

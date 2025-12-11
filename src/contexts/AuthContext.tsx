@@ -94,10 +94,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch additional user data from Firestore and custom claims
   const fetchUserData = async (firebaseUser: User, forceRefresh: boolean = false): Promise<AuthUser> => {
+    // VALIDATION LOG 5a: fetchUserData called
+    console.log('🔍 [VALIDATION] fetchUserData CALLED', {
+      uid: firebaseUser.uid,
+      forceRefresh,
+      timestamp: Date.now()
+    });
+
     try {
       // Get token result (only force refresh when explicitly needed)
       const idTokenResult = await firebaseUser.getIdTokenResult(forceRefresh);
       const customClaims = idTokenResult.claims;
+
+      // VALIDATION LOG 5b: Custom claims fetched
+      console.log('🔍 [VALIDATION] Custom claims fetched:', {
+        role: customClaims.role,
+        companyId: customClaims.companyId,
+        companyRole: customClaims.companyRole,
+        forceRefresh
+      });
 
       // Try to fetch user document from Firestore, but don't fail if it doesn't exist yet
       let userData: any = null;
@@ -114,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (userData) {
-        return {
+        const result = {
           ...firebaseUser,
           role: userData.role || customClaims.role,
           universityId: userData.universityId,
@@ -130,9 +145,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           bio: userData.bio,
           phone: userData.phone
         };
+
+        // VALIDATION LOG 5c: fetchUserData returning (with Firestore data)
+        console.log('🔍 [VALIDATION] fetchUserData RETURNING:', {
+          role: result.role,
+          companyId: result.companyId,
+          companyRole: result.companyRole,
+          source: 'Firestore',
+          timestamp: Date.now()
+        });
+
+        return result;
       } else {
         // If no Firestore document, fall back to custom claims
-        return {
+        const result = {
           ...firebaseUser,
           role: customClaims.role as UserRole | undefined,
           companyId: customClaims.companyId as string | undefined,
@@ -140,6 +166,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           teamId: undefined,
           isTeamOwner: false
         };
+
+        // VALIDATION LOG 5c: fetchUserData returning (custom claims only)
+        console.log('🔍 [VALIDATION] fetchUserData RETURNING:', {
+          role: result.role,
+          companyId: result.companyId,
+          companyRole: result.companyRole,
+          source: 'CustomClaims',
+          timestamp: Date.now()
+        });
+
+        return result;
       }
     } catch (error) {
       console.error('Error fetching user data:', error);
@@ -149,7 +186,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // VALIDATION LOG 4: Track onAuthStateChanged triggers
+      const triggerCount = ((window as any).__authStateChangedCount || 0) + 1;
+      (window as any).__authStateChangedCount = triggerCount;
+
+      console.log('🔍 [VALIDATION] onAuthStateChanged TRIGGER #' + triggerCount, {
+        hasUser: !!firebaseUser,
+        uid: firebaseUser?.uid,
+        timestamp: Date.now()
+      });
+
       if (firebaseUser) {
+        const tokenResult = await firebaseUser.getIdTokenResult(false);
+        console.log('🔍 [VALIDATION] Token claims at trigger #' + triggerCount, {
+          role: tokenResult.claims.role,
+          companyId: tokenResult.claims.companyId,
+          companyRole: tokenResult.claims.companyRole
+        });
+
         const enrichedUser = await fetchUserData(firebaseUser);
         setUser(enrichedUser);
       } else {
