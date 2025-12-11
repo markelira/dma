@@ -265,10 +265,10 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
             )}
           </button>
 
-          {/* Search button */}
+          {/* Search button - Hidden on mobile since filters auto-apply */}
           <button
             onClick={handleSearch}
-            className="px-4 py-2 mr-1 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary/90 transition-colors"
+            className="hidden sm:inline-flex px-4 py-2 mr-1 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary/90 transition-colors"
           >
             Keresés
           </button>

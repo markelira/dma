@@ -29,7 +29,7 @@ export function StatsSection() {
               key={index}
               className="bg-white rounded-2xl p-6 md:p-8 shadow-sm"
             >
-              <span className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#E72B36] leading-none tracking-tight block mb-2">
+              <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-[#E72B36] leading-none tracking-tight block mb-2">
                 {stat.value}
               </span>
               <span className="text-sm md:text-base text-gray-600">

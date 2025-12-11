@@ -121,7 +121,7 @@ export default function AkademiaPage() {
       <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
         {/* Featured Hero - Netflix Style */}
         {featuredCourse && (
-          <div className="relative h-[70vh] min-h-[500px] max-h-[700px]">
+          <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] max-h-[700px]">
             {/* Background Image */}
             <div className="absolute inset-0">
               {featuredCourse.thumbnailUrl ? (
