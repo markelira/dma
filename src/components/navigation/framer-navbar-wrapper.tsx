@@ -54,54 +54,90 @@ export function FramerNavbarWrapper() {
             >
               {/* Navigation Links */}
               <nav className="p-2">
-                {/* Course Type Links */}
-                <Link
-                  href="/webinar"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Webinárok
-                </Link>
-                <Link
-                  href="/akademia"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Akadémia
-                </Link>
-                <Link
-                  href="/masterclass"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Masterclass
-                </Link>
-                <Link
-                  href="/podcast"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Podcast
-                </Link>
+                {/* Authenticated Users - Dashboard Links */}
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Kezdőlap
+                    </Link>
+                    <Link
+                      href="/dashboard/webinar"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Webinárok
+                    </Link>
+                    <Link
+                      href="/dashboard/academia"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Akadémia
+                    </Link>
+                    <Link
+                      href="/dashboard/masterclass"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Masterclass
+                    </Link>
+                    <Link
+                      href="/dashboard/podcast"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Podcast
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    {/* Non-authenticated Users - Marketing Links */}
+                    <Link
+                      href="/webinar"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Webinárok
+                    </Link>
+                    <Link
+                      href="/akademia"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Akadémia
+                    </Link>
+                    <Link
+                      href="/masterclass"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-amber-50 hover:text-amber-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Masterclass
+                    </Link>
+                    <Link
+                      href="/podcast"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-green-50 hover:text-green-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Podcast
+                    </Link>
 
-                {/* Divider */}
-                <div className="h-px bg-gray-100 my-2 mx-4" />
+                    {/* Divider */}
+                    <div className="h-px bg-gray-100 my-2 mx-4" />
 
-                {/* Secondary Links */}
-                <Link
-                  href="/courses"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Kategóriák
-                </Link>
-                                <Link
-                  href="/blog"
-                  onClick={closeMobileMenu}
-                  className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
-                >
-                  Blog
-                </Link>
+                    {/* Secondary Links */}
+                    <Link
+                      href="/courses"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Kategóriák
+                    </Link>
+                  </>
+                )}
 
                 {/* User Links (if authenticated) */}
                 {isAuthenticated && user && (

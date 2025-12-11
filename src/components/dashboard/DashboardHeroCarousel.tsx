@@ -217,8 +217,20 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 </p>
               )}
 
-              {/* Stats - No instructor names */}
+              {/* Stats with instructor info */}
               <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
+                {currentSlide.instructorNames && currentSlide.instructorNames.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    {currentSlide.instructorImageUrl && (
+                      <img
+                        src={currentSlide.instructorImageUrl}
+                        alt={currentSlide.instructorNames[0]}
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                    )}
+                    <span>{currentSlide.instructorNames.join(', ')}</span>
+                  </div>
+                )}
                 {currentSlide.duration && (
                   <div className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
