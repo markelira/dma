@@ -162,11 +162,6 @@ export function UniversalCourseCard({
             Kiemelt
           </div>
         )}
-        {finalShowElements.includes('category') && course.category && (
-          <div className="bg-black/70 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-            {categoryIcons[typeof course.category === 'string' ? course.category : (course.category as any)?.name]} {typeof course.category === 'string' ? course.category : (course.category as any)?.name}
-          </div>
-        )}
       </div>
 
       {/* Rating badge */}
@@ -374,9 +369,18 @@ export function UniversalCourseCard({
 
       <div className="p-6 space-y-4">
         <div>
-          <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors">
+          <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors mb-3">
             {course.title}
           </h3>
+
+          {/* Category badge centered below title */}
+          {finalShowElements.includes('category') && course.category && (
+            <div className="flex justify-center mb-3">
+              <div className="bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium">
+                {categoryIcons[typeof course.category === 'string' ? course.category : (course.category as any)?.name]} {typeof course.category === 'string' ? course.category : (course.category as any)?.name}
+              </div>
+            </div>
+          )}
 
           <div className="mt-2 space-y-2">
             {renderUniversity()}
