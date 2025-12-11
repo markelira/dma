@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
-import { Loader2, Building2, Star, Play } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
 import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
 import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
@@ -322,27 +322,6 @@ export default function CompanyDashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Company Banner */}
-      <div className="rounded-xl bg-gradient-to-r from-brand-secondary/5 to-purple-50/80 border border-brand-secondary/20 p-4">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-secondary to-purple-600 flex items-center justify-center shadow-lg flex-shrink-0">
-            <Building2 className="w-5 h-5 text-white" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900">
-              Vállalati fiók
-            </p>
-            <p className="text-sm font-normal text-gray-600">
-              Korlátlan hozzáférés az összes tartalomhoz
-            </p>
-          </div>
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-normal bg-brand-secondary/10 text-brand-secondary">
-            <Star className="w-3 h-3 mr-1" />
-            Prémium
-          </span>
-        </div>
-      </div>
-
       {/* Hero Carousel */}
       {heroSlides.length > 0 && (
         <DashboardHeroCarousel slides={heroSlides} />
