@@ -67,9 +67,18 @@ export function NewLessonContent({
 
       {/* Lesson Content (for text-based lessons) */}
       {lesson.content && lesson.type !== 'VIDEO' && (
-        <div className="space-y-3">
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold text-gray-900">Tartalom</h2>
           <div
-            className="prose prose-gray max-w-none leading-relaxed"
+            className="prose prose-lg prose-gray max-w-none leading-relaxed
+                       prose-headings:text-gray-900 prose-headings:font-bold
+                       prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-base
+                       prose-li:text-gray-700 prose-li:text-base
+                       prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
+                       prose-strong:text-gray-900 prose-strong:font-semibold
+                       prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600
+                       [&_*]:!bg-transparent [&_*]:!text-inherit
+                       bg-white rounded-lg"
             dangerouslySetInnerHTML={{ __html: lesson.content }}
           />
         </div>

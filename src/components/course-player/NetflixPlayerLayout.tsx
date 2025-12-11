@@ -222,7 +222,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Video Player Area */}
-          <div className="flex-1 bg-black flex items-center justify-center">
+          <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
             {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
@@ -236,20 +236,46 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content or no video available */}
+            {/* Non-video content - Reading mode with light background */}
             {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
-              <div className="w-full h-full flex items-center justify-center bg-gray-900">
-                <div className="text-center text-white p-8 max-w-2xl">
-                  <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
-                  {currentLesson.content && (
-                    <div className="prose prose-invert prose-lg max-w-none">
-                      <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                        {currentLesson.content}
-                      </p>
-                    </div>
+              <div className="w-full h-full overflow-y-auto bg-white">
+                <div className="max-w-3xl mx-auto px-8 py-12">
+                  {/* Lesson Title */}
+                  <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    {currentLesson.title}
+                  </h1>
+
+                  {/* Lesson Description if available */}
+                  {currentLesson.description && (
+                    <p className="text-lg text-gray-600 mb-8 leading-relaxed border-l-4 border-brand-secondary pl-4">
+                      {currentLesson.description}
+                    </p>
                   )}
-                  {!videoSource && !currentLesson.content && (
-                    <p className="text-gray-500">Nincs elérhető tartalom</p>
+
+                  {/* Main Content - rendered as HTML for rich text */}
+                  {currentLesson.content && (
+                    <div
+                      className="prose prose-lg prose-gray max-w-none
+                                 prose-headings:text-gray-900 prose-headings:font-bold prose-headings:leading-tight
+                                 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                                 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                                 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-base
+                                 prose-li:text-gray-700 prose-li:text-base prose-li:leading-relaxed
+                                 prose-ul:my-4 prose-ol:my-4
+                                 prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
+                                 prose-strong:text-gray-900 prose-strong:font-semibold
+                                 prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600 prose-blockquote:italic
+                                 prose-img:rounded-lg prose-img:shadow-md
+                                 [&_*]:!bg-transparent"
+                      dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                    />
+                  )}
+
+                  {/* No content available */}
+                  {!currentLesson.content && (
+                    <div className="text-center py-12">
+                      <p className="text-gray-400 text-lg">Nincs elérhető tartalom ehhez a leckéhez.</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -257,16 +283,16 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Bottom Navigation with Previous/Next buttons */}
-          <div className="bg-[#1a1a1a] border-t border-gray-800 px-6 py-4 flex-shrink-0">
-            <div className="flex items-center justify-between">
+          <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
+            <div className="flex items-center justify-between max-w-3xl mx-auto">
               {/* Previous Button */}
               <button
                 onClick={onPreviousLesson}
                 disabled={!previousLesson}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   previousLesson
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                 }`}
               >
                 <ArrowLeftIcon size={18} />
@@ -274,7 +300,7 @@ export function NetflixPlayerLayout({
               </button>
 
               {/* Lesson indicator */}
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-500">
                 Lecke {currentIndex + 1} / {lessons.length}
               </span>
 
@@ -284,8 +310,8 @@ export function NetflixPlayerLayout({
                 disabled={!nextLesson}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   nextLesson
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    ? 'bg-brand-secondary hover:bg-brand-secondary-hover text-white shadow-md'
+                    : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                 }`}
               >
                 Következő lecke
@@ -333,7 +359,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Video Player Area */}
-          <div className="flex-1 bg-black flex items-center justify-center">
+          <div className="flex-1 bg-black flex items-center justify-center overflow-hidden">
             {videoSource && (!currentLesson.type || currentLesson.type === 'VIDEO') && (
               <div className="w-full h-full">
                 <NewVideoPlayer
@@ -347,20 +373,46 @@ export function NetflixPlayerLayout({
               </div>
             )}
 
-            {/* Non-video content or no video available */}
+            {/* Non-video content - Reading mode with light background */}
             {(!videoSource || (currentLesson.type && currentLesson.type !== 'VIDEO')) && (
-              <div className="w-full h-full flex items-center justify-center bg-gray-900">
-                <div className="text-center text-white p-8 max-w-2xl">
-                  <h2 className="text-2xl font-bold mb-4">{currentLesson.title}</h2>
-                  {currentLesson.content && (
-                    <div className="prose prose-invert prose-lg max-w-none">
-                      <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                        {currentLesson.content}
-                      </p>
-                    </div>
+              <div className="w-full h-full overflow-y-auto bg-white">
+                <div className="max-w-3xl mx-auto px-8 py-12">
+                  {/* Lesson Title */}
+                  <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                    {currentLesson.title}
+                  </h1>
+
+                  {/* Lesson Description if available */}
+                  {currentLesson.description && (
+                    <p className="text-lg text-gray-600 mb-8 leading-relaxed border-l-4 border-brand-secondary pl-4">
+                      {currentLesson.description}
+                    </p>
                   )}
-                  {!videoSource && !currentLesson.content && (
-                    <p className="text-gray-500">Nincs elérhető tartalom</p>
+
+                  {/* Main Content - rendered as HTML for rich text */}
+                  {currentLesson.content && (
+                    <div
+                      className="prose prose-lg prose-gray max-w-none
+                                 prose-headings:text-gray-900 prose-headings:font-bold prose-headings:leading-tight
+                                 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                                 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                                 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-base
+                                 prose-li:text-gray-700 prose-li:text-base prose-li:leading-relaxed
+                                 prose-ul:my-4 prose-ol:my-4
+                                 prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
+                                 prose-strong:text-gray-900 prose-strong:font-semibold
+                                 prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600 prose-blockquote:italic
+                                 prose-img:rounded-lg prose-img:shadow-md
+                                 [&_*]:!bg-transparent"
+                      dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                    />
+                  )}
+
+                  {/* No content available */}
+                  {!currentLesson.content && (
+                    <div className="text-center py-12">
+                      <p className="text-gray-400 text-lg">Nincs elérhető tartalom ehhez a leckéhez.</p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -368,16 +420,16 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Bottom Navigation with Previous/Next buttons */}
-          <div className="bg-[#1a1a1a] border-t border-gray-800 px-6 py-4 flex-shrink-0">
-            <div className="flex items-center justify-between">
+          <div className="bg-white border-t border-gray-200 px-6 py-4 flex-shrink-0">
+            <div className="flex items-center justify-between max-w-3xl mx-auto">
               {/* Previous Button */}
               <button
                 onClick={onPreviousLesson}
                 disabled={!previousLesson}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   previousLesson
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                 }`}
               >
                 <ArrowLeftIcon size={18} />
@@ -385,7 +437,7 @@ export function NetflixPlayerLayout({
               </button>
 
               {/* Lesson indicator */}
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-gray-500">
                 Lecke {currentIndex + 1} / {lessons.length}
               </span>
 
@@ -395,8 +447,8 @@ export function NetflixPlayerLayout({
                 disabled={!nextLesson}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                   nextLesson
-                    ? 'bg-red-600 hover:bg-red-700 text-white'
-                    : 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                    ? 'bg-brand-secondary hover:bg-brand-secondary-hover text-white shadow-md'
+                    : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                 }`}
               >
                 Következő lecke

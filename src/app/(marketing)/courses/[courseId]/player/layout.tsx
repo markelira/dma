@@ -56,7 +56,7 @@ export default function PlayerLayout({
           overflow: hidden !important;
         }
       `}</style>
-      <div className="fixed inset-0 z-50 bg-background">
+      <div className="fixed inset-0 z-50 bg-white">
         {children}
       </div>
     </>
