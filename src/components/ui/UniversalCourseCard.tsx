@@ -369,13 +369,20 @@ export function UniversalCourseCard({
 
       <div className="p-6 space-y-4">
         <div>
-          <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors mb-3">
+          <h3 className="text-lg font-bold text-white line-clamp-2 group-hover:text-brand-secondary transition-colors mb-2">
             {course.title}
           </h3>
 
-          {/* Category badge centered below title */}
+          {/* Progress Percentage - Only for cards with progress */}
+          {course.progress !== undefined && course.progress > 0 && (
+            <div className="text-sm font-medium text-red-400 mb-2">
+              {Math.round(course.progress)}% befejezve
+            </div>
+          )}
+
+          {/* Category badge left-aligned below title */}
           {finalShowElements.includes('category') && course.category && (
-            <div className="flex justify-center mb-3">
+            <div className="flex gap-2 mb-3">
               <div className="bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium">
                 {categoryIcons[typeof course.category === 'string' ? course.category : (course.category as any)?.name]} {typeof course.category === 'string' ? course.category : (course.category as any)?.name}
               </div>

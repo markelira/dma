@@ -208,6 +208,13 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
+          {/* Course Type Badge - Top Left */}
+          {getCourseTypeLabel(course.courseType) && (
+            <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium">
+              {getCourseTypeLabel(course.courseType)}
+            </div>
+          )}
+
           {/* Centered Play Icon */}
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <Play className="w-16 h-16 text-white drop-shadow-lg" fill="white" fillOpacity={0.9} />
@@ -239,40 +246,31 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
 
           {/* Progress Bar */}
           {course.progress !== undefined && course.progress > 0 && (
-            <div className="absolute bottom-0 left-0 right-0">
-              <div className="w-full bg-gray-800/80 h-1">
-                <div
-                  className="bg-brand-secondary h-1 transition-all duration-300"
-                  style={{ width: `${course.progress}%` }}
-                />
-              </div>
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-300">
+              <div
+                className="h-full bg-brand-secondary transition-all"
+                style={{ width: `${course.progress}%` }}
+              />
             </div>
           )}
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col p-5">
+        <div className="flex-1 flex flex-col p-4">
           {/* Title */}
-          <h3 className="text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-brand-secondary transition-colors duration-200 mb-3">
+          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-brand-secondary transition-colors">
             {course.title}
           </h3>
 
-          {/* Course Type and Category Badges - Centered */}
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            {/* Course Type Badge */}
-            {getCourseTypeLabel(course.courseType) && (
-              <div
-                className="px-2.5 py-1 rounded-md text-xs font-normal"
-                style={{
-                  background: courseTypeColors.bg,
-                  border: `1px solid ${courseTypeColors.border}`,
-                  color: courseTypeColors.text
-                }}
-              >
-                {getCourseTypeLabel(course.courseType)}
-              </div>
-            )}
-            {/* Category Badges */}
+          {/* Progress Percentage - Only for cards with progress */}
+          {course.progress !== undefined && course.progress > 0 && (
+            <div className="text-sm font-medium text-brand-secondary mb-2">
+              {Math.round(course.progress)}% befejezve
+            </div>
+          )}
+
+          {/* Category Badges - Left Aligned */}
+          <div className="flex items-center gap-2 flex-wrap">
             {getCategoryNames().map((catName, idx) => (
               <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary">
                 {catName}
