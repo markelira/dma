@@ -111,7 +111,7 @@ export function CarouselSection({
   return (
     <section className="mb-16">
       {/* Section Header */}
-      <div className="flex items-center justify-between mb-6 px-6 lg:px-12">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         <div className="flex items-center gap-4">
           <div className={`p-3 rounded-xl bg-gradient-to-br ${config.gradient} shadow-lg`}>
             <Icon className="w-6 h-6 text-white" />
@@ -139,7 +139,7 @@ export function CarouselSection({
 
       {/* Carousel */}
       <div
-        className="relative px-6 lg:px-12"
+        className="relative px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
@@ -147,7 +147,7 @@ export function CarouselSection({
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 ml-6 lg:ml-12 ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 ml-4 sm:ml-5 md:ml-6 lg:ml-12 xl:ml-20 ${
               isHovered ? 'opacity-100' : 'opacity-0'
             } ${
               isDark
@@ -162,7 +162,7 @@ export function CarouselSection({
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 mr-6 lg:mr-12 ${
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 mr-4 sm:mr-5 md:mr-6 lg:mr-12 xl:mr-20 ${
               isHovered ? 'opacity-100' : 'opacity-0'
             } ${
               isDark

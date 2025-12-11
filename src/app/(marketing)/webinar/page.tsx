@@ -163,7 +163,7 @@ export default function WebinarPage() {
 
             {/* Content */}
             <div className="relative h-full flex items-end">
-              <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-16 w-full">
+              <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-8 sm:pb-12 md:pb-16">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -171,32 +171,32 @@ export default function WebinarPage() {
                   className="max-w-2xl"
                 >
                   {/* Type Badge */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-purple-500 flex items-center justify-center">
-                      <Video className="w-4 h-4 text-white" />
+                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-purple-500 flex items-center justify-center">
+                      <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
                     </div>
-                    <span className="text-purple-400 font-medium text-sm uppercase tracking-wider">
+                    <span className="text-purple-400 font-medium text-xs sm:text-sm uppercase tracking-wider">
                       Webinár
                     </span>
                     <span className="text-gray-500">•</span>
-                    <span className="text-gray-400 text-sm">Legújabb</span>
+                    <span className="text-gray-400 text-xs sm:text-sm">Legújabb</span>
                   </div>
 
-                  {/* Title */}
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
+                  {/* Title - Mobile-first: smaller on phones, larger on desktop */}
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight">
                     {featuredCourse.title}
                   </h1>
 
-                  {/* Description */}
-                  <p className="text-gray-300 text-lg mb-6 line-clamp-3">
+                  {/* Description - Mobile-first: base size on phones */}
+                  <p className="text-gray-300 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-3">
                     {featuredCourse.description}
                   </p>
 
-                  {/* CTA Button */}
+                  {/* CTA Button - Touch-friendly minimum 48px height */}
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 sm:px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm sm:text-base"
                     >
                       <Play className="w-5 h-5 fill-current" />
                       Megtekintés
@@ -210,7 +210,7 @@ export default function WebinarPage() {
 
         {/* Simple Filter Bar */}
         <div className="bg-gray-950 relative z-20">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-6">
+          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-4 sm:py-6">
             <SimpleFilterBar
               categories={categoryObjects}
               selectedCategory={selectedCategory}
@@ -250,7 +250,7 @@ export default function WebinarPage() {
           )}
 
           {/* Cross-Type Navigation */}
-          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] mt-16">
+          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 mt-12 sm:mt-16">
             <CrossTypeNavigation currentType="WEBINAR" />
           </div>
         </div>

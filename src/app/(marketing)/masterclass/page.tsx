@@ -163,7 +163,7 @@ export default function MasterclassPage() {
 
             {/* Content */}
             <div className="relative h-full flex items-end">
-              <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-16 w-full">
+              <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-8 sm:pb-12 md:pb-16 w-full">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -183,12 +183,12 @@ export default function MasterclassPage() {
                   </div>
 
                   {/* Title */}
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-4 leading-tight">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight">
                     {featuredCourse.title}
                   </h1>
 
                   {/* Description */}
-                  <p className="text-gray-300 text-lg mb-6 line-clamp-3">
+                  <p className="text-gray-300 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-3">
                     {featuredCourse.description}
                   </p>
 
@@ -196,7 +196,7 @@ export default function MasterclassPage() {
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                      className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 sm:px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm sm:text-base hover:bg-gray-200 transition-colors"
                     >
                       <Play className="w-5 h-5 fill-current" />
                       Megtekintés
@@ -210,7 +210,7 @@ export default function MasterclassPage() {
 
         {/* Simple Filter Bar */}
         <div className="bg-gray-950 relative z-20">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-6">
+          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-4 sm:py-6">
             <SimpleFilterBar
               categories={categoryObjects}
               selectedCategory={selectedCategory}
@@ -250,7 +250,7 @@ export default function MasterclassPage() {
           )}
 
           {/* Cross-Type Navigation */}
-          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] mt-16">
+          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 mt-12 sm:mt-16">
             <CrossTypeNavigation currentType="MASTERCLASS" />
           </div>
         </div>

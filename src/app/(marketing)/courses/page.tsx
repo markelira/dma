@@ -313,7 +313,7 @@ export default function CoursesPage() {
       <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
         {/* Hero Carousel and Search/Filter */}
         <div className="bg-gray-950">
-          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pt-24 md:pt-32 pb-8">
+          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pt-20 sm:pt-24 md:pt-28 pb-6 sm:pb-8">
             {/* Hero Carousel */}
             {heroSlides.length > 0 && (
               <div className="mb-8">
@@ -397,7 +397,7 @@ export default function CoursesPage() {
             </>
           ) : (
             /* Empty State for Filters */
-            <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12">
+            <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8 sm:py-12">
               <motion.div
                 className="flex flex-col items-center justify-center py-16 px-6 bg-gray-800/60 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg max-w-md mx-auto"
                 initial={{ opacity: 0, scale: 0.9 }}
