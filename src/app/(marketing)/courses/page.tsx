@@ -1,45 +1,18 @@
 'use client'
 
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from "motion/react"
-import { BookOpen, Video, GraduationCap, Mic, ChevronLeft, ChevronRight } from 'lucide-react'
+import { BookOpen } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
-import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
-import { CoursesHeroSection } from '@/components/courses/CoursesHeroSection'
+import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel'
+import { AdvancedFilterBar } from '@/components/courses/AdvancedFilterBar'
+import { CarouselSection } from '@/components/courses/CarouselSection'
 import { useInstructors } from '@/hooks/useInstructorQueries'
 import { shuffleArray } from '@/lib/utils'
-
-const COURSE_TYPE_ICONS: Record<string, any> = {
-  ACADEMIA: GraduationCap,
-  WEBINAR: Video,
-  MASTERCLASS: BookOpen,
-  PODCAST: Mic,
-}
-
-const COURSE_TYPE_LABELS: Record<string, string> = {
-  ACADEMIA: 'Akadémia',
-  WEBINAR: 'Webinár',
-  MASTERCLASS: 'Masterclass',
-  PODCAST: 'Podcast',
-}
-
-const COURSE_TYPE_DESCRIPTIONS: Record<string, string> = {
-  ACADEMIA: 'Hosszú, több leckéből álló képzés videókkal',
-  WEBINAR: 'Egyszeri, 1 videós alkalom erőforrásokkal',
-  MASTERCLASS: 'Átfogó, több modulból álló mestertartalom',
-  PODCAST: 'Egyszeri podcast epizód audio- vagy videótartalommal',
-}
-
-const COURSE_TYPE_GRADIENTS: Record<string, string> = {
-  ACADEMIA: 'from-brand-secondary/50 to-brand-secondary',
-  WEBINAR: 'from-purple-500 to-purple-600',
-  MASTERCLASS: 'from-teal-500 to-teal-600',
-  PODCAST: 'from-green-500 to-green-600',
-}
 
 interface Course {
   id: string
@@ -63,138 +36,6 @@ interface Course {
   courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
   createdAt?: any
   tags?: string[]
-}
-
-interface CourseCarouselSectionProps {
-  title: string
-  description: string
-  courses: Course[]
-  courseType: string
-  categories: any[]
-  instructors: any[]
-  viewAllLink: string
-}
-
-function CourseCarouselSection({
-  title,
-  description,
-  courses,
-  courseType,
-  categories,
-  instructors,
-  viewAllLink,
-}: CourseCarouselSectionProps) {
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(false)
-
-  const Icon = COURSE_TYPE_ICONS[courseType]
-  const gradient = COURSE_TYPE_GRADIENTS[courseType]
-
-  const checkScroll = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
-      setCanScrollLeft(scrollLeft > 0)
-      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
-    }
-  }
-
-  useEffect(() => {
-    checkScroll()
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', checkScroll)
-      window.addEventListener('resize', checkScroll)
-      return () => {
-        container.removeEventListener('scroll', checkScroll)
-        window.removeEventListener('resize', checkScroll)
-      }
-    }
-  }, [courses])
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -600 : 600
-      scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
-    }
-  }
-
-  if (!courses || courses.length === 0) return null
-
-  return (
-    <section className="mb-16">
-      {/* Section Header */}
-      <div className="flex items-center justify-between mb-6 px-6 lg:px-12">
-        <div className="flex items-center gap-4">
-          <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} shadow-lg`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{title}</h2>
-          </div>
-        </div>
-        <a
-          href={viewAllLink}
-          className="hidden md:inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 text-sm font-medium hover:bg-white/80 hover:shadow-md transition-all duration-200"
-        >
-          Összes megtekintése
-          <ChevronRight className="w-4 h-4" />
-        </a>
-      </div>
-
-      {/* Carousel */}
-      <div className="relative group px-6 lg:px-12">
-        {/* Navigation Buttons */}
-        {canScrollLeft && (
-          <button
-            onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-xl shadow-xl border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white ml-6 lg:ml-12"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft className="w-6 h-6 text-gray-700" />
-          </button>
-        )}
-        {canScrollRight && (
-          <button
-            onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-white/90 backdrop-blur-xl shadow-xl border border-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white mr-6 lg:mr-12"
-            aria-label="Scroll right"
-          >
-            <ChevronRight className="w-6 h-6 text-gray-700" />
-          </button>
-        )}
-
-        {/* Scrollable Container */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-        >
-          {courses.map((course, index) => (
-            <div key={course.id} className="flex-shrink-0 w-[300px] md:w-[340px]">
-              <PremiumCourseCard
-                course={course}
-                index={index}
-                categories={categories}
-                instructors={instructors}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Mobile View All Button */}
-        <div className="md:hidden mt-6 text-center">
-          <a
-            href={viewAllLink}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/60 backdrop-blur-xl border border-white/20 text-gray-700 text-sm font-medium hover:bg-white/80 hover:shadow-md transition-all duration-200"
-          >
-            Összes {title}
-            <ChevronRight className="w-4 h-4" />
-          </a>
-        </div>
-      </div>
-    </section>
-  )
 }
 
 export default function CoursesPage() {
@@ -341,6 +182,104 @@ export default function CoursesPage() {
 
   const hasActiveFilters = selectedCategories.length > 0 || selectedTargetAudiences.length > 0 || selectedCourseTypes.length > 0 || selectedInstructors.length > 0
 
+  // Build hero slides with one course from each type
+  const heroSlides = useMemo(() => {
+    const slides: Array<{
+      id: string
+      title: string
+      description?: string
+      thumbnailUrl?: string
+      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
+      instructorNames?: string[]
+      duration?: string
+    }> = []
+
+    // Helper to get instructor names
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return []
+      const names: string[] = []
+
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId)
+        if (instructor?.name) names.push(instructor.name)
+      }
+
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id)
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name)
+          }
+        })
+      }
+
+      return names
+    }
+
+    // Get latest from each course type
+    const sortedCourses = [...courses].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime()
+      const dateB = new Date(b.createdAt).getTime()
+      return dateB - dateA
+    })
+
+    const webinar = sortedCourses.find(c => c.courseType === 'WEBINAR')
+    const academia = sortedCourses.find(c => c.courseType === 'ACADEMIA')
+    const masterclass = sortedCourses.find(c => c.courseType === 'MASTERCLASS')
+    const podcast = sortedCourses.find(c => c.courseType === 'PODCAST')
+
+    // Add in order: Webinar, Academia, Masterclass, Podcast
+    if (webinar) {
+      slides.push({
+        id: webinar.id,
+        title: webinar.title,
+        description: webinar.description,
+        thumbnailUrl: webinar.thumbnailUrl,
+        courseType: 'WEBINAR',
+        instructorNames: getInstructorNames(webinar),
+        duration: webinar.duration,
+      })
+    }
+
+    if (academia) {
+      slides.push({
+        id: academia.id,
+        title: academia.title,
+        description: academia.description,
+        thumbnailUrl: academia.thumbnailUrl,
+        courseType: 'ACADEMIA',
+        instructorNames: getInstructorNames(academia),
+        duration: academia.duration,
+      })
+    }
+
+    if (masterclass) {
+      slides.push({
+        id: masterclass.id,
+        title: masterclass.title,
+        description: masterclass.description,
+        thumbnailUrl: masterclass.thumbnailUrl,
+        courseType: 'MASTERCLASS',
+        instructorNames: getInstructorNames(masterclass),
+        duration: masterclass.duration,
+      })
+    }
+
+    if (podcast) {
+      slides.push({
+        id: podcast.id,
+        title: podcast.title,
+        description: podcast.description,
+        thumbnailUrl: podcast.thumbnailUrl,
+        courseType: 'PODCAST',
+        instructorNames: getInstructorNames(podcast),
+        duration: podcast.duration,
+      })
+    }
+
+    return slides
+  }, [courses, instructors])
+
   // Calculate stats
   const stats = useMemo(() => {
     const totalStudents = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
@@ -356,10 +295,10 @@ export default function CoursesPage() {
     return (
       <>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-[rgb(249,250,251)] flex items-center justify-center">
+        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-200 border-t-brand-secondary" />
-            <p className="text-base font-normal text-gray-600">Tartalmak betöltése...</p>
+            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-800 border-t-brand-secondary" />
+            <p className="text-base font-normal text-gray-300">Tartalmak betöltése...</p>
           </div>
         </div>
         <Footer border={true} />
@@ -371,96 +310,109 @@ export default function CoursesPage() {
     <>
       <FramerNavbarWrapper />
 
-      <div className="w-full min-h-screen bg-[rgb(249,250,251)] overflow-x-hidden">
-        {/* Hero Section with Search & Filters */}
-        <CoursesHeroSection
-          courses={courses}
-          categories={categories}
-          targetAudiences={targetAudiences}
-          instructors={instructors}
-          selectedCategories={selectedCategories}
-          selectedTargetAudiences={selectedTargetAudiences}
-          selectedCourseTypes={selectedCourseTypes}
-          selectedInstructors={selectedInstructors}
-          onCategoriesChange={setSelectedCategories}
-          onTargetAudiencesChange={setSelectedTargetAudiences}
-          onCourseTypesChange={setSelectedCourseTypes}
-          onInstructorsChange={setSelectedInstructors}
-          onClearFilters={() => {
-            setSelectedCategories([])
-            setSelectedTargetAudiences([])
-            setSelectedCourseTypes([])
-            setSelectedInstructors([])
-          }}
-        />
+      <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
+        {/* Hero Carousel and Search/Filter */}
+        <div className="bg-gray-950">
+          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pt-24 md:pt-32 pb-8">
+            {/* Hero Carousel */}
+            {heroSlides.length > 0 && (
+              <div className="mb-8">
+                <DashboardHeroCarousel slides={heroSlides} />
+              </div>
+            )}
+
+            {/* Search and Filter Bar */}
+            <AdvancedFilterBar
+              courses={courses}
+              categories={categories}
+              targetAudiences={targetAudiences}
+              instructors={instructors}
+              selectedCategories={selectedCategories}
+              selectedTargetAudiences={selectedTargetAudiences}
+              selectedCourseTypes={selectedCourseTypes}
+              selectedInstructors={selectedInstructors}
+              onCategoriesChange={setSelectedCategories}
+              onTargetAudiencesChange={setSelectedTargetAudiences}
+              onCourseTypesChange={setSelectedCourseTypes}
+              onInstructorsChange={setSelectedInstructors}
+              onClearFilters={() => {
+                setSelectedCategories([])
+                setSelectedTargetAudiences([])
+                setSelectedCourseTypes([])
+                setSelectedInstructors([])
+              }}
+              backgroundColor="light"
+            />
+          </div>
+        </div>
 
         {/* Course Carousels */}
         <div className="py-12">
           {/* Show carousels only if there are filtered results */}
           {hasFilteredResults ? (
             <>
-              {/* Webinar Carousel - now first based on new order */}
-              <CourseCarouselSection
-                title={COURSE_TYPE_LABELS.WEBINAR}
-                description={COURSE_TYPE_DESCRIPTIONS.WEBINAR}
-                courses={filteredCoursesByType.WEBINAR}
+              {/* Webinar Carousel */}
+              <CarouselSection
+                title="Webinár"
                 courseType="WEBINAR"
+                courses={filteredCoursesByType.WEBINAR}
                 categories={categories}
                 instructors={instructors}
                 viewAllLink="/webinar"
+                backgroundColor="dark"
               />
 
               {/* Academia Carousel */}
-              <CourseCarouselSection
-                title={COURSE_TYPE_LABELS.ACADEMIA}
-                description={COURSE_TYPE_DESCRIPTIONS.ACADEMIA}
-                courses={filteredCoursesByType.ACADEMIA}
+              <CarouselSection
+                title="Akadémia"
                 courseType="ACADEMIA"
+                courses={filteredCoursesByType.ACADEMIA}
                 categories={categories}
                 instructors={instructors}
                 viewAllLink="/akadémia"
+                backgroundColor="dark"
               />
 
               {/* Masterclass Carousel */}
-              <CourseCarouselSection
-                title={COURSE_TYPE_LABELS.MASTERCLASS}
-                description={COURSE_TYPE_DESCRIPTIONS.MASTERCLASS}
-                courses={filteredCoursesByType.MASTERCLASS}
+              <CarouselSection
+                title="Masterclass"
                 courseType="MASTERCLASS"
+                courses={filteredCoursesByType.MASTERCLASS}
                 categories={categories}
                 instructors={instructors}
                 viewAllLink="/masterclass"
+                backgroundColor="dark"
               />
 
               {/* Podcast Carousel */}
-              <CourseCarouselSection
-                title={COURSE_TYPE_LABELS.PODCAST}
-                description={COURSE_TYPE_DESCRIPTIONS.PODCAST}
-                courses={filteredCoursesByType.PODCAST}
+              <CarouselSection
+                title="Podcast"
                 courseType="PODCAST"
+                courses={filteredCoursesByType.PODCAST}
                 categories={categories}
                 instructors={instructors}
                 viewAllLink="/podcast"
+                backgroundColor="dark"
               />
             </>
           ) : (
             /* Empty State for Filters */
             <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12">
               <motion.div
-                className="flex flex-col items-center justify-center py-16 px-6 bg-white/60 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg max-w-md mx-auto"
+                className="flex flex-col items-center justify-center py-16 px-6 bg-gray-800/60 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg max-w-md mx-auto"
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center mb-4 shadow-lg">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center mb-4 shadow-lg">
                   <BookOpen className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                <h3 className="text-lg font-bold text-white mb-2">
                   {hasActiveFilters
                     ? 'Nem található tartalom a kiválasztott szűrőkkel'
                     : 'Nincsenek elérhető tartalmak'}
                 </h3>
-                <p className="text-sm font-normal text-gray-600 text-center mb-4">
+                <p className="text-sm font-normal text-gray-300 text-center mb-4">
                   {hasActiveFilters
                     ? 'Próbálj más szűrőket választani'
                     : 'Jelenleg nincsenek közzétett tartalmak'}

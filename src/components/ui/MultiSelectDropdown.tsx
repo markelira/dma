@@ -17,6 +17,7 @@ interface MultiSelectDropdownProps {
   selected: string[];
   onChange: (selected: string[]) => void;
   className?: string;
+  isDark?: boolean;
 }
 
 export function MultiSelectDropdown({
@@ -26,6 +27,7 @@ export function MultiSelectDropdown({
   selected,
   onChange,
   className,
+  isDark = false,
 }: MultiSelectDropdownProps) {
   const handleToggle = (value: string) => {
     if (selected.includes(value)) {
@@ -48,22 +50,32 @@ export function MultiSelectDropdown({
 
   return (
     <div className={className}>
-      <label className="block text-xs font-medium text-gray-700 mb-2">
+      <label className={cn(
+        "block text-xs font-medium mb-2",
+        isDark ? "text-gray-300" : "text-gray-700"
+      )}>
         {label}
       </label>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             className={cn(
-              'w-full flex items-center justify-between px-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg',
-              'hover:bg-gray-100 focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary',
+              'w-full flex items-center justify-between px-3 py-2 text-sm border rounded-lg',
+              'focus:outline-none focus:border-brand-secondary focus:ring-1 focus:ring-brand-secondary',
               'transition-colors',
-              selected.length > 0 && 'text-gray-900',
-              selected.length === 0 && 'text-gray-500'
+              isDark
+                ? 'bg-gray-900/80 border-white/20 hover:bg-gray-900 hover:border-white/40'
+                : 'bg-gray-50 border-gray-200 hover:bg-gray-100',
+              isDark
+                ? selected.length > 0 ? 'text-white' : 'text-gray-400'
+                : selected.length > 0 ? 'text-gray-900' : 'text-gray-500'
             )}
           >
             <span className="truncate">{getDisplayText()}</span>
-            <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0 ml-2" />
+            <ChevronDown className={cn(
+              "w-4 h-4 flex-shrink-0 ml-2",
+              isDark ? "text-gray-400" : "text-gray-400"
+            )} />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent

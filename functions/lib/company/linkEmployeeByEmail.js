@@ -107,6 +107,7 @@ async function linkEmployeeByEmail(userId, email) {
             await admin.auth().setCustomUserClaims(userId, {
                 role: 'COMPANY_EMPLOYEE',
                 companyId: companyId,
+                companyRole: 'employee', // Include companyRole in JWT for permission checks
             });
             console.log('✅ [linkEmployeeByEmail] Custom claims set for employee');
         }

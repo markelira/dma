@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from "motion/react"
-import { Video, Play, Info } from 'lucide-react'
+import { Video, Play } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
-import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
+import { SimpleFilterBar } from '@/components/courses/SimpleFilterBar'
+import { CarouselSection } from '@/components/courses/CarouselSection'
 import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
 import { useInstructors } from '@/hooks/useInstructorQueries'
 import Link from 'next/link'
@@ -38,6 +39,8 @@ export default function WebinarPage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
+  const [selectedCategory, setSelectedCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   // Fetch instructors using React Query
   const { data: instructors = [] } = useInstructors()
@@ -85,18 +88,38 @@ export default function WebinarPage() {
     return () => unsubscribe()
   }, [])
 
+  // Filter courses based on category and search
+  const filteredCourses = useMemo(() => {
+    let filtered = courses
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(c =>
+        c.categoryIds?.includes(selectedCategory) || c.category === selectedCategory
+      )
+    }
+
+    if (searchQuery.length >= 2) {
+      filtered = filtered.filter(c =>
+        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        c.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    }
+
+    return filtered
+  }, [courses, selectedCategory, searchQuery])
+
   // Get featured (latest) course
   const featuredCourse = courses[0]
 
   // Popular courses - sorted by enrollment count
   const popularCourses = useMemo(() => {
-    return [...courses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0)).slice(0, 8)
-  }, [courses])
+    return [...filteredCourses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0)).slice(0, 12)
+  }, [filteredCourses])
 
   // Newest courses - already sorted by createdAt from query
   const newestCourses = useMemo(() => {
-    return courses.slice(0, 8)
-  }, [courses])
+    return filteredCourses.slice(0, 12)
+  }, [filteredCourses])
 
 
   if (loading) {
@@ -185,58 +208,49 @@ export default function WebinarPage() {
           </div>
         )}
 
-        {/* Course Sections */}
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12 space-y-12">
-          {/* Felkapott Webinárok */}
+        {/* Simple Filter Bar */}
+        <div className="bg-gray-950 relative z-20">
+          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-6">
+            <SimpleFilterBar
+              categories={categoryObjects}
+              selectedCategory={selectedCategory}
+              searchQuery={searchQuery}
+              onCategoryChange={setSelectedCategory}
+              onSearchChange={setSearchQuery}
+              backgroundColor="dark"
+              courseType="WEBINAR"
+            />
+          </div>
+        </div>
+
+        {/* Course Carousels */}
+        <div className="py-12 space-y-12">
+          {/* Popular Webinars Carousel */}
           {popularCourses.length > 0 && (
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Felkapott Webinárok
-              </h2>
-              <motion.div
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {popularCourses.map((course, index) => (
-                  <PremiumCourseCard
-                    key={course.id}
-                    course={course}
-                    index={index}
-                    categories={categoryObjects}
-                    instructors={instructors}
-                  />
-                ))}
-              </motion.div>
-            </section>
+            <CarouselSection
+              title="Felkapott Webinárok"
+              courseType="WEBINAR"
+              courses={popularCourses}
+              categories={categoryObjects}
+              instructors={instructors}
+              backgroundColor="dark"
+            />
           )}
 
-          {/* Legújabb Webinárok */}
+          {/* Newest Webinars Carousel */}
           {newestCourses.length > 0 && (
-            <section>
-              <h2 className="text-2xl font-bold text-white mb-6">
-                Legújabb Webinárok
-              </h2>
-              <motion.div
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                {newestCourses.map((course, index) => (
-                  <PremiumCourseCard
-                    key={course.id}
-                    course={course}
-                    index={index}
-                    categories={categoryObjects}
-                    instructors={instructors}
-                  />
-                ))}
-              </motion.div>
-            </section>
+            <CarouselSection
+              title="Legújabb Webinárok"
+              courseType="WEBINAR"
+              courses={newestCourses}
+              categories={categoryObjects}
+              instructors={instructors}
+              backgroundColor="dark"
+            />
           )}
 
           {/* Cross-Type Navigation */}
-          <div className="mt-16">
+          <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] mt-16">
             <CrossTypeNavigation currentType="WEBINAR" />
           </div>
         </div>
