@@ -3,13 +3,12 @@
 import { useMemo } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { BookOpen, Play, Clock, CheckCircle, Loader2 } from 'lucide-react'
+import { BookOpen, Play, Loader2 } from 'lucide-react'
 import { useEnrollments } from '@/hooks/useEnrollments'
 import { useCourses } from '@/hooks/useCourseQueries'
 import { useCategories } from '@/hooks/useCategoryQueries'
 import { useInstructors } from '@/hooks/useInstructorQueries'
-import { DashboardSearch } from '@/components/dashboard/DashboardSearch'
-import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel'
+import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow'
 import type { Course } from '@/types'
 
 // Helper to get first lesson ID from course (flat lessons array)
@@ -97,8 +96,6 @@ export default function CompanyMyCoursesPage() {
           <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
         </div>
 
-        <DashboardSearch className="my-2" />
-
         <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-xl border border-gray-200">
           <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand-secondary/5">
             <BookOpen className="h-10 w-10 text-brand-secondary" />
@@ -183,24 +180,22 @@ export default function CompanyMyCoursesPage() {
         </div>
       )}
 
-      {/* Search */}
-      <DashboardSearch className="my-2" />
-
-      {/* Kaland folytatása - In Progress */}
+      {/* Kaland folytatása - In Progress (with progress %) */}
       {inProgressCourses.length > 0 && (
-        <EnrolledCourseCarousel
+        <CourseCarouselRow
           title="Kaland folytatása"
-          enrollments={inProgressCourses}
+          courses={inProgressCourses.map(e => ({ ...e.course, progress: e.progress }))}
           categories={categories}
           instructors={instructors}
+          enrollments={inProgressCourses.map(e => ({ courseId: e.courseId, progress: e.progress }))}
         />
       )}
 
       {/* Saját listám - Not Started / Saved */}
       {notStartedCourses.length > 0 && (
-        <EnrolledCourseCarousel
+        <CourseCarouselRow
           title="Saját listám"
-          enrollments={notStartedCourses}
+          courses={notStartedCourses.map(e => e.course)}
           categories={categories}
           instructors={instructors}
         />
@@ -208,9 +203,9 @@ export default function CompanyMyCoursesPage() {
 
       {/* Befejezett - Completed */}
       {completedCourses.length > 0 && (
-        <EnrolledCourseCarousel
+        <CourseCarouselRow
           title="Befejezett"
-          enrollments={completedCourses}
+          courses={completedCourses.map(e => e.course)}
           categories={categories}
           instructors={instructors}
         />

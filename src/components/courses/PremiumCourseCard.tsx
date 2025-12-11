@@ -179,10 +179,11 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
         delay: index * 0.05, // Stagger effect
         ease: [0.16, 1, 0.3, 1]
       }}
-      whileHover={{ y: -4 }}
+      whileHover={{ scale: 1.03, y: -4 }}
+      className="origin-center"
     >
       <div
-        className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
+        className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl h-full flex flex-col group cursor-pointer transition-all duration-300"
         onClick={handleCardClick}
       >
         {/* Course Image */}

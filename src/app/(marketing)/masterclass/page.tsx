@@ -37,7 +37,6 @@ interface Course {
 export default function MasterclassPage() {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
-  const [searchInput, setSearchInput] = useState('')
   const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
 
   // Fetch instructors using React Query
@@ -99,18 +98,6 @@ export default function MasterclassPage() {
     return courses.slice(0, 8)
   }, [courses])
 
-  // Filter courses by search only - include all courses (featured one too)
-  const filteredCourses = useMemo(() => {
-    if (!searchInput) return courses
-
-    return courses.filter(course =>
-      course.title.toLowerCase().includes(searchInput.toLowerCase()) ||
-      course.description?.toLowerCase().includes(searchInput.toLowerCase()) ||
-      course.tags?.some(tag => tag.toLowerCase().includes(searchInput.toLowerCase()))
-    )
-  }, [searchInput, courses])
-
-  const isSearching = searchInput.length > 0
 
   if (loading) {
     return (
@@ -200,66 +187,28 @@ export default function MasterclassPage() {
 
         {/* Course Sections */}
         <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-12 space-y-12">
-          {/* Search */}
-          <div className="flex items-center justify-end">
-            <div className="relative w-[300px]">
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Keresés masterclassok között..."
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-amber-500 text-sm"
-              />
-            </div>
-          </div>
+          {/* Felkapott Masterclassok */}
+          {popularCourses.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold text-white mb-6">Felkapott Masterclassok</h2>
+              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {popularCourses.map((course, index) => (
+                  <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
+                ))}
+              </motion.div>
+            </section>
+          )}
 
-          {/* Search Results */}
-          {isSearching ? (
-            <>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">Keresési eredmények</h2>
-              </div>
-              {filteredCourses.length === 0 ? (
-                <motion.div className="flex flex-col items-center justify-center py-20 px-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <div className="w-16 h-16 rounded-2xl bg-amber-500/20 flex items-center justify-center mb-4">
-                    <GraduationCap className="w-8 h-8 text-amber-400" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-white mb-2">Nincs találat</h3>
-                </motion.div>
-              ) : (
-                <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  {filteredCourses.map((course, index) => (
-                    <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
-                  ))}
-                </motion.div>
-              )}
-            </>
-          ) : (
-            <>
-              {/* Felkapott Masterclassok */}
-              {popularCourses.length > 0 && (
-                <section>
-                  <h2 className="text-2xl font-bold text-white mb-6">Felkapott Masterclassok</h2>
-                  <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    {popularCourses.map((course, index) => (
-                      <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
-                    ))}
-                  </motion.div>
-                </section>
-              )}
-
-              {/* Legújabb Masterclassok */}
-              {newestCourses.length > 0 && (
-                <section>
-                  <h2 className="text-2xl font-bold text-white mb-6">Legújabb Masterclassok</h2>
-                  <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                    {newestCourses.map((course, index) => (
-                      <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
-                    ))}
-                  </motion.div>
-                </section>
-              )}
-            </>
+          {/* Legújabb Masterclassok */}
+          {newestCourses.length > 0 && (
+            <section>
+              <h2 className="text-2xl font-bold text-white mb-6">Legújabb Masterclassok</h2>
+              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                {newestCourses.map((course, index) => (
+                  <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
+                ))}
+              </motion.div>
+            </section>
           )}
 
           {/* Cross-Type Navigation */}

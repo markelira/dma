@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Save, Loader2, Upload, X, User, Camera } from 'lucide-react'
+import { Save, Loader2, Upload, X, User, Camera, Building2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { updateProfile as updateAuthProfile } from 'firebase/auth'
 import { auth, db, storage } from '@/lib/firebase'
@@ -28,6 +28,12 @@ export default function SettingsPage() {
   const [profileSaving, setProfileSaving] = useState(false)
   const profileInputRef = useRef<HTMLInputElement>(null)
 
+  // Company data (read-only for employees)
+  const [companyName, setCompanyName] = useState('')
+  const [companyIndustry, setCompanyIndustry] = useState('')
+  const [companySize, setCompanySize] = useState('')
+  const [jobTitle, setJobTitle] = useState('')
+
   // Load user settings on mount
   useEffect(() => {
     if (user?.uid) {
@@ -44,6 +50,18 @@ export default function SettingsPage() {
         const data = userDoc.data()
         setPhone(data.phone || '')
         setProfilePictureUrl(data.profilePictureUrl || null)
+        setJobTitle(data.jobTitle || '')
+
+        // Load company data if user is a company employee
+        if (data.companyId) {
+          const companyDoc = await getDoc(doc(db, 'companies', data.companyId))
+          if (companyDoc.exists()) {
+            const companyData = companyDoc.data()
+            setCompanyName(companyData.name || '')
+            setCompanyIndustry(companyData.industry || '')
+            setCompanySize(companyData.companySize || '')
+          }
+        }
       }
     } catch (error) {
       console.error('Error loading settings:', error)
@@ -314,6 +332,62 @@ export default function SettingsPage() {
                 />
               </div>
             </div>
+
+            {/* Company Info (if user is a company employee) */}
+            {companyName && (
+              <div className="pt-7 border-t border-gray-200 space-y-6">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-5 h-5 text-brand-secondary" />
+                  <h3 className="text-lg font-semibold text-gray-900">Céges adatok</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium text-gray-900">Cég neve</Label>
+                    <Input
+                      value={companyName}
+                      disabled
+                      className="h-10 bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                    />
+                  </div>
+
+                  {companyIndustry && (
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium text-gray-900">Iparág</Label>
+                      <Input
+                        value={companyIndustry}
+                        disabled
+                        className="h-10 bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                      />
+                    </div>
+                  )}
+
+                  {companySize && (
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium text-gray-900">Cég mérete</Label>
+                      <Input
+                        value={`${companySize} alkalmazott`}
+                        disabled
+                        className="h-10 bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                      />
+                    </div>
+                  )}
+
+                  {jobTitle && (
+                    <div className="space-y-1.5">
+                      <Label className="text-sm font-medium text-gray-900">Pozíció</Label>
+                      <Input
+                        value={jobTitle}
+                        disabled
+                        className="h-10 bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-gray-500">A céges adatokat a cég adminisztrátora tudja módosítani.</p>
+              </div>
+            )}
 
             {/* Save Button */}
             <div className="flex justify-end pt-7 border-t border-gray-200">
