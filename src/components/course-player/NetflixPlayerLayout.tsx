@@ -41,6 +41,33 @@ interface NetflixPlayerLayoutProps {
 }
 
 /**
+ * Helper function to format plain text content into readable HTML
+ * Converts double newlines to paragraphs, single newlines to <br>
+ */
+function formatTextContent(content: string): string {
+  // Check if content already has HTML tags
+  const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
+
+  if (hasHtmlTags) {
+    // Content has HTML, return as-is but ensure paragraphs have spacing
+    return content;
+  }
+
+  // Plain text - convert to readable HTML with paragraphs
+  // Split by double newlines (paragraph breaks)
+  const paragraphs = content.split(/\n\s*\n/);
+
+  return paragraphs
+    .map(para => {
+      // Convert single newlines within paragraph to <br>
+      const withBreaks = para.trim().replace(/\n/g, '<br>');
+      return `<p>${withBreaks}</p>`;
+    })
+    .filter(p => p !== '<p></p>')
+    .join('\n');
+}
+
+/**
  * Netflix-style Player Layout for WEBINAR and PODCAST course types
  * Full-width video player with minimal UI, expandable episode list below
  */
@@ -259,15 +286,16 @@ export function NetflixPlayerLayout({
                                  prose-headings:text-gray-900 prose-headings:font-bold prose-headings:leading-tight
                                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
                                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                                 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-base
-                                 prose-li:text-gray-700 prose-li:text-base prose-li:leading-relaxed
-                                 prose-ul:my-4 prose-ol:my-4
+                                 prose-p:text-gray-700 prose-p:leading-loose prose-p:mb-6 prose-p:text-lg
+                                 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-relaxed
+                                 prose-ul:my-6 prose-ol:my-6
                                  prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
                                  prose-strong:text-gray-900 prose-strong:font-semibold
                                  prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600 prose-blockquote:italic
                                  prose-img:rounded-lg prose-img:shadow-md
-                                 [&_*]:!bg-transparent"
-                      dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                                 [&_*]:!bg-transparent
+                                 [&_p]:mb-6 [&_p]:leading-loose [&_p]:text-lg"
+                      dangerouslySetInnerHTML={{ __html: formatTextContent(currentLesson.content) }}
                     />
                   )}
 
@@ -396,15 +424,16 @@ export function NetflixPlayerLayout({
                                  prose-headings:text-gray-900 prose-headings:font-bold prose-headings:leading-tight
                                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
                                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                                 prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4 prose-p:text-base
-                                 prose-li:text-gray-700 prose-li:text-base prose-li:leading-relaxed
-                                 prose-ul:my-4 prose-ol:my-4
+                                 prose-p:text-gray-700 prose-p:leading-loose prose-p:mb-6 prose-p:text-lg
+                                 prose-li:text-gray-700 prose-li:text-lg prose-li:leading-relaxed
+                                 prose-ul:my-6 prose-ol:my-6
                                  prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
                                  prose-strong:text-gray-900 prose-strong:font-semibold
                                  prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600 prose-blockquote:italic
                                  prose-img:rounded-lg prose-img:shadow-md
-                                 [&_*]:!bg-transparent"
-                      dangerouslySetInnerHTML={{ __html: currentLesson.content }}
+                                 [&_*]:!bg-transparent
+                                 [&_p]:mb-6 [&_p]:leading-loose [&_p]:text-lg"
+                      dangerouslySetInnerHTML={{ __html: formatTextContent(currentLesson.content) }}
                     />
                   )}
 

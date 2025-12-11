@@ -11,6 +11,30 @@ interface NewLessonContentProps {
 }
 
 /**
+ * Helper function to format plain text content into readable HTML
+ * Converts double newlines to paragraphs, single newlines to <br>
+ */
+function formatTextContent(content: string): string {
+  // Check if content already has HTML tags
+  const hasHtmlTags = /<[a-z][\s\S]*>/i.test(content);
+
+  if (hasHtmlTags) {
+    return content;
+  }
+
+  // Plain text - convert to readable HTML with paragraphs
+  const paragraphs = content.split(/\n\s*\n/);
+
+  return paragraphs
+    .map(para => {
+      const withBreaks = para.trim().replace(/\n/g, '<br>');
+      return `<p>${withBreaks}</p>`;
+    })
+    .filter(p => p !== '<p></p>')
+    .join('\n');
+}
+
+/**
  * NewLessonContent Component
  * Displays lesson information below the video player
  * Includes: title, breadcrumb, description, learning outcomes
@@ -70,16 +94,21 @@ export function NewLessonContent({
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-gray-900">Tartalom</h2>
           <div
-            className="prose prose-lg prose-gray max-w-none leading-relaxed
-                       prose-headings:text-gray-900 prose-headings:font-bold
-                       prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-base
-                       prose-li:text-gray-700 prose-li:text-base
+            className="prose prose-lg prose-gray max-w-none
+                       prose-headings:text-gray-900 prose-headings:font-bold prose-headings:leading-tight
+                       prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
+                       prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                       prose-p:text-gray-700 prose-p:leading-loose prose-p:mb-6 prose-p:text-lg
+                       prose-li:text-gray-700 prose-li:text-lg prose-li:leading-relaxed
+                       prose-ul:my-6 prose-ol:my-6
                        prose-a:text-brand-secondary prose-a:no-underline hover:prose-a:underline
                        prose-strong:text-gray-900 prose-strong:font-semibold
-                       prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600
-                       [&_*]:!bg-transparent [&_*]:!text-inherit
+                       prose-blockquote:border-l-brand-secondary prose-blockquote:text-gray-600 prose-blockquote:italic
+                       prose-img:rounded-lg prose-img:shadow-md
+                       [&_*]:!bg-transparent
+                       [&_p]:mb-6 [&_p]:leading-loose [&_p]:text-lg
                        bg-white rounded-lg"
-            dangerouslySetInnerHTML={{ __html: lesson.content }}
+            dangerouslySetInnerHTML={{ __html: formatTextContent(lesson.content) }}
           />
         </div>
       )}
