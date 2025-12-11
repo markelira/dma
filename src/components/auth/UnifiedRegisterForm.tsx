@@ -21,6 +21,8 @@ import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
+import { updateAuthStoreFromFirebase } from '@/lib/updateAuthStore';
+import { useAuthStore } from '@/stores/authStore';
 
 interface UnifiedRegistrationData {
   // Step 1: Personal info (all required)
@@ -287,6 +289,24 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           companyId: refreshedToken.claims.companyId,
           role: refreshedToken.claims.role,
           companyRole: refreshedToken.claims.companyRole,
+          timestamp: Date.now()
+        });
+
+        // FIX: Manually update Zustand store with fresh custom claims
+        // This prevents race condition where store has stale data before redirect
+        console.log('[Unified Registration] Updating Zustand store with fresh claims...');
+        await updateAuthStoreFromFirebase(userCredential.user);
+        console.log('[Unified Registration] ✅ Store updated');
+
+        // VALIDATION: Verify store was updated correctly
+        const storeState = useAuthStore.getState();
+        console.log('🔍 [VALIDATION] STORE STATE AFTER UPDATE:', {
+          storeCompanyId: storeState.user?.companyId,
+          storeRole: storeState.user?.role,
+          storeCompanyRole: storeState.user?.companyRole,
+          tokenCompanyId: refreshedToken.claims.companyId,
+          tokenRole: refreshedToken.claims.role,
+          match: storeState.user?.companyId === refreshedToken.claims.companyId,
           timestamp: Date.now()
         });
 
