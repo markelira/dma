@@ -22,34 +22,29 @@ export default function HomepageFAQ() {
 
   const faqs: FAQItem[] = [
     {
-      question: "Miben más a DMA, mint a Coursera vagy az Udemy?",
+      question: "Miben más a DMA Masterclass?",
       answer:
-        "A DMA nem általános online tartalmakat kínál. Minden anyagunk a Vállalati Térkép módszertanra épül – egy 20 éve fejlesztett, 50+ cégnél bizonyított rendszerre. Nem inspirációt kapsz, hanem konkrét keretrendszereket, amiket azonnal alkalmazhatsz.",
+        "A DMA Masterclasson 20 év tapasztalatából összerakott, működő és azonnal alkalmazható cégépítési rendszereket kapsz szakértő Mentoroktól.",
     },
     {
-      question: "Tényleg ingyen kipróbálhatom 7 napig?",
+      question: "Tényleg kipróbálhatom 7 napig ingyen?",
       answer:
-        "Igen, teljes hozzáféréssel. Nem kell bankkártya, nincs automatikus terhelés. Ha nem tetszik, egyszerűen nem csinálsz semmit – nem fogunk zaklatni.",
+        "Igen. Sikeres regisztráció után 7 napig teljesen ingyenesen tudod felfedezni a tartalmakat. 7 nap után, ha nem mondod le az előfizetést, akkor 14.990 Ft-ért tudod folytatni a kalandozást.",
     },
     {
-      question: "Mennyi időt igényel?",
+      question: "Munkatársakat is hozzá tudok adni az oldalhoz?",
       answer:
-        "Te döntöd el. Egy webinár 90 perc. Egy akadémia 10-20 szekció, amit a saját tempódban végezhetsz. A podcastokat útközben hallgathatod. Nincs határidő, nincs nyomás.",
+        "Igen, teljesen ingyenesen hozzá tudsz adni 5 munkatársat is, akik veled együtt kalandozhatnak a különböző tematikájú tartalmak között.",
     },
     {
-      question: "Egyénként és cégként is használhatom?",
+      question: "Mit nézhetek a DMA Masterclasson?",
       answer:
-        "Igen. Egyéni előfizetéssel a saját fejlődésedre koncentrálhatsz. Céges előfizetéssel a teljes csapatod hozzáférést kap, te pedig látod a haladásukat és az eredményeket.",
+        "150+ cégépítési rendszer elérhető az oldalon. Felfedzheted az Ügyvezetés, a HR, a Marketing, az Értékesítés és a Működés területeihez tartozó több, mint 200 órányi tartalmat.",
     },
     {
-      question: "Mi van, ha nem tetszik?",
+      question: "Hogyan mondhatom le?",
       answer:
-        "A 7 napos próba után bármikor lemondhatsz egyetlen kattintással. Nincs hosszú távú elköteleződés, nincs rejtett költség. Ha úgy érzed, nem neked való – nincs harag.",
-    },
-    {
-      question: "Kapok tanúsítványt?",
-      answer:
-        "Igen, minden befejezett akadémiához és mesterkurzushoz. A tanúsítványt megoszthatod LinkedInen, munkáltatókkal vagy ügyfelekkel. A webinárokhoz és podcastokhoz nem jár tanúsítvány.",
+        "A profilodon a Számlázás menüpontban találod az előfizetés lemondását. Ha lemondtad az előfizetésed, akkor a fordulónapjáig természetesen továbbra is elérhetőek lesznek a tartalmak, viszont után nem újul meg az előfizetés és elveszted a hozzáférést.",
     },
   ];
 
@@ -60,16 +55,6 @@ export default function HomepageFAQ() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
       <div className="mx-auto max-w-4xl px-6">
-        {/* Section Header */}
-        <div className="mb-16 text-center" data-aos="fade-up">
-          <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
-            Gyakran ismételt kérdések
-          </h2>
-          <p className="text-lg text-gray-600 md:text-xl">
-            Mielőtt elkezded
-          </p>
-        </div>
-
         {/* FAQ Accordion */}
         <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
           {faqs.map((faq, index) => (

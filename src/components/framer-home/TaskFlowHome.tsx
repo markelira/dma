@@ -11,6 +11,7 @@ import { CategoriesEditorial } from '@/components/home/CategoriesEditorial';
 import { PricingEditorial } from '@/components/home/PricingEditorial';
 import { TestimonialsEditorial } from '@/components/home/TestimonialsEditorial';
 import Footer from '@/components/landing-home/ui/footer';
+import HomepageFAQ from '@/components/landing-home/HomepageFAQ';
 
 // Loading placeholder for sections
 const SectionLoader = () => (
@@ -19,11 +20,6 @@ const SectionLoader = () => (
 
 const MainHero = dynamic(
   () => import('@framer/main-hero').then(m => m.default.Responsive || m.default),
-  { ssr: false, loading: SectionLoader }
-);
-
-const Faq = dynamic(
-  () => import('@framer/faq').then(m => m.default.Responsive || m.default),
   { ssr: false, loading: SectionLoader }
 );
 
@@ -58,7 +54,7 @@ export function TaskFlowHome() {
         <PricingEditorial />
         {/* Testimonials Section - Google Reviews */}
         <TestimonialsEditorial />
-        <Faq {...fullWidthProps} />
+        <HomepageFAQ />
         <Footer border={true} />
       </main>
     </div>
