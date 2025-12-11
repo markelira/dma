@@ -23,14 +23,9 @@ export function WhyDMASection() {
           </div>
         </div>
 
-        {/* Feature 1 - Left aligned with large number */}
+        {/* Feature 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 sm:mb-20 md:mb-24">
-          <div className="lg:col-span-2 flex items-start">
-            <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#E72B36] leading-none select-none tracking-tight">
-              01
-            </span>
-          </div>
-          <div className="lg:col-span-6 lg:col-start-4">
+          <div className="lg:col-span-8 lg:col-start-2">
             <div className="border-t border-gray-300 pt-6">
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-[-0.01em]">
                 Exkluzív kalandok.
@@ -70,9 +65,6 @@ export function WhyDMASection() {
         <div className="relative mb-16 sm:mb-20 md:mb-24">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 md:p-16 lg:p-20">
             <div className="max-w-3xl">
-              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#E72B36] leading-none select-none mb-6 block tracking-tight">
-                03
-              </span>
               <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight tracking-[-0.01em]">
                 Nincs bullshit.
               </h3>
