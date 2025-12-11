@@ -72,6 +72,7 @@ export function CarouselSection({
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
 
   const config = TYPE_CONFIG[courseType]
   const Icon = config.icon
@@ -137,12 +138,18 @@ export function CarouselSection({
       </div>
 
       {/* Carousel */}
-      <div className="relative group px-6 lg:px-12">
+      <div
+        className="relative px-6 lg:px-12"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         {/* Navigation Buttons */}
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 ml-6 lg:ml-12 ${
+            className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 ml-6 lg:ml-12 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            } ${
               isDark
                 ? 'bg-white/20 border-white/20 text-white hover:bg-white/30'
                 : 'bg-white/90 border-white/20 text-gray-700 hover:bg-white'
@@ -155,7 +162,9 @@ export function CarouselSection({
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 mr-6 lg:mr-12 ${
+            className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full shadow-xl border flex items-center justify-center transition-opacity duration-200 mr-6 lg:mr-12 ${
+              isHovered ? 'opacity-100' : 'opacity-0'
+            } ${
               isDark
                 ? 'bg-white/20 border-white/20 text-white hover:bg-white/30'
                 : 'bg-white/90 border-white/20 text-gray-700 hover:bg-white'
