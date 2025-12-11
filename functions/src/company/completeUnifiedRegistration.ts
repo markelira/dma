@@ -111,18 +111,24 @@ export const completeUnifiedRegistration = https.onCall(
       }
 
       // Step 1: Create company document
-      const companyData: Omit<Company, 'id'> = {
+      const companyData: any = {
         name: finalCompanyName,
         slug: finalSlug,
         billingEmail: finalBillingEmail,
         plan: 'basic',
         status: 'active',
         subscriptionStatus: 'none', // Will be set to 'active' or 'trialing' after Stripe checkout
-        industry: industry || undefined,
-        companySize: companySize || undefined,
-        createdAt: FieldValue.serverTimestamp() as admin.firestore.Timestamp,
-        updatedAt: FieldValue.serverTimestamp() as admin.firestore.Timestamp,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       };
+
+      // Only add optional fields if they have values
+      if (industry) {
+        companyData.industry = industry;
+      }
+      if (companySize) {
+        companyData.companySize = companySize;
+      }
 
       const companyRef = await db.collection('companies').add(companyData);
       const companyId = companyRef.id;

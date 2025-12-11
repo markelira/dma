@@ -116,11 +116,16 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             plan: 'basic',
             status: 'active',
             subscriptionStatus: 'none', // Will be set to 'active' or 'trialing' after Stripe checkout
-            industry: industry || undefined,
-            companySize: companySize || undefined,
             createdAt: firestore_1.FieldValue.serverTimestamp(),
             updatedAt: firestore_1.FieldValue.serverTimestamp(),
         };
+        // Only add optional fields if they have values
+        if (industry) {
+            companyData.industry = industry;
+        }
+        if (companySize) {
+            companyData.companySize = companySize;
+        }
         const companyRef = await db.collection('companies').add(companyData);
         const companyId = companyRef.id;
         console.log('✅ [completeUnifiedRegistration] Company document created:', companyId);

@@ -57,15 +57,6 @@ function RegisterPageContent() {
 
         if (result.data.valid) {
           setInviteData(result.data);
-          // Prefill email from invite data (more reliable than URL param)
-          setFormData(prev => ({
-            ...prev,
-            email: result.data.employeeEmail,
-            firstName: result.data.employeeName.split(' ')[0] || '',
-            lastName: result.data.employeeName.split(' ').slice(1).join(' ') || '',
-          }));
-          // Auto-select individual account type for employee invites
-          setAccountType('individual');
           console.log('[Register] Valid invite for company:', result.data.companyName);
         } else if (result.data.expired) {
           setInviteError('Ez a meghívó lejárt. Kérj új meghívót a cég adminisztrátorától.');
@@ -79,9 +70,7 @@ function RegisterPageContent() {
         } else {
           // If verification fails, still allow registration but don't show company info
           // User can register normally and linkEmployeeByEmail will try to match by email
-          if (inviteEmail) {
-            setFormData(prev => ({ ...prev, email: decodeURIComponent(inviteEmail) }));
-          }
+          console.log('[Register] Invite verification failed, allowing normal registration');
         }
       } finally {
         setInviteLoading(false);
@@ -99,7 +88,7 @@ function RegisterPageContent() {
         const data = JSON.parse(pendingVerification);
         console.log('[Register Page] Found pending verification in sessionStorage:', data);
         setRegisteredUserId(data.userId);
-        setFormData(prev => ({ ...prev, email: data.email }));
+        setRegisteredEmail(data.email);
         setIsVerifying(true);
         setShowVerificationModal(true);
       } catch (err) {
