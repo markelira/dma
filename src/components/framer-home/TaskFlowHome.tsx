@@ -6,7 +6,6 @@ import { NetflixCourseCarousel } from '@/components/home/NetflixCourseCarousel';
 import { WhyDMASection } from '@/components/home/WhyDMASection';
 import { FeaturesEditorial, TartalmakHeader } from '@/components/home/FeaturesEditorial';
 import { BenefitsEditorial } from '@/components/home/BenefitsEditorial';
-import { StatsSection } from '@/components/home/StatsSection';
 import { AllCoursesShowcase } from '@/components/home/AllCoursesShowcase';
 import { CategoriesEditorial } from '@/components/home/CategoriesEditorial';
 import { PricingEditorial } from '@/components/home/PricingEditorial';
@@ -49,8 +48,6 @@ export function TaskFlowHome() {
         {/* Tartalmak Header - separate from Bento Grid */}
         <TartalmakHeader />
         <FeaturesEditorial />
-        {/* Stats Section - moved from hero */}
-        <StatsSection />
         {/* All Courses Carousel - "Tartalmaink" section with all course types */}
         <AllCoursesShowcase />
         {/* Benefits Section - "Miért bízz bennünk?" */}
