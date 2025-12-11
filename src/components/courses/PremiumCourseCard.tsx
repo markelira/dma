@@ -96,6 +96,16 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const getCategoryNames = () => {
     const names: string[] = [];
 
+    // Debug logging
+    console.log('Course category data:', {
+      title: course.title,
+      categoryIds: course.categoryIds,
+      categoryId: course.categoryId,
+      category: course.category,
+      hasCategories: !!categories,
+      categoriesLength: categories?.length
+    });
+
     // Check for multiple categories first (new system)
     if (course.categoryIds && course.categoryIds.length > 0 && categories) {
       course.categoryIds.forEach(catId => {
