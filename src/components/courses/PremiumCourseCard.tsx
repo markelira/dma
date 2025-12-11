@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from "motion/react";
 import { BookOpen, Bookmark, BookmarkCheck, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -58,6 +58,19 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
 
+  // Log when categories are undefined or empty (for debugging)
+  useEffect(() => {
+    if (!categories || categories.length === 0) {
+      console.warn(`[PremiumCourseCard] No categories for course: ${course.title}`, {
+        hasCategories: !!categories,
+        categoriesLength: categories?.length,
+        courseId: course.id,
+        courseCategoryId: course.categoryId,
+        courseCategoryIds: course.categoryIds
+      });
+    }
+  }, [categories, course.title, course.id, course.categoryId, course.categoryIds]);
+
   const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
   const isEnrolling = enrollMutation.isPending;
   const isSubscriber = subscription?.isActive ?? false;
@@ -96,33 +109,33 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const getCategoryNames = () => {
     const names: string[] = [];
 
-    // Debug logging
-    console.log('Course category data:', {
-      title: course.title,
-      categoryIds: course.categoryIds,
-      categoryId: course.categoryId,
-      category: course.category,
-      hasCategories: !!categories,
-      categoriesLength: categories?.length
-    });
+    // Early return if no categories array provided
+    if (!categories || categories.length === 0) {
+      return [];
+    }
 
     // Check for multiple categories first (new system)
-    if (course.categoryIds && course.categoryIds.length > 0 && categories) {
+    if (course.categoryIds && course.categoryIds.length > 0) {
       course.categoryIds.forEach(catId => {
         const cat = categories.find(c => c.id === catId);
-        if (cat) names.push(cat.name);
+        if (cat && cat.name) {
+          names.push(cat.name);
+        }
       });
       if (names.length > 0) return names;
     }
 
-    // Fallback to single category
-    if (course.category && typeof course.category === 'string') {
-      return [course.category];
+    // Fallback to single category ID
+    if (course.categoryId) {
+      const category = categories.find(cat => cat.id === course.categoryId);
+      if (category && category.name) {
+        return [category.name];
+      }
     }
 
-    if (course.categoryId && categories) {
-      const category = categories.find(cat => cat.id === course.categoryId);
-      if (category) return [category.name];
+    // Fallback to category string (legacy)
+    if (course.category && typeof course.category === 'string') {
+      return [course.category];
     }
 
     return [];
