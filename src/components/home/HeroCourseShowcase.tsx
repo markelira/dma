@@ -118,7 +118,7 @@ export function HeroCourseShowcase({ maxCourses = 8 }: HeroCourseShowcaseProps) 
 
   if (loading) {
     return (
-      <div className="w-full max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8">
         <div className="bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-2xl overflow-hidden">
           <div className="h-[500px] flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-brand-secondary" />
@@ -131,7 +131,7 @@ export function HeroCourseShowcase({ maxCourses = 8 }: HeroCourseShowcaseProps) 
   // Show a message if no courses (instead of returning null)
   if (courses.length === 0) {
     return (
-      <div className="w-full max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-8">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8">
         <div className="bg-gradient-to-br from-brand-secondary/5/60 via-purple-50/40 to-white/30 backdrop-blur-xl rounded-3xl border border-white/30 shadow-2xl overflow-hidden p-12 text-center">
           <div className="max-w-md mx-auto">
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-secondary/50 to-purple-600 mx-auto mb-4 flex items-center justify-center">
@@ -151,7 +151,7 @@ export function HeroCourseShowcase({ maxCourses = 8 }: HeroCourseShowcaseProps) 
   }
 
   return (
-    <div className="w-full max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] py-8">
+    <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

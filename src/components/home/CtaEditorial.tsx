@@ -4,7 +4,7 @@ import Link from 'next/link'
 
 export function CtaEditorial() {
   return (
-    <section className="w-full bg-gray-900 py-24 md:py-32 overflow-hidden relative">
+    <section className="w-full bg-gray-900 py-20 sm:py-24 md:py-28 overflow-hidden relative">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -13,7 +13,7 @@ export function CtaEditorial() {
         }} />
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] relative z-10">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
           {/* Small text */}
           <p className="text-[#E72B36] text-sm md:text-base font-medium uppercase tracking-widest mb-6">

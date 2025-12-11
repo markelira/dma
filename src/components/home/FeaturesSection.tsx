@@ -86,7 +86,7 @@ const headerVariants = {
 
 export function FeaturesSection() {
   return (
-    <section className="relative w-full bg-[rgb(15,15,15)] py-24 md:py-32 overflow-hidden">
+    <section className="relative w-full bg-[rgb(15,15,15)] py-20 sm:py-24 md:py-28 overflow-hidden">
       {/* Subtle gradient at top */}
       <div
         className="absolute top-0 left-0 right-0 h-40 pointer-events-none"

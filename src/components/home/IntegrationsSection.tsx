@@ -123,7 +123,7 @@ const containerVariants = {
 
 export function IntegrationsSection() {
   return (
-    <section className="relative w-full bg-[rgb(15,15,15)] py-24 md:py-32 overflow-hidden">
+    <section className="relative w-full bg-[rgb(15,15,15)] py-20 sm:py-24 md:py-28 overflow-hidden">
       {/* Subtle radial gradient */}
       <div
         className="absolute inset-0 pointer-events-none"

@@ -121,8 +121,8 @@ export function NetflixCourseCarousel() {
   }
 
   return (
-    <section className="w-full bg-[rgb(249,250,251)] py-12 md:py-16">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+    <section className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">

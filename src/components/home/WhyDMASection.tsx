@@ -4,11 +4,11 @@ import Link from 'next/link'
 
 export function WhyDMASection() {
   return (
-    <section className="w-full bg-[rgb(249,250,251)] py-24 md:py-32 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+    <section className="w-full bg-[rgb(249,250,251)] py-20 sm:py-24 md:py-28 overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
 
         {/* Header - Asymmetric with pull quote */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-24 md:mb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20 sm:mb-24 md:mb-28">
           <div className="lg:col-span-7">
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
               Még több ok, hogy miért
@@ -24,7 +24,7 @@ export function WhyDMASection() {
         </div>
 
         {/* Feature 1 - Left aligned with large number */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20 md:mb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 sm:mb-20 md:mb-24">
           <div className="lg:col-span-2 flex items-start">
             <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-[#E72B36] leading-none select-none tracking-tight">
               01
@@ -43,7 +43,7 @@ export function WhyDMASection() {
         </div>
 
         {/* Feature 2 - Right aligned with big number accent */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-20 md:mb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-16 sm:mb-20 md:mb-24">
           <div className="lg:col-span-5 lg:col-start-2 order-2 lg:order-1">
             <div className="border-t border-gray-300 pt-6">
               <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 tracking-[-0.01em]">
@@ -67,7 +67,7 @@ export function WhyDMASection() {
         </div>
 
         {/* Feature 3 - Full width dark accent block */}
-        <div className="relative mb-20 md:mb-28">
+        <div className="relative mb-16 sm:mb-20 md:mb-24">
           <div className="bg-gray-900 rounded-2xl p-6 sm:p-10 md:p-16 lg:p-20">
             <div className="max-w-3xl">
               <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#E72B36] leading-none select-none mb-6 block tracking-tight">

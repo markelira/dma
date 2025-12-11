@@ -37,8 +37,8 @@ const features = [
 // Header component for the Tartalmak section
 export function TartalmakHeader() {
   return (
-    <section className="w-full bg-[rgb(249,250,251)] pt-24 md:pt-32 pb-12 md:pb-16 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+    <section className="w-full bg-[rgb(249,250,251)] pt-20 sm:pt-24 md:pt-28 pb-12 md:pb-16 overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-7">
             <span className="text-sm font-medium text-gray-500 uppercase tracking-wide mb-4 block">
@@ -63,8 +63,8 @@ export function TartalmakHeader() {
 
 export function FeaturesEditorial() {
   return (
-    <section className="w-full bg-[rgb(249,250,251)] pb-24 md:pb-32 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+    <section className="w-full bg-[rgb(249,250,251)] pb-20 sm:pb-24 md:pb-28 overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">

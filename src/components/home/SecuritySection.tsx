@@ -120,7 +120,7 @@ export function SecuritySection() {
         }}
       />
 
-      <div className="relative z-10 mx-auto max-w-[1200px] px-5 md:px-12 py-24 md:py-32">
+      <div className="relative z-10 mx-auto max-w-[1200px] px-5 md:px-12 py-20 sm:py-24 md:py-28">
         {/* Section header */}
         <motion.div
           className="text-center mb-16 md:mb-20"

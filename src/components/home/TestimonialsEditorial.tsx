@@ -103,7 +103,7 @@ export function TestimonialsEditorial() {
 
   return (
     <section className="w-full bg-[rgb(249,250,251)] py-20 md:py-28 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Header - Editorial Style */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12 md:mb-16">
           <div className="lg:col-span-7">

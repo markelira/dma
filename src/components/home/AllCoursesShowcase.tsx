@@ -219,8 +219,8 @@ export function AllCoursesShowcase() {
 
   if (loading) {
     return (
-      <section className="w-full bg-[rgb(249,250,251)] py-12 md:py-16">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+      <section className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
           <div className="h-[400px] flex items-center justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-[#E72B36]" />
           </div>
@@ -237,7 +237,7 @@ export function AllCoursesShowcase() {
 
   return (
     <section className="w-full bg-[rgb(249,250,251)] pt-8 pb-16 md:pt-12 md:pb-24">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Main Header */}
         <div className="flex items-center justify-between mb-10 md:mb-14">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 tracking-[-0.01em]">

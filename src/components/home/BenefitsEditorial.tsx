@@ -25,8 +25,8 @@ const benefits = [
 
 export function BenefitsEditorial() {
   return (
-    <section className="w-full bg-[rgb(249,250,251)] py-24 md:py-32 overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+    <section className="w-full bg-[rgb(249,250,251)] py-20 sm:py-24 md:py-28 overflow-hidden">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
 
         {/* Header - Centered */}
         <div className="text-center max-w-3xl mx-auto mb-16 md:mb-24">
