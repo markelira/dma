@@ -179,7 +179,6 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
         delay: index * 0.05, // Stagger effect
         ease: [0.16, 1, 0.3, 1]
       }}
-      whileHover={{ scale: 1.03, y: -4 }}
       className="origin-center"
     >
       <div
