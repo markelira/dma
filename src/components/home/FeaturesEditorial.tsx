@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Trophy, Video, GraduationCap, Mic } from 'lucide-react'
+import { Monitor, Video, GraduationCap, Mic } from 'lucide-react'
 
 const features = [
   {
@@ -9,7 +9,7 @@ const features = [
     title: 'Masterclass',
     description: 'Összegyűjtöttük neked a főbb tematikákat, hogy Masterclassokban fedezd fel a cégépítési rendszereket.',
     href: '/masterclass',
-    Icon: Trophy,
+    Icon: Monitor,
   },
   {
     id: 'webinar',
@@ -77,7 +77,7 @@ export function FeaturesEditorial() {
             <div className="h-full bg-gray-900 rounded-2xl p-6 sm:p-8 md:p-10 lg:p-12 transition-all duration-300 hover:bg-gray-800 hover:scale-[1.02] flex flex-col justify-between min-h-[280px] sm:min-h-[320px]">
               <div>
                 <div className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-2xl bg-[#E72B36]/20 flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-[#E72B36]/30 transition-colors">
-                  <Trophy className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#E72B36]" />
+                  <Monitor className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 text-[#E72B36]" />
                 </div>
                 <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-[-0.01em]">
                   {features[0].title}
