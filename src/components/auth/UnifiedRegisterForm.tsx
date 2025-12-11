@@ -228,6 +228,14 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
       console.log('[Unified Registration] ✅ User created successfully:', userCredential.user.uid);
 
+      // CRITICAL: Set pending verification in sessionStorage IMMEDIATELY
+      // This prevents the register page from redirecting before registration completes
+      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+        userId: userCredential.user.uid,
+        email: formData.email.trim().toLowerCase()
+      }));
+      console.log('[Unified Registration] ✅ Set pending verification flag in sessionStorage');
+
       // Update display name
       console.log('[Unified Registration] Step 2: Updating display name...');
       await updateProfile(userCredential.user, {
