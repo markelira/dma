@@ -19,57 +19,41 @@ export default function Footer({ border = false }: { border?: boolean }) {
             </div>
           </div>
 
-          {/* 2nd block - Kurzusok */}
+          {/* 2nd block - Tartalmak */}
           <div className="space-y-2 sm:col-span-6 md:col-span-3 lg:col-span-2">
             <h3 className="text-sm font-medium">Tartalmak</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="/courses"
+                  href="/webinar"
                 >
-                  Összes tartalom
+                  Webinár
                 </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="https://masterclass.dma.hu/akademia"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/akademia"
                 >
-                  Akadémiák
-                </a>
+                  Akadémia
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="https://masterclass.dma.hu/webinar"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/masterclass"
                 >
-                  Webinárok
-                </a>
+                  Masterclass
+                </Link>
               </li>
               <li>
-                <a
+                <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="https://masterclass.dma.hu/masterclass"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/podcast"
                 >
-                  Masterclass-ok
-                </a>
-              </li>
-              <li>
-                <a
-                  className="text-gray-600 transition hover:text-gray-900"
-                  href="https://masterclass.dma.hu/podcast"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Podcastok
-                </a>
+                  Podcast
+                </Link>
               </li>
             </ul>
           </div>

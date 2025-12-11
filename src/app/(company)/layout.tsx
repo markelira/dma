@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { Loader2, Menu, X } from 'lucide-react'
 import { CompanyDashboardSidebar } from '@/components/company/CompanyDashboardSidebar'
 import { AuthProvider } from '@/contexts/AuthContext'
+import Footer from '@/components/landing-home/ui/footer'
 import { db } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
 
@@ -108,9 +109,14 @@ export default function CompanyLayout({
         </button>
 
         {/* Main Content - with left margin for fixed sidebar on desktop */}
-        <main className="min-h-screen bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-hidden">
+        <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-hidden">
           {children}
         </main>
+
+        {/* Footer */}
+        <div className="lg:ml-64">
+          <Footer border={true} />
+        </div>
       </div>
     </AuthProvider>
   )

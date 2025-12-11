@@ -29,9 +29,10 @@ interface DashboardSearchProps {
   className?: string;
   onFilterChange?: (filters: DashboardFilters) => void;
   courseType?: 'MASTERCLASS' | 'WEBINAR' | 'ACADEMIA' | 'PODCAST';
+  hideCourseTypeFilter?: boolean;
 }
 
-export function DashboardSearch({ className, onFilterChange, courseType }: DashboardSearchProps) {
+export function DashboardSearch({ className, onFilterChange, courseType, hideCourseTypeFilter }: DashboardSearchProps) {
   const router = useRouter();
   const { data: courses } = useCourses();
   const { data: categories } = useCategories();
@@ -300,13 +301,15 @@ export function DashboardSearch({ className, onFilterChange, courseType }: Dashb
             />
 
             {/* Course Type Filter - now "Tartalmak" */}
-            <MultiSelectDropdown
-              label="Tartalmak"
-              placeholder="Összes tartalom"
-              options={COURSE_TYPE_OPTIONS}
-              selected={selectedCourseTypes}
-              onChange={setSelectedCourseTypes}
-            />
+            {!hideCourseTypeFilter && (
+              <MultiSelectDropdown
+                label="Tartalmak"
+                placeholder="Összes tartalom"
+                options={COURSE_TYPE_OPTIONS}
+                selected={selectedCourseTypes}
+                onChange={setSelectedCourseTypes}
+              />
+            )}
 
             {/* Target Audience Filter */}
             <MultiSelectDropdown

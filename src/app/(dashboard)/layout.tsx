@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { Loader2, Menu, X } from 'lucide-react'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { AuthProvider } from '@/contexts/AuthContext'
+import Footer from '@/components/landing-home/ui/footer'
 
 export default function DashboardRouteGroupLayout({
   children,
@@ -120,9 +121,14 @@ export default function DashboardRouteGroupLayout({
         </button>
 
         {/* Main Content Area - offset by sidebar width on desktop */}
-        <main className="min-h-screen bg-gray-50 p-4 lg:p-6 lg:ml-64">
+        <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64">
           {children}
         </main>
+
+        {/* Footer */}
+        <div className="lg:ml-64">
+          <Footer border={true} />
+        </div>
       </div>
     </AuthProvider>
   )

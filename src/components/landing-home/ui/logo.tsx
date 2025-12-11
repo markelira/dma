@@ -7,9 +7,9 @@ export default function Logo() {
       <Image
         src="/images/DMA.hu-logo.png"
         alt="DMA Logo"
-        width={50}
-        height={18}
-        className="h-6 w-auto"
+        width={80}
+        height={29}
+        className="h-8 w-auto"
       />
     </Link>
   );
