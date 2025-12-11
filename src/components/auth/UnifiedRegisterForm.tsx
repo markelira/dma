@@ -9,8 +9,6 @@ import {
   User,
   Phone,
   Building2,
-  Briefcase,
-  Users,
   Loader2,
   Eye,
   EyeOff,
@@ -68,25 +66,6 @@ interface UnifiedRegistrationResponse {
   linkedToInvite?: boolean;
   message?: string;
 }
-
-const industries = [
-  'Technológia',
-  'Pénzügy',
-  'Egészségügy',
-  'Oktatás',
-  'Kereskedelem',
-  'Marketing',
-  'Gyártás',
-  'Egyéb'
-];
-
-const companySizes = [
-  '1-10 fő',
-  '11-50 fő',
-  '51-200 fő',
-  '201-500 fő',
-  '500+ fő'
-];
 
 export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   inviteData,
@@ -236,10 +215,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       }));
       console.log('[Unified Registration] ✅ Set pending verification flag in sessionStorage');
 
-      // Update display name
+      // Update display name (Hungarian convention: family name first)
       console.log('[Unified Registration] Step 2: Updating display name...');
       await updateProfile(userCredential.user, {
-        displayName: `${formData.firstName.trim()} ${formData.lastName.trim()}`
+        displayName: `${formData.lastName.trim()} ${formData.firstName.trim()}`
       });
 
       console.log('[Unified Registration] ✅ Display name updated');
@@ -401,6 +380,28 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         )}
 
         <div className="space-y-5">
+          {/* Last Name - Hungarian convention: family name first */}
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="lastName">
+              Vezetéknév
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                id="lastName"
+                type="text"
+                className="form-input w-full py-2.5 pl-10"
+                placeholder="Kovács"
+                value={formData.lastName}
+                onChange={(e) => updateField('lastName', e.target.value)}
+                required
+                disabled={loading}
+              />
+            </div>
+          </div>
+
           {/* First Name */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="firstName">
@@ -417,28 +418,6 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 placeholder="János"
                 value={formData.firstName}
                 onChange={(e) => updateField('firstName', e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          {/* Last Name */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="lastName">
-              Vezetéknév
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="lastName"
-                type="text"
-                className="form-input w-full py-2.5 pl-10"
-                placeholder="Kovács"
-                value={formData.lastName}
-                onChange={(e) => updateField('lastName', e.target.value)}
                 required
                 disabled={loading}
               />
@@ -638,54 +617,6 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   onChange={(e) => updateField('billingEmail', e.target.value)}
                   disabled={loading}
                 />
-              </div>
-            </div>
-
-            {/* Industry */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="industry">
-                Iparág <span className="text-gray-400 font-normal">(opcionális)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Briefcase className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  id="industry"
-                  className="form-input w-full py-2.5 pl-10 appearance-none"
-                  value={formData.industry}
-                  onChange={(e) => updateField('industry', e.target.value)}
-                  disabled={loading}
-                >
-                  <option value="">Válassz iparágat...</option>
-                  {industries.map(industry => (
-                    <option key={industry} value={industry}>{industry}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Company Size */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companySize">
-                Cég mérete <span className="text-gray-400 font-normal">(opcionális)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Users className="h-5 w-5 text-gray-400" />
-                </div>
-                <select
-                  id="companySize"
-                  className="form-input w-full py-2.5 pl-10 appearance-none"
-                  value={formData.companySize}
-                  onChange={(e) => updateField('companySize', e.target.value)}
-                  disabled={loading}
-                >
-                  <option value="">Válassz méretet...</option>
-                  {companySizes.map(size => (
-                    <option key={size} value={size}>{size}</option>
-                  ))}
-                </select>
               </div>
             </div>
 
