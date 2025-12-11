@@ -82,7 +82,7 @@ const getContextDefaults = (context: string) => {
       return {
         variant: 'default' as const,
         actions: ['enroll'] as const,
-        showElements: ['rating', 'price', 'instructor', 'students'] as const
+        showElements: ['rating', 'price', 'students'] as const
       }
     case 'search':
       return {
@@ -100,7 +100,7 @@ const getContextDefaults = (context: string) => {
       return {
         variant: 'default' as const,
         actions: ['enroll'] as const,
-        showElements: ['rating', 'price', 'instructor', 'category'] as const
+        showElements: ['rating', 'price', 'category'] as const
       }
     default:
       return {
@@ -323,7 +323,7 @@ export function UniversalCourseCard({
                 onClick={() => handleAction('enroll')}
                 className="flex-1 bg-brand-secondary text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-secondary-hover transition-colors text-center min-w-[120px]"
               >
-                {course.isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
+                {course.isEnrolled ? 'Elmentve' : 'Mentés a listámra'}
               </button>
             )
 
@@ -334,7 +334,7 @@ export function UniversalCourseCard({
                 onClick={() => handleAction('purchase')}
                 className="flex-1 bg-brand-secondary text-white px-4 py-2 rounded-lg font-bold hover:bg-brand-secondary-hover transition-colors text-center min-w-[120px]"
               >
-                Beiratkozás
+                Mentés a listámra
               </button>
             )
 
@@ -424,7 +424,7 @@ export function UniversalCourseCard({
               onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
               className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-3 py-1 rounded-md text-xs font-medium transition-colors"
             >
-              {course.isEnrolled ? 'Folytatás' : 'Beiratkozás'}
+              {course.isEnrolled ? 'Folytatás' : 'Mentés'}
             </button>
           </div>
         </div>
@@ -470,7 +470,7 @@ export function UniversalCourseCard({
             onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
             className="flex-1 bg-gradient-to-r from-brand-secondary to-brand-secondary-hover text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-brand-secondary/20 transition-all hover:scale-105"
           >
-            Beiratkozás Most
+            Mentés a listámra
           </button>
         </div>
       </div>
@@ -514,7 +514,7 @@ export function UniversalCourseCard({
             onClick={() => handleAction(course.price && course.price > 0 ? 'purchase' : 'enroll')}
             className="bg-brand-secondary hover:bg-brand-secondary-hover text-white px-6 py-2 rounded-lg font-bold transition-colors whitespace-nowrap"
           >
-            Beiratkozás
+            Mentés
           </button>
         </div>
       </div>

@@ -130,31 +130,24 @@ export default function CompanyMyCoursesPage() {
 
       {/* Hero - Continue Watching */}
       {mostRecentCourse && mostRecentCourse.course && (
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800">
-          {/* Background Image */}
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800 min-h-[200px]">
+          {/* Background Image - Full cover */}
           {mostRecentCourse.thumbnailUrl && (
             <div className="absolute inset-0">
               <img
                 src={mostRecentCourse.thumbnailUrl}
                 alt=""
-                className="w-full h-full object-cover opacity-30"
+                className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/80 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/70 to-gray-900/40" />
             </div>
           )}
 
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
             <div className="flex-1 min-w-0">
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-brand-secondary/20 text-brand-secondary mb-3">
-                <Play className="w-3 h-3 mr-1" />
-                Folytatás
-              </span>
               <h2 className="text-xl md:text-2xl font-bold text-white mb-2 line-clamp-2">
                 {mostRecentCourse.courseName}
               </h2>
-              <p className="text-gray-300 text-sm mb-4">
-                {mostRecentCourse.courseInstructor}
-              </p>
 
               {/* Progress */}
               {mostRecentCourse.progress > 0 && mostRecentCourse.progress < 100 && (
@@ -186,17 +179,6 @@ export default function CompanyMyCoursesPage() {
                 {mostRecentCourse.progress > 0 ? 'Folytatás' : 'Indítás'}
               </button>
             </div>
-
-            {/* Thumbnail */}
-            {mostRecentCourse.thumbnailUrl && (
-              <div className="hidden md:block w-48 h-32 rounded-lg overflow-hidden flex-shrink-0 shadow-xl">
-                <img
-                  src={mostRecentCourse.thumbnailUrl}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            )}
           </div>
         </div>
       )}
@@ -204,33 +186,30 @@ export default function CompanyMyCoursesPage() {
       {/* Search */}
       <DashboardSearch className="my-2" />
 
-      {/* In Progress Courses */}
+      {/* Kaland folytatása - In Progress */}
       {inProgressCourses.length > 0 && (
         <EnrolledCourseCarousel
-          title="Folyamatban"
-          icon={<Clock className="w-5 h-5 text-brand-secondary" />}
+          title="Kaland folytatása"
           enrollments={inProgressCourses}
           categories={categories}
           instructors={instructors}
         />
       )}
 
-      {/* Not Started Courses */}
+      {/* Saját listám - Not Started / Saved */}
       {notStartedCourses.length > 0 && (
         <EnrolledCourseCarousel
-          title="Még nem kezdett"
-          icon={<BookOpen className="w-5 h-5 text-gray-500" />}
+          title="Saját listám"
           enrollments={notStartedCourses}
           categories={categories}
           instructors={instructors}
         />
       )}
 
-      {/* Completed Courses */}
+      {/* Befejezett - Completed */}
       {completedCourses.length > 0 && (
         <EnrolledCourseCarousel
           title="Befejezett"
-          icon={<CheckCircle className="w-5 h-5 text-green-500" />}
           enrollments={completedCourses}
           categories={categories}
           instructors={instructors}

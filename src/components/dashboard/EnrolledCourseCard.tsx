@@ -94,12 +94,6 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
             {enrollment.courseName}
           </h3>
 
-          {enrollment.courseInstructor && (
-            <p className="text-sm text-gray-500 mb-2">
-              {enrollment.courseInstructor}
-            </p>
-          )}
-
           {/* Progress info */}
           <div className="flex items-center justify-between text-sm">
             {isInProgress && (

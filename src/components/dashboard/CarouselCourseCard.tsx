@@ -103,10 +103,6 @@ export function CarouselCourseCard({
             {title}
           </h3>
 
-          <p className="text-sm font-medium text-gray-600 mb-4">
-            {instructor}
-          </p>
-
           <div className="mt-auto flex items-center flex-wrap gap-3 text-xs font-medium text-gray-500">
             {duration && (
               <div className="flex items-center gap-1.5">

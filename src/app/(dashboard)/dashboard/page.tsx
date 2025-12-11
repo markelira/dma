@@ -486,21 +486,10 @@ export default function DashboardPage() {
         {/* Regular content - hidden when filters are active */}
         {!hasActiveFilters && (
           <>
-            {/* Folytatás - Enrolled courses linking to player */}
-        {enrichedEnrollments.length > 0 && (
-          <EnrolledCourseCarousel
-            title="Folytatás"
-            icon={<Play className="w-5 h-5 text-brand-secondary" />}
-            enrollments={enrichedEnrollments}
-            categories={categories || []}
-            instructors={instructors || []}
-          />
-        )}
-
-        {/* Népszerű tartalmak - always show if we have courses */}
+            {/* Felkapott tartalmak - most popular */}
         {popularCourses.length > 0 && (
           <CourseCarouselRow
-            title="Népszerű tartalmak"
+            title="Felkapott tartalmak"
             courses={popularCourses}
             categories={categories || []}
             instructors={instructors || []}
@@ -517,6 +506,16 @@ export default function DashboardPage() {
             categories={categories || []}
             instructors={instructors || []}
             enrollments={enrollments || []}
+          />
+        )}
+
+        {/* Kaland folytatása - Only in-progress courses, no icon */}
+        {enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < 100)).length > 0 && (
+          <EnrolledCourseCarousel
+            title="Kaland folytatása"
+            enrollments={enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < 100))}
+            categories={categories || []}
+            instructors={instructors || []}
           />
         )}
 

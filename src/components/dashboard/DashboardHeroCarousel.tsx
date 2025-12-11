@@ -206,7 +206,7 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight line-clamp-2">
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-white mb-3 leading-tight line-clamp-2">
                 {currentSlide.title}
               </h1>
 
@@ -217,11 +217,8 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 </p>
               )}
 
-              {/* Instructor & Stats */}
+              {/* Stats - No instructor names */}
               <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
-                {currentSlide.instructorNames && currentSlide.instructorNames.length > 0 && (
-                  <span>{currentSlide.instructorNames.join(', ')}</span>
-                )}
                 {currentSlide.duration && (
                   <div className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />

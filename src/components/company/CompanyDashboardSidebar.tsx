@@ -37,7 +37,6 @@ const navigationSections = [
     items: [
       { title: 'Kezdőlap', href: '/company/dashboard', icon: Home },
       { title: 'Saját tartalmaim', href: '/company/dashboard/my-courses', icon: BookOpen },
-      { title: 'Összes tartalom', href: '/company/dashboard/osszes-tartalom', icon: GraduationCap },
     ]
   },
   {

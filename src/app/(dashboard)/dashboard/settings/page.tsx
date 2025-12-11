@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import { Save, Loader2, Upload, X, User, Camera } from 'lucide-react'
 import { toast } from 'sonner'
 import { updateProfile as updateAuthProfile } from 'firebase/auth'
@@ -24,8 +23,6 @@ export default function SettingsPage() {
   const [lastName, setLastName] = useState(user?.lastName || '')
   const [email, setEmail] = useState(user?.email || '')
   const [phone, setPhone] = useState('')
-  const [title, setTitle] = useState('')
-  const [bio, setBio] = useState('')
   const [profilePictureUrl, setProfilePictureUrl] = useState<string | null>(user?.profilePictureUrl || null)
   const [profileUploading, setProfileUploading] = useState(false)
   const [profileSaving, setProfileSaving] = useState(false)
@@ -46,8 +43,6 @@ export default function SettingsPage() {
       if (userDoc.exists()) {
         const data = userDoc.data()
         setPhone(data.phone || '')
-        setTitle(data.title || '')
-        setBio(data.bio || '')
         setProfilePictureUrl(data.profilePictureUrl || null)
       }
     } catch (error) {
@@ -171,8 +166,6 @@ export default function SettingsPage() {
         firstName,
         lastName,
         phone,
-        title,
-        bio,
         updatedAt: new Date().toISOString()
       })
 
@@ -290,20 +283,6 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            {/* Title Field */}
-            <div className="space-y-1.5">
-              <Label htmlFor="title" className="text-sm font-medium text-gray-900">
-                Beosztás / Pozíció <span className="text-gray-400 font-normal">(opcionális)</span>
-              </Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
-                placeholder="pl. Senior Manager, HR vezető, Ügyvezető"
-              />
-            </div>
-
             {/* Contact Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-1.5">
@@ -322,7 +301,7 @@ export default function SettingsPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="phone" className="text-sm font-medium text-gray-900">
-                  Telefonszám <span className="text-gray-400 font-normal">(opcionális)</span>
+                  Telefonszám <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="phone"
@@ -331,24 +310,9 @@ export default function SettingsPage() {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+36 30 123 4567"
                   className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
+                  required
                 />
               </div>
-            </div>
-
-            {/* Bio */}
-            <div className="space-y-1.5">
-              <Label htmlFor="bio" className="text-sm font-medium text-gray-900">
-                Bemutatkozás <span className="text-gray-400 font-normal">(opcionális)</span>
-              </Label>
-              <Textarea
-                id="bio"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                rows={4}
-                className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary resize-none"
-                placeholder="Rövid bemutatkozás magadról..."
-              />
-              <p className="text-xs text-gray-500 mt-1">Maximum 500 karakter</p>
             </div>
 
             {/* Save Button */}

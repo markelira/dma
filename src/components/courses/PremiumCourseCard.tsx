@@ -2,28 +2,15 @@
 
 import { useState } from 'react';
 import { motion } from "motion/react";
-import { BookOpen, Clock, Star, Bookmark, BookmarkCheck } from "lucide-react";
+import { BookOpen, Bookmark, BookmarkCheck, Play } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
 import { useEnrollmentStatus } from "@/hooks/useEnrollmentStatus";
 import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
+import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { toast } from "sonner";
-
-// Helper function to format date in Hungarian locale
-const formatHungarianDate = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('hu-HU', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  } catch {
-    return dateString;
-  }
-};
 
 interface Course {
   id: string;
@@ -67,11 +54,24 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
   const router = useRouter();
   const { user } = useAuthStore();
   const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
+  const { data: subscription } = useSubscriptionStatus();
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
 
   const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
   const isEnrolling = enrollMutation.isPending;
+  const isSubscriber = subscription?.isActive ?? false;
+  const currentLessonId = (enrollmentStatus as any)?.currentLessonId;
+  const hasStarted = currentLessonId || (course.progress && course.progress > 0);
+
+  // Handle card click - subscribers with started courses go to player
+  const handleCardClick = () => {
+    if (isSubscriber && hasStarted && currentLessonId) {
+      router.push(`/courses/${course.id}/player/${currentLessonId}`);
+    } else {
+      router.push(`/courses/${course.id}`);
+    }
+  };
 
   const handleEnroll = async (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent card click navigation
@@ -113,33 +113,6 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
     if (course.categoryId && categories) {
       const category = categories.find(cat => cat.id === course.categoryId);
       if (category) return [category.name];
-    }
-
-    return [];
-  };
-
-  // Get instructor names (supports multiple instructors)
-  // Courses store instructorId/instructorIds in Firestore, so we need to map to instructor names
-  const getInstructorNames = () => {
-    const names: string[] = [];
-
-    // Check for multiple instructors first (new system)
-    if (course.instructorIds && course.instructorIds.length > 0 && instructors) {
-      course.instructorIds.forEach(instId => {
-        const inst = instructors.find(i => i.id === instId);
-        if (inst) names.push(inst.name);
-      });
-      if (names.length > 0) return names;
-    }
-
-    // Fallback to single instructor
-    if (course.instructorName) {
-      return [course.instructorName];
-    }
-
-    if (course.instructorId && instructors) {
-      const instructor = instructors.find(inst => inst.id === course.instructorId);
-      if (instructor) return [instructor.name];
     }
 
     return [];
@@ -195,40 +168,6 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
     }
   };
 
-  const getLevelColor = (level: string) => {
-    switch (level?.toLowerCase()) {
-      case 'beginner':
-      case 'kezdő':
-        return {
-          bg: 'rgba(16, 185, 129, 0.1)',
-          border: 'rgba(16, 185, 129, 0.3)',
-          text: '#10B981'
-        };
-      case 'intermediate':
-      case 'középhaladó':
-        return {
-          bg: 'rgba(251, 191, 36, 0.1)',
-          border: 'rgba(251, 191, 36, 0.3)',
-          text: '#F59E0B'
-        };
-      case 'advanced':
-      case 'haladó':
-        return {
-          bg: 'rgba(239, 68, 68, 0.1)',
-          border: 'rgba(239, 68, 68, 0.3)',
-          text: '#EF4444'
-        };
-      default:
-        return {
-          bg: 'rgba(107, 114, 128, 0.1)',
-          border: 'rgba(107, 114, 128, 0.3)',
-          text: '#6B7280'
-        };
-    }
-  };
-
-  // Level badge removed - levelColors no longer needed
-  // const levelColors = getLevelColor(course.level);
   const courseTypeColors = getCourseTypeColor(course.courseType);
 
   return (
@@ -244,7 +183,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
     >
       <div
         className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl overflow-hidden h-full flex flex-col group cursor-pointer transition-all duration-300"
-        onClick={() => router.push(`/courses/${course.id}`)}
+        onClick={handleCardClick}
       >
         {/* Course Image */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
@@ -268,6 +207,11 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
+          {/* Centered Play Icon */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <Play className="w-16 h-16 text-white drop-shadow-lg" fill="white" fillOpacity={0.9} />
+          </div>
+
           {/* Enrollment Button */}
           {user && (
             <div className="absolute top-3 right-3">
@@ -281,7 +225,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
                   }
                   ${isEnrolling ? 'cursor-wait animate-pulse' : ''}
                 `}
-                title={isEnrolled ? 'Beiratkozva' : 'Beiratkozás'}
+                title={isEnrolled ? 'Elmentve a listámra' : 'Mentés a saját listámra'}
               >
                 {isEnrolled ? (
                   <BookmarkCheck className="w-4 h-4" />
@@ -335,37 +279,9 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
           </div>
 
           {/* Title */}
-          <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-brand-secondary transition-colors duration-200">
+          <h3 className="text-base font-semibold text-gray-900 line-clamp-2 group-hover:text-brand-secondary transition-colors duration-200">
             {course.title}
           </h3>
-
-          {/* Description */}
-          <p className="text-sm font-normal text-gray-600 line-clamp-2 mb-4 flex-1">
-            {course.description}
-          </p>
-
-          {/* Stats */}
-          <div className="flex items-center flex-wrap gap-3 text-xs text-gray-500 mb-4 pb-4 border-b border-gray-100">
-            {course.duration && (
-              <div className="flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{course.duration}</span>
-              </div>
-            )}
-            {(course.lessons ?? 0) > 0 && (
-              <div className="flex items-center gap-1.5">
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>{course.lessons} lecke</span>
-              </div>
-            )}
-            {(course.rating ?? 0) > 0 && (
-              <div className="flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-                <span>{course.rating}</span>
-              </div>
-            )}
-          </div>
-
         </div>
       </div>
     </motion.div>
