@@ -48,7 +48,7 @@ export function PricingEditorial() {
                     Teljes hozzáférés
                   </h3>
                   <p className="text-gray-400">
-                    Egyéni és céges előfizetés – 1 előfizetéssel 5 kollégát adhatsz hozzá a csapatodhoz, és mindenki hozzáfér az összes tartalomhoz.
+                    Egy előfizetéssel 5 munkatársat adhatsz hozzá díjmentesen, így mindenki hozzáfér az összes tartalomhoz.
                   </p>
                 </div>
 
