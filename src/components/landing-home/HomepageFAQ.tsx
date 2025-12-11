@@ -55,6 +55,13 @@ export default function HomepageFAQ() {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
       <div className="mx-auto max-w-4xl px-6">
+        {/* Section Header */}
+        <div className="mb-16 text-center" data-aos="fade-up">
+          <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+            Gyakran ismételt kérdések
+          </h2>
+        </div>
+
         {/* FAQ Accordion */}
         <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
           {faqs.map((faq, index) => (
