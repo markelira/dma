@@ -126,7 +126,7 @@ export function CoursesHeroSection({
 
       {/* Search & Filter Bar - positioned below hero */}
       <div className="bg-[rgb(249,250,251)] relative z-20">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pt-12 pb-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pt-12 pb-8">
           <div className="max-w-4xl mx-auto">
             {/* Search Bar */}
             <motion.div

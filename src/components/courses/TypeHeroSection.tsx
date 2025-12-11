@@ -104,7 +104,7 @@ export function TypeHeroSection({
 
   return (
     <div className="pt-[100px] pb-6">
-      <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Simple Header - Netflix style */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
           {/* Title Section */}

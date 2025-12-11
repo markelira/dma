@@ -77,7 +77,7 @@ export function FeaturedHeroBanner({
 
       {/* Content */}
       <div className="relative h-full flex items-end">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-[26px] lg:px-[80px] pb-12 md:pb-16 w-full">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-12 md:pb-16 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
