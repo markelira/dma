@@ -126,7 +126,7 @@ export function MyCoursesSection({ data, isLoading = false }: MyCoursesProps) {
               <Link href="/trending">
                 <button className={buttonStyles.secondaryDark}>
                   <TrendingUp className="w-5 h-5" />
-                  <span>Népszerű kurzusok</span>
+                  <span>Felkapott kurzusok</span>
                 </button>
               </Link>
             </div>

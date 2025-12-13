@@ -293,7 +293,7 @@ export default function DashboardPage() {
       .filter(row => row.courses.length > 0);
   }, [categories, courses]);
 
-  // Always prepare a "Népszerű" section with top courses (shuffled)
+  // Always prepare a "Felkapott" section with top courses (shuffled)
   const popularCourses = useMemo(() => {
     if (!courses) return [];
     return shufflePopularCourses(courses, 10);

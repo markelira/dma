@@ -110,7 +110,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               </button>
             </div>
 
-            {/* Népszerű tartalmak */}
+            {/* Felkapott tartalmak */}
             <div className="space-y-1">
               <button
                 onMouseEnter={() => setHoveredSection('popular')}
@@ -120,7 +120,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                   <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
                     <TrendingUp className="w-4 h-4" />
                   </div>
-                  <span className="font-medium">Népszerű tartalmak</span>
+                  <span className="font-medium">Felkapott tartalmak</span>
                 </div>
                 <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
                   {hoveredSection === 'popular' ? (
@@ -331,7 +331,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold mb-6 flex items-center space-x-3">
                   <TrendingUp className="w-6 h-6" />
-                  <span>Népszerű tartalmak</span>
+                  <span>Felkapott tartalmak</span>
                 </h3>
                 <div className="space-y-3">
                   {popularLoading

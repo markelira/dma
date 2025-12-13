@@ -243,7 +243,7 @@ export default function MasterclassPage() {
           {/* Popular masterclasses */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Népszerű masterclass tartalmak"
+              title="Felkapott masterclass tartalmak"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}

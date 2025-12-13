@@ -225,7 +225,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       {/* Popular in this category */}
       {popularCourses.length > 0 && (
         <CourseCarouselRow
-          title={`Népszerű ${title.toLowerCase()} tartalmak`}
+          title={`Felkapott ${title.toLowerCase()} tartalmak`}
           courses={popularCourses}
           categories={categories || []}
           instructors={instructors || []}

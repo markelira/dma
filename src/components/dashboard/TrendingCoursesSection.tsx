@@ -202,7 +202,7 @@ export function TrendingCoursesSection() {
 
   const tabs = [
     { key: 'trending', label: 'Felkapott', icon: Flame, count: trendingCourses.length },
-    { key: 'popular', label: 'Népszerű', icon: Star, count: popularCourses.length },
+    { key: 'popular', label: 'Felkapott', icon: Star, count: popularCourses.length },
     { key: 'new', label: 'Új tartalmak', icon: Zap, count: newCourses.length }
   ]
 

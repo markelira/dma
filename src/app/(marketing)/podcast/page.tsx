@@ -243,7 +243,7 @@ export default function PodcastPage() {
           {/* Popular podcasts */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Népszerű podcast tartalmak"
+              title="Felkapott podcast tartalmak"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}

@@ -243,7 +243,7 @@ export default function AkademiaPage() {
           {/* Popular academias */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Népszerű akadémia tartalmak"
+              title="Felkapott akadémia tartalmak"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}

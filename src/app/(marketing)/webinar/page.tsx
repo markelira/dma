@@ -243,7 +243,7 @@ export default function WebinarPage() {
           {/* Popular webinars */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Népszerű webinár tartalmak"
+              title="Felkapott webinár tartalmak"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}

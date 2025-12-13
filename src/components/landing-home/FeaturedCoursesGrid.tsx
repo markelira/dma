@@ -115,7 +115,7 @@ export default function FeaturedCoursesGrid() {
         {/* Section Header */}
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
-            Népszerű kurzusok
+            Felkapott kurzusok
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-gray-600">
             Fedezd fel a legjobban értékelt és legkedveltebb tanfolyamainkat

@@ -70,7 +70,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
       description: 'Fedezze fel 100+ szakmai kurzust',
       href: '/dashboard/browse',
       color: 'bg-brand-secondary hover:bg-brand-secondary-hover',
-      badge: 'Népszerű'
+      badge: 'Felkapott'
     },
     {
       icon: <Target className="w-5 h-5" />,

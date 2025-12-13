@@ -223,7 +223,7 @@ export function BrowseCoursesSection() {
           <div className="flex items-center">
             <BookOpen className="w-5 h-5 text-gray-600 mr-2" />
             <h3 className="text-lg font-bold text-gray-900">
-              {catalogFilters.search ? `Keresési eredmények: "${catalogFilters.search}"` : 'Népszerű tartalmak'}
+              {catalogFilters.search ? `Keresési eredmények: "${catalogFilters.search}"` : 'Felkapott tartalmak'}
             </h3>
           </div>
           {catalogData?.total && (
