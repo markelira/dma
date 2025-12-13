@@ -17,6 +17,7 @@ interface FreeTrialModalProps {
   courseName?: string;
   onStartTrial: () => void;
   onDismiss: () => void;
+  hasUsedTrial?: boolean;
 }
 
 export function FreeTrialModal({
@@ -25,7 +26,8 @@ export function FreeTrialModal({
   variant,
   courseName,
   onStartTrial,
-  onDismiss
+  onDismiss,
+  hasUsedTrial = false
 }: FreeTrialModalProps) {
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
@@ -55,6 +57,14 @@ export function FreeTrialModal({
       case 'course-unauth':
         return courseName ? `Hozzáférés: ${courseName}` : 'Hozzáférés a kurzushoz';
     }
+  };
+
+  // Dynamic button text based on trial usage
+  const getButtonText = () => {
+    if (hasUsedTrial) {
+      return 'ELŐFIZETEK';
+    }
+    return 'KIPRÓBÁLOM';
   };
 
   const benefits = [
@@ -166,7 +176,7 @@ export function FreeTrialModal({
                       onClick={handleStartTrial}
                       className="w-full h-14 text-lg font-bold bg-brand-secondary hover:bg-brand-secondary-hover shadow-lg shadow-brand-secondary/30 hover:shadow-brand-secondary/40 transition-all tracking-tight"
                     >
-                      FEDEZD FEL INGYEN
+                      {getButtonText()}
                     </Button>
                   </motion.div>
 

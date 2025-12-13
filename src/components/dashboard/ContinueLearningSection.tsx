@@ -51,14 +51,16 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
   }
 
   // Filter and get top 3 in-progress courses (already sorted by priority score)
-  const inProgressCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) => 
-    course.completionPercentage > 0 && course.completionPercentage < 100
+  // Courses 90%+ are considered completed, not in-progress
+  const inProgressCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) =>
+    course.completionPercentage > 0 && course.completionPercentage < 90
   ).slice(0, 3) || []
 
   // Check if user has any enrolled courses at all
   const hasEnrolledCourses = (data?.enrolledCourses?.length || 0) > 0;
-  const completedCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) => 
-    course.completionPercentage === 100
+  // Courses 90%+ are considered completed
+  const completedCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) =>
+    course.completionPercentage >= 90
   ) || []
 
   // If no enrolled courses at all, don't show this section
@@ -123,16 +125,16 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ y: -4 }}
+            whileHover={{ scale: 1.03, y: -4 }}
           >
 
             {/* Course Thumbnail */}
             <div className="h-48 relative overflow-hidden" style={{ background: brandGradient }}>
               {course.thumbnailUrl ? (
-                <img 
-                  src={course.thumbnailUrl} 
+                <img
+                  src={course.thumbnailUrl}
                   alt={course.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  className="w-full h-full object-cover transition-opacity duration-200"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
@@ -144,27 +146,38 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
                   </div>
                 </div>
               )}
-              
-              {/* Difficulty Badge */}
+
+              {/* Course Type + Duration Badge */}
               <div className="absolute top-3 left-3">
-                <span className="px-2 py-1 bg-black/60 text-white text-xs rounded-full">
-                  {course.difficulty === 'BEGINNER' ? 'Kezdő' : 
-                   course.difficulty === 'INTERMEDIATE' ? 'Középhaladó' :
-                   course.difficulty === 'ADVANCED' ? 'Haladó' : 'Szakértő'}
+                <span className="px-2 py-1 bg-black/60 text-white text-xs rounded-full backdrop-blur-sm">
+                  {course.courseType && (
+                    <>
+                      {course.courseType === 'WEBINAR' && 'Webinár'}
+                      {course.courseType === 'MASTERCLASS' && 'Masterclass'}
+                      {course.courseType === 'ACADEMIA' && 'Akadémia'}
+                      {course.courseType === 'PODCAST' && 'Podcast'}
+                    </>
+                  )}
+                  {course.estimatedHours && course.courseType && ' • '}
+                  {course.estimatedHours && `${course.estimatedHours} óra`}
                 </span>
               </div>
               
               {/* Progress Overlay */}
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
                 <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="font-medium">{Math.round(course.completionPercentage)}% teljesítve</span>
+                  <span className="font-medium">
+                    {course.completionPercentage >= 90
+                      ? 'Befejezve'
+                      : `${Math.round(course.completionPercentage)}% teljesítve`}
+                  </span>
                   <span className="flex items-center">
                     <Clock className="w-4 h-4 mr-1" />
                     {course.estimatedTimeRemaining} hátra
                   </span>
                 </div>
-                <Progress 
-                  value={course.completionPercentage} 
+                <Progress
+                  value={course.completionPercentage}
                   className="h-2 bg-white/20"
                 />
               </div>
@@ -173,7 +186,7 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
             {/* Course Info */}
             <div className="p-5 space-y-4">
               <div>
-                <h3 className="font-bold text-gray-900 mb-1 line-clamp-2 group-hover:text-[#466C95] transition-colors">
+                <h3 className="font-bold text-gray-900 mb-1 group-hover:text-[#466C95] transition-colors">
                   {course.title}
                 </h3>
                 <p className="text-sm text-gray-600">

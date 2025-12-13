@@ -1,256 +1,292 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo } from 'react'
-import { motion } from "motion/react"
-import { Mic, Play } from 'lucide-react'
-import { db, functions as fbFunctions } from '@/lib/firebase'
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
-import { httpsCallable } from 'firebase/functions'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
-import Footer from '@/components/landing-home/ui/footer'
-import { SimpleFilterBar } from '@/components/courses/SimpleFilterBar'
-import { CarouselSection } from '@/components/courses/CarouselSection'
-import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
-import { useInstructors } from '@/hooks/useInstructorQueries'
-import Link from 'next/link'
+import { useMemo, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
+import Footer from '@/components/landing-home/ui/footer';
+import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
+import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
+import { DashboardSearch, DashboardFilters } from '@/components/dashboard/DashboardSearch';
+import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation';
+import { useCourses } from '@/hooks/useCourseQueries';
+import { useCategories } from '@/hooks/useCategoryQueries';
+import { useInstructors } from '@/hooks/useInstructorQueries';
+import { useEnrollments } from '@/hooks/useEnrollments';
+import type { Course } from '@/types';
 
-interface Course {
-  id: string
-  title: string
-  description: string
-  instructorName?: string
-  category: string
-  categoryIds?: string[]
-  level: string
-  duration: string
-  rating?: number
-  students?: number
-  enrollmentCount?: number
-  price: number
-  thumbnailUrl?: string
-  lessons?: number
-  createdAt?: any
-  tags?: string[]
-  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
+// Helper to get first lesson ID from course (flat lessons array)
+function getFirstLessonId(course: Course): string | undefined {
+  const lessons = (course as any).lessons || [];
+  if (lessons.length === 0) return undefined;
+
+  const sortedLessons = [...lessons]
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+
+  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
 }
 
 export default function PodcastPage() {
-  const [courses, setCourses] = useState<Course[]>([])
-  const [loading, setLoading] = useState(true)
-  const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState<string>('')
+  const { data: courses, isLoading: coursesLoading } = useCourses();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: instructors, isLoading: instructorsLoading } = useInstructors();
+  const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
 
-  // Fetch instructors using React Query
-  const { data: instructors = [] } = useInstructors()
+  // Filter state
+  const [filters, setFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
+  });
 
-  // Fetch categories from Cloud Function
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const getCategories = httpsCallable(fbFunctions, 'getCategories')
-        const result: any = await getCategories()
-
-        if (result.data?.success && result.data?.categories) {
-          setCategoryObjects(result.data.categories)
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-        setCategoryObjects([])
-      }
-    }
-
-    fetchCategories()
-  }, [])
-
-  // Fetch PODCAST courses only from Firestore
-  useEffect(() => {
-    const coursesQuery = query(
-      collection(db, 'courses'),
-      where('courseType', '==', 'PODCAST'),
-      orderBy('createdAt', 'desc')
-    )
-
-    const unsubscribe = onSnapshot(coursesQuery, (snapshot) => {
-      const coursesData: Course[] = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Course[]
-
-      setCourses(coursesData)
-      setLoading(false)
-    }, (error) => {
-      console.error('Error fetching podcast courses:', error)
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
-  }, [])
-
-  // Filter courses based on category and search
+  // Filter courses by PODCAST type and user filters
   const filteredCourses = useMemo(() => {
-    let filtered = courses
+    if (!courses) return [];
 
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(c =>
-        c.categoryIds?.includes(selectedCategory) || c.category === selectedCategory
-      )
+    // CRITICAL: Only PODCAST courses
+    let result = courses.filter(course => course.courseType === 'PODCAST');
+
+    // Apply search query
+    if (filters.query) {
+      const searchLower = filters.query.toLowerCase();
+      result = result.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
     }
 
-    if (searchQuery.length >= 2) {
-      filtered = filtered.filter(c =>
-        c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.description?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    // Apply category filter (OR logic for multi-select)
+    if (filters.categoryIds.length > 0) {
+      result = result.filter(course => {
+        return filters.categoryIds.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if (course.category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
+      });
     }
 
-    return filtered
-  }, [courses, selectedCategory, searchQuery])
+    // Apply target audience filter (OR logic for multi-select)
+    if (filters.audienceIds.length > 0) {
+      result = result.filter(course =>
+        filters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
+      );
+    }
 
-  // Get featured (latest) course
-  const featuredCourse = courses[0]
+    // Apply instructor filter (OR logic for multi-select)
+    if (filters.instructorIds.length > 0) {
+      result = result.filter(course =>
+        filters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
+      );
+    }
 
-  // Popular courses - sorted by enrollment count
+    return result;
+  }, [courses, filters]);
+
+  // Build hero slides from filtered courses
+  const heroSlides = useMemo(() => {
+    if (!filteredCourses.length) return [];
+
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return [];
+      const names: string[] = [];
+
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId);
+        if (instructor?.name) names.push(instructor.name);
+      }
+
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id);
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name);
+          }
+        });
+      }
+
+      return names;
+    };
+
+    // Sort by createdAt (newest first) and take top 5
+    const sortedCourses = [...filteredCourses].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    }).slice(0, 5);
+
+    return sortedCourses.map(course => {
+      const enrollment = enrollments?.find(e => e.courseId === course.id);
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        thumbnailUrl: course.thumbnailUrl,
+        courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
+        instructorNames: getInstructorNames(course),
+        duration: course.duration,
+        progress: enrollment?.progress,
+        isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
+      };
+    });
+  }, [filteredCourses, instructors, enrollments]);
+
+  // Build category rows
+  const categoryRows = useMemo(() => {
+    if (!categories || !filteredCourses.length) return [];
+
+    return categories
+      .map(category => {
+        const categoryCourses = filteredCourses.filter(course => {
+          if (course.categoryIds?.includes(category.id)) return true;
+          if (course.category?.id === category.id) return true;
+          if ((course as any).categoryId === category.id) return true;
+          return false;
+        });
+        return { category, courses: categoryCourses };
+      })
+      .filter(row => row.courses.length > 0);
+  }, [categories, filteredCourses]);
+
+  // Popular courses
   const popularCourses = useMemo(() => {
-    return [...filteredCourses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0)).slice(0, 12)
-  }, [filteredCourses])
+    if (!filteredCourses.length) return [];
+    return [...filteredCourses]
+      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
+      .slice(0, 10);
+  }, [filteredCourses]);
 
-  // Newest courses - already sorted by createdAt from query
+  // Newest courses
   const newestCourses = useMemo(() => {
-    return filteredCourses.slice(0, 12)
-  }, [filteredCourses])
+    if (!filteredCourses.length) return [];
+    return [...filteredCourses]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10);
+  }, [filteredCourses]);
 
+  const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;
 
-  if (loading) {
+  // Check if any filters are active
+  const hasActiveFilters = filters.query || filters.categoryIds.length > 0 || filters.audienceIds.length > 0 || filters.instructorIds.length > 0;
+
+  // Check if there are any PODCAST courses at all (before user filters)
+  const allPodcastCourses = useMemo(() => {
+    if (!courses) return [];
+    return courses.filter(course => course.courseType === 'PODCAST');
+  }, [courses]);
+
+  if (isLoading) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 mx-auto mb-4 border-4 border-gray-700 border-t-green-500" />
-            <p className="text-gray-400">Podcastok betöltése...</p>
+        <div className="flex min-h-[400px] items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-brand-secondary" />
+        </div>
+        <Footer border={true} />
+      </AuthProvider>
+    );
+  }
+
+  // No PODCAST courses at all
+  if (allPodcastCourses.length === 0) {
+    return (
+      <AuthProvider>
+        <FramerNavbarWrapper />
+        <div className="min-h-screen bg-gray-50">
+          <div className="space-y-6 px-4 py-16">
+            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+              <p className="text-gray-500">Nincs megjeleníthető podcast tartalom</p>
+            </div>
           </div>
         </div>
         <Footer border={true} />
       </AuthProvider>
-    )
+    );
   }
 
   return (
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
-        {/* Featured Hero - Netflix Style */}
-        {featuredCourse && (
-          <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] max-h-[700px]">
-            {/* Background Image */}
-            <div className="absolute inset-0">
-              {featuredCourse.thumbnailUrl ? (
-                <img
-                  src={featuredCourse.thumbnailUrl}
-                  alt={featuredCourse.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-green-500 to-emerald-600" />
-              )}
-              {/* Gradient overlays - enhanced for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,1)_0%,rgba(3,7,18,0.95)_35%,rgba(3,7,18,0.8)_50%,rgba(3,7,18,0.5)_65%,rgba(3,7,18,0.2)_75%,transparent_85%)]" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="space-y-8 px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+          {/* Hero Carousel */}
+          {heroSlides.length > 0 && (
+            <DashboardHeroCarousel slides={heroSlides} />
+          )}
+
+          {/* Search Bar - automatically uses "Vendégek" label for PODCAST */}
+          <DashboardSearch
+            className="my-2"
+            onFilterChange={setFilters}
+            courseType="PODCAST"
+            hideCourseTypeFilter={true}
+          />
+
+          {/* No results message when filters are active but no matches */}
+          {hasActiveFilters && filteredCourses.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+              <p className="text-gray-500 mb-2">Nincs találat a megadott szűrőkkel</p>
+              <p className="text-sm text-gray-400">Próbálj más szűrőket választani</p>
             </div>
+          )}
 
-            {/* Content */}
-            <div className="relative h-full flex items-end">
-              <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-8 sm:pb-12 md:pb-16 w-full">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="max-w-2xl"
-                >
-                  {/* Type Badge */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-green-500 flex items-center justify-center">
-                      <Mic className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-green-400 font-medium text-sm uppercase tracking-wider">
-                      Podcast
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-400 text-sm">Legújabb</span>
-                  </div>
-
-                  {/* Title */}
-                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight">
-                    {featuredCourse.title}
-                  </h1>
-
-                  {/* Description */}
-                  <p className="text-gray-300 text-sm sm:text-base md:text-lg mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-3">
-                    {featuredCourse.description}
-                  </p>
-
-                  {/* CTA Button */}
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center justify-center gap-2 min-h-[48px] px-5 sm:px-6 py-3 bg-white text-gray-900 rounded-lg font-semibold text-sm sm:text-base hover:bg-gray-200 transition-colors"
-                    >
-                      <Play className="w-5 h-5 fill-current" />
-                      Megtekintés
-                    </Link>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Simple Filter Bar */}
-        <div className="bg-gray-950 relative z-20">
-          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-4 sm:py-6">
-            <SimpleFilterBar
-              categories={categoryObjects}
-              selectedCategory={selectedCategory}
-              searchQuery={searchQuery}
-              onCategoryChange={setSelectedCategory}
-              onSearchChange={setSearchQuery}
-              backgroundColor="dark"
-              courseType="PODCAST"
-            />
-          </div>
-        </div>
-
-        {/* Course Carousels */}
-        <div className="py-12 space-y-12">
-          {/* Popular Podcast Carousel */}
+          {/* Popular podcasts */}
           {popularCourses.length > 0 && (
-            <CarouselSection
-              title="Felkapott Podcastok"
-              courseType="PODCAST"
+            <CourseCarouselRow
+              title="Népszerű podcast tartalmak"
               courses={popularCourses}
-              categories={categoryObjects}
-              instructors={instructors}
-              backgroundColor="dark"
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
             />
           )}
 
-          {/* Newest Podcast Carousel */}
+          {/* Newest podcasts */}
           {newestCourses.length > 0 && (
-            <CarouselSection
-              title="Legújabb Podcastok"
-              courseType="PODCAST"
+            <CourseCarouselRow
+              title="Legújabb podcast tartalmak"
               courses={newestCourses}
-              categories={categoryObjects}
-              instructors={instructors}
-              backgroundColor="dark"
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
             />
           )}
 
-          {/* Cross-Type Navigation */}
-          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 mt-12 sm:mt-16">
+          {/* Category rows */}
+          {categoryRows.map(({ category, courses: categoryCourses }) => (
+            <CourseCarouselRow
+              key={category.id}
+              title={category.name}
+              courses={categoryCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
+          ))}
+
+          {/* All courses if no category rows */}
+          {categoryRows.length === 0 && filteredCourses.length > 0 && (
+            <CourseCarouselRow
+              title="Összes podcast tartalom"
+              courses={filteredCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
+          )}
+
+          {/* CrossTypeNavigation - marketing-specific feature */}
+          <div className="w-full mx-auto max-w-[1440px] mt-12 sm:mt-16">
             <CrossTypeNavigation currentType="PODCAST" />
           </div>
         </div>
@@ -258,5 +294,5 @@ export default function PodcastPage() {
 
       <Footer border={true} />
     </AuthProvider>
-  )
+  );
 }

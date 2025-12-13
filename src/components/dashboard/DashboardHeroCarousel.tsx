@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Info, ChevronLeft, ChevronRight, BookOpen, Video, GraduationCap, Mic, Clock } from 'lucide-react';
+import { Play, ChevronLeft, ChevronRight, BookOpen, Video, GraduationCap, Mic, Clock } from 'lucide-react';
 
 interface HeroSlide {
   id: string;
@@ -122,10 +122,6 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
       }
     }
     // Fallback to course detail page
-    router.push(`/courses/${currentSlide.id}`);
-  };
-
-  const handleDetails = () => {
     router.push(`/courses/${currentSlide.id}`);
   };
 
@@ -255,7 +251,7 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 </div>
               )}
 
-              {/* CTA Buttons */}
+              {/* CTA Button */}
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleContinue}
@@ -263,13 +259,6 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 >
                   <Play className="w-4 h-4 fill-current" />
                   {currentSlide.isEnrolled ? 'Folytatás' : config.ctaLabel}
-                </button>
-                <button
-                  onClick={handleDetails}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-700/80 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors text-sm"
-                >
-                  <Info className="w-4 h-4" />
-                  Részletek
                 </button>
               </div>
             </motion.div>

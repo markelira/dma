@@ -189,11 +189,17 @@ export default function CoursePlayerPage() {
     durationRef.current = duration;
 
     if (percentage < 5) return;
+
+    // Mark as completed if within last 20 seconds of video
+    const timeRemaining = duration - currentTime;
+    const isNearEnd = timeRemaining <= 20;
+
     progressMutation.mutate({
       lessonId: currentLessonId,
       watchPercentage: percentage,
       timeSpent: currentTime,
       resumePosition: currentTime, // ✅ Save resume position!
+      completed: isNearEnd ? true : undefined,
       courseId,
     });
   }, [currentLessonId, courseId, progressMutation]);
@@ -400,6 +406,7 @@ export default function CoursePlayerPage() {
           isOpen={justCompleted}
           courseTitle={course?.title || ''}
           courseId={courseId}
+          courseType={courseType}
           onDismiss={dismissCompletion}
         />
       </>
@@ -607,6 +614,7 @@ export default function CoursePlayerPage() {
         isOpen={justCompleted}
         courseTitle={course?.title || ''}
         courseId={courseId}
+        courseType={courseType}
         onDismiss={dismissCompletion}
       />
     </>

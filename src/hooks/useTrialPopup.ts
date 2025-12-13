@@ -20,6 +20,7 @@ export function useTrialPopup() {
 
   const isAuthenticated = !!user;
   const isLoading = authLoading || subLoading || !authReady;
+  const hasUsedTrial = subscription?.hasUsedTrial || false;
 
   // Check if popup was dismissed this session
   const isDismissedThisSession = useMemo(() => {
@@ -69,6 +70,7 @@ export function useTrialPopup() {
     isLoading,
     isAuthenticated,
     hasActiveSubscription: subscription?.isActive ?? false,
+    hasUsedTrial,
 
     // Actions
     dismiss,

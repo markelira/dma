@@ -4,18 +4,28 @@ import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripe } from '@/hooks/useStripe';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { Loader2 } from 'lucide-react';
 
-// Monthly subscription priceId (15,000 HUF/mo)
-const MONTHLY_PRICE_ID = 'price_1SNAlsGe8tBqGEXM8vEOVhgY';
+// Monthly subscription priceId (14,990 HUF/mo with 7-day trial)
+const MONTHLY_PRICE_ID = 'price_1SdoIlGe8tBqGEXM2uyTAihs';
 
 export default function SubscribeStartPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, authReady } = useAuth();
   const { createCheckoutSession } = useStripe();
+  const { data: subscription } = useSubscriptionStatus();
   const [error, setError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const checkoutInitiated = useRef(false);
+
+  // Check if user already has active subscription - redirect to dashboard if so
+  useEffect(() => {
+    if (subscription?.isActive) {
+      console.log('[SubscribeStart] User already has active subscription, redirecting to dashboard');
+      router.push('/dashboard');
+    }
+  }, [subscription, router]);
 
   useEffect(() => {
     // Wait for auth to be ready
@@ -42,10 +52,10 @@ export default function SubscribeStartPage() {
         await createCheckoutSession.mutateAsync({
           priceId: MONTHLY_PRICE_ID,
           mode: 'subscription',
-          successUrl: `${window.location.origin}/dashboard?subscribed=true`,
+          successUrl: `${window.location.origin}/payment/success?subscription_success=true`,
           cancelUrl: `${window.location.origin}/?cancelled=true`,
           metadata: {
-            source: 'homepage_cta',
+            source: 'registration_flow',
             plan: 'monthly'
           }
         });

@@ -69,6 +69,7 @@ export const getSubscriptionStatus = onCall({
             isActive: true,
             hasActiveSubscription: true,
             viaTeam: true,
+            hasUsedTrial: userData?.hasUsedTrial || false,
             subscription: {
               id: userData.stripeSubscriptionId || teamData?.stripeSubscriptionId || userData.teamId,
               subscriptionId: teamData?.stripeSubscriptionId || userData.stripeSubscriptionId,
@@ -91,6 +92,7 @@ export const getSubscriptionStatus = onCall({
         hasSubscription: true,
         isActive: true,
         hasActiveSubscription: true,
+        hasUsedTrial: userData?.hasUsedTrial || false,
         subscription: {
           id: userData.stripeSubscriptionId || 'direct',
           subscriptionId: userData.stripeSubscriptionId,
@@ -123,6 +125,7 @@ export const getSubscriptionStatus = onCall({
         hasSubscription: true,
         isActive: true,
         hasActiveSubscription: true,
+        hasUsedTrial: userData?.hasUsedTrial || false,
         subscription: {
           id: subscriptionDoc.id,
           subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
@@ -153,6 +156,7 @@ export const getSubscriptionStatus = onCall({
             isActive: true,
             hasActiveSubscription: true,
             inheritedFromTeam: true,
+            hasUsedTrial: userData?.hasUsedTrial || false,
             subscription: {
               id: teamData.stripeSubscriptionId || teamId,
               subscriptionId: teamData.stripeSubscriptionId,
@@ -202,6 +206,7 @@ export const getSubscriptionStatus = onCall({
             isActive: true,
             hasActiveSubscription: true,
             viaCompany: true,
+            hasUsedTrial: userData?.hasUsedTrial || false,
             subscription: {
               id: companyData.stripeSubscriptionId || companyId,
               subscriptionId: companyData.stripeSubscriptionId,
@@ -228,6 +233,7 @@ export const getSubscriptionStatus = onCall({
       hasSubscription: false,
       isActive: false,
       hasActiveSubscription: false,
+      hasUsedTrial: userData?.hasUsedTrial || false,
       subscription: null
     };
 

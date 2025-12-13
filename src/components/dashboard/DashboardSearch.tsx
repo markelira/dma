@@ -84,6 +84,11 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
 
     let results = courses;
 
+    // Filter by courseType if prop is provided (for type-specific pages)
+    if (courseType) {
+      results = results.filter(course => course.courseType === courseType);
+    }
+
     // Filter by search query
     if (query.trim()) {
       const searchLower = query.toLowerCase();
@@ -130,7 +135,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
     }
 
     return results.slice(0, 8); // Limit to 8 results
-  }, [courses, query, selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors]);
+  }, [courses, query, selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors, courseType]);
 
   const handleSelect = (courseId: string) => {
     setIsOpen(false);

@@ -20,6 +20,7 @@ import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useGamificationData, useSaveUserPreferences } from '@/hooks/useGamification';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import type { UserPreferences, Course } from '@/types';
+import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils';
 
 /**
  * DMA Dashboard - Netflix-Style Content Browser
@@ -46,7 +47,7 @@ export default function DashboardPage() {
   const savePreferences = useSaveUserPreferences();
 
   // Trial popup state
-  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription } = useTrialPopup();
+  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial } = useTrialPopup();
   const [showTrialModal, setShowTrialModal] = useState(false);
 
   // Welcome popup state (shows first after registration)
@@ -292,21 +293,16 @@ export default function DashboardPage() {
       .filter(row => row.courses.length > 0);
   }, [categories, courses]);
 
-  // Always prepare a "Népszerű" section with top courses
+  // Always prepare a "Népszerű" section with top courses (shuffled)
   const popularCourses = useMemo(() => {
     if (!courses) return [];
-    // Sort by enrollment count and take top 10
-    return [...courses]
-      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
-      .slice(0, 10);
+    return shufflePopularCourses(courses, 10);
   }, [courses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
     if (!courses) return [];
-    return [...courses]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10);
+    return sortByContentCreatedAt(courses).slice(0, 10);
   }, [courses]);
 
   // Check if we need to show a fallback "Felfedezés" section
@@ -433,6 +429,7 @@ export default function DashboardPage() {
         variant="dashboard"
         onStartTrial={handleTrialStart}
         onDismiss={handleTrialDismiss}
+        hasUsedTrial={hasUsedTrial}
       />
 
       {/* Onboarding Wizard - Shows only if trial modal not showing */}

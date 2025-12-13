@@ -147,10 +147,6 @@ function RegisterPageContent() {
           sessionStorage.removeItem('pendingEmailVerification');
           console.log('[Register Page] Cleared pending verification from sessionStorage');
 
-          // Set flag for welcome popup on first dashboard visit
-          sessionStorage.setItem('showWelcomePopup', 'true');
-          console.log('[Register Page] Set welcome popup flag');
-
           setIsVerifying(false);
           setShowVerificationModal(false);
 
@@ -160,24 +156,13 @@ function RegisterPageContent() {
             console.log('[Register Page] Refreshing token for auto-login');
             await currentUser.getIdToken(true);
 
-            // Role-based redirect after email verification
-            const tokenResult = await currentUser.getIdTokenResult(true);
-            const userRole = tokenResult.claims.role as string;
-
-            console.log('[Register Page] Email verified, redirecting based on role:', userRole);
-
-            if (userRole === 'company_admin' || userRole === 'COMPANY_ADMIN') {
-              console.log('[Register Page] Redirecting COMPANY_ADMIN to /company/dashboard');
-              router.push('/company/dashboard');
-            } else {
-              // COMPANY_EMPLOYEE, STUDENT, or any other role → regular dashboard
-              console.log('[Register Page] Redirecting employee/student to /dashboard');
-              router.push('/dashboard');
-            }
+            // Redirect all new users to Stripe checkout to start trial
+            console.log('[Register Page] Redirecting new user to Stripe checkout');
+            router.push('/subscribe/start?plan=monthly');
           } else {
-            // Fallback if no user
-            console.log('[Register Page] No current user, redirecting to /dashboard');
-            router.push('/dashboard');
+            // Fallback if no user - still redirect to subscribe/start
+            console.log('[Register Page] No current user, redirecting to subscribe/start');
+            router.push('/subscribe/start?plan=monthly');
           }
         }}
       />

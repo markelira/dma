@@ -45,7 +45,7 @@ export default function FeaturedCoursesGrid() {
         // Fetch recent courses
         const coursesQuery = query(
           collection(db, "courses"),
-          orderBy("createdAt", "desc"),
+          orderBy("contentCreatedAt", "desc"),
           limit(8)
         );
 

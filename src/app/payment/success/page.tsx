@@ -20,9 +20,16 @@ export default function PaymentSuccessPage() {
       origin: { y: 0.6 }
     });
 
-    // Get course ID from URL
+    // Get course ID and subscription success flag from URL
     const id = searchParams.get('courseId');
+    const subscriptionSuccess = searchParams.get('subscription_success');
     setCourseId(id);
+
+    // If this is a subscription purchase, set welcome popup flag
+    if (subscriptionSuccess === 'true') {
+      sessionStorage.setItem('showWelcomePopup', 'true');
+      console.log('[Payment Success] Welcome popup flag set for subscription purchase');
+    }
 
     // Redirect to dashboard after delay if no course ID
     if (!id) {

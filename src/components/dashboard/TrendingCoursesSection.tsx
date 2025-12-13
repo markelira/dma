@@ -21,6 +21,7 @@ import {
   Award
 } from 'lucide-react'
 import { brandGradient, cardStyles, buttonStyles } from '@/lib/design-tokens'
+import { shuffleForUser } from '@/lib/carouselUtils'
 
 /**
  * Trending Courses Section - Never Empty
@@ -157,15 +158,18 @@ export function TrendingCoursesSection() {
     if (!apiCourses || apiCourses.length === 0) {
       return fallbackCourses
     }
-    
-    // Sort by enrollment count (descending) for trending display
+
+    // Sort by enrollment count (descending), then shuffle for variety
     const sortedCourses = [...apiCourses].sort((a, b) => {
       const aEnrollment = a.enrollmentCount || 0
       const bEnrollment = b.enrollmentCount || 0
       return bEnrollment - aEnrollment
     })
-    
-    return sortedCourses.map((course, index) => ({
+
+    // Shuffle the sorted courses for user-specific randomization
+    const shuffledCourses = shuffleForUser(sortedCourses)
+
+    return shuffledCourses.map((course, index) => ({
       id: course.id,
       slug: course.slug,
       title: course.title,

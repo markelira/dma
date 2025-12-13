@@ -17,6 +17,7 @@ import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import type { Course } from '@/types';
 import { shuffleArray } from '@/lib/utils';
+import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils';
 
 /**
  * Company Dashboard - Netflix-Style Content Browser
@@ -265,21 +266,16 @@ export default function CompanyDashboardPage() {
       .filter(row => row.courses.length > 0);
   }, [categories, courses]);
 
-  // Always prepare a "Népszerű" section with top courses
+  // Always prepare a "Népszerű" section with top courses (shuffled)
   const popularCourses = useMemo(() => {
     if (!courses) return [];
-    // Sort by enrollment count, take top 10, then shuffle
-    return shuffleArray([...courses]
-      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
-      .slice(0, 10));
+    return shufflePopularCourses(courses, 10);
   }, [courses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
     if (!courses) return [];
-    return shuffleArray([...courses]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10));
+    return sortByContentCreatedAt(courses).slice(0, 10);
   }, [courses]);
 
   // Check if we need to show a fallback "Felfedezés" section

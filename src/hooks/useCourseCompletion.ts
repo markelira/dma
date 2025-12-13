@@ -74,8 +74,8 @@ export function useCourseCompletion(
   const previousProgressRef = useRef<number | null>(null)
   const hasTriggeredRef = useRef(false)
 
-  // Track if course is 100% complete
-  const isCompleted = progress >= 100
+  // Track if course is 90%+ complete (considered complete)
+  const isCompleted = progress >= 90
 
   // Detect transition from incomplete to complete
   useEffect(() => {
@@ -83,11 +83,11 @@ export function useCourseCompletion(
 
     const prevProgress = previousProgressRef.current
 
-    // Check if we just transitioned to 100%
+    // Check if we just transitioned to 90% (completion threshold)
     if (
       prevProgress !== null &&
-      prevProgress < 100 &&
-      progress >= 100 &&
+      prevProgress < 90 &&
+      progress >= 90 &&
       !hasTriggeredRef.current &&
       !hasSeenCompletion(courseId)
     ) {

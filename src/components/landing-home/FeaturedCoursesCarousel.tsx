@@ -58,7 +58,7 @@ export default function FeaturedCoursesCarousel() {
         // Fetch featured courses (or fallback to recent courses if no featured flag)
         const coursesQuery = query(
           collection(db, "courses"),
-          orderBy("createdAt", "desc"),
+          orderBy("contentCreatedAt", "desc"),
           limit(8)
         );
 

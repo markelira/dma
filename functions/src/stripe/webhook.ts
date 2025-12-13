@@ -382,6 +382,7 @@ async function handleIndividualSubscription(params: {
       subscriptionStatus,
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
+      hasUsedTrial: subscriptionStatus === 'trialing' ? true : undefined,
       updatedAt: new Date().toISOString(),
     });
 
@@ -476,6 +477,7 @@ async function handleCompanySubscription(params: {
       subscriptionStatus,
       stripeCustomerId: customerId,
       stripeSubscriptionId: subscriptionId,
+      hasUsedTrial: subscriptionStatus === 'trialing' ? true : undefined,
       updatedAt: new Date().toISOString(),
     });
 
@@ -621,10 +623,17 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
       // Also update the user's subscriptionStatus
       const subscriptionData = subscriptionDoc.data();
       if (subscriptionData.userId) {
-        await firestore.collection('users').doc(subscriptionData.userId).update({
+        const updateUserData: any = {
           subscriptionStatus: status,
           updatedAt: new Date().toISOString(),
-        });
+        };
+
+        // If subscription was/is trialing, mark that user has used trial
+        if (status === 'trialing' || (subscriptionData.status === 'trialing' && status !== 'trialing')) {
+          updateUserData.hasUsedTrial = true;
+        }
+
+        await firestore.collection('users').doc(subscriptionData.userId).update(updateUserData);
       }
     }
 

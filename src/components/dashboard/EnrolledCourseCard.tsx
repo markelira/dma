@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Play, Clock, CheckCircle } from 'lucide-react';
+import { Play, CheckCircle } from 'lucide-react';
+import { formatDurationHungarian } from '@/lib/carouselUtils';
 
 interface EnrolledCourseCardProps {
   enrollment: {
@@ -77,13 +78,17 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
             </div>
           )}
 
-          {/* Course type badge */}
+          {/* Course type + duration badge */}
           {enrollment.courseType && (
-            <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium">
+            <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
               {enrollment.courseType === 'MASTERCLASS' && 'Masterclass'}
               {enrollment.courseType === 'WEBINAR' && 'Webinár'}
               {enrollment.courseType === 'ACADEMIA' && 'Akadémia'}
               {enrollment.courseType === 'PODCAST' && 'Podcast'}
+              {enrollment.duration && ' • '}
+              {enrollment.duration && (typeof enrollment.duration === 'number'
+                ? formatDurationHungarian(enrollment.duration)
+                : enrollment.duration)}
             </div>
           )}
         </div>
@@ -109,13 +114,6 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
             {!isInProgress && !isCompleted && (
               <span className="text-gray-400">
                 Még nem kezdted el
-              </span>
-            )}
-
-            {enrollment.duration && (
-              <span className="text-gray-400 flex items-center gap-1">
-                <Clock className="w-3.5 h-3.5" />
-                {enrollment.duration}
               </span>
             )}
           </div>

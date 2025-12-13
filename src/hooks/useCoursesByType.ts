@@ -12,7 +12,7 @@ export const useCoursesByType = (courseType: CourseType, limit = 4) => {
         collection(db, 'courses'),
         where('status', '==', 'PUBLISHED'),
         where('courseType', '==', courseType),
-        orderBy('createdAt', 'desc'),
+        orderBy('contentCreatedAt', 'desc'),
         firestoreLimit(limit)
       );
 

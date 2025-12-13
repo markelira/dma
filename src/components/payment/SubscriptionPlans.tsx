@@ -53,8 +53,8 @@ const defaultPlans: SubscriptionPlan[] = [
     id: 'monthly',
     name: 'Havi előfizetés',
     description: 'Havi rugalmas előfizetés',
-    priceId: 'price_1SNAlsGe8tBqGEXM8vEOVhgY',
-    price: 15000,
+    priceId: 'price_1SdoIlGe8tBqGEXM2uyTAihs',
+    price: 14990,
     currency: 'HUF',
     interval: 'month',
     features: [

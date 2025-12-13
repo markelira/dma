@@ -174,6 +174,15 @@
         { "fieldPath": "status", "order": "ASCENDING" },
         { "fieldPath": "updatedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "courses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "courseType", "order": "ASCENDING" },
+        { "fieldPath": "contentCreatedAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []

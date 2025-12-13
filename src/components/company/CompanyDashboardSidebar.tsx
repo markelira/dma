@@ -21,8 +21,7 @@ import {
   Star,
   Video,
   Mic,
-  BarChart3,
-  FileText
+  CreditCard
 } from 'lucide-react'
 
 /**
@@ -49,12 +48,11 @@ const navigationSections = [
     ]
   },
   {
-    title: 'Cég kezelése',
+    title: 'EGYÉB',
     items: [
-      { title: 'Munkatársak', href: '/company/dashboard/employees', icon: Users },
-      { title: 'Haladás', href: '/company/dashboard/progress', icon: TrendingUp },
-      { title: 'Számlázás', href: '/company/dashboard/billing', icon: FileText },
-      { title: 'Vezérlőpult', href: '/company/dashboard/vezerlopult', icon: BarChart3 },
+      { title: 'Munkatársaim', href: '/company/dashboard/employees', icon: Users },
+      { title: 'Számlázás', href: '/company/dashboard/billing', icon: CreditCard },
+      { title: 'Beállítások', href: '/company/dashboard/settings', icon: Settings },
     ]
   }
 ]

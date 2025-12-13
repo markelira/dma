@@ -1,218 +1,292 @@
-'use client'
+'use client';
 
-import { useState, useEffect, useMemo } from 'react'
-import { motion } from "motion/react"
-import { BookOpen, Play, Info } from 'lucide-react'
-import { db, functions as fbFunctions } from '@/lib/firebase'
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore'
-import { httpsCallable } from 'firebase/functions'
-import { AuthProvider } from '@/contexts/AuthContext'
-import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
-import Footer from '@/components/landing-home/ui/footer'
-import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard'
-import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation'
-import { useInstructors } from '@/hooks/useInstructorQueries'
-import Link from 'next/link'
+import { useMemo, useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
+import Footer from '@/components/landing-home/ui/footer';
+import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
+import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
+import { DashboardSearch, DashboardFilters } from '@/components/dashboard/DashboardSearch';
+import { CrossTypeNavigation } from '@/components/courses/CrossTypeNavigation';
+import { useCourses } from '@/hooks/useCourseQueries';
+import { useCategories } from '@/hooks/useCategoryQueries';
+import { useInstructors } from '@/hooks/useInstructorQueries';
+import { useEnrollments } from '@/hooks/useEnrollments';
+import type { Course } from '@/types';
 
-interface Course {
-  id: string
-  title: string
-  description: string
-  instructorName?: string
-  category: string
-  categoryIds?: string[]
-  level: string
-  duration: string
-  rating?: number
-  students?: number
-  enrollmentCount?: number
-  price: number
-  thumbnailUrl?: string
-  lessons?: number
-  createdAt?: any
-  tags?: string[]
-  courseType: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
+// Helper to get first lesson ID from course (flat lessons array)
+function getFirstLessonId(course: Course): string | undefined {
+  const lessons = (course as any).lessons || [];
+  if (lessons.length === 0) return undefined;
+
+  const sortedLessons = [...lessons]
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+
+  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
 }
 
 export default function AkademiaPage() {
-  const [courses, setCourses] = useState<Course[]>([])
-  const [loading, setLoading] = useState(true)
-  const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
+  const { data: courses, isLoading: coursesLoading } = useCourses();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const { data: instructors, isLoading: instructorsLoading } = useInstructors();
+  const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
 
-  // Fetch instructors using React Query
-  const { data: instructors = [] } = useInstructors()
+  // Filter state
+  const [filters, setFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
+  });
 
-  // Fetch categories from Cloud Function
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const getCategories = httpsCallable(fbFunctions, 'getCategories')
-        const result: any = await getCategories()
+  // Filter courses by ACADEMIA type and user filters
+  const filteredCourses = useMemo(() => {
+    if (!courses) return [];
 
-        if (result.data?.success && result.data?.categories) {
-          setCategoryObjects(result.data.categories)
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-        setCategoryObjects([])
-      }
+    // CRITICAL: Only ACADEMIA courses
+    let result = courses.filter(course => course.courseType === 'ACADEMIA');
+
+    // Apply search query
+    if (filters.query) {
+      const searchLower = filters.query.toLowerCase();
+      result = result.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
     }
 
-    fetchCategories()
-  }, [])
+    // Apply category filter (OR logic for multi-select)
+    if (filters.categoryIds.length > 0) {
+      result = result.filter(course => {
+        return filters.categoryIds.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if (course.category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
+      });
+    }
 
-  // Fetch ACADEMIA courses only from Firestore
-  useEffect(() => {
-    const coursesQuery = query(
-      collection(db, 'courses'),
-      where('courseType', '==', 'ACADEMIA'),
-      orderBy('createdAt', 'desc')
-    )
+    // Apply target audience filter (OR logic for multi-select)
+    if (filters.audienceIds.length > 0) {
+      result = result.filter(course =>
+        filters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
+      );
+    }
 
-    const unsubscribe = onSnapshot(coursesQuery, (snapshot) => {
-      const coursesData: Course[] = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Course[]
+    // Apply instructor filter (OR logic for multi-select)
+    if (filters.instructorIds.length > 0) {
+      result = result.filter(course =>
+        filters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
+      );
+    }
 
-      setCourses(coursesData)
-      setLoading(false)
-    }, (error) => {
-      console.error('Error fetching academia courses:', error)
-      setLoading(false)
-    })
+    return result;
+  }, [courses, filters]);
 
-    return () => unsubscribe()
-  }, [])
+  // Build hero slides from filtered courses
+  const heroSlides = useMemo(() => {
+    if (!filteredCourses.length) return [];
 
-  // Get featured (latest) course
-  const featuredCourse = courses[0]
+    const getInstructorNames = (course: Course): string[] => {
+      if (!instructors) return [];
+      const names: string[] = [];
 
-  // Popular courses - sorted by enrollment count
+      if (course.instructorId) {
+        const instructor = instructors.find(i => i.id === course.instructorId);
+        if (instructor?.name) names.push(instructor.name);
+      }
+
+      if ((course as any).instructorIds?.length) {
+        (course as any).instructorIds.forEach((id: string) => {
+          const instructor = instructors.find(i => i.id === id);
+          if (instructor?.name && !names.includes(instructor.name)) {
+            names.push(instructor.name);
+          }
+        });
+      }
+
+      return names;
+    };
+
+    // Sort by createdAt (newest first) and take top 5
+    const sortedCourses = [...filteredCourses].sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    }).slice(0, 5);
+
+    return sortedCourses.map(course => {
+      const enrollment = enrollments?.find(e => e.courseId === course.id);
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        thumbnailUrl: course.thumbnailUrl,
+        courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
+        instructorNames: getInstructorNames(course),
+        duration: course.duration,
+        progress: enrollment?.progress,
+        isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
+      };
+    });
+  }, [filteredCourses, instructors, enrollments]);
+
+  // Build category rows
+  const categoryRows = useMemo(() => {
+    if (!categories || !filteredCourses.length) return [];
+
+    return categories
+      .map(category => {
+        const categoryCourses = filteredCourses.filter(course => {
+          if (course.categoryIds?.includes(category.id)) return true;
+          if (course.category?.id === category.id) return true;
+          if ((course as any).categoryId === category.id) return true;
+          return false;
+        });
+        return { category, courses: categoryCourses };
+      })
+      .filter(row => row.courses.length > 0);
+  }, [categories, filteredCourses]);
+
+  // Popular courses
   const popularCourses = useMemo(() => {
-    return [...courses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0)).slice(0, 8)
-  }, [courses])
+    if (!filteredCourses.length) return [];
+    return [...filteredCourses]
+      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
+      .slice(0, 10);
+  }, [filteredCourses]);
 
-  // Newest courses - already sorted by createdAt from query
+  // Newest courses
   const newestCourses = useMemo(() => {
-    return courses.slice(0, 8)
-  }, [courses])
+    if (!filteredCourses.length) return [];
+    return [...filteredCourses]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 10);
+  }, [filteredCourses]);
 
+  const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;
 
-  if (loading) {
+  // Check if any filters are active
+  const hasActiveFilters = filters.query || filters.categoryIds.length > 0 || filters.audienceIds.length > 0 || filters.instructorIds.length > 0;
+
+  // Check if there are any ACADEMIA courses at all (before user filters)
+  const allAcademiaCourses = useMemo(() => {
+    if (!courses) return [];
+    return courses.filter(course => course.courseType === 'ACADEMIA');
+  }, [courses]);
+
+  if (isLoading) {
     return (
       <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 mx-auto mb-4 border-4 border-gray-700 border-t-brand-secondary" />
-            <p className="text-gray-400">Akadémia tartalmak betöltése...</p>
+        <div className="flex min-h-[400px] items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-brand-secondary" />
+        </div>
+        <Footer border={true} />
+      </AuthProvider>
+    );
+  }
+
+  // No ACADEMIA courses at all
+  if (allAcademiaCourses.length === 0) {
+    return (
+      <AuthProvider>
+        <FramerNavbarWrapper />
+        <div className="min-h-screen bg-gray-50">
+          <div className="space-y-6 px-4 py-16">
+            <div className="text-center py-16 bg-white rounded-xl border border-gray-200">
+              <p className="text-gray-500">Nincs megjeleníthető akadémia tartalom</p>
+            </div>
           </div>
         </div>
         <Footer border={true} />
       </AuthProvider>
-    )
+    );
   }
 
   return (
     <AuthProvider>
       <FramerNavbarWrapper />
 
-      <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
-        {/* Featured Hero - Netflix Style */}
-        {featuredCourse && (
-          <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[350px] sm:min-h-[400px] md:min-h-[500px] max-h-[700px]">
-            {/* Background Image */}
-            <div className="absolute inset-0">
-              {featuredCourse.thumbnailUrl ? (
-                <img
-                  src={featuredCourse.thumbnailUrl}
-                  alt={featuredCourse.title}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-brand-secondary to-cyan-600" />
-              )}
-              {/* Gradient overlays - enhanced for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/50 to-transparent" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(3,7,18,1)_0%,rgba(3,7,18,0.95)_35%,rgba(3,7,18,0.8)_50%,rgba(3,7,18,0.5)_65%,rgba(3,7,18,0.2)_75%,transparent_85%)]" />
+      <div className="min-h-screen bg-gray-50">
+        <div className="space-y-8 px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+          {/* Hero Carousel */}
+          {heroSlides.length > 0 && (
+            <DashboardHeroCarousel slides={heroSlides} />
+          )}
+
+          {/* Search Bar */}
+          <DashboardSearch
+            className="my-2"
+            onFilterChange={setFilters}
+            courseType="ACADEMIA"
+            hideCourseTypeFilter={true}
+          />
+
+          {/* No results message when filters are active but no matches */}
+          {hasActiveFilters && filteredCourses.length === 0 && (
+            <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+              <p className="text-gray-500 mb-2">Nincs találat a megadott szűrőkkel</p>
+              <p className="text-sm text-gray-400">Próbálj más szűrőket választani</p>
             </div>
+          )}
 
-            {/* Content */}
-            <div className="relative h-full flex items-end">
-              <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-12 sm:pb-14 md:pb-16">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="max-w-2xl"
-                >
-                  {/* Type Badge */}
-                  <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-brand-secondary flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-brand-secondary font-medium text-sm uppercase tracking-wider">
-                      Akadémia
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span className="text-gray-400 text-sm">Legújabb</span>
-                  </div>
-
-                  {/* Title */}
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3 sm:mb-4 leading-tight">
-                    {featuredCourse.title}
-                  </h1>
-
-                  {/* Description */}
-                  <p className="text-gray-300 text-base sm:text-lg mb-5 sm:mb-6 line-clamp-2 sm:line-clamp-3">
-                    {featuredCourse.description}
-                  </p>
-
-                  {/* CTA Button */}
-                  <div className="flex items-center gap-3">
-                    <Link
-                      href={`/courses/${featuredCourse.id}`}
-                      className="inline-flex items-center gap-2 min-h-[48px] px-6 py-3 bg-white text-gray-900 rounded-lg text-sm sm:text-base font-semibold hover:bg-gray-200 transition-colors"
-                    >
-                      <Play className="w-5 h-5 fill-current" />
-                      Megtekintés
-                    </Link>
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Course Sections */}
-        <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-10 sm:py-12 space-y-10 sm:space-y-12">
-          {/* Felkapott Akadémiák */}
+          {/* Popular academias */}
           {popularCourses.length > 0 && (
-            <section>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-5 sm:mb-6">Felkapott Akadémiák</h2>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                {popularCourses.map((course, index) => (
-                  <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
-                ))}
-              </motion.div>
-            </section>
+            <CourseCarouselRow
+              title="Népszerű akadémia tartalmak"
+              courses={popularCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
           )}
 
-          {/* Legújabb Akadémiák */}
+          {/* Newest academias */}
           {newestCourses.length > 0 && (
-            <section>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-5 sm:mb-6">Legújabb Akadémiák</h2>
-              <motion.div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                {newestCourses.map((course, index) => (
-                  <PremiumCourseCard key={course.id} course={course} index={index} categories={categoryObjects} instructors={instructors} />
-                ))}
-              </motion.div>
-            </section>
+            <CourseCarouselRow
+              title="Legújabb akadémia tartalmak"
+              courses={newestCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
           )}
 
-          {/* Cross-Type Navigation */}
-          <div className="mt-16">
+          {/* Category rows */}
+          {categoryRows.map(({ category, courses: categoryCourses }) => (
+            <CourseCarouselRow
+              key={category.id}
+              title={category.name}
+              courses={categoryCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
+          ))}
+
+          {/* All courses if no category rows */}
+          {categoryRows.length === 0 && filteredCourses.length > 0 && (
+            <CourseCarouselRow
+              title="Összes akadémia tartalom"
+              courses={filteredCourses}
+              categories={categories || []}
+              instructors={instructors || []}
+              enrollments={enrollments || []}
+            />
+          )}
+
+          {/* CrossTypeNavigation - marketing-specific feature */}
+          <div className="w-full mx-auto max-w-[1440px] mt-12 sm:mt-16">
             <CrossTypeNavigation currentType="ACADEMIA" />
           </div>
         </div>
@@ -220,5 +294,5 @@ export default function AkademiaPage() {
 
       <Footer border={true} />
     </AuthProvider>
-  )
+  );
 }

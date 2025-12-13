@@ -17,7 +17,10 @@ interface SubscriptionStatusResponse {
     currentPeriodEnd: string
     cancelAtPeriodEnd: boolean
     createdAt: string
+    trialEnd?: string
+    isTrialing?: boolean
   }
+  hasUsedTrial?: boolean
   error?: string
   // Legacy compatibility
   hasActiveSubscription?: boolean
@@ -29,6 +32,7 @@ interface SubscriptionStatusResponse {
     role: string
     profilePictureUrl?: string
     subscriptionActive: boolean
+    hasUsedTrial?: boolean
   }
 }
 
@@ -55,6 +59,7 @@ export const useSubscriptionStatus = () => {
           hasSubscription: false,
           isActive: false,
           hasActiveSubscription: false,
+          hasUsedTrial: false,
           error: error.message || 'Subscription status check failed'
         } as SubscriptionStatusResponse
       }
