@@ -16,6 +16,7 @@ import {
   Calendar,
   CheckCircle,
   XCircle,
+  X,
   AlertCircle,
   Gift,
   Clock,
@@ -29,6 +30,16 @@ import {
   Users
 } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 /**
  * Company Billing Page
@@ -36,6 +47,18 @@ import { useToast } from '@/hooks/use-toast'
  * For Company Admins: Full billing management (same as individual)
  * For Company Employees: Info message that admin manages billing
  */
+
+// Helper component for benefit list items
+function BenefitItem({ text }: { text: string }) {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 flex items-center justify-center mt-0.5">
+        <X className="w-3 h-3 text-red-600" />
+      </div>
+      <p className="text-sm text-gray-700">{text}</p>
+    </div>
+  );
+}
 
 // Helper to convert base64 to Blob
 function base64ToBlob(base64: string, mimeType: string): Blob {
@@ -56,9 +79,7 @@ export default function CompanyBillingPage() {
   const { data: invoices = [], isLoading: invoicesLoading } = useSubscriptionInvoices()
   const { openBillingPortal, isLoading: portalLoading } = useBillingPortal()
 
-  const [showCancelModal, setShowCancelModal] = useState(false)
-  const [showRetentionOffer, setShowRetentionOffer] = useState(false)
-  const [isCanceling, setIsCanceling] = useState(false)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
   // Check if user is company admin
@@ -78,104 +99,9 @@ export default function CompanyBillingPage() {
   // Only show trial banner if actually trialing AND days remaining > 0
   const showTrialBanner = isOnTrial && trialDaysRemaining > 0
 
-  const handleCancelClick = () => {
-    setShowCancelModal(true)
-    if (hasActiveSubscription && !isOnTrial) {
-      setShowRetentionOffer(true)
-    }
-  }
-
-  const handleCancelConfirm = async () => {
-    if (!subscription?.id) return
-
-    setIsCanceling(true)
-    try {
-      const cancelSubscription = httpsCallable(functions, 'cancelSubscription')
-      const result = await cancelSubscription({
-        subscriptionId: subscription.id,
-        acceptRetentionOffer: false
-      })
-
-      const data = result.data as any
-      if (data.success) {
-        toast({
-          title: 'Előfizetés lemondva',
-          description: data.message,
-        })
-        await refetch()
-        setShowCancelModal(false)
-        setShowRetentionOffer(false)
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Hiba',
-        description: error.message || 'Lemondás sikertelen',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsCanceling(false)
-    }
-  }
-
-  const handleAcceptRetentionOffer = async () => {
-    if (!subscription?.id) return
-
-    setIsCanceling(true)
-    try {
-      const cancelSubscription = httpsCallable(functions, 'cancelSubscription')
-      const result = await cancelSubscription({
-        subscriptionId: subscription.id,
-        acceptRetentionOffer: true
-      })
-
-      const data = result.data as any
-      if (data.success) {
-        toast({
-          title: 'Ajánlat elfogadva',
-          description: data.message,
-        })
-        await refetch()
-        setShowCancelModal(false)
-        setShowRetentionOffer(false)
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Hiba',
-        description: error.message || 'Hiba történt',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsCanceling(false)
-    }
-  }
-
-  const handleReactivate = async () => {
-    if (!subscription?.subscriptionId) return
-
-    setIsCanceling(true)
-    try {
-      const reactivateSubscription = httpsCallable(functions, 'reactivateSubscription')
-      const result = await reactivateSubscription({
-        subscriptionId: subscription.subscriptionId
-      })
-
-      const data = result.data as any
-      if (data.success) {
-        toast({
-          title: 'Előfizetés újraaktiválva',
-          description: 'Az előfizetés ismét aktív.',
-        })
-        await refetch()
-      }
-    } catch (error: any) {
-      toast({
-        title: 'Hiba',
-        description: error.message || 'Újraaktiválás sikertelen',
-        variant: 'destructive',
-      })
-    } finally {
-      setIsCanceling(false)
-    }
+  const handleCancelSubscription = () => {
+    setShowCancelDialog(false)
+    openBillingPortal()
   }
 
   // Download Hungarian invoice PDF
@@ -468,17 +394,17 @@ export default function CompanyBillingPage() {
               {cancelAtPeriodEnd ? (
                 <Button
                   variant="outline"
-                  onClick={handleReactivate}
-                  disabled={isCanceling}
+                  onClick={() => openBillingPortal()}
+                  disabled={portalLoading}
                   className="text-green-600 border-green-200 hover:bg-green-50"
                 >
-                  {isCanceling && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  {portalLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Előfizetés újraaktiválása
                 </Button>
               ) : (
                 <Button
                   variant="outline"
-                  onClick={handleCancelClick}
+                  onClick={() => setShowCancelDialog(true)}
                   className="text-red-600 border-red-200 hover:bg-red-50"
                 >
                   Előfizetés lemondása
@@ -617,77 +543,37 @@ export default function CompanyBillingPage() {
         </div>
       </div>
 
-      {/* Cancel Modal with Retention Offer */}
-      {showCancelModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            {showRetentionOffer ? (
-              <>
-                <Gift className="w-12 h-12 text-brand-secondary mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">
-                  Várjon! Maradjon velünk!
-                </h3>
-                <p className="text-gray-700 mb-4 text-center">
-                  Értékeljük, hogy a vállalatuk velünk tanul. Szeretnénk felajánlani Önnek <strong>1 hónap ingyenes hozzáférést</strong> ajándékba.
-                </p>
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                  <p className="text-green-900 font-bold text-center">
-                    Fogadja el az ajánlatot, és kapjon 1 havi ingyenes hozzáférést!
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <Button
-                    className="w-full bg-brand-secondary hover:bg-brand-secondary-hover"
-                    onClick={handleAcceptRetentionOffer}
-                    disabled={isCanceling}
-                  >
-                    {isCanceling ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Gift className="w-4 h-4 mr-2" />}
-                    Igen, elfogadom!
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => setShowRetentionOffer(false)}
-                    disabled={isCanceling}
-                  >
-                    Nem, folytatom a lemondást
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  Biztosan lemondja a vállalati előfizetést?
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  A vállalat összes munkatársa elveszíti a hozzáférést az összes tartalomhoz. Az előfizetés a jelenlegi számlázási időszak végéig aktív marad.
-                </p>
-                <div className="flex gap-3">
-                  <Button
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setShowCancelModal(false)
-                      setShowRetentionOffer(false)
-                    }}
-                    disabled={isCanceling}
-                  >
-                    Mégsem
-                  </Button>
-                  <Button
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-                    onClick={handleCancelConfirm}
-                    disabled={isCanceling}
-                  >
-                    {isCanceling && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                    Lemondás
-                  </Button>
-                </div>
-              </>
-            )}
+      {/* Subscription Cancellation Confirmation Dialog */}
+      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">
+              Biztos, hogy véget akarsz vetni a kalandnak?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-base text-gray-600">
+              Ha lemondod, el fogod veszíteni a jelenlegi előfizetésed:
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {/* Benefits List */}
+          <div className="space-y-3 py-4">
+            <BenefitItem text="Teljes hozzáférés 150+ struktúraépítő tartalomhoz" />
+            <BenefitItem text="Több mint 200 órányi azonnal alkalmazható, működő rendszer" />
+            <BenefitItem text="5 munkatárs díjmentes hozzáadása" />
+            <BenefitItem text="Hetente frissülő tartalmak" />
           </div>
-        </div>
-      )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Mégse</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelSubscription}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Előfizetés lemondása
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }
