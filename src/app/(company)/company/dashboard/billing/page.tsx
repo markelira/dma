@@ -265,18 +265,6 @@ export default function CompanyBillingPage() {
   // Company Admin View - Full billing management
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <CreditCard className="w-6 h-6 text-brand-secondary" />
-          <h1 className="text-3xl font-bold text-gray-900">Számlázás</h1>
-        </div>
-        <p className="text-gray-500">
-          Kezelje a vállalati előfizetést és tekintse meg a számlákat
-        </p>
-      </div>
-
-      <div className="space-y-6">
         {/* Trial Banner */}
         {showTrialBanner && (
           <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
