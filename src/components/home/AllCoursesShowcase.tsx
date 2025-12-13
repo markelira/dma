@@ -95,12 +95,12 @@ function CourseCarousel({ courses, categories, instructors, courseType, title }:
       </div>
 
       {/* Carousel */}
-      <div className="relative group">
+      <div className="relative group/carousel">
         {/* Navigation Buttons */}
         {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className="absolute -left-4 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+            className="absolute -left-4 md:-left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
             aria-label="Scroll left"
           >
             <ChevronRight className="w-5 h-5 text-gray-600 rotate-180" />
@@ -109,7 +109,7 @@ function CourseCarousel({ courses, categories, instructors, courseType, title }:
         {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className="absolute -right-4 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
+            className="absolute -right-4 md:-right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center opacity-0 group-hover/carousel:opacity-100 transition-all duration-200 hover:bg-gray-50 hover:scale-105"
             aria-label="Scroll right"
           >
             <ChevronRight className="w-5 h-5 text-gray-600" />

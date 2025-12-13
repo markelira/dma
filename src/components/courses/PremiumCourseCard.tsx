@@ -268,7 +268,7 @@ export function PremiumCourseCard({
       className="origin-center"
     >
       <div
-        className="bg-white border border-gray-200 rounded-xl shadow-lg hover:shadow-xl h-full flex flex-col group cursor-pointer transition-all duration-300"
+        className="bg-white border border-gray-200 hover:border-gray-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 h-full flex flex-col group cursor-pointer transition-all duration-300"
         onClick={handleCardClick}
       >
         {/* Course Image */}
