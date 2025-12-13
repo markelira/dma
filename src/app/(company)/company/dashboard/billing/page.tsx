@@ -516,39 +516,38 @@ export default function CompanyBillingPage() {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Subscription Cancellation Confirmation Dialog */}
-      <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent className="max-w-md">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold">
-              Biztos, hogy véget akarsz vetni a kalandnak?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-base text-gray-600">
-              Ha lemondod, el fogod veszíteni a jelenlegi előfizetésed:
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+        {/* Subscription Cancellation Confirmation Dialog */}
+        <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+          <AlertDialogContent className="max-w-md">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-xl font-bold">
+                Biztos, hogy véget akarsz vetni a kalandnak?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-base text-gray-600">
+                Ha lemondod, el fogod veszíteni a jelenlegi előfizetésed:
+              </AlertDialogDescription>
+            </AlertDialogHeader>
 
-          {/* Benefits List */}
-          <div className="space-y-3 py-4">
-            <BenefitItem text="Teljes hozzáférés 150+ struktúraépítő tartalomhoz" />
-            <BenefitItem text="Több mint 200 órányi azonnal alkalmazható, működő rendszer" />
-            <BenefitItem text="5 munkatárs díjmentes hozzáadása" />
-            <BenefitItem text="Hetente frissülő tartalmak" />
-          </div>
+            {/* Benefits List */}
+            <div className="space-y-3 py-4">
+              <BenefitItem text="Teljes hozzáférés 150+ struktúraépítő tartalomhoz" />
+              <BenefitItem text="Több mint 200 órányi azonnal alkalmazható, működő rendszer" />
+              <BenefitItem text="5 munkatárs díjmentes hozzáadása" />
+              <BenefitItem text="Hetente frissülő tartalmak" />
+            </div>
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Mégse</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleCancelSubscription}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              Előfizetés lemondása
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Mégse</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleCancelSubscription}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                Előfizetés lemondása
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
     </div>
   )
 }
