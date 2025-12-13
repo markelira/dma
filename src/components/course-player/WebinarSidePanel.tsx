@@ -8,7 +8,8 @@ import { Instructor, Lesson } from '@/types';
 interface WebinarSidePanelProps {
   courseTitle: string;
   courseDescription?: string;
-  instructor?: Instructor | null;
+  instructor?: Instructor | null; // Backward compatibility
+  instructors?: Instructor[]; // Multiple instructors support
   currentLesson: Lesson;
   totalDuration?: number; // in seconds
 }
@@ -22,6 +23,7 @@ export function WebinarSidePanel({
   courseTitle,
   courseDescription,
   instructor,
+  instructors = [],
   currentLesson,
   totalDuration,
 }: WebinarSidePanelProps) {
@@ -38,47 +40,62 @@ export function WebinarSidePanel({
 
   const duration = formatDuration(totalDuration || currentLesson.duration);
 
+  // Determine which instructors to display
+  const displayInstructors = instructors.length > 0 ? instructors : instructor ? [instructor] : [];
+
   return (
     <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
-        {/* Mentor Card */}
-        {instructor && (
-          <div className="space-y-4">
-            {/* Mentor Photo */}
-            <div className="flex justify-center">
-              {instructor.profilePictureUrl ? (
-                <div className="relative w-28 h-28 rounded-full overflow-hidden ring-2 ring-red-600/50">
-                  <Image
-                    src={instructor.profilePictureUrl}
-                    alt={instructor.name}
-                    fill
-                    className="object-cover"
-                  />
+        {/* Mentor/Guest Section - All Displayed */}
+        {displayInstructors.length > 0 && (
+          <div className="space-y-6">
+            {displayInstructors.map((inst) => (
+              <div key={inst.id} className="space-y-3">
+                {/* Photo */}
+                <div className="flex justify-center">
+                  {inst.profilePictureUrl ? (
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden ring-2 ring-red-600/50">
+                      <Image
+                        src={inst.profilePictureUrl}
+                        alt={inst.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
+                      <User className="w-10 h-10 text-gray-600" />
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <div className="w-28 h-28 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
-                  <User className="w-12 h-12 text-gray-600" />
+
+                {/* Name */}
+                <h3 className="text-lg font-bold text-white text-center">
+                  {inst.name}
+                </h3>
+
+                {/* Title */}
+                {inst.title && (
+                  <p className="text-sm text-gray-400 text-center">
+                    {inst.title}
+                  </p>
+                )}
+
+                {/* Bio */}
+                {inst.bio && (
+                  <p className="text-sm text-gray-300 text-center leading-relaxed">
+                    {inst.bio}
+                  </p>
+                )}
+
+                {/* Badge */}
+                <div className="flex justify-center">
+                  <span className="px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
+                    {inst.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
+                  </span>
                 </div>
-              )}
-            </div>
-
-            {/* Mentor Info */}
-            <div className="text-center">
-              <h3 className="text-lg font-bold text-white">{instructor.name}</h3>
-              {instructor.title && (
-                <p className="text-sm text-gray-400 mt-1">{instructor.title}</p>
-              )}
-              <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
-              </span>
-            </div>
-
-            {/* Mentor Bio */}
-            {instructor.bio && (
-              <p className="text-sm text-gray-400 leading-relaxed text-center">
-                {instructor.bio}
-              </p>
-            )}
+              </div>
+            ))}
           </div>
         )}
 
@@ -100,9 +117,6 @@ export function WebinarSidePanel({
             </div>
           )}
         </div>
-
-        {/* Divider */}
-        <div className="h-px bg-gray-800" />
 
         {/* About Section */}
         <div className="space-y-3">

@@ -55,16 +55,72 @@ export function AcademiaSidePanel({
       <div className="p-6 space-y-6">
         {/* Instructors Section - All Instructors Displayed */}
         {instructors.length > 0 && (
-          <div className="space-y-6">
-            {instructors.map((instructor) => (
-              <div key={instructor.id} className="space-y-3">
+          <>
+            {instructors.length > 1 ? (
+              <div className="space-y-4">
+                {/* Avatars in a horizontal row */}
+                <div className="flex justify-center gap-2">
+                  {instructors.map((instructor) => (
+                    <div key={instructor.id} className="relative w-20 h-20">
+                      {instructor.profilePictureUrl ? (
+                        <Image
+                          src={instructor.profilePictureUrl}
+                          alt={instructor.name}
+                          fill
+                          className="rounded-full object-cover ring-2 ring-red-600/50"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
+                          <User className="w-10 h-10 text-gray-600" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* All Instructors Info - Stacked Below Avatars */}
+                <div className="space-y-4">
+                  {instructors.map((instructor) => (
+                    <div key={`info-${instructor.id}`} className="text-center space-y-2">
+                      {/* Instructor Name */}
+                      <h3 className="text-lg font-bold text-white">
+                        {instructor.name}
+                      </h3>
+
+                      {/* Instructor Title (Titulus) */}
+                      {instructor.title && (
+                        <p className="text-sm text-gray-400">
+                          {instructor.title}
+                        </p>
+                      )}
+
+                      {/* Instructor Bio */}
+                      {instructor.bio && (
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          {instructor.bio}
+                        </p>
+                      )}
+
+                      {/* Mentor/Vendég Badge */}
+                      <div className="flex justify-center">
+                        <span className="px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
+                          {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Single Instructor - Keep current centered layout */
+              <div className="space-y-3">
                 {/* Instructor Photo */}
                 <div className="flex justify-center">
-                  {instructor.profilePictureUrl ? (
+                  {instructors[0].profilePictureUrl ? (
                     <div className="relative w-24 h-24 rounded-full overflow-hidden ring-2 ring-red-600/50">
                       <Image
-                        src={instructor.profilePictureUrl}
-                        alt={instructor.name}
+                        src={instructors[0].profilePictureUrl}
+                        alt={instructors[0].name}
                         fill
                         className="object-cover"
                       />
@@ -78,32 +134,32 @@ export function AcademiaSidePanel({
 
                 {/* Instructor Name */}
                 <h3 className="text-lg font-bold text-white text-center">
-                  {instructor.name}
+                  {instructors[0].name}
                 </h3>
 
                 {/* Instructor Title (Titulus) */}
-                {instructor.title && (
+                {instructors[0].title && (
                   <p className="text-sm text-gray-400 text-center">
-                    {instructor.title}
+                    {instructors[0].title}
                   </p>
                 )}
 
                 {/* Instructor Bio */}
-                {instructor.bio && (
+                {instructors[0].bio && (
                   <p className="text-sm text-gray-300 text-center leading-relaxed">
-                    {instructor.bio}
+                    {instructors[0].bio}
                   </p>
                 )}
 
                 {/* Mentor/Vendég Badge */}
                 <div className="flex justify-center">
                   <span className="px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                    {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
+                    {instructors[0].role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
                   </span>
                 </div>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
 
         {/* Divider */}

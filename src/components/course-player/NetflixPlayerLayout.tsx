@@ -211,6 +211,7 @@ export function NetflixPlayerLayout({
             courseTitle={course.title}
             courseDescription={course.description}
             instructor={instructor}
+            instructors={instructors}
             currentLesson={currentLesson}
             totalDuration={totalDuration}
           />
@@ -871,6 +872,7 @@ export function NetflixPlayerLayout({
             courseTitle={course.title}
             courseDescription={course.description}
             instructor={instructor}
+            instructors={instructors}
             currentLesson={currentLesson}
             totalDuration={totalDuration}
           />

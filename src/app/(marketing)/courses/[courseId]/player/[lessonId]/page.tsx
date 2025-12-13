@@ -468,16 +468,11 @@ export default function CoursePlayerPage() {
               />
             )}
 
-            {/* Lesson Title and Breadcrumb */}
+            {/* Lesson Title */}
             <div className="space-y-3">
               <h1 className="text-xl font-bold text-gray-900 leading-tight">
                 {currentLesson.title}
               </h1>
-              {currentModule && !useMasterclassSidebar && (
-                <p className="text-sm text-gray-600">
-                  {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
-                </p>
-              )}
             </div>
 
             {/* Navigation Buttons */}
@@ -486,6 +481,7 @@ export default function CoursePlayerPage() {
               hasNext={!!nextLesson}
               onPrevious={handlePreviousLesson}
               onNext={handleNextLesson}
+              courseType={courseType}
             />
 
             {/* Divider */}
@@ -494,8 +490,6 @@ export default function CoursePlayerPage() {
             {/* Lesson Content (Description & Outcomes) */}
             <NewLessonContent
               lesson={currentLesson}
-              moduleName={currentModule?.title}
-              moduleNumber={modules.findIndex(m => m.id === currentModule?.id) + 1}
               showTitle={false}
             />
           </div>
@@ -531,16 +525,11 @@ export default function CoursePlayerPage() {
                 />
               )}
 
-              {/* Lesson Title and Breadcrumb */}
+              {/* Lesson Title */}
               <div className="space-y-2">
                 <h1 className="text-2xl font-bold text-gray-900 leading-tight">
                   {currentLesson.title}
                 </h1>
-                {currentModule && !useMasterclassSidebar && (
-                  <p className="text-sm text-gray-600">
-                    {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
-                  </p>
-                )}
               </div>
 
               {/* Navigation Buttons */}
@@ -549,6 +538,7 @@ export default function CoursePlayerPage() {
                 hasNext={!!nextLesson}
                 onPrevious={handlePreviousLesson}
                 onNext={handleNextLesson}
+                courseType={courseType}
               />
 
               {/* Divider */}
@@ -557,8 +547,6 @@ export default function CoursePlayerPage() {
               {/* Lesson Content (Description & Outcomes) */}
               <NewLessonContent
                 lesson={currentLesson}
-                moduleName={currentModule?.title}
-                moduleNumber={modules.findIndex(m => m.id === currentModule?.id) + 1}
                 showTitle={false}
               />
             </div>
