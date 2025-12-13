@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
 import { useInstructors } from '@/hooks/useInstructorQueries';
+import { useEnrollments } from '@/hooks/useEnrollments';
 import { Company } from '@/types/company';
 
 const COURSE_TYPE_ICONS: Record<string, any> = {
@@ -70,6 +71,7 @@ export default function CompanyCoursesPage() {
   const [searchInput, setSearchInput] = useState('');
   const [selectedType, setSelectedType] = useState<string>('ALL');
   const { data: instructors = [] } = useInstructors();
+  const { data: enrollments = [] } = useEnrollments();
 
   // Redirect if not logged in
   useEffect(() => {
@@ -293,6 +295,8 @@ export default function CompanyCoursesPage() {
               index={index}
               categories={categories}
               instructors={instructors}
+              enrollments={enrollments}
+              userId={user?.uid}
             />
           ))}
         </div>

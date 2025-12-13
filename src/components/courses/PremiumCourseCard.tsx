@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from "motion/react";
-import { BookOpen, Bookmark, BookmarkCheck, Play } from "lucide-react";
+import { BookOpen, Bookmark, BookmarkCheck, Play, Clock, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { cardStyles, buttonStyles } from "@/lib/design-tokens";
@@ -11,6 +11,7 @@ import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { toast } from "sonner";
+import { calculateCourseDuration, formatDurationHungarian } from "@/lib/carouselUtils";
 
 interface Course {
   id: string;
@@ -43,20 +44,82 @@ interface Instructor {
   profilePictureUrl?: string;
 }
 
+interface Enrollment {
+  courseId: string;
+  courseName: string;
+  courseInstructor?: string;
+  progress: number;
+  status: string;
+  thumbnailUrl?: string;
+  courseType?: string;
+  duration?: string;
+  currentLessonId?: string;
+  firstLessonId?: string;
+  userId?: string;
+}
+
 interface PremiumCourseCardProps {
   course: Course;
   index: number;
   categories?: Array<{ id: string; name: string }>;
   instructors?: Instructor[]; // Optional instructors array
+  enrollments?: Enrollment[]; // NEW: Array of enrollments for checking enrollment status
+  enrollment?: Enrollment; // NEW: Explicit enrollment data for this course
+  showProgress?: boolean; // NEW: Force show progress bar
+  userId?: string; // NEW: User ID for enrollment detection
 }
 
-export function PremiumCourseCard({ course, index, categories, instructors }: PremiumCourseCardProps) {
+export function PremiumCourseCard({
+  course,
+  index,
+  categories,
+  instructors,
+  enrollments,
+  enrollment,
+  showProgress,
+  userId
+}: PremiumCourseCardProps) {
   const router = useRouter();
   const { user } = useAuthStore();
   const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
   const { data: subscription } = useSubscriptionStatus();
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
+
+  // Check if user is enrolled (NEW: Universal enrollment detection)
+  const userEnrollment = useMemo(() => {
+    // If explicit enrollment provided, use it
+    if (enrollment) return enrollment;
+    // Otherwise check enrollments array
+    if (!enrollments || !userId) return null;
+    return enrollments.find(e => e.courseId === course.id && e.userId === userId);
+  }, [enrollment, enrollments, userId, course.id]);
+
+  const isEnrolledUniversal = !!userEnrollment;
+  const enrollmentProgress = userEnrollment?.progress || 0;
+  const enrollmentStatusValue = userEnrollment?.status;
+
+  // Calculate total duration from lessons (NEW: Mux duration support)
+  const totalDuration = useMemo(() => {
+    let allLessons: any[] = [];
+
+    // Check for flat lessons array first
+    if (course.lessons && Array.isArray(course.lessons)) {
+      allLessons = course.lessons;
+    } else if (course.modules && Array.isArray(course.modules)) {
+      // Fallback to modules structure
+      allLessons = course.modules.flatMap(m => m.lessons || []);
+    }
+
+    // Map lessons to duration, prioritizing muxDuration over duration
+    const lessonsWithDuration = allLessons.map(lesson => ({
+      duration: lesson.muxDuration || lesson.duration || 0
+    }));
+
+    return calculateCourseDuration(lessonsWithDuration); // Returns seconds
+  }, [course.lessons, course.modules]);
+
+  const durationText = totalDuration > 0 ? formatDurationHungarian(totalDuration) : null;
 
   // Log when categories are undefined or empty (for debugging)
   useEffect(() => {
@@ -215,7 +278,7 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
               src={course.thumbnailUrl}
               alt={course.title}
               fill
-              className="object-cover"
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               onError={() => setImageError(true)}
             />
@@ -230,16 +293,26 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
-          {/* Course Type Badge - Top Left */}
-          {getCourseTypeLabel(course.courseType) && (
-            <div className="absolute top-2 left-2 px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium">
-              {getCourseTypeLabel(course.courseType)}
-            </div>
-          )}
+          {/* Course Type + Duration Badge - Top Left */}
+          <div className="absolute top-2 left-2 flex items-center gap-2">
+            {getCourseTypeLabel(course.courseType) && (
+              <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+                {getCourseTypeLabel(course.courseType)}
+              </div>
+            )}
+            {durationText && (
+              <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                {durationText}
+              </div>
+            )}
+          </div>
 
-          {/* Centered Play Icon */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Play className="w-16 h-16 text-white drop-shadow-lg" fill="white" fillOpacity={0.9} />
+          {/* Dark Overlay + Play Button (NEW: Improved hover animation) */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100 duration-300">
+              <Play className="w-7 h-7 text-gray-900 ml-1 fill-current" />
+            </div>
           </div>
 
           {/* Enrollment Button */}
@@ -266,28 +339,36 @@ export function PremiumCourseCard({ course, index, categories, instructors }: Pr
             </div>
           )}
 
-          {/* Progress Bar */}
-          {course.progress !== undefined && course.progress > 0 && (
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-300">
+          {/* Progress Bar (NEW: Shows for enrolled users) */}
+          {(isEnrolledUniversal || showProgress || (course.progress !== undefined && course.progress > 0)) && enrollmentProgress > 0 && (
+            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-700">
               <div
                 className="h-full bg-brand-secondary transition-all"
-                style={{ width: `${course.progress}%` }}
+                style={{ width: `${enrollmentProgress}%` }}
               />
+            </div>
+          )}
+
+          {/* Completed Badge (NEW) */}
+          {(isEnrolledUniversal || showProgress) && (enrollmentStatusValue === 'COMPLETED' || enrollmentProgress === 100) && (
+            <div className="absolute top-2 right-2 px-2 py-1 rounded-full bg-green-500 text-white text-xs font-medium flex items-center gap-1">
+              <CheckCircle className="w-3 h-3" />
+              Befejezve
             </div>
           )}
         </div>
 
         {/* Content */}
         <div className="flex-1 flex flex-col p-4">
-          {/* Title */}
-          <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2 group-hover:text-brand-secondary transition-colors">
+          {/* Title (NEW: Smaller text size) */}
+          <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem] group-hover:text-brand-secondary transition-colors">
             {course.title}
           </h3>
 
-          {/* Progress Percentage - Only for cards with progress */}
-          {course.progress !== undefined && course.progress > 0 && (
+          {/* Progress Percentage - Shows for enrolled users (NEW: Universal enrollment support) */}
+          {(isEnrolledUniversal || showProgress || (course.progress !== undefined && course.progress > 0)) && enrollmentProgress > 0 && (
             <div className="text-sm font-medium text-brand-secondary mb-2">
-              {Math.round(course.progress)}% befejezve
+              {Math.round(enrollmentProgress)}% befejezve
             </div>
           )}
 

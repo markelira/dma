@@ -2,7 +2,22 @@
 
 import { useRef, useState, useEffect, ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { EnrolledCourseCard } from './EnrolledCourseCard';
+import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
+  thumbnailUrl?: string;
+  categoryId?: string;
+  categoryIds?: string[];
+  instructorId?: string;
+  instructorIds?: string[];
+  lessons?: any[];
+  modules?: any[];
+  [key: string]: any;
+}
 
 interface EnrolledCourseCarouselProps {
   title: string;
@@ -19,17 +34,22 @@ interface EnrolledCourseCarouselProps {
     duration?: string;
     currentLessonId?: string;
     firstLessonId?: string;
+    userId?: string;
   }>;
+  courses?: Course[]; // NEW: Full course objects for PremiumCourseCard
   categories?: Array<{ id: string; name: string }>;
-  instructors?: Array<{ id: string; name: string }>;
+  instructors?: Array<{ id: string; name: string; title?: string; bio?: string; profilePictureUrl?: string }>;
+  userId?: string; // NEW: User ID for enrollment detection
 }
 
 export function EnrolledCourseCarousel({
   title,
   icon,
   enrollments,
+  courses = [],
   categories = [],
   instructors = [],
+  userId,
 }: EnrolledCourseCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -106,18 +126,34 @@ export function EnrolledCourseCarousel({
           className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
           style={{ scrollSnapType: 'x mandatory' }}
         >
-          {enrollments.map((enrollment, index) => (
-            <div
-              key={enrollment.id}
-              className="flex-shrink-0 w-[280px] md:w-[320px]"
-              style={{ scrollSnapAlign: 'start' }}
-            >
-              <EnrolledCourseCard
-                enrollment={enrollment}
-                index={index}
-              />
-            </div>
-          ))}
+          {enrollments.map((enrollment, index) => {
+            // Find the full course object for this enrollment
+            const fullCourse = courses.find(c => c.id === enrollment.courseId);
+
+            // If no course found, skip this enrollment
+            if (!fullCourse) {
+              console.warn(`[EnrolledCourseCarousel] Course not found for enrollment: ${enrollment.courseId}`);
+              return null;
+            }
+
+            return (
+              <div
+                key={enrollment.id}
+                className="flex-shrink-0 w-[280px] md:w-[300px]"
+                style={{ scrollSnapAlign: 'start' }}
+              >
+                <PremiumCourseCard
+                  course={fullCourse}
+                  enrollment={enrollment}
+                  showProgress={true}
+                  categories={categories}
+                  instructors={instructors}
+                  userId={userId || enrollment.userId}
+                  index={index}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

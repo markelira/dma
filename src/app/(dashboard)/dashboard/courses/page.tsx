@@ -7,6 +7,7 @@ import { useEnrollments } from '@/hooks/useEnrollments'
 import { useCourses } from '@/hooks/useCourseQueries'
 import { useCategories } from '@/hooks/useCategoryQueries'
 import { useInstructors } from '@/hooks/useInstructorQueries'
+import { useAuthStore } from '@/stores/authStore'
 import { DashboardSearch } from '@/components/dashboard/DashboardSearch'
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel'
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel'
@@ -32,6 +33,7 @@ function getFirstLessonId(course: Course): string | undefined {
  * Displays enrolled courses with carousels grouped by status
  */
 export default function DashboardCoursesPage() {
+  const { user } = useAuthStore()
   const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments()
   const { data: courses = [], isLoading: coursesLoading } = useCourses()
   const { data: categories = [] } = useCategories()
@@ -209,8 +211,10 @@ export default function DashboardCoursesPage() {
           title="Folytatás"
           icon={<Clock className="w-5 h-5 text-brand-secondary" />}
           enrollments={inProgressCourses}
+          courses={courses}
           categories={categories}
           instructors={instructors}
+          userId={user?.uid}
         />
       )}
 
@@ -220,8 +224,10 @@ export default function DashboardCoursesPage() {
           title="Saját listám"
           icon={<BookOpen className="w-5 h-5 text-gray-500" />}
           enrollments={notStartedCourses}
+          courses={courses}
           categories={categories}
           instructors={instructors}
+          userId={user?.uid}
         />
       )}
 
@@ -231,8 +237,10 @@ export default function DashboardCoursesPage() {
           title="Befejezett"
           icon={<CheckCircle className="w-5 h-5 text-green-500" />}
           enrollments={completedCourses}
+          courses={courses}
           categories={categories}
           instructors={instructors}
+          userId={user?.uid}
         />
       )}
     </div>

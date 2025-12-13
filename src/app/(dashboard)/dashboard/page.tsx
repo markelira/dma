@@ -511,8 +511,10 @@ export default function DashboardPage() {
           <EnrolledCourseCarousel
             title="Kaland folytatása"
             enrollments={enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < 100))}
+            courses={courses || []}
             categories={categories || []}
             instructors={instructors || []}
+            userId={user?.uid}
           />
         )}
 
