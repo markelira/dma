@@ -99,17 +99,6 @@ export function WebinarSidePanel({
               </div>
             </div>
           )}
-
-          {/* Lesson Count (if multi-lesson) */}
-          <div className="flex items-center gap-3 text-gray-300">
-            <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-red-500" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Típus</p>
-              <p className="font-medium">Webinár</p>
-            </div>
-          </div>
         </div>
 
         {/* Divider */}
@@ -118,25 +107,11 @@ export function WebinarSidePanel({
         {/* About Section */}
         <div className="space-y-3">
           <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
-            A webinárról
+            A WEBINÁRRÓL
           </h4>
           <p className="text-gray-300 leading-relaxed text-sm">
             {courseDescription || currentLesson.description || 'Nincs leírás.'}
           </p>
-        </div>
-
-        {/* Current Lesson Title */}
-        <div className="h-px bg-gray-800" />
-        <div className="space-y-2">
-          <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
-            Most játszva
-          </h4>
-          <p className="text-white font-medium">{currentLesson.title}</p>
-          {currentLesson.duration && (
-            <p className="text-xs text-gray-500">
-              {formatDuration(currentLesson.duration)}
-            </p>
-          )}
         </div>
       </div>
     </aside>

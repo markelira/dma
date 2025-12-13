@@ -478,11 +478,6 @@ export default function CoursePlayerPage() {
                   {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
                 </p>
               )}
-              {useMasterclassSidebar && (
-                <p className="text-sm text-gray-600">
-                  Lecke {lessonsForSidebar.findIndex(l => l.id === currentLessonId) + 1} / {lessonsForSidebar.length}
-                </p>
-              )}
             </div>
 
             {/* Navigation Buttons */}
@@ -544,11 +539,6 @@ export default function CoursePlayerPage() {
                 {currentModule && !useMasterclassSidebar && (
                   <p className="text-sm text-gray-600">
                     {modules.findIndex(m => m.id === currentModule?.id) + 1}. Modul: {currentModule.title}
-                  </p>
-                )}
-                {useMasterclassSidebar && (
-                  <p className="text-sm text-gray-600">
-                    Lecke {lessonsForSidebar.findIndex(l => l.id === currentLessonId) + 1} / {lessonsForSidebar.length}
                   </p>
                 )}
               </div>

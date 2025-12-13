@@ -8,6 +8,7 @@ export type MobileTab = 'video' | 'lessons';
 interface MobileBottomTabsProps {
   activeTab: MobileTab;
   onTabChange: (tab: MobileTab) => void;
+  courseType?: string;
 }
 
 /**
@@ -18,6 +19,7 @@ interface MobileBottomTabsProps {
 export function MobileBottomTabs({
   activeTab,
   onTabChange,
+  courseType,
 }: MobileBottomTabsProps) {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden">
@@ -45,7 +47,7 @@ export function MobileBottomTabs({
           }`}
         >
           <DocumentIcon size={20} className={activeTab === 'lessons' ? '' : 'opacity-60'} />
-          <span>Leckék</span>
+          <span>{courseType === 'MASTERCLASS' ? 'Részek' : 'Leckék'}</span>
         </button>
       </div>
     </div>

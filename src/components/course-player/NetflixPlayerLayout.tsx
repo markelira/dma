@@ -409,7 +409,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Mobile Bottom Tabs */}
-          <MobileBottomTabs activeTab={mobileTab} onTabChange={setMobileTab} />
+          <MobileBottomTabs activeTab={mobileTab} onTabChange={setMobileTab} courseType={course.type} />
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
@@ -489,9 +489,9 @@ export function NetflixPlayerLayout({
                   }`}
                 >
                   <ArrowLeftIcon size={18} />
-                  Előző lecke
+                  {isMasterclass ? 'Előző rész' : 'Előző lecke'}
                 </button>
-                <span className="text-sm text-gray-500">Lecke {currentIndex + 1} / {lessons.length}</span>
+                <span className="text-sm text-gray-500">{currentLesson.title}</span>
                 <button
                   onClick={onNextLesson}
                   disabled={!nextLesson}
@@ -499,7 +499,7 @@ export function NetflixPlayerLayout({
                     nextLesson ? 'bg-brand-secondary hover:bg-brand-secondary-hover text-white shadow-md' : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  Következő lecke
+                  {isMasterclass ? 'Következő rész' : 'Következő lecke'}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -680,7 +680,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Mobile Bottom Tabs */}
-          <MobileBottomTabs activeTab={mobileTab} onTabChange={setMobileTab} />
+          <MobileBottomTabs activeTab={mobileTab} onTabChange={setMobileTab} courseType={course.type} />
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
@@ -781,10 +781,10 @@ export function NetflixPlayerLayout({
                   }`}
                 >
                   <ArrowLeftIcon size={18} />
-                  Előző lecke
+                  {isMasterclass ? 'Előző rész' : 'Előző lecke'}
                 </button>
                 <span className="text-sm text-gray-500">
-                  Lecke {currentIndex + 1} / {lessons.length}
+                  {currentLesson.title}
                 </span>
                 <button
                   onClick={onNextLesson}
@@ -795,7 +795,7 @@ export function NetflixPlayerLayout({
                       : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  Következő lecke
+                  {isMasterclass ? 'Következő rész' : 'Következő lecke'}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

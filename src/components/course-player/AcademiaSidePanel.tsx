@@ -30,7 +30,6 @@ export function AcademiaSidePanel({
   onLessonClick,
 }: AcademiaSidePanelProps) {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
-  const [selectedInstructorIndex, setSelectedInstructorIndex] = useState(0);
 
   // Format duration from seconds to readable format
   const formatDuration = (seconds?: number) => {
@@ -51,110 +50,59 @@ export function AcademiaSidePanel({
     return <Circle className="w-5 h-5 text-gray-500 flex-shrink-0" />;
   };
 
-  // Selected instructor for main display
-  const selectedInstructor = instructors[selectedInstructorIndex];
-  const hasMultipleInstructors = instructors.length > 1;
-
   return (
     <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
-        {/* Instructors Section */}
+        {/* Instructors Section - All Instructors Displayed */}
         {instructors.length > 0 && (
-          <div className="space-y-4">
-            {/* Multiple Instructors - Stacked Avatars */}
-            {hasMultipleInstructors ? (
-              <div className="space-y-4">
-                {/* Stacked avatar row */}
+          <div className="space-y-6">
+            {instructors.map((instructor) => (
+              <div key={instructor.id} className="space-y-3">
+                {/* Instructor Photo */}
                 <div className="flex justify-center">
-                  <div className="flex -space-x-3">
-                    {instructors.map((instructor, index) => (
-                      <button
-                        key={instructor.id}
-                        onClick={() => setSelectedInstructorIndex(index)}
-                        className={`relative transition-all ${
-                          index === selectedInstructorIndex
-                            ? 'z-10 scale-110'
-                            : 'z-0 opacity-70 hover:opacity-100'
-                        }`}
-                      >
-                        {instructor.profilePictureUrl ? (
-                          <div className={`relative w-16 h-16 rounded-full overflow-hidden ring-2 ${
-                            index === selectedInstructorIndex
-                              ? 'ring-red-600'
-                              : 'ring-gray-700'
-                          }`}>
-                            <Image
-                              src={instructor.profilePictureUrl}
-                              alt={instructor.name}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        ) : (
-                          <div className={`w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center ring-2 ${
-                            index === selectedInstructorIndex
-                              ? 'ring-red-600'
-                              : 'ring-gray-700'
-                          }`}>
-                            <User className="w-8 h-8 text-gray-600" />
-                          </div>
-                        )}
-                      </button>
-                    ))}
-                  </div>
+                  {instructor.profilePictureUrl ? (
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden ring-2 ring-red-600/50">
+                      <Image
+                        src={instructor.profilePictureUrl}
+                        alt={instructor.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
+                      <User className="w-10 h-10 text-gray-600" />
+                    </div>
+                  )}
                 </div>
 
-                {/* Selected Instructor Info */}
-                {selectedInstructor && (
-                  <div className="text-center">
-                    <h3 className="text-lg font-bold text-white">{selectedInstructor.name}</h3>
-                    {selectedInstructor.title && (
-                      <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
-                    )}
-                    <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
-                    </span>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {selectedInstructorIndex + 1} / {instructors.length} oktató
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* Single Instructor - Full Display */
-              selectedInstructor && (
-                <>
-                  {/* Instructor Photo */}
-                  <div className="flex justify-center">
-                    {selectedInstructor.profilePictureUrl ? (
-                      <div className="relative w-28 h-28 rounded-full overflow-hidden ring-2 ring-red-600/50">
-                        <Image
-                          src={selectedInstructor.profilePictureUrl}
-                          alt={selectedInstructor.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-28 h-28 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
-                        <User className="w-12 h-12 text-gray-600" />
-                      </div>
-                    )}
-                  </div>
+                {/* Instructor Name */}
+                <h3 className="text-lg font-bold text-white text-center">
+                  {instructor.name}
+                </h3>
 
-                  {/* Instructor Info */}
-                  <div className="text-center">
-                    <h3 className="text-lg font-bold text-white">{selectedInstructor.name}</h3>
-                    {selectedInstructor.title && (
-                      <p className="text-sm text-gray-400 mt-1">{selectedInstructor.title}</p>
-                    )}
-                    <span className="inline-block mt-2 px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
-                      {selectedInstructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
-                    </span>
-                  </div>
-                </>
-              )
-            )}
+                {/* Instructor Title (Titulus) */}
+                {instructor.title && (
+                  <p className="text-sm text-gray-400 text-center">
+                    {instructor.title}
+                  </p>
+                )}
+
+                {/* Instructor Bio */}
+                {instructor.bio && (
+                  <p className="text-sm text-gray-300 text-center leading-relaxed">
+                    {instructor.bio}
+                  </p>
+                )}
+
+                {/* Mentor/Vendég Badge */}
+                <div className="flex justify-center">
+                  <span className="px-3 py-1 bg-red-600/20 text-red-400 text-xs font-medium rounded-full">
+                    {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
@@ -164,7 +112,7 @@ export function AcademiaSidePanel({
         {/* About Section - Collapsible */}
         <div className="space-y-2">
           <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wide">
-            Leírás
+            AZ AKADÉMIÁRÓL
           </h4>
           {courseDescription ? (
             <div>
