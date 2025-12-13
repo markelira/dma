@@ -25,11 +25,6 @@ export function SocialProofLogos() {
   return (
     <div className="w-full bg-transparent py-8 sm:py-12 overflow-hidden relative z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Heading - Z-index ensures visibility above background */}
-        <h2 className="text-center text-white text-lg sm:text-xl font-bold mb-8 sm:mb-12 relative z-50">
-          Akikkel már együtt dolgoztunk:
-        </h2>
-
         {/* True Infinite Horizontal Carousel */}
         <div className="relative">
           <motion.div
