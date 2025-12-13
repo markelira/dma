@@ -258,7 +258,7 @@ export function AllCoursesShowcase() {
           categories={categories}
           instructors={instructors}
           courseType="MASTERCLASS"
-          title="Masterclass-ok"
+          title="Masterclassok"
         />
 
         <CourseCarousel
