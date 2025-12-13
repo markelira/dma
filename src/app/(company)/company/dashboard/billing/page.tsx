@@ -277,19 +277,6 @@ export default function CompanyBillingPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Admin Badge */}
-        <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-brand-secondary flex items-center justify-center">
-              <Building2 className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-900">Vállalati adminisztrátor</p>
-              <p className="text-sm text-gray-600">Teljes hozzáférés a számlázás kezeléséhez</p>
-            </div>
-          </div>
-        </div>
-
         {/* Trial Banner */}
         {showTrialBanner && (
           <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
