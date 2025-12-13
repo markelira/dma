@@ -355,6 +355,7 @@ async function handleIndividualSubscription(params) {
             subscriptionStatus,
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
+            hasUsedTrial: subscriptionStatus === 'trialing' ? true : undefined,
             updatedAt: new Date().toISOString(),
         });
         v2_1.logger.info('[handleIndividualSubscription] Individual subscription created', {
@@ -421,6 +422,7 @@ async function handleCompanySubscription(params) {
             subscriptionStatus,
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
+            hasUsedTrial: subscriptionStatus === 'trialing' ? true : undefined,
             updatedAt: new Date().toISOString(),
         });
         // Also create a subscription document for fallback lookup
@@ -553,10 +555,15 @@ async function handleSubscriptionUpdated(subscription) {
             // Also update the user's subscriptionStatus
             const subscriptionData = subscriptionDoc.data();
             if (subscriptionData.userId) {
-                await firestore.collection('users').doc(subscriptionData.userId).update({
+                const updateUserData = {
                     subscriptionStatus: status,
                     updatedAt: new Date().toISOString(),
-                });
+                };
+                // If subscription was/is trialing, mark that user has used trial
+                if (subscriptionData.status === 'trialing') {
+                    updateUserData.hasUsedTrial = true;
+                }
+                await firestore.collection('users').doc(subscriptionData.userId).update(updateUserData);
             }
         }
         v2_1.logger.info('[handleSubscriptionUpdated] Subscription updated', {

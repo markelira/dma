@@ -629,7 +629,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription): Pro
         };
 
         // If subscription was/is trialing, mark that user has used trial
-        if (status === 'trialing' || (subscriptionData.status === 'trialing' && status !== 'trialing')) {
+        if (subscriptionData.status === 'trialing') {
           updateUserData.hasUsedTrial = true;
         }
 

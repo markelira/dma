@@ -98,6 +98,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                         isActive: true,
                         hasActiveSubscription: true,
                         viaTeam: true,
+                        hasUsedTrial: userData?.hasUsedTrial || false,
                         subscription: {
                             id: userData.stripeSubscriptionId || teamData?.stripeSubscriptionId || userData.teamId,
                             subscriptionId: teamData?.stripeSubscriptionId || userData.stripeSubscriptionId,
@@ -119,6 +120,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                 hasSubscription: true,
                 isActive: true,
                 hasActiveSubscription: true,
+                hasUsedTrial: userData?.hasUsedTrial || false,
                 subscription: {
                     id: userData.stripeSubscriptionId || 'direct',
                     subscriptionId: userData.stripeSubscriptionId,
@@ -148,6 +150,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                 hasSubscription: true,
                 isActive: true,
                 hasActiveSubscription: true,
+                hasUsedTrial: userData?.hasUsedTrial || false,
                 subscription: {
                     id: subscriptionDoc.id,
                     subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
@@ -176,6 +179,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                         isActive: true,
                         hasActiveSubscription: true,
                         inheritedFromTeam: true,
+                        hasUsedTrial: userData?.hasUsedTrial || false,
                         subscription: {
                             id: teamData.stripeSubscriptionId || teamId,
                             subscriptionId: teamData.stripeSubscriptionId,
@@ -221,6 +225,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                         isActive: true,
                         hasActiveSubscription: true,
                         viaCompany: true,
+                        hasUsedTrial: userData?.hasUsedTrial || false,
                         subscription: {
                             id: companyData.stripeSubscriptionId || companyId,
                             subscriptionId: companyData.stripeSubscriptionId,
@@ -245,6 +250,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
             hasSubscription: false,
             isActive: false,
             hasActiveSubscription: false,
+            hasUsedTrial: userData?.hasUsedTrial || false,
             subscription: null
         };
     }
