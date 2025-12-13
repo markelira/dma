@@ -17,7 +17,7 @@ const SCROLL_THRESHOLD = 100
 
 // Course type nav items configuration
 const COURSE_TYPE_NAV_ITEMS: { type: CourseType; label: string; color: string; url: string }[] = [
-  { type: 'WEBINAR', label: 'Webinárok', color: 'hover:text-purple-600', url: '/webinar' },
+  { type: 'WEBINAR', label: 'Webinár', color: 'hover:text-purple-600', url: '/webinar' },
   { type: 'ACADEMIA', label: 'Akadémia', color: 'hover:text-blue-600', url: '/akademia' },
   { type: 'MASTERCLASS', label: 'Masterclass', color: 'hover:text-amber-600', url: '/masterclass' },
   { type: 'PODCAST', label: 'Podcast', color: 'hover:text-green-600', url: '/podcast' },
@@ -139,7 +139,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
                     fontSize: scrolled ? '13px' : '14px',
                   }}
                 >
-                  Kategóriák
+                  Területek
                   <svg
                     className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'categories' ? 'rotate-180' : ''}`}
                     fill="none"

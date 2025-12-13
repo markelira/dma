@@ -199,7 +199,7 @@ export function NewFramerNavbar() {
                     onClick={closeMobileMenu}
                     className="block text-white text-lg font-medium hover:text-white/80 transition-colors duration-200 py-2 px-6 min-h-[44px]"
                   >
-                    Webinárok
+                    Webinár
                   </Link>
                   <Link
                     href="/akademia"

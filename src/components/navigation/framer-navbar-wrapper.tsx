@@ -69,7 +69,7 @@ export function FramerNavbarWrapper() {
                       onClick={closeMobileMenu}
                       className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
                     >
-                      Webinárok
+                      Webinár
                     </Link>
                     <Link
                       href="/dashboard/academia"
@@ -101,7 +101,7 @@ export function FramerNavbarWrapper() {
                       onClick={closeMobileMenu}
                       className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-purple-50 hover:text-purple-600 rounded-xl transition-colors min-h-[48px]"
                     >
-                      Webinárok
+                      Webinár
                     </Link>
                     <Link
                       href="/akademia"
@@ -134,7 +134,7 @@ export function FramerNavbarWrapper() {
                       onClick={closeMobileMenu}
                       className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                     >
-                      Kategóriák
+                      Területek
                     </Link>
                   </>
                 )}
