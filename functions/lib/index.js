@@ -244,6 +244,12 @@ exports.requestPasswordReset = (0, https_1.onCall)({
     region: 'us-central1',
 }, async (request) => {
     try {
+        // Log configuration status
+        v2_1.logger.info('Password reset request started', {
+            hasSendGridKey: !!process.env.SENDGRID_API_KEY,
+            fromEmail: FROM_EMAIL,
+            baseUrl: process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000'
+        });
         const { email } = request.data;
         if (!email) {
             throw new Error('Email cím kötelező.');
@@ -435,11 +441,28 @@ exports.requestPasswordReset = (0, https_1.onCall)({
                 };
             }
             catch (error) {
-                v2_1.logger.error('SendGrid error, falling back to SMTP:', error);
+                v2_1.logger.error('SendGrid error, falling back to SMTP:', {
+                    message: error.message,
+                    code: error.code,
+                    statusCode: error.response?.statusCode,
+                    body: error.response?.body,
+                    to: email,
+                    from: FROM_EMAIL
+                });
             }
         }
         // Use nodemailer (Brevo, Gmail, or Ethereal)
-        const transporter = await createTransporter();
+        let transporter;
+        try {
+            transporter = await createTransporter();
+        }
+        catch (transportError) {
+            v2_1.logger.error('Failed to create email transporter:', transportError);
+            return {
+                success: false,
+                error: 'Email service temporarily unavailable. Please try again later.'
+            };
+        }
         const fromEmail = process.env.FROM_EMAIL || process.env.GMAIL_USER || 'noreply@dma.hu';
         const mailOptions = {
             from: `"DMA Platform" <${fromEmail}>`,
@@ -461,8 +484,18 @@ exports.requestPasswordReset = (0, https_1.onCall)({
         };
     }
     catch (error) {
-        v2_1.logger.error('Password reset request error:', error);
-        throw new Error(error.message || 'Hiba történt a jelszó visszaállítási kérelem során.');
+        v2_1.logger.error('Password reset request error:', {
+            message: error.message,
+            code: error.code,
+            stack: error.stack,
+            response: error.response?.body
+        });
+        // Return error response instead of throwing
+        return {
+            success: false,
+            error: 'Hiba történt a jelszó visszaállítási kérelem során. Kérjük, próbáld újra később.',
+            // Don't expose internal error details to client for security
+        };
     }
 });
 /**

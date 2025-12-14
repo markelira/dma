@@ -364,7 +364,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         />
 
         {/* Main Content */}
-        <div ref={detailsRef} className="w-full mx-auto max-w-[1440px] 2xl:max-w-[1800px] 3xl:max-w-[2400px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 2xl:px-24 py-8 sm:py-10 lg:py-12">
+        <div ref={detailsRef} className="relative z-10 w-full mx-auto max-w-[1440px] 2xl:max-w-[1800px] 3xl:max-w-[2400px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 2xl:px-24 py-8 sm:py-10 lg:py-12">
           {/* Course Type Info - Type-specific details */}
           <CourseTypeInfo
             courseType={courseType}

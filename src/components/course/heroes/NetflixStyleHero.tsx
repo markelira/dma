@@ -133,7 +133,7 @@ export function NetflixStyleHero({
   }, [modules]);
 
   return (
-    <div className="relative min-h-[500px]">
+    <div className="relative min-h-[500px] overflow-hidden">
       {/* Background Image - fixed height */}
       <div className="absolute inset-0 h-[70vh] min-h-[500px]">
         {imageUrl ? (
