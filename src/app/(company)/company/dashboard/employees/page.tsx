@@ -921,7 +921,7 @@ export default function EmployeesPage() {
                   FEDEZD FEL 7 NAPIG INGYEN
                 </h2>
                 <p className="text-white/90 text-center text-sm">
-                  Munkatárs meghívás: Miért ne add el a termékeid?
+                  Munkatárs meghívás
                 </p>
               </div>
 
