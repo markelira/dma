@@ -46,13 +46,16 @@ export function WelcomePopup({ onDismiss }: WelcomePopupProps) {
                 <PartyPopper className="w-8 h-8 text-white" />
               </motion.div>
 
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Örülünk, hogy itt vagy!
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                Gratulálunk a döntésedhez,
               </h2>
 
+              <p className="text-lg font-semibold text-gray-800 mb-4">
+                már te is a struktúraépítők közé tartozol!
+              </p>
+
               <p className="text-gray-600 mb-6 leading-relaxed">
-                Most 7 napig ingyen férsz hozzá minden tartalomhoz.
-                Fedezd fel a platformot és kezdd el a tanulást!
+                Most 7 napig ingyen hozzáférsz minden tartalomhoz és utána is csak 14.990 Ft-ért tudod folytatni a kalandot!
               </p>
 
               <button
