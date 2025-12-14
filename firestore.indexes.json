@@ -183,6 +183,14 @@
         { "fieldPath": "courseType", "order": "ASCENDING" },
         { "fieldPath": "contentCreatedAt", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "passwordResetAttempts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "email", "order": "ASCENDING" },
+        { "fieldPath": "attemptedAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
