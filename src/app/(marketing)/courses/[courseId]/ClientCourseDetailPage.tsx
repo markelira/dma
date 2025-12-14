@@ -382,13 +382,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
             <div className="lg:col-span-2 space-y-8">
               {/* What You'll Learn Section */}
               {c.whatYouWillLearn && c.whatYouWillLearn.length > 0 && (
-                <motion.section
-                  className="py-6 border-b border-gray-800"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                >
+                <section className="py-6 border-b border-gray-800">
                   <h2 className="text-2xl font-bold text-white mb-6">
                     {terminology.outcomesLabel}
                   </h2>
@@ -400,7 +394,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
                       </div>
                     ))}
                   </div>
-                </motion.section>
+                </section>
               )}
 
               {/* Curriculum Section - Netflix-style episode layout */}
