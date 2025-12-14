@@ -168,11 +168,6 @@ export default function DashboardCoursesPage() {
   if (enrichedEnrollments.length === 0) {
     return (
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Saját tartalmaim</h1>
-          <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
-        </div>
-
         <DashboardSearch className="my-2" />
 
         <div className="flex flex-col items-center justify-center py-16 text-center bg-white rounded-xl border border-gray-200">

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Infinity } from 'lucide-react';
-import { CourseType } from '@/types';
+import { CourseType, COURSE_TYPE_LABELS } from '@/types';
 import { getStartActionText, getContinueActionText } from '@/lib/terminology';
 
 interface StickyBottomCTAProps {
@@ -18,6 +18,7 @@ export function StickyBottomCTA({ courseTitle, courseType, onEnroll, isEnrolled 
   const buttonText = isEnrolled
     ? getContinueActionText(courseType)
     : getStartActionText(courseType);
+  const courseTypeLabel = COURSE_TYPE_LABELS[courseType] || 'Tartalom';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,7 +37,7 @@ export function StickyBottomCTA({ courseTitle, courseType, onEnroll, isEnrolled 
       <div className="bg-white/90 backdrop-blur-xl border-t border-gray-200 shadow-2xl p-4">
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-gray-600 mb-1">Tartalom</p>
+            <p className="text-xs text-gray-600 mb-1">{courseTypeLabel}</p>
             <p className="text-sm font-bold text-gray-900 truncate">{courseTitle}</p>
           </div>
           <Button

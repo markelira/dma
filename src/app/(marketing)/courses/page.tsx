@@ -3,17 +3,19 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { motion } from "motion/react"
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Loader2 } from 'lucide-react'
 import { db, functions as fbFunctions } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
+import { AuthProvider } from '@/contexts/AuthContext'
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper'
 import Footer from '@/components/landing-home/ui/footer'
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel'
-import { AdvancedFilterBar } from '@/components/courses/AdvancedFilterBar'
-import { CarouselSection } from '@/components/courses/CarouselSection'
+import { DashboardSearch, DashboardFilters } from '@/components/dashboard/DashboardSearch'
+import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow'
 import { useInstructors } from '@/hooks/useInstructorQueries'
-import { shuffleArray } from '@/lib/utils'
+import { useEnrollments } from '@/hooks/useEnrollments'
+import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils'
 
 interface Course {
   id: string
@@ -39,18 +41,33 @@ interface Course {
   tags?: string[]
 }
 
+// Helper to get first lesson ID from course (flat lessons array)
+function getFirstLessonId(course: Course): string | undefined {
+  const lessons = (course as any).lessons || [];
+  if (lessons.length === 0) return undefined;
+
+  const sortedLessons = [...lessons]
+    .sort((a: any, b: any) => (a.order || 0) - (b.order || 0))
+    .filter((l: any) => l.status === 'PUBLISHED' || !l.status);
+
+  return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
+}
+
 export default function CoursesPage() {
   const searchParams = useSearchParams()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([])
   const [targetAudiences, setTargetAudiences] = useState<Array<{ id: string; name: string }>>([])
-  // Multi-select state - arrays instead of single strings
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedTargetAudiences, setSelectedTargetAudiences] = useState<string[]>([])
-  const [selectedCourseTypes, setSelectedCourseTypes] = useState<string[]>([])
-  const [selectedInstructors, setSelectedInstructors] = useState<string[]>([])
+  const [activeFilters, setActiveFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
+  })
   const { data: instructors = [] } = useInstructors()
+  const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments()
 
   // Auto-select category from URL query parameter
   useEffect(() => {
@@ -58,11 +75,14 @@ export default function CoursesPage() {
     if (categoryParam && categories.length > 0) {
       // Check if the category ID exists in our categories
       const categoryExists = categories.find(c => c.id === categoryParam)
-      if (categoryExists && !selectedCategories.includes(categoryParam)) {
-        setSelectedCategories([categoryParam])
+      if (categoryExists && !activeFilters.categoryIds.includes(categoryParam)) {
+        setActiveFilters(prev => ({
+          ...prev,
+          categoryIds: [categoryParam]
+        }))
       }
     }
-  }, [searchParams, categories, selectedCategories])
+  }, [searchParams, categories, activeFilters.categoryIds])
 
   // Fetch categories
   useEffect(() => {
@@ -139,319 +159,304 @@ export default function CoursesPage() {
     return () => unsubscribe()
   }, [])
 
-  // Apply filters and organize courses by type (with multi-select OR logic)
-  const filteredCoursesByType = useMemo(() => {
-    let filtered = courses
+  // Check if any filters are active
+  const hasActiveFilters = activeFilters.query ||
+    activeFilters.categoryIds.length > 0 ||
+    activeFilters.audienceIds.length > 0 ||
+    activeFilters.courseTypes.length > 0 ||
+    activeFilters.instructorIds.length > 0;
 
-    // Apply category filter (OR logic for multi-select)
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(c => {
-        return selectedCategories.some(catId => {
-          if (c.categoryIds?.includes(catId)) return true
-          if (c.categoryId === catId) return true
-          return false
-        })
-      })
+  // Filter courses
+  const filteredCourses = useMemo(() => {
+    if (!courses || !hasActiveFilters) return null;
+
+    let results = [...courses];
+
+    // Search query
+    if (activeFilters.query) {
+      const searchLower = activeFilters.query.toLowerCase();
+      results = results.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
     }
 
-    // Apply target audience filter (OR logic for multi-select)
-    if (selectedTargetAudiences.length > 0) {
-      filtered = filtered.filter(c =>
-        selectedTargetAudiences.some(audId => c.targetAudienceIds?.includes(audId))
-      )
+    // Categories (OR logic)
+    if (activeFilters.categoryIds.length > 0) {
+      results = results.filter(course => {
+        return activeFilters.categoryIds.some(catId => {
+          if (course.categoryIds?.includes(catId)) return true;
+          if ((course as any).category?.id === catId) return true;
+          if ((course as any).categoryId === catId) return true;
+          return false;
+        });
+      });
     }
 
-    // Apply course type filter (OR logic for multi-select)
-    if (selectedCourseTypes.length > 0) {
-      filtered = filtered.filter(c => selectedCourseTypes.includes(c.courseType))
+    // Target Audiences (OR logic)
+    if (activeFilters.audienceIds.length > 0) {
+      results = results.filter(course =>
+        activeFilters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
+      );
     }
 
-    // Apply instructor filter (OR logic for multi-select)
-    if (selectedInstructors.length > 0) {
-      filtered = filtered.filter(c =>
-        selectedInstructors.some(instId =>
-          c.instructorId === instId ||
-          c.instructorIds?.includes(instId)
+    // Course Types (OR logic)
+    if (activeFilters.courseTypes.length > 0) {
+      results = results.filter(course =>
+        activeFilters.courseTypes.includes(course.courseType)
+      );
+    }
+
+    // Instructors (OR logic)
+    if (activeFilters.instructorIds.length > 0) {
+      results = results.filter(course =>
+        activeFilters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
         )
-      )
+      );
     }
 
-    return {
-      ACADEMIA: shuffleArray(filtered.filter(c => c.courseType === 'ACADEMIA')),
-      WEBINAR: shuffleArray(filtered.filter(c => c.courseType === 'WEBINAR')),
-      MASTERCLASS: shuffleArray(filtered.filter(c => c.courseType === 'MASTERCLASS')),
-      PODCAST: shuffleArray(filtered.filter(c => c.courseType === 'PODCAST')),
+    return results.sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
+  }, [courses, hasActiveFilters, activeFilters])
+
+  // Helper to get instructor names
+  const getInstructorNames = (course: Course): string[] => {
+    if (!instructors) return [];
+    const names: string[] = [];
+
+    if (course.instructorId) {
+      const instructor = instructors.find(i => i.id === course.instructorId);
+      if (instructor?.name) names.push(instructor.name);
     }
-  }, [courses, selectedCategories, selectedTargetAudiences, selectedCourseTypes, selectedInstructors])
 
-  // Check if all filtered sections are empty
-  const hasFilteredResults = useMemo(() => {
-    return (
-      filteredCoursesByType.ACADEMIA.length > 0 ||
-      filteredCoursesByType.WEBINAR.length > 0 ||
-      filteredCoursesByType.MASTERCLASS.length > 0 ||
-      filteredCoursesByType.PODCAST.length > 0
-    )
-  }, [filteredCoursesByType])
+    if ((course as any).instructorIds?.length) {
+      (course as any).instructorIds.forEach((id: string) => {
+        const instructor = instructors.find(i => i.id === id);
+        if (instructor?.name && !names.includes(instructor.name)) {
+          names.push(instructor.name);
+        }
+      });
+    }
 
-  const hasActiveFilters = selectedCategories.length > 0 || selectedTargetAudiences.length > 0 || selectedCourseTypes.length > 0 || selectedInstructors.length > 0
+    return names;
+  };
 
-  // Build hero slides with one course from each type
+  // Build hero slides - 5 random shuffled courses
   const heroSlides = useMemo(() => {
-    const slides: Array<{
-      id: string
-      title: string
-      description?: string
-      thumbnailUrl?: string
-      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST'
-      instructorNames?: string[]
-      duration?: string
-    }> = []
+    if (!courses || courses.length === 0) return [];
 
-    // Helper to get instructor names
-    const getInstructorNames = (course: Course): string[] => {
-      if (!instructors) return []
-      const names: string[] = []
-
-      if (course.instructorId) {
-        const instructor = instructors.find(i => i.id === course.instructorId)
-        if (instructor?.name) names.push(instructor.name)
-      }
-
-      if ((course as any).instructorIds?.length) {
-        (course as any).instructorIds.forEach((id: string) => {
-          const instructor = instructors.find(i => i.id === id)
-          if (instructor?.name && !names.includes(instructor.name)) {
-            names.push(instructor.name)
-          }
-        })
-      }
-
-      return names
+    // Shuffle courses using Fisher-Yates with date seed
+    const shuffled = [...courses];
+    const today = new Date().toDateString();
+    let seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      seed = (seed * 9301 + 49297) % 233280;
+      const j = Math.floor((seed / 233280) * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
-    // Get latest from each course type
-    const sortedCourses = [...courses].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime()
-      const dateB = new Date(b.createdAt).getTime()
-      return dateB - dateA
-    })
+    // Take first 5
+    return shuffled.slice(0, 5).map(course => {
+      const enrollment = enrollments?.find(e => e.courseId === course.id);
+      return {
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        thumbnailUrl: course.thumbnailUrl,
+        courseType: course.courseType,
+        instructorNames: getInstructorNames(course),
+        duration: course.duration,
+        progress: enrollment?.progress,
+        isEnrolled: !!enrollment,
+        currentLessonId: enrollment?.currentLessonId,
+        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
+      };
+    });
+  }, [courses, enrollments, instructors])
 
-    const webinar = sortedCourses.find(c => c.courseType === 'WEBINAR')
-    const academia = sortedCourses.find(c => c.courseType === 'ACADEMIA')
-    const masterclass = sortedCourses.find(c => c.courseType === 'MASTERCLASS')
-    const podcast = sortedCourses.find(c => c.courseType === 'PODCAST')
+  // Popular courses (top by enrollment count)
+  const popularCourses = useMemo(() => {
+    if (!courses) return [];
+    return shufflePopularCourses(courses, 10);
+  }, [courses]);
 
-    // Add in order: Webinar, Academia, Masterclass, Podcast
-    if (webinar) {
-      slides.push({
-        id: webinar.id,
-        title: webinar.title,
-        description: webinar.description,
-        thumbnailUrl: webinar.thumbnailUrl,
-        courseType: 'WEBINAR',
-        instructorNames: getInstructorNames(webinar),
-        duration: webinar.duration,
+  // Newest courses (sorted by createdAt)
+  const newestCourses = useMemo(() => {
+    if (!courses) return [];
+    return sortByContentCreatedAt(courses).slice(0, 10);
+  }, [courses]);
+
+  // Category rows
+  const categoryRows = useMemo(() => {
+    if (!categories || !courses) return [];
+
+    return categories
+      .map(category => {
+        const categoryCourses = courses.filter(course => {
+          if (course.categoryIds?.includes(category.id)) return true;
+          if ((course as any).category?.id === category.id) return true;
+          if ((course as any).categoryId === category.id) return true;
+          return false;
+        });
+        return {
+          category,
+          courses: categoryCourses,
+        };
       })
-    }
+      .filter(row => row.courses.length > 0);
+  }, [categories, courses]);
 
-    if (academia) {
-      slides.push({
-        id: academia.id,
-        title: academia.title,
-        description: academia.description,
-        thumbnailUrl: academia.thumbnailUrl,
-        courseType: 'ACADEMIA',
-        instructorNames: getInstructorNames(academia),
-        duration: academia.duration,
-      })
-    }
+  // Fallback section check
+  const showFallbackSection = useMemo(() => {
+    return courses && courses.length > 0 && categoryRows.length === 0;
+  }, [courses, categoryRows])
 
-    if (masterclass) {
-      slides.push({
-        id: masterclass.id,
-        title: masterclass.title,
-        description: masterclass.description,
-        thumbnailUrl: masterclass.thumbnailUrl,
-        courseType: 'MASTERCLASS',
-        instructorNames: getInstructorNames(masterclass),
-        duration: masterclass.duration,
-      })
-    }
+  const isLoading = loading || enrollmentsLoading;
 
-    if (podcast) {
-      slides.push({
-        id: podcast.id,
-        title: podcast.title,
-        description: podcast.description,
-        thumbnailUrl: podcast.thumbnailUrl,
-        courseType: 'PODCAST',
-        instructorNames: getInstructorNames(podcast),
-        duration: podcast.duration,
-      })
-    }
-
-    return slides
-  }, [courses, instructors])
-
-  // Calculate stats
-  const stats = useMemo(() => {
-    const totalStudents = courses.reduce((sum, c) => sum + (c.enrollmentCount || 0), 0)
-    const categoryCount = new Set(courses.map(c => c.categoryId || c.category)).size
-    return {
-      totalCourses: courses.length,
-      totalStudents,
-      categoryCount,
-    }
-  }, [courses])
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <>
+      <AuthProvider>
         <FramerNavbarWrapper />
-        <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 mx-auto mb-6 border-4 border-gray-800 border-t-brand-secondary" />
-            <p className="text-base font-normal text-gray-300">Tartalmak betöltése...</p>
-          </div>
+        <div className="flex min-h-[400px] items-center justify-center">
+          <Loader2 className="h-10 w-10 animate-spin text-brand-secondary" />
         </div>
         <Footer border={true} />
-      </>
+      </AuthProvider>
     )
   }
 
+  // Filter change handler
+  const handleFilterChange = (filters: DashboardFilters) => {
+    setActiveFilters(filters);
+  }
+
   return (
-    <>
+    <AuthProvider>
       <FramerNavbarWrapper />
+      <main className="min-h-screen bg-gray-50">
+        <div className="space-y-8 px-4 sm:px-6 lg:px-8 pt-24 pb-8">
+          {/* Hero Carousel */}
+          {heroSlides.length > 0 && (
+            <DashboardHeroCarousel slides={heroSlides} />
+          )}
 
-      <div className="w-full min-h-screen bg-gray-950 overflow-x-hidden">
-        {/* Hero Carousel and Search/Filter */}
-        <div className="bg-gray-950">
-          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pt-20 sm:pt-24 md:pt-28 pb-6 sm:pb-8">
-            {/* Hero Carousel */}
-            {heroSlides.length > 0 && (
-              <div className="mb-8">
-                <DashboardHeroCarousel slides={heroSlides} />
+          {/* Search and Filter */}
+          <DashboardSearch
+            className="my-2"
+            onFilterChange={handleFilterChange}
+          />
+
+          {/* Filtered Results - shown when filters are active */}
+          {hasActiveFilters && filteredCourses && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Találatok ({filteredCourses.length})
+                </h2>
+                <button
+                  onClick={() => setActiveFilters({ query: '', categoryIds: [], audienceIds: [], courseTypes: [], instructorIds: [] })}
+                  className="text-sm text-brand-secondary hover:text-brand-secondary/80"
+                >
+                  Szűrők törlése
+                </button>
               </div>
-            )}
-
-            {/* Search and Filter Bar */}
-            <AdvancedFilterBar
-              courses={courses}
-              categories={categories}
-              targetAudiences={targetAudiences}
-              instructors={instructors}
-              selectedCategories={selectedCategories}
-              selectedTargetAudiences={selectedTargetAudiences}
-              selectedCourseTypes={selectedCourseTypes}
-              selectedInstructors={selectedInstructors}
-              onCategoriesChange={setSelectedCategories}
-              onTargetAudiencesChange={setSelectedTargetAudiences}
-              onCourseTypesChange={setSelectedCourseTypes}
-              onInstructorsChange={setSelectedInstructors}
-              onClearFilters={() => {
-                setSelectedCategories([])
-                setSelectedTargetAudiences([])
-                setSelectedCourseTypes([])
-                setSelectedInstructors([])
-              }}
-              backgroundColor="light"
-            />
-          </div>
-        </div>
-
-        {/* Course Carousels */}
-        <div className="py-12">
-          {/* Show carousels only if there are filtered results */}
-          {hasFilteredResults ? (
-            <>
-              {/* Webinar Carousel */}
-              <CarouselSection
-                title="Webinár"
-                courseType="WEBINAR"
-                courses={filteredCoursesByType.WEBINAR}
-                categories={categories}
-                instructors={instructors}
-                viewAllLink="/webinar"
-                backgroundColor="dark"
-              />
-
-              {/* Academia Carousel */}
-              <CarouselSection
-                title="Akadémia"
-                courseType="ACADEMIA"
-                courses={filteredCoursesByType.ACADEMIA}
-                categories={categories}
-                instructors={instructors}
-                viewAllLink="/akadémia"
-                backgroundColor="dark"
-              />
-
-              {/* Masterclass Carousel */}
-              <CarouselSection
-                title="Masterclass"
-                courseType="MASTERCLASS"
-                courses={filteredCoursesByType.MASTERCLASS}
-                categories={categories}
-                instructors={instructors}
-                viewAllLink="/masterclass"
-                backgroundColor="dark"
-              />
-
-              {/* Podcast Carousel */}
-              <CarouselSection
-                title="Podcast"
-                courseType="PODCAST"
-                courses={filteredCoursesByType.PODCAST}
-                categories={categories}
-                instructors={instructors}
-                viewAllLink="/podcast"
-                backgroundColor="dark"
-              />
-            </>
-          ) : (
-            /* Empty State for Filters */
-            <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8 sm:py-12">
-              <motion.div
-                className="flex flex-col items-center justify-center py-16 px-6 bg-gray-800/60 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-lg max-w-md mx-auto"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center mb-4 shadow-lg">
-                  <BookOpen className="w-8 h-8 text-white" />
+              {filteredCourses.length > 0 ? (
+                <CourseCarouselRow
+                  title=""
+                  courses={filteredCourses}
+                  categories={categories || []}
+                  instructors={instructors || []}
+                  enrollments={enrollments || []}
+                />
+              ) : (
+                <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+                  <p className="text-gray-500">Nincs találat a szűrőknek megfelelő tartalom</p>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">
-                  {hasActiveFilters
-                    ? 'Nem található tartalom a kiválasztott szűrőkkel'
-                    : 'Nincsenek elérhető tartalmak'}
-                </h3>
-                <p className="text-sm font-normal text-gray-300 text-center mb-4">
-                  {hasActiveFilters
-                    ? 'Próbálj más szűrőket választani'
-                    : 'Jelenleg nincsenek közzétett tartalmak'}
-                </p>
-                {hasActiveFilters && (
-                  <button
-                    onClick={() => {
-                      setSelectedCategories([])
-                      setSelectedTargetAudiences([])
-                      setSelectedCourseTypes([])
-                      setSelectedInstructors([])
-                    }}
-                    className="px-6 py-2 text-sm font-medium text-brand-secondary hover:text-brand-secondary-hover bg-brand-secondary/10 hover:bg-brand-secondary/20 rounded-lg transition-all"
-                  >
-                    Szűrők törlése
-                  </button>
-                )}
-              </motion.div>
+              )}
             </div>
           )}
+
+          {/* Regular content - hidden when filters are active */}
+          {!hasActiveFilters && (
+            <>
+              {/* Felkapott tartalmak - most popular */}
+              {popularCourses.length > 0 && (
+                <CourseCarouselRow
+                  title="Felkapott tartalmak"
+                  courses={popularCourses}
+                  categories={categories || []}
+                  instructors={instructors || []}
+                  enrollments={enrollments || []}
+                  viewAllLink="/courses"
+                />
+              )}
+
+              {/* Legújabb tartalmak */}
+              {newestCourses.length > 0 && (
+                <CourseCarouselRow
+                  title="Legújabb tartalmak"
+                  courses={newestCourses}
+                  categories={categories || []}
+                  instructors={instructors || []}
+                  enrollments={enrollments || []}
+                />
+              )}
+
+              {/* Category Carousels */}
+              {categoryRows.map(({ category, courses: categoryCourses }) => (
+                <CourseCarouselRow
+                  key={category.id}
+                  title={category.name}
+                  courses={categoryCourses}
+                  categories={categories || []}
+                  instructors={instructors || []}
+                  enrollments={enrollments || []}
+                  viewAllLink={`/courses?category=${category.id}`}
+                />
+              ))}
+
+              {/* Fallback: All Courses if no categories matched */}
+              {showFallbackSection && courses && (
+                <CourseCarouselRow
+                  title="Felfedezés"
+                  courses={[...courses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))}
+                  categories={categories || []}
+                  instructors={instructors || []}
+                  enrollments={enrollments || []}
+                  viewAllLink="/courses"
+                />
+              )}
+
+              {/* Course Type Carousels */}
+              {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
+                const typeCourses = courses.filter(c => c.courseType === type);
+                if (typeCourses.length === 0) return null;
+
+                const typeLabels: Record<string, string> = {
+                  'WEBINAR': 'Webinár',
+                  'ACADEMIA': 'Akadémia',
+                  'MASTERCLASS': 'Masterclass',
+                  'PODCAST': 'Podcast'
+                };
+
+                return (
+                  <CourseCarouselRow
+                    key={type}
+                    title={typeLabels[type]}
+                    courses={typeCourses}
+                    categories={categories || []}
+                    instructors={instructors || []}
+                    enrollments={enrollments || []}
+                    viewAllLink={`/${type.toLowerCase()}`}
+                  />
+                );
+              })}
+            </>
+          )}
         </div>
-
-      </div>
-
+      </main>
       <Footer border={true} />
-    </>
+    </AuthProvider>
   )
 }
