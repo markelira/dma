@@ -25,7 +25,8 @@ export function NewLessonNavigation({
   isLoading = false,
   courseType,
 }: NewLessonNavigationProps) {
-  const isMasterclass = courseType === 'MASTERCLASS';
+  // Use "rész" for Masterclass and Academia, "lecke" for others
+  const useReszTerminology = courseType === 'MASTERCLASS' || courseType === 'ACADEMIA';
   return (
     <div className="flex items-center justify-between">
       {/* Previous Button */}
@@ -36,7 +37,7 @@ export function NewLessonNavigation({
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
           <ArrowLeftIcon size={20} />
-          <span>{isMasterclass ? 'Előző rész' : 'Előző lecke'}</span>
+          <span>{useReszTerminology ? 'Előző rész' : 'Előző lecke'}</span>
         </button>
       ) : (
         <div />
@@ -49,7 +50,7 @@ export function NewLessonNavigation({
           disabled={isLoading}
           className="flex items-center gap-2 bg-brand-secondary/50 hover:bg-brand-secondary text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg shadow-brand-secondary/20 hover:shadow-brand-secondary/40 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <span>{isMasterclass ? 'Következő rész' : 'Következő lecke'}</span>
+          <span>{useReszTerminology ? 'Következő rész' : 'Következő lecke'}</span>
           <ArrowRightIcon size={20} />
         </button>
       ) : (
