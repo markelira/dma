@@ -154,7 +154,7 @@ export function NetflixStyleHero({
 
       {/* Content */}
       <div className="relative pt-[15vh] pb-16">
-        <div className="max-w-[1440px] 2xl:max-w-[1800px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 w-full">
+        <div className="max-w-[1440px] 2xl:max-w-[1800px] 3xl:max-w-[2400px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

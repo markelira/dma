@@ -241,7 +241,7 @@ body {
 html, body {
     margin: 0 !important;
     padding: 0 !important;
-    overflow-x: hidden !important;
+    overflow-x: auto;  /* Allow horizontal overflow for ultra-wide displays */
 }
 
 /* Ensure Framer sections are full width */
@@ -579,12 +579,6 @@ section[class*="framer-"][class*="framer-"] {
 .touch-target-min {
     min-height: 44px !important;
     min-width: 44px !important;
-}
-
-/* Prevent Horizontal Overflow Globally */
-html, body {
-    overflow-x: hidden !important;
-    max-width: 100vw !important;
 }
 
 /* Mobile-First Container Padding Scale */
