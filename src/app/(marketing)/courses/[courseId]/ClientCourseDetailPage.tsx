@@ -364,7 +364,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         />
 
         {/* Main Content */}
-        <div ref={detailsRef} className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 py-8 sm:py-10 lg:py-12">
+        <div ref={detailsRef} className="w-full mx-auto max-w-[1440px] 2xl:max-w-[1600px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 2xl:px-24 py-8 sm:py-10 lg:py-12">
           {/* Course Type Info - Type-specific details */}
           <CourseTypeInfo
             courseType={courseType}
@@ -567,7 +567,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
         {/* Related Courses Section */}
         {relatedCourses.length > 0 && (
-          <div className="w-full mx-auto max-w-[1440px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 pb-8 sm:pb-10 lg:pb-12">
+          <div className="w-full mx-auto max-w-[1440px] 2xl:max-w-[1600px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 2xl:px-24 pb-8 sm:pb-10 lg:pb-12">
             <RelatedCoursesSection
               courses={relatedCourses}
               categories={categories}
@@ -604,6 +604,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         {!subscription?.isActive && (
           <StickyBottomCTA
             courseTitle={c.title}
+            courseType={courseType}
             onEnroll={handleEnroll}
             isEnrolled={false}
           />

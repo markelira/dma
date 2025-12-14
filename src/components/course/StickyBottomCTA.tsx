@@ -3,15 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Infinity } from 'lucide-react';
+import { CourseType } from '@/types';
+import { getStartActionText, getContinueActionText } from '@/lib/terminology';
 
 interface StickyBottomCTAProps {
   courseTitle: string;
+  courseType: CourseType;
   onEnroll: () => void;
   isEnrolled: boolean;
 }
 
-export function StickyBottomCTA({ courseTitle, onEnroll, isEnrolled }: StickyBottomCTAProps) {
+export function StickyBottomCTA({ courseTitle, courseType, onEnroll, isEnrolled }: StickyBottomCTAProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const buttonText = isEnrolled
+    ? getContinueActionText(courseType)
+    : getStartActionText(courseType);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,7 +44,7 @@ export function StickyBottomCTA({ courseTitle, onEnroll, isEnrolled }: StickyBot
             className="flex-shrink-0 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 hover:shadow-xl text-white font-bold px-6 py-3 rounded-lg transition-all"
           >
             <Infinity className="w-4 h-4 mr-2" />
-            Feliratkozás
+            {buttonText}
           </Button>
         </div>
       </div>
