@@ -23,6 +23,7 @@ import { StickyBottomCTA } from '@/components/course/StickyBottomCTA';
 import { CourseEnrollmentCard } from '@/components/course/CourseEnrollmentCard';
 import { SubscriptionRequiredModal } from '@/components/payment/SubscriptionRequiredModal';
 import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
+import { CompanyEmployeeNoAccessModal } from '@/components/subscription/CompanyEmployeeNoAccessModal';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight } from 'lucide-react';
@@ -39,7 +40,11 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const enrollMutation = useEnrollInCourse();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [showTrialModal, setShowTrialModal] = useState(false);
+  const [showCompanyNoAccessModal, setShowCompanyNoAccessModal] = useState(false);
   const [trialVariant, setTrialVariant] = useState<'course-auth' | 'course-unauth'>('course-auth');
+
+  // Check if user is company employee
+  const isCompanyEmployee = user?.role === 'COMPANY_EMPLOYEE';
   const { data: subscription, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -285,8 +290,14 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
       return;
     }
 
-    // SCENARIO 2: Authenticated but no subscription - show trial popup proactively
+    // SCENARIO 2: Authenticated but no subscription
     if (!subscription?.isActive) {
+      // Company employees see different modal (they can't pay, must contact admin)
+      if (isCompanyEmployee) {
+        setShowCompanyNoAccessModal(true);
+        return;
+      }
+      // Regular users see trial popup
       setTrialVariant('course-auth');
       setShowTrialModal(true);
       return;
@@ -572,8 +583,8 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           </div>
         )}
 
-        {/* Free Trial Modal - Only for non-subscribers */}
-        {!subscription?.isActive && (
+        {/* Free Trial Modal - Only for non-subscribers (not company employees) */}
+        {!subscription?.isActive && !isCompanyEmployee && (
           <FreeTrialModal
             open={showTrialModal}
             onOpenChange={setShowTrialModal}
@@ -584,8 +595,16 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           />
         )}
 
-        {/* Subscription Required Modal - Fallback for errors */}
-        {!subscription?.isActive && (
+        {/* Company Employee No Access Modal - for company employees without company subscription */}
+        {isCompanyEmployee && !subscription?.isActive && (
+          <CompanyEmployeeNoAccessModal
+            open={showCompanyNoAccessModal}
+            onOpenChange={setShowCompanyNoAccessModal}
+          />
+        )}
+
+        {/* Subscription Required Modal - Fallback for errors (not for company employees) */}
+        {!subscription?.isActive && !isCompanyEmployee && (
           <SubscriptionRequiredModal
             open={showSubscriptionModal}
             onOpenChange={setShowSubscriptionModal}

@@ -10,6 +10,7 @@ import { DashboardSearch, DashboardFilters } from '@/components/dashboard/Dashbo
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel';
 import { OnboardingWizard } from '@/components/onboarding/OnboardingWizard';
 import { FreeTrialModal } from '@/components/subscription/FreeTrialModal';
+import { CompanyEmployeeNoAccessModal } from '@/components/subscription/CompanyEmployeeNoAccessModal';
 import { WelcomePopup } from '@/components/dashboard/WelcomePopup';
 import { useTrialPopup } from '@/hooks/useTrialPopup';
 import { useEnrollments } from '@/hooks/useEnrollments';
@@ -49,6 +50,7 @@ export default function DashboardPage() {
   // Trial popup state
   const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial } = useTrialPopup();
   const [showTrialModal, setShowTrialModal] = useState(false);
+  const [showCompanyNoAccessModal, setShowCompanyNoAccessModal] = useState(false);
 
   // Welcome popup state (shows first after registration)
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
@@ -100,10 +102,16 @@ export default function DashboardPage() {
   }, []);
 
   // Check if trial popup should show (AFTER welcome popup is dismissed)
-  // Company employees bypass trial popup (they have company subscription)
+  // Company employees see different modal if company has no subscription
   useEffect(() => {
-    if (shouldShowForAuthUser && !isCompanyEmployee && !hasActiveSubscription && !showWelcomePopup) {
-      setShowTrialModal(true);
+    if (!showWelcomePopup && !hasActiveSubscription) {
+      if (isCompanyEmployee) {
+        // Company employee without company subscription - show contact admin modal
+        setShowCompanyNoAccessModal(true);
+      } else if (shouldShowForAuthUser) {
+        // Regular user - show trial modal
+        setShowTrialModal(true);
+      }
     }
   }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup]);
 
@@ -422,7 +430,7 @@ export default function DashboardPage() {
         <WelcomePopup onDismiss={handleWelcomePopupDismiss} />
       )}
 
-      {/* Free Trial Modal - Shows AFTER welcome popup is dismissed */}
+      {/* Free Trial Modal - Shows AFTER welcome popup is dismissed (regular users only) */}
       <FreeTrialModal
         open={showTrialModal}
         onOpenChange={setShowTrialModal}
@@ -430,6 +438,12 @@ export default function DashboardPage() {
         onStartTrial={handleTrialStart}
         onDismiss={handleTrialDismiss}
         hasUsedTrial={hasUsedTrial}
+      />
+
+      {/* Company Employee No Access Modal - for company employees without company subscription */}
+      <CompanyEmployeeNoAccessModal
+        open={showCompanyNoAccessModal}
+        onOpenChange={setShowCompanyNoAccessModal}
       />
 
       {/* Onboarding Wizard - Shows only if trial modal not showing */}
