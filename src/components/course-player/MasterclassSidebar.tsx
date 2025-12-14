@@ -108,11 +108,6 @@ export function MasterclassSidebar({
     }
   };
 
-  // Get global lesson index for display
-  const getLessonIndex = (lessonId: string) => {
-    return lessons.findIndex(l => l.id === lessonId) + 1;
-  };
-
   return (
     <div className="flex h-full w-96 flex-col bg-white border-r border-gray-200">
       {/* Course Header */}
@@ -155,7 +150,6 @@ export function MasterclassSidebar({
               const isCurrentLesson = lesson.id === currentLessonId;
               const isCompleted = completedLessonIds.has(lesson.id);
               const isImported = !!(lesson as any).isImported || !!(lesson as any).sourceCourseid || !!(lesson as any).sourceCourseId;
-              const lessonIndex = getLessonIndex(lesson.id);
 
               return (
                 <button
@@ -167,17 +161,6 @@ export function MasterclassSidebar({
                       : 'hover:bg-gray-50 border-l-4 border-l-transparent'
                   } ${isImported && !isCurrentLesson ? 'bg-brand-secondary/5/30' : ''}`}
                 >
-                  {/* Lesson number */}
-                  <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                    isCurrentLesson
-                      ? 'bg-brand-secondary/50 text-white'
-                      : isCompleted
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {lessonIndex}
-                  </div>
-
                   {/* Lesson Icon */}
                   <div className="flex-shrink-0 mt-0.5">
                     {getLessonIcon(lesson)}
