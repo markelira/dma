@@ -30,6 +30,7 @@ export function AcademiaSidePanel({
   onLessonClick,
 }: AcademiaSidePanelProps) {
   const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+  const [selectedInstructorIndex, setSelectedInstructorIndex] = useState(0);
 
   // Format duration from seconds to readable format
   const formatDuration = (seconds?: number) => {
@@ -58,36 +59,49 @@ export function AcademiaSidePanel({
           <>
             {instructors.length > 1 ? (
               <div className="space-y-4">
-                {/* Avatars in a horizontal row */}
-                <div className="flex justify-center gap-2">
-                  {instructors.map((instructor) => (
-                    <div key={instructor.id} className="relative w-20 h-20">
+                {/* Avatars Row - Clickable Carousel */}
+                <div className="flex justify-center gap-1">
+                  {instructors.map((instructor, index) => (
+                    <button
+                      key={instructor.id}
+                      onClick={() => setSelectedInstructorIndex(index)}
+                      className="relative w-20 h-20 transition-all cursor-pointer hover:scale-105 focus:outline-none"
+                    >
                       {instructor.profilePictureUrl ? (
                         <Image
                           src={instructor.profilePictureUrl}
                           alt={instructor.name}
                           fill
-                          className="rounded-full object-cover ring-2 ring-red-600/50"
+                          className={`rounded-full object-cover transition-all ${
+                            index === selectedInstructorIndex
+                              ? 'ring-4 ring-red-600'
+                              : 'ring-2 ring-red-600/30 hover:ring-red-600/50'
+                          }`}
                         />
                       ) : (
-                        <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center ring-2 ring-red-600/50">
+                        <div className={`w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center transition-all ${
+                          index === selectedInstructorIndex
+                            ? 'ring-4 ring-red-600'
+                            : 'ring-2 ring-red-600/30 hover:ring-red-600/50'
+                        }`}>
                           <User className="w-10 h-10 text-gray-600" />
                         </div>
                       )}
-                    </div>
+                    </button>
                   ))}
                 </div>
 
-                {/* All Instructors Info - Stacked Below Avatars */}
-                <div className="space-y-4">
-                  {instructors.map((instructor) => (
-                    <div key={`info-${instructor.id}`} className="text-center space-y-2">
+                {/* Selected Instructor Info Only */}
+                {(() => {
+                  const instructor = instructors[selectedInstructorIndex];
+                  return (
+                    <div className="text-center space-y-3">
                       {/* Instructor Name */}
                       <h3 className="text-lg font-bold text-white">
                         {instructor.name}
                       </h3>
 
-                      {/* Instructor Title (Titulus) */}
+                      {/* Instructor Title */}
                       {instructor.title && (
                         <p className="text-sm text-gray-400">
                           {instructor.title}
@@ -107,9 +121,14 @@ export function AcademiaSidePanel({
                           {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
                         </span>
                       </div>
+
+                      {/* Instructor Counter */}
+                      <p className="text-sm text-blue-400 font-medium">
+                        {selectedInstructorIndex + 1} / {instructors.length} mentor
+                      </p>
                     </div>
-                  ))}
-                </div>
+                  );
+                })()}
               </div>
             ) : (
               /* Single Instructor - Keep current centered layout */
