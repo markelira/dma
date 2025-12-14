@@ -948,7 +948,7 @@ export default function EmployeesPage() {
 
                 {/* CTA Button */}
                 <Link href="/subscribe/start" className="block mt-6">
-                  <button className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors text-lg">
+                  <button className="w-full py-3 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-bold rounded-full transition-colors text-lg">
                     KIPRÓBÁLOM
                   </button>
                 </Link>
