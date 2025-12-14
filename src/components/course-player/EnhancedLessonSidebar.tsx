@@ -40,14 +40,12 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
     const isActive = lesson.id === currentLessonId
     const isLocked = !hasSubscription && lesson.subscriptionTier === 'PREMIUM'
     const difficulty = lesson.difficulty || 'BEGINNER'
-    const estimatedDuration = lesson.duration ? Math.ceil(lesson.duration / 60) : 8
-    
+
     return {
       isCompleted,
       isActive,
       isLocked,
-      difficulty,
-      estimatedDuration
+      difficulty
     }
   }
 
@@ -162,12 +160,6 @@ export const EnhancedLessonSidebar: React.FC<EnhancedLessonSidebarProps> = ({
 
                         {/* Lesson Metadata Row */}
                         <div className="flex items-center gap-2 flex-wrap">
-                          {/* Duration */}
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-600">{metadata.estimatedDuration}p</span>
-                          </div>
-
                           {/* Difficulty */}
                           <Badge 
                             variant="outline" 

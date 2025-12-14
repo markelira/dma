@@ -56,7 +56,7 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
   onClose,
   className = ''
 }) => {
-  const { t, formatDuration } = useTranslation()
+  const { t } = useTranslation()
 
   // Calculate overall course progress
   const courseStats = useMemo(() => {
@@ -65,10 +65,6 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
     const completedLessons = allLessons.filter(
       l => l.progress?.completed || (l.progress?.watchPercentage ?? 0) >= 90
     ).length
-    const totalDuration = allLessons.reduce(
-      (acc, lesson) => acc + (parseInt(String(lesson.duration || 0)) || 0),
-      0
-    )
     const overallProgress = totalLessons > 0
       ? Math.round((completedLessons / totalLessons) * 100)
       : 0
@@ -76,7 +72,6 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
     return {
       totalLessons,
       completedLessons,
-      totalDuration,
       overallProgress
     }
   }, [course.modules])
@@ -153,11 +148,6 @@ export const CourseNavigationSidebar: React.FC<CourseNavigationSidebarProps> = (
               <span className={playerTypography.bodySmall} style={{ color: playerColors.textSecondary }}>
                 {t('sidebar.lessonsCompleted', { completed: courseStats.completedLessons, total: courseStats.totalLessons })}
               </span>
-              {courseStats.totalDuration > 0 && (
-                <span className={playerTypography.bodySmall} style={{ color: playerColors.textSecondary }}>
-                  {formatDuration(courseStats.totalDuration)}
-                </span>
-              )}
             </div>
           </div>
 

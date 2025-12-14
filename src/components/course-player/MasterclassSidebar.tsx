@@ -85,14 +85,6 @@ export function MasterclassSidebar({
     return <EmptyCircleIcon size={20} />;
   };
 
-  const formatDuration = (duration?: number | string) => {
-    const numDuration = typeof duration === 'string' ? parseInt(duration, 10) : duration;
-    if (!numDuration || numDuration <= 0 || isNaN(numDuration)) return null;
-    const minutes = Math.floor(numDuration / 60);
-    const seconds = numDuration % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
-
   const getLessonTypeLabel = (lesson: Lesson) => {
     switch (lesson.type) {
       case 'VIDEO':
@@ -187,12 +179,6 @@ export function MasterclassSidebar({
                     </div>
                     <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
                       <span>{getLessonTypeLabel(lesson)}</span>
-                      {lesson.duration && Number(lesson.duration) > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>{formatDuration(lesson.duration)}</span>
-                        </>
-                      )}
                     </div>
                     {lesson.description && (
                       <p className="text-xs text-gray-400 line-clamp-1 mt-1">

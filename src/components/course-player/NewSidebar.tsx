@@ -76,12 +76,6 @@ export function NewSidebar({
     return <EmptyCircleIcon size={20} />;
   };
 
-  const formatDuration = (duration?: number) => {
-    if (!duration) return '';
-    const minutes = Math.floor(duration / 60);
-    const seconds = duration % 60;
-    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
-  };
 
   return (
     <div className="flex h-full w-96 flex-col bg-white border-r border-gray-200">
@@ -170,21 +164,6 @@ export function NewSidebar({
                           >
                             {lesson.title}
                           </div>
-                          {lesson.type === 'VIDEO' && lesson.duration && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Video • {formatDuration(lesson.duration)}
-                            </div>
-                          )}
-                          {lesson.type === 'TEXT' && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Olvasmány • {lesson.duration ? `${lesson.duration} perc` : '10 perc'}
-                            </div>
-                          )}
-                          {lesson.type === 'PDF' && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              Olvasmány • PDF
-                            </div>
-                          )}
                         </div>
                       </button>
                     );

@@ -93,13 +93,6 @@ const SidebarComponent = function Sidebar({
                     .map((lesson) => {
                       const isActive = lesson.id === currentLessonId;
                       const isCompleted = completedLessonIds.includes(lesson.id);
-                      const duration = lesson.duration || lesson.muxDuration;
-                      const formatDuration = (seconds?: number): string => {
-                        if (!seconds) return '';
-                        const mins = Math.floor(seconds / 60);
-                        const secs = Math.floor(seconds % 60);
-                        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                      };
 
                       return (
                         <button
@@ -127,9 +120,6 @@ const SidebarComponent = function Sidebar({
                               isActive ? "text-primary" : "text-foreground/80"
                             )}>
                               {lesson.title}
-                            </span>
-                            <span className="text-xs text-muted-foreground flex items-center gap-1">
-                              {lesson.type === 'VIDEO' && "Videó •"} {duration ? formatDuration(duration) : ''}
                             </span>
                           </div>
                         </button>
