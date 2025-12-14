@@ -102,6 +102,26 @@ export const addEmployee = https.onCall(
         );
       }
 
+      // 2b. Check if email already exists in Firebase Auth
+      try {
+        await admin.auth().getUserByEmail(email.toLowerCase());
+        // If we get here, user exists - throw error
+        throw new HttpsError(
+          'already-exists',
+          'Ez az email cím már regisztrálva van. A felhasználó a beállításokban csatlakozhat a céghez.'
+        );
+      } catch (authError: any) {
+        // user-not-found is expected and good - means we can invite
+        if (authError.code !== 'auth/user-not-found' && !(authError instanceof HttpsError)) {
+          console.error('[addEmployee] Error checking email in Auth:', authError);
+          throw new HttpsError('internal', 'Failed to verify email availability');
+        }
+        // Re-throw our HttpsError if that's what it is
+        if (authError instanceof HttpsError) {
+          throw authError;
+        }
+      }
+
       // 3. Generate secure invite token
       const inviteToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date();
