@@ -127,11 +127,6 @@ export function MasterclassSidePanel({
                           {instructor.role === 'SZEREPLŐ' ? 'Vendég' : 'Mentor'}
                         </span>
                       </div>
-
-                      {/* Instructor Counter */}
-                      <p className="text-sm text-blue-400 font-medium">
-                        {selectedInstructorIndex + 1} / {instructors.length} mentor
-                      </p>
                     </div>
                   );
                 })()}
