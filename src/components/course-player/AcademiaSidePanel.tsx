@@ -33,10 +33,11 @@ export function AcademiaSidePanel({
   const [selectedInstructorIndex, setSelectedInstructorIndex] = useState(0);
 
   // Format duration from seconds to readable format
-  const formatDuration = (seconds?: number) => {
-    if (!seconds) return null;
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
+  const formatDuration = (seconds?: number | string) => {
+    const numSeconds = typeof seconds === 'string' ? parseInt(seconds, 10) : seconds;
+    if (!numSeconds || numSeconds <= 0 || isNaN(numSeconds)) return null;
+    const mins = Math.floor(numSeconds / 60);
+    const secs = numSeconds % 60;
     return `${mins}:${String(secs).padStart(2, '0')}`;
   };
 
@@ -256,7 +257,7 @@ export function AcademiaSidePanel({
                         }`}>
                           {lesson.title}
                         </p>
-                        {lesson.duration && (
+                        {lesson.duration && Number(lesson.duration) > 0 && (
                           <p className="text-xs text-gray-500">
                             {formatDuration(lesson.duration)}
                           </p>
