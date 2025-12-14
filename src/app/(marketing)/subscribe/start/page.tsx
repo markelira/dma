@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { useStripe } from '@/hooks/useStripe';
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
+import { getDashboardPath } from '@/lib/routing';
 import { Loader2 } from 'lucide-react';
 
 // Monthly subscription priceId (14,990 HUF/mo with 7-day trial)
@@ -22,10 +23,11 @@ export default function SubscribeStartPage() {
   // Check if user already has active subscription - redirect to dashboard if so
   useEffect(() => {
     if (subscription?.isActive) {
-      console.log('[SubscribeStart] User already has active subscription, redirecting to dashboard');
-      router.push('/dashboard');
+      const dashboardPath = getDashboardPath((user as any)?.role);
+      console.log('[SubscribeStart] User already has active subscription, redirecting to', dashboardPath);
+      router.push(dashboardPath);
     }
-  }, [subscription, router]);
+  }, [subscription, router, user]);
 
   useEffect(() => {
     // Wait for auth to be ready

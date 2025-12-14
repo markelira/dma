@@ -9,6 +9,7 @@ import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus'
 import { useAuthStore } from '@/stores/authStore'
+import { getDashboardPath } from '@/lib/routing'
 import Link from 'next/link'
 
 interface SubscriptionData {
@@ -25,7 +26,7 @@ function SubscribeSuccessContent() {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { refetch: refetchSubscription } = useSubscriptionStatus()
-  const { updateSubscriptionStatus } = useAuthStore()
+  const { updateSubscriptionStatus, user } = useAuthStore()
 
   useEffect(() => {
     const verifySubscription = async () => {
@@ -193,7 +194,7 @@ function SubscribeSuccessContent() {
                   Tartalmak böngészése
                 </Button>
               </Link>
-              <Link href="/dashboard" className="flex-1">
+              <Link href={getDashboardPath(user?.role)} className="flex-1">
                 <Button variant="outline" className="w-full" size="lg">
                   <Home className="w-4 h-4 mr-2" />
                   Irányítópult

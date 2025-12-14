@@ -10,6 +10,7 @@ import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
 import { Building2 } from 'lucide-react';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
+import { getDashboardPath } from '@/lib/routing';
 
 interface InviteData {
   valid: boolean;
@@ -34,8 +35,8 @@ function RegisterPageContent() {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteError, setInviteError] = useState('');
 
-  // Get params from URL
-  const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
+  // Get params from URL (redirectTo is kept for potential future use but not currently used)
+  const redirectToParam = searchParams?.get('redirect_to');
   const inviteToken = searchParams?.get('invite');
   const inviteEmail = searchParams?.get('email');
 
@@ -99,13 +100,14 @@ function RegisterPageContent() {
   }, []); // Run once on mount
 
   useEffect(() => {
-    // If user is already authenticated, redirect to company dashboard
+    // If user is already authenticated, redirect to appropriate dashboard
     // Don't redirect if we're verifying email
     const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
 
     if (user && !authLoading && !isVerifying && !pendingVerification) {
-      console.log('[Register Page] User authenticated, redirecting to /company/dashboard');
-      router.push('/company/dashboard');
+      const dashboardPath = getDashboardPath((user as any)?.role);
+      console.log('[Register Page] User authenticated, redirecting to', dashboardPath);
+      router.push(dashboardPath);
     }
   }, [user, authLoading, router, isVerifying]);
 

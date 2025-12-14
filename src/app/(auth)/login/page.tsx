@@ -6,6 +6,7 @@ import { functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { useLogin } from '@/hooks/useAuthQueries';
 import { useAuthStore } from '@/stores/authStore';
+import { getDashboardPath } from '@/lib/routing';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'motion/react';
 import { Mail, CheckCircle, AlertCircle, X, Eye, EyeOff } from 'lucide-react';
@@ -33,16 +34,20 @@ export default function LoginPage() {
   const [forgotError, setForgotError] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState(false);
 
-  // Get redirect URL from query params or default to dashboard
-  const redirectTo = searchParams?.get('redirect_to') || '/dashboard';
+  // Get redirect URL from query params (role-based default is computed in useEffect)
+  const redirectToParam = searchParams?.get('redirect_to');
   // Check if this is a trial flow (coming from course detail page trial popup)
   const isTrialFlow = searchParams?.get('trial') === 'true';
 
   useEffect(() => {
+    // Compute role-based default redirect
+    const redirectTo = redirectToParam || getDashboardPath(user?.role);
+
     console.log('🚀 [DIAGNOSTIC] Login page redirect check', {
       hasUser: !!user,
       isLoading,
       userId: user?.id,
+      userRole: user?.role,
       willRedirect: user && !isLoading,
       redirectTo,
       isTrialFlow,
@@ -54,6 +59,7 @@ export default function LoginPage() {
       console.log('🚀 [DIAGNOSTIC] Login page: User authenticated, REDIRECTING to:', {
         redirectTo,
         userId: user.id,
+        userRole: user.role,
         isTrialFlow,
         timestamp: Date.now()
       });
@@ -65,7 +71,7 @@ export default function LoginPage() {
         router.push(redirectTo);
       }
     }
-  }, [user, isLoading, redirectTo, isTrialFlow, router]);
+  }, [user, isLoading, redirectToParam, isTrialFlow, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,8 +347,8 @@ export default function LoginPage() {
         Még nincs fiókod?{' '}
         <Link
           className="font-medium text-gray-900 underline hover:no-underline"
-          href={redirectTo !== '/dashboard'
-            ? `/register?redirect_to=${encodeURIComponent(redirectTo)}${isTrialFlow ? '&trial=true' : ''}`
+          href={redirectToParam
+            ? `/register?redirect_to=${encodeURIComponent(redirectToParam)}${isTrialFlow ? '&trial=true' : ''}`
             : '/register'}
         >
           Regisztrálj itt
