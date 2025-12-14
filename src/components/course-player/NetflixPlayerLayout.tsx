@@ -490,7 +490,7 @@ export function NetflixPlayerLayout({
                   }`}
                 >
                   <ArrowLeftIcon size={18} />
-                  {isMasterclass ? 'Előző rész' : 'Előző lecke'}
+                  Előző rész
                 </button>
                 <span className="text-sm text-gray-500">{currentLesson.title}</span>
                 <button
@@ -500,7 +500,7 @@ export function NetflixPlayerLayout({
                     nextLesson ? 'bg-brand-secondary hover:bg-brand-secondary-hover text-white shadow-md' : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  {isMasterclass ? 'Következő rész' : 'Következő lecke'}
+                  Következő rész
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -782,7 +782,7 @@ export function NetflixPlayerLayout({
                   }`}
                 >
                   <ArrowLeftIcon size={18} />
-                  {isMasterclass ? 'Előző rész' : 'Előző lecke'}
+                  Előző rész
                 </button>
                 <span className="text-sm text-gray-500">
                   {currentLesson.title}
@@ -796,7 +796,7 @@ export function NetflixPlayerLayout({
                       : 'bg-gray-50 text-gray-300 cursor-not-allowed'
                   }`}
                 >
-                  {isMasterclass ? 'Következő rész' : 'Következő lecke'}
+                  Következő rész
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
