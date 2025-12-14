@@ -13,7 +13,10 @@ import {
   Eye,
   EyeOff,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  UserPlus,
+  X,
+  Users
 } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
@@ -67,6 +70,19 @@ interface UnifiedRegistrationResponse {
   message?: string;
 }
 
+interface AddEmployeeInput {
+  companyId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface AddEmployeeResponse {
+  success: boolean;
+  employeeId: string;
+  inviteToken: string;
+}
+
 export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   inviteData,
   onRegistrationComplete
@@ -79,6 +95,17 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
+
+  // Employee invite state (max 5)
+  const [pendingEmployees, setPendingEmployees] = useState<{
+    email: string;
+    firstName: string;
+    lastName: string;
+  }[]>([]);
+  const [newEmployeeEmail, setNewEmployeeEmail] = useState('');
+  const [newEmployeeFirstName, setNewEmployeeFirstName] = useState('');
+  const [newEmployeeLastName, setNewEmployeeLastName] = useState('');
+  const [employeeError, setEmployeeError] = useState('');
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: inviteData?.employeeName.split(' ')[0] || '',
@@ -96,6 +123,48 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const updateField = (field: keyof UnifiedRegistrationData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setError('');
+  };
+
+  // Employee invite helpers
+  const handleAddEmployee = () => {
+    setEmployeeError('');
+
+    if (pendingEmployees.length >= 5) {
+      setEmployeeError('Maximum 5 munkatársat adhatsz hozzá');
+      return;
+    }
+
+    if (!newEmployeeEmail.trim() || !newEmployeeFirstName.trim() || !newEmployeeLastName.trim()) {
+      setEmployeeError('Minden mező kitöltése kötelező');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmployeeEmail)) {
+      setEmployeeError('Érvénytelen email cím');
+      return;
+    }
+
+    // Check for duplicate email
+    if (pendingEmployees.some(emp => emp.email.toLowerCase() === newEmployeeEmail.toLowerCase())) {
+      setEmployeeError('Ez az email cím már hozzá lett adva');
+      return;
+    }
+
+    setPendingEmployees(prev => [...prev, {
+      email: newEmployeeEmail.trim().toLowerCase(),
+      firstName: newEmployeeFirstName.trim(),
+      lastName: newEmployeeLastName.trim()
+    }]);
+
+    // Clear inputs
+    setNewEmployeeEmail('');
+    setNewEmployeeFirstName('');
+    setNewEmployeeLastName('');
+  };
+
+  const handleRemoveEmployee = (email: string) => {
+    setPendingEmployees(prev => prev.filter(emp => emp.email !== email));
   };
 
   const validateStep1 = async (): Promise<boolean> => {
@@ -296,6 +365,27 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           match: storeState.user?.companyId === refreshedToken.claims.companyId,
           timestamp: Date.now()
         });
+
+        // Send employee invites if any were added
+        if (pendingEmployees.length > 0) {
+          console.log('[Unified Registration] Sending employee invites:', pendingEmployees.length);
+          const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
+
+          for (const employee of pendingEmployees) {
+            try {
+              await addEmployee({
+                companyId: result.data.companyId,
+                email: employee.email,
+                firstName: employee.firstName,
+                lastName: employee.lastName
+              });
+              console.log(`[Unified Registration] ✅ Invite sent to ${employee.email}`);
+            } catch (inviteError: any) {
+              console.error(`[Unified Registration] ⚠️ Failed to invite ${employee.email}:`, inviteError);
+              // Don't block registration - invites can be resent later
+            }
+          }
+        }
 
         // Send verification email BEFORE showing modal
         console.log('[Unified Registration] Sending email verification code...');
@@ -628,6 +718,111 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   disabled={loading}
                 />
               </div>
+            </div>
+
+            {/* Employee Invites Section */}
+            <div className="pt-6 border-t border-gray-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-brand-secondary" />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Munkatársak meghívása <span className="text-gray-400 font-normal text-sm">(opcionális, max 5)</span>
+                </h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Hívd meg a munkatársaidat, hogy hozzáférjenek a tartalmakhoz
+              </p>
+
+              {/* Add Employee Form */}
+              <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <input
+                      type="text"
+                      className="form-input w-full py-2 text-sm"
+                      placeholder="Vezetéknév"
+                      value={newEmployeeLastName}
+                      onChange={(e) => setNewEmployeeLastName(e.target.value)}
+                      disabled={loading || pendingEmployees.length >= 5}
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      className="form-input w-full py-2 text-sm"
+                      placeholder="Keresztnév"
+                      value={newEmployeeFirstName}
+                      onChange={(e) => setNewEmployeeFirstName(e.target.value)}
+                      disabled={loading || pendingEmployees.length >= 5}
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    className="form-input flex-1 py-2 text-sm"
+                    placeholder="Email cím"
+                    value={newEmployeeEmail}
+                    onChange={(e) => setNewEmployeeEmail(e.target.value)}
+                    disabled={loading || pendingEmployees.length >= 5}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleAddEmployee();
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddEmployee}
+                    disabled={loading || pendingEmployees.length >= 5}
+                    className="px-4 py-2 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Hozzáadás
+                  </button>
+                </div>
+
+                {employeeError && (
+                  <p className="text-sm text-red-600">{employeeError}</p>
+                )}
+              </div>
+
+              {/* Pending Employees List */}
+              {pendingEmployees.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    Hozzáadott munkatársak ({pendingEmployees.length}/5):
+                  </p>
+                  {pendingEmployees.map((employee) => (
+                    <div
+                      key={employee.email}
+                      className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                          <span className="text-xs font-medium text-brand-secondary">
+                            {employee.firstName[0]}{employee.lastName[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {employee.lastName} {employee.firstName}
+                          </p>
+                          <p className="text-xs text-gray-500">{employee.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmployee(employee.email)}
+                        disabled={loading}
+                        className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
