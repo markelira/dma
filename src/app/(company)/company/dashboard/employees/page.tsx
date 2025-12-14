@@ -26,6 +26,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import Link from 'next/link';
 import { Company, CompanyEmployee, AddEmployeeInput, DashboardStats, EmployeeProgress, CompanyDashboardData } from '@/types/company';
 import { useRemoveEmployee } from '@/hooks/useCompanyActions';
@@ -34,7 +35,9 @@ import { StatCard } from '@/components/dashboard/StatCard';
 export default function EmployeesPage() {
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuthStore();
+  const { data: subscription } = useSubscriptionStatus();
   const [company, setCompany] = useState<Company | null>(null);
+  const [showSubscriptionPopup, setShowSubscriptionPopup] = useState(false);
   const [employees, setEmployees] = useState<CompanyEmployee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -469,7 +472,13 @@ export default function EmployeesPage() {
           <p className="text-gray-600">Kezeld a vállalat munkatársait és küldj meghívókat</p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={() => {
+            if (!subscription?.isActive) {
+              setShowSubscriptionPopup(true);
+            } else {
+              setShowAddModal(true);
+            }
+          }}
           className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm"
         >
           <UserPlus className="w-5 h-5 mr-2" />
@@ -881,6 +890,73 @@ export default function EmployeesPage() {
                     )}
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Subscription Required Popup */}
+      <AnimatePresence>
+        {showSubscriptionPopup && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
+            >
+              {/* Red gradient header */}
+              <div className="bg-gradient-to-b from-red-400 to-red-500 px-6 pt-8 pb-6 relative">
+                <button
+                  onClick={() => setShowSubscriptionPopup(false)}
+                  className="absolute top-3 right-3 text-white/80 hover:text-white transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
+                  <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1" />
+                </div>
+                <h2 className="text-2xl font-bold text-white text-center mb-2">
+                  FEDEZD FEL 7 NAPIG INGYEN
+                </h2>
+                <p className="text-white/90 text-center text-sm">
+                  Munkatárs meghívás: Miért ne add el a termékeid?
+                </p>
+              </div>
+
+              {/* Features checklist */}
+              <div className="px-6 py-6">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Minden tartalom</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Webinárok + Akadémia</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Mobil hozzáférés</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-sm text-gray-700">Nincs elköteleződés</span>
+                  </div>
+                </div>
+
+                {/* CTA Button */}
+                <Link href="/subscribe/start" className="block mt-6">
+                  <button className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition-colors text-lg">
+                    KIPRÓBÁLOM
+                  </button>
+                </Link>
+
+                {/* Price footer */}
+                <p className="text-center text-gray-500 text-sm mt-4">
+                  A próba után: <span className="font-bold text-gray-700">14 990 Ft/hó</span>
+                </p>
               </div>
             </motion.div>
           </div>
