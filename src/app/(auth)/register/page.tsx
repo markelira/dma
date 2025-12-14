@@ -158,13 +158,22 @@ function RegisterPageContent() {
             console.log('[Register Page] Refreshing token for auto-login');
             await currentUser.getIdToken(true);
 
-            // Redirect all new users to Stripe checkout to start trial
-            console.log('[Register Page] Redirecting new user to Stripe checkout');
-            router.push('/subscribe/start?plan=monthly');
+            // Check if this is an invited employee (they don't need to pay)
+            if (inviteData) {
+              console.log('[Register Page] Invited employee - redirecting to dashboard (no payment required)');
+              router.push('/dashboard');
+            } else {
+              // Regular registration - redirect to Stripe checkout to start trial
+              console.log('[Register Page] Redirecting new user to Stripe checkout');
+              router.push('/subscribe/start?plan=monthly');
+            }
           } else {
-            // Fallback if no user - still redirect to subscribe/start
-            console.log('[Register Page] No current user, redirecting to subscribe/start');
-            router.push('/subscribe/start?plan=monthly');
+            // Fallback if no user
+            if (inviteData) {
+              router.push('/dashboard');
+            } else {
+              router.push('/subscribe/start?plan=monthly');
+            }
           }
         }}
       />
