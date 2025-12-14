@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuthStore } from '@/stores/authStore'
+import { getDashboardPath } from '@/lib/routing'
 import { Button } from '@/components/ui/button'
 import { CourseTypeDropdown } from './CourseTypeDropdown'
 import { CategoryDropdown } from './CategoryDropdown'
@@ -83,7 +84,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
             }}
           >
             {/* Logo */}
-            <Link href={isAuthenticated ? '/dashboard' : '/'} className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
+            <Link href={isAuthenticated ? getDashboardPath(user?.role) : '/'} className="flex items-center gap-2 hover:opacity-80 transition-opacity flex-shrink-0">
               <img
                 src="/images/DMA.hu-logo.png"
                 alt="DMA Logo"
@@ -157,7 +158,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
             {/* Desktop Auth Button */}
             <div className="hidden lg:flex items-center flex-shrink-0">
               {isLoading ? null : isAuthenticated && user ? (
-                <Link href={user.role === 'INSTRUCTOR' ? '/instructor/dashboard' : user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}>
+                <Link href={getDashboardPath(user.role)}>
                   <Button
                     size="sm"
                     className="bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-full font-medium font-inter transition-all duration-200"

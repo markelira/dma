@@ -51,8 +51,8 @@ export default function DashboardRouteGroupLayout({
         if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
           router.replace('/login?redirect_to=/dashboard')
         }
-      } else if (user.role === 'COMPANY_ADMIN') {
-        console.log('🏢 [DIAGNOSTIC] DashboardLayout: COMPANY_ADMIN user, redirecting to company dashboard')
+      } else if (user.role === 'company_admin') {
+        console.log('🏢 [DIAGNOSTIC] DashboardLayout: company_admin user, redirecting to company dashboard')
         router.replace('/company/dashboard')
       } else {
         console.log('✅ [DIAGNOSTIC] DashboardLayout: User present, rendering dashboard', {
