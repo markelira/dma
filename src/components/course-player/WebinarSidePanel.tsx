@@ -27,19 +27,6 @@ export function WebinarSidePanel({
   currentLesson,
   totalDuration,
 }: WebinarSidePanelProps) {
-  // Format duration from seconds to readable format
-  const formatDuration = (seconds?: number) => {
-    if (!seconds) return null;
-    const hours = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    if (hours > 0) {
-      return `${hours} óra ${mins} perc`;
-    }
-    return `${mins} perc`;
-  };
-
-  const duration = formatDuration(totalDuration || currentLesson.duration);
-
   // Determine which instructors to display
   const displayInstructors = instructors.length > 0 ? instructors : instructor ? [instructor] : [];
 
@@ -173,22 +160,6 @@ export function WebinarSidePanel({
 
         {/* Divider */}
         <div className="h-px bg-gray-800" />
-
-        {/* Webinar Details */}
-        <div className="space-y-4">
-          {/* Duration */}
-          {duration && (
-            <div className="flex items-center gap-3 text-gray-300">
-              <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-red-500" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Időtartam</p>
-                <p className="font-medium">{duration}</p>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* About Section */}
         <div className="space-y-3">
