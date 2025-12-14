@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { UserProgressData, EnrolledCourse } from '@/types'
 import { brandGradient, buttonStyles, cardStyles } from '@/lib/design-tokens'
+import { COURSE_COMPLETION_THRESHOLD } from '@/lib/progress'
 
 /**
  * Continue Learning Section
@@ -51,16 +52,16 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
   }
 
   // Filter and get top 3 in-progress courses (already sorted by priority score)
-  // Courses 90%+ are considered completed, not in-progress
+  // Courses at completion threshold are considered completed, not in-progress
   const inProgressCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) =>
-    course.completionPercentage > 0 && course.completionPercentage < 90
+    course.completionPercentage > 0 && course.completionPercentage < COURSE_COMPLETION_THRESHOLD
   ).slice(0, 3) || []
 
   // Check if user has any enrolled courses at all
   const hasEnrolledCourses = (data?.enrolledCourses?.length || 0) > 0;
-  // Courses 90%+ are considered completed
+  // Courses at completion threshold are considered completed
   const completedCourses = data?.enrolledCourses?.filter((course: EnrolledCourse) =>
-    course.completionPercentage >= 90
+    course.completionPercentage >= COURSE_COMPLETION_THRESHOLD
   ) || []
 
   // If no enrolled courses at all, don't show this section
@@ -167,7 +168,7 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent text-white p-4">
                 <div className="flex items-center justify-between text-sm mb-2">
                   <span className="font-medium">
-                    {course.completionPercentage >= 90
+                    {course.completionPercentage >= COURSE_COMPLETION_THRESHOLD
                       ? 'Befejezve'
                       : `${Math.round(course.completionPercentage)}% teljesítve`}
                   </span>

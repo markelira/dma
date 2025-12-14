@@ -14,6 +14,7 @@ import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCar
 import type { Course } from '@/types'
 import { calculateCourseDuration } from '@/lib/carouselUtils'
 import { shuffleArray } from '@/lib/utils'
+import { COURSE_COMPLETION_THRESHOLD } from '@/lib/progress'
 
 // Helper to get first lesson ID from course (flat lessons array)
 function getFirstLessonId(course: Course): string | undefined {
@@ -137,14 +138,14 @@ export default function DashboardCoursesPage() {
     }).filter((e): e is NonNullable<typeof e> => e !== null) // Only show enrollments with valid courses
   }, [enrollments, courses])
 
-  // Group by status - 90%+ is considered completed
+  // Group by status - courses at completion threshold are considered completed
   const inProgressCourses = useMemo(() =>
-    enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < 90)),
+    enrichedEnrollments.filter(e => e.status === 'in_progress' || (e.progress > 0 && e.progress < COURSE_COMPLETION_THRESHOLD)),
     [enrichedEnrollments]
   )
 
   const completedCourses = useMemo(() =>
-    enrichedEnrollments.filter(e => e.status === 'completed' || e.progress >= 90),
+    enrichedEnrollments.filter(e => e.status === 'completed' || e.progress >= COURSE_COMPLETION_THRESHOLD),
     [enrichedEnrollments]
   )
 

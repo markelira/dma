@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
+import { COURSE_COMPLETION_THRESHOLD } from '@/lib/progress'
 
 const STORAGE_KEY = 'dma_completed_celebrations'
 
@@ -74,8 +75,8 @@ export function useCourseCompletion(
   const previousProgressRef = useRef<number | null>(null)
   const hasTriggeredRef = useRef(false)
 
-  // Track if course is 90%+ complete (considered complete)
-  const isCompleted = progress >= 90
+  // Track if course is at completion threshold (considered complete)
+  const isCompleted = progress >= COURSE_COMPLETION_THRESHOLD
 
   // Detect transition from incomplete to complete
   useEffect(() => {
@@ -83,11 +84,11 @@ export function useCourseCompletion(
 
     const prevProgress = previousProgressRef.current
 
-    // Check if we just transitioned to 90% (completion threshold)
+    // Check if we just transitioned to completion threshold
     if (
       prevProgress !== null &&
-      prevProgress < 90 &&
-      progress >= 90 &&
+      prevProgress < COURSE_COMPLETION_THRESHOLD &&
+      progress >= COURSE_COMPLETION_THRESHOLD &&
       !hasTriggeredRef.current &&
       !hasSeenCompletion(courseId)
     ) {
