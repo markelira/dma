@@ -35,7 +35,7 @@ const navigationSections = [
     title: null, // No section header for main navigation
     items: [
       { title: 'Kezdőlap', href: '/company/dashboard', icon: Home },
-      { title: 'Saját tartalmaim', href: '/company/dashboard/my-courses', icon: BookOpen },
+      { title: 'Saját listám', href: '/company/dashboard/my-courses', icon: BookOpen },
     ]
   },
   {
