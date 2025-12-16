@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus'
-import { useSubscriptionInvoices } from '@/hooks/useSubscriptionInvoices'
+import { useStripeInvoices } from '@/hooks/useStripeInvoices'
 import { useBillingPortal } from '@/hooks/useBillingPortal'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
@@ -76,7 +76,7 @@ export default function CompanyBillingPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { data: subscriptionData, isLoading: subscriptionLoading, refetch } = useSubscriptionStatus()
-  const { data: invoices = [], isLoading: invoicesLoading } = useSubscriptionInvoices()
+  const { data: invoices = [], isLoading: invoicesLoading } = useStripeInvoices()
   const { openBillingPortal, isLoading: portalLoading } = useBillingPortal()
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -225,9 +225,11 @@ export default function CompanyBillingPage() {
     }).format(amount)
   }
 
-  const formatDate = (timestamp: { _seconds: number; _nanoseconds: number } | undefined) => {
+  const formatDate = (timestamp: number | { _seconds: number; _nanoseconds: number } | undefined) => {
     if (!timestamp) return '-'
-    return format(new Date(timestamp._seconds * 1000), 'yyyy. MMMM dd.', { locale: hu })
+    // Handle both milliseconds (from Stripe) and Firestore timestamps
+    const ms = typeof timestamp === 'number' ? timestamp : timestamp._seconds * 1000
+    return format(new Date(ms), 'yyyy. MMMM dd.', { locale: hu })
   }
 
   if (subscriptionLoading) {
@@ -581,12 +583,12 @@ export default function CompanyBillingPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="text-sm font-medium text-gray-900">
-                          {invoice.invoiceNumber || '-'}
+                          {invoice.number || '-'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-700">
-                          {invoice.description || 'DMA Vállalati Előfizetés'}
+                          {invoice.courseName || 'DMA Vállalati Előfizetés'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -605,7 +607,7 @@ export default function CompanyBillingPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         {(invoice.status === 'paid' || invoice.status === 'succeeded') ? (
                           <button
-                            onClick={() => handleDownloadInvoice(invoice.id, invoice.stripePaymentIntentId, invoice.invoiceUrl)}
+                            onClick={() => handleDownloadInvoice(invoice.id, invoice.paymentIntentId, invoice.stripeInvoiceUrl)}
                             disabled={downloadingId === invoice.id}
                             className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm rounded-lg text-gray-700 bg-white hover:bg-brand-secondary/5 hover:text-brand-secondary hover:border-brand-secondary/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
