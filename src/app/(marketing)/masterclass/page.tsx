@@ -13,6 +13,7 @@ import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useEnrollments } from '@/hooks/useEnrollments';
+import { sortByContentCreatedAt } from '@/lib/carouselUtils';
 import type { Course } from '@/types';
 
 // Helper to get first lesson ID from course (flat lessons array)
@@ -115,12 +116,8 @@ export default function MasterclassPage() {
       return names;
     };
 
-    // Sort by createdAt (newest first) and take top 5
-    const sortedCourses = [...filteredCourses].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA;
-    }).slice(0, 5);
+    // Sort by contentCreatedAt (newest first) and take top 5
+    const sortedCourses = sortByContentCreatedAt(filteredCourses).slice(0, 5);
 
     return sortedCourses.map(course => {
       const enrollment = enrollments?.find(e => e.courseId === course.id);
@@ -168,9 +165,7 @@ export default function MasterclassPage() {
   // Newest courses
   const newestCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return [...filteredCourses]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10);
+    return sortByContentCreatedAt(filteredCourses).slice(0, 10);
   }, [filteredCourses]);
 
   const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;

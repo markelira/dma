@@ -109,7 +109,7 @@ export function CourseCarouselRow({
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth py-4 -my-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-6 -my-6"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {courses.map((course, index) => {
@@ -120,7 +120,7 @@ export function CourseCarouselRow({
             return (
               <div
                 key={course.id}
-                className="flex-shrink-0 w-[280px] md:w-[320px]"
+                className="flex-shrink-0 w-[300px] md:w-[360px]"
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <PremiumCourseCard
