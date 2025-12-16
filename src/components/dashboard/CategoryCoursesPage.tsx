@@ -9,6 +9,7 @@ import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useEnrollments } from '@/hooks/useEnrollments';
+import { shuffleArray } from '@/lib/utils';
 import type { Course } from '@/types';
 
 interface CategoryCoursesPageProps {
@@ -16,6 +17,14 @@ interface CategoryCoursesPageProps {
   title: string;
   description: string;
 }
+
+// Plural forms for course types
+const COURSE_TYPE_PLURALS: Record<string, string> = {
+  'WEBINAR': 'Webinárok',
+  'ACADEMIA': 'Akadémiák',
+  'MASTERCLASS': 'Masterclassok',
+  'PODCAST': 'Podcastok',
+};
 
 // Helper to get first lesson ID from course (flat lessons array)
 function getFirstLessonId(course: Course): string | undefined {
@@ -158,12 +167,10 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       .filter(row => row.courses.length > 0);
   }, [categories, filteredCourses]);
 
-  // Popular courses in this category
+  // Popular courses in this category - completely random shuffle
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return [...filteredCourses]
-      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
-      .slice(0, 10);
+    return shuffleArray([...filteredCourses]).slice(0, 10);
   }, [filteredCourses]);
 
   // Newest courses in this category
@@ -225,7 +232,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       {/* Popular in this category */}
       {popularCourses.length > 0 && (
         <CourseCarouselRow
-          title={`Felkapott ${title.toLowerCase()} tartalmak`}
+          title={`Felkapott ${COURSE_TYPE_PLURALS[courseType]}`}
           courses={popularCourses}
           categories={categories || []}
           instructors={instructors || []}
@@ -236,7 +243,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       {/* Newest in this category */}
       {newestCourses.length > 0 && (
         <CourseCarouselRow
-          title={`Legújabb ${title.toLowerCase()} tartalmak`}
+          title={`Legújabb ${COURSE_TYPE_PLURALS[courseType]}`}
           courses={newestCourses}
           categories={categories || []}
           instructors={instructors || []}
