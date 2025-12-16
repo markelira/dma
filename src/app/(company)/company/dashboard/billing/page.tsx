@@ -106,18 +106,29 @@ export default function CompanyBillingPage() {
 
   const handleStartSubscription = async () => {
     try {
+      console.log('[Billing] Starting subscription checkout...')
       const createCheckoutSessionFn = httpsCallable(functions, 'createCheckoutSession')
       const result = await createCheckoutSessionFn({
-        priceId: 'price_monthly',  // TODO: Replace with actual monthly price ID from env
+        priceId: 'price_1SNAlsGe8tBqGEXM8vEOVhgY',  // Monthly subscription price ID
         successUrl: `${window.location.origin}/company/dashboard/billing?success=true`,
         cancelUrl: `${window.location.origin}/company/dashboard/billing`
-      }) as { data: { url?: string } }
+      }) as { data: { success?: boolean; data?: { url?: string } } }
 
-      if (result.data.url) {
-        window.location.href = result.data.url
+      console.log('[Billing] Checkout session result:', result)
+
+      if (result.data.success && result.data.data?.url) {
+        console.log('[Billing] Redirecting to:', result.data.data.url)
+        window.location.href = result.data.data.url
+      } else {
+        console.error('[Billing] No URL in response:', result.data)
+        toast({
+          title: 'Hiba történt',
+          description: 'Nem sikerült elindítani a fizetést. Kérjük próbálja újra.',
+          variant: 'destructive'
+        })
       }
     } catch (error) {
-      console.error('Error creating checkout session:', error)
+      console.error('[Billing] Error creating checkout session:', error)
       toast({
         title: 'Hiba történt',
         description: 'Nem sikerült elindítani a fizetést. Kérjük próbálja újra.',
@@ -363,31 +374,33 @@ export default function CompanyBillingPage() {
 
         {/* No Subscription State */}
         {!hasActiveSubscription && !isOnTrial && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-8 text-center shadow-sm">
-            <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Nincs aktív előfizetés
-            </h3>
-            <p className="text-gray-600 mb-4">
+          <div className="bg-red-50 border border-red-200 rounded-xl p-8 shadow-sm">
+            <div className="flex items-start gap-2 mb-4">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <h3 className="text-xl font-bold text-gray-900">
+                Nincs aktív előfizetés
+              </h3>
+            </div>
+            <p className="text-gray-600 mb-6">
               Indítson el egy vállalati előfizetést az összes tartalomhoz való hozzáféréshez
             </p>
 
-            {/* Add benefits list - what they're missing */}
-            <ul className="text-gray-600 space-y-3 max-w-xl mx-auto mb-6">
+            {/* Benefits list - what they will get */}
+            <ul className="text-gray-600 space-y-3 max-w-xl mb-6">
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-1 flex-shrink-0">✗</span>
+                <span className="text-green-600 mt-1 flex-shrink-0">✓</span>
                 <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-1 flex-shrink-0">✗</span>
+                <span className="text-green-600 mt-1 flex-shrink-0">✓</span>
                 <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-1 flex-shrink-0">✗</span>
+                <span className="text-green-600 mt-1 flex-shrink-0">✓</span>
                 <span>5 munkatárs díjmentes hozzáadása</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-red-500 mt-1 flex-shrink-0">✗</span>
+                <span className="text-green-600 mt-1 flex-shrink-0">✓</span>
                 <span>Hetente frissülő tartalmak</span>
               </li>
             </ul>
