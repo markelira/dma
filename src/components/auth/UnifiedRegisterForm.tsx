@@ -300,6 +300,87 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       return;
     }
 
+    // Check if there are unsaved employee details in input fields
+    // If user filled in employee data but didn't click "Munkatárs hozzáadása", auto-save it
+    const hasUnsavedEmployeeData = newEmployeeEmail.trim() || newEmployeeFirstName.trim() || newEmployeeLastName.trim();
+
+    if (hasUnsavedEmployeeData) {
+      // Check if all required fields are filled
+      const allFieldsFilled = newEmployeeEmail.trim() && newEmployeeFirstName.trim() && newEmployeeLastName.trim();
+
+      if (!allFieldsFilled) {
+        // Partial data - ask user to complete or clear
+        setError('Töltsd ki az összes munkatárs mezőt, vagy töröld a részben kitöltött adatokat a folytatáshoz.');
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Validate employee email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(newEmployeeEmail.trim())) {
+        setEmployeeError('Érvénytelen munkatárs email cím');
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Check if max employees reached
+      if (pendingEmployees.length >= 5) {
+        setEmployeeError('Maximum 5 munkatársat adhatsz hozzá. Töröld az egyik meglévőt vagy hagyd üresen a mezőket.');
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Check for duplicate in pending list
+      if (pendingEmployees.some(emp => emp.email.toLowerCase() === newEmployeeEmail.trim().toLowerCase())) {
+        setEmployeeError('Ez az email cím már hozzá lett adva');
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Check if same as main registration email
+      if (newEmployeeEmail.trim().toLowerCase() === formData.email.trim().toLowerCase()) {
+        setEmployeeError('Nem adhatod hozzá a saját email címedet');
+        isProcessingRef.current = false;
+        return;
+      }
+
+      // Check employee email availability
+      setLoading(true);
+      try {
+        console.log('[Registration] Checking unsaved employee email availability...');
+        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
+          functions,
+          'checkEmailAvailability'
+        );
+        const result = await checkEmail({ email: newEmployeeEmail.trim().toLowerCase() });
+
+        if (!result.data.available) {
+          setEmployeeError('Ez az email cím már használatban van');
+          setLoading(false);
+          isProcessingRef.current = false;
+          return;
+        }
+      } catch (err) {
+        console.error('[Registration] Employee email check error:', err);
+        // Continue - backend will catch duplicates
+      }
+
+      // All validations passed - add to pending employees
+      console.log('[Registration] Auto-saving unsaved employee data...');
+      setPendingEmployees(prev => [...prev, {
+        email: newEmployeeEmail.trim().toLowerCase(),
+        firstName: newEmployeeFirstName.trim(),
+        lastName: newEmployeeLastName.trim()
+      }]);
+
+      // Clear the input fields
+      setNewEmployeeEmail('');
+      setNewEmployeeFirstName('');
+      setNewEmployeeLastName('');
+      setEmployeeSuccess(true);
+      setTimeout(() => setEmployeeSuccess(false), 3000);
+    }
+
     setLoading(true);
 
     // Re-check email availability before registration (prevents race condition)
