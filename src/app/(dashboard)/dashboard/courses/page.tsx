@@ -118,17 +118,14 @@ export default function DashboardCoursesPage() {
         <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-brand-secondary/5">
           <BookOpen className="h-10 w-10 text-brand-secondary" />
         </div>
-        <h3 className="mb-2 text-lg font-bold text-gray-900">
-          Még nincs tartalmad
+        <h3 className="mb-6 text-lg font-bold text-gray-900">
+          Még nincs tartalom a saját listádon
         </h3>
-        <p className="mb-6 text-sm text-gray-500">
-          Kezdj el egy új tartalmat a böngészés gombra kattintva
-        </p>
         <Link
-          href="/courses"
+          href="/dashboard"
           className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary/90 transition-colors"
         >
-          Tartalmak böngészése
+          Tartalmak felfedezése
         </Link>
       </div>
     )
