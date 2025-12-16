@@ -14,6 +14,7 @@ interface MuxWebhookEvent {
   data: {
     id: string
     status?: string
+    duration?: number  // Video duration in seconds from Mux
     playback_ids?: Array<{
       id: string
       policy: string
@@ -89,12 +90,13 @@ function verifyMuxSignature(
 }
 
 /**
- * Find lessons by muxAssetId and update with playback ID
+ * Find lessons by muxAssetId and update with playback ID and duration
  * Searches both flat lessons (PODCAST/WEBINAR/MASTERCLASS) and module lessons (ACADEMIA)
  */
 async function updateLessonWithPlaybackId(
   assetId: string,
-  playbackId: string
+  playbackId: string,
+  duration?: number  // Video duration in seconds from Mux
 ): Promise<void> {
   try {
     console.log(`🔍 [muxWebhook] Searching for lessons with muxAssetId: ${assetId}`)
@@ -120,11 +122,12 @@ async function updateLessonWithPlaybackId(
         const lessonId = lessonDoc.id
         const lessonPath = `courses/${courseId}/lessons/${lessonId}`
 
-        console.log(`✅ [muxWebhook] Updating FLAT lesson ${lessonId} with playbackId: ${playbackId}`)
+        console.log(`✅ [muxWebhook] Updating FLAT lesson ${lessonId} with playbackId: ${playbackId}, duration: ${duration}`)
 
         await firestore.doc(lessonPath).update({
           muxPlaybackId: playbackId,
           videoUrl: `https://stream.mux.com/${playbackId}`,
+          muxDuration: duration || null,  // Store video duration from Mux
           updatedAt: new Date().toISOString()
         })
 
@@ -158,11 +161,12 @@ async function updateLessonWithPlaybackId(
           const lessonId = lessonDoc.id
           const lessonPath = `courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`
 
-          console.log(`✅ [muxWebhook] Updating MODULE lesson ${lessonId} with playbackId: ${playbackId}`)
+          console.log(`✅ [muxWebhook] Updating MODULE lesson ${lessonId} with playbackId: ${playbackId}, duration: ${duration}`)
 
           await firestore.doc(lessonPath).update({
             muxPlaybackId: playbackId,
             videoUrl: `https://stream.mux.com/${playbackId}`,
+            muxDuration: duration || null,  // Store video duration from Mux
             updatedAt: new Date().toISOString()
           })
 
@@ -197,12 +201,13 @@ async function processMuxEvent(event: MuxWebhookPayload): Promise<void> {
           console.error('❌ [muxWebhook] No playback IDs found in asset.ready event')
           return
         }
-        
+
         const playbackId = data.playback_ids[0].id
-        console.log(`🎯 [muxWebhook] Asset ready - PlaybackId: ${playbackId}`)
-        
-        await updateLessonWithPlaybackId(assetId, playbackId)
-        
+        const duration = data.duration  // Get duration from Mux webhook data
+        console.log(`🎯 [muxWebhook] Asset ready - PlaybackId: ${playbackId}, Duration: ${duration}s`)
+
+        await updateLessonWithPlaybackId(assetId, playbackId, duration)
+
         console.log(`✅ [muxWebhook] Successfully processed video.asset.ready for ${assetId}`)
       } catch (error) {
         console.error(`❌ [muxWebhook] Error processing video.asset.ready:`, error)

@@ -96,7 +96,8 @@ export function PremiumCourseCard({
   }, [enrollment, enrollments, userId, course.id]);
 
   const isEnrolledUniversal = !!userEnrollment;
-  const enrollmentProgress = userEnrollment?.progress || 0;
+  // Fix: Use course.progress as fallback when enrollment data not available
+  const enrollmentProgress = userEnrollment?.progress || course.progress || 0;
   const enrollmentStatusValue = userEnrollment?.status;
 
   // Calculate total duration from lessons (NEW: Mux duration support)
@@ -120,6 +121,42 @@ export function PremiumCourseCard({
   }, [course.lessons, course.modules]);
 
   const durationText = totalDuration > 0 ? formatDurationHungarian(totalDuration) : null;
+
+  // Course type detection for badge display
+  const isSinglePartContent = course.courseType === 'WEBINAR' || course.courseType === 'PODCAST';
+  const isMultiPartContent = course.courseType === 'ACADEMIA' || course.courseType === 'MASTERCLASS';
+
+  // Count PUBLISHED lessons for multi-part content badge
+  const publishedLessonCount = useMemo(() => {
+    let allLessons: any[] = [];
+
+    if (course.lessons && Array.isArray(course.lessons)) {
+      allLessons = course.lessons;
+    } else if ((course as any).modules && Array.isArray((course as any).modules)) {
+      allLessons = (course as any).modules.flatMap((m: any) => m.lessons || []);
+    }
+
+    // Filter for PUBLISHED lessons only (treat missing status as published for legacy data)
+    return allLessons.filter(lesson =>
+      lesson.status === 'PUBLISHED' || !lesson.status
+    ).length;
+  }, [course.lessons, (course as any).modules]);
+
+  // Format duration for badge display (single-part content)
+  const formatDurationBadge = (seconds: number): string => {
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) {
+      return `${minutes} perc`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (remainingMinutes === 0) {
+      return `${hours} óra`;
+    }
+    return `${hours} óra ${remainingMinutes} perc`;
+  };
+
+  const durationBadgeText = totalDuration > 0 ? formatDurationBadge(totalDuration) : null;
 
   // Log when categories are undefined or empty (for debugging)
   useEffect(() => {
@@ -265,12 +302,13 @@ export function PremiumCourseCard({
         delay: index * 0.05, // Stagger effect
         ease: [0.16, 1, 0.3, 1]
       }}
-      className="origin-center"
+      className="origin-center overflow-visible"
     >
-      <div
-        className="bg-white border border-gray-200 hover:border-gray-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 h-full flex flex-col group cursor-pointer transition-all duration-300"
-        onClick={handleCardClick}
-      >
+      <div className="overflow-visible">
+        <div
+          className="bg-white border border-gray-200 hover:border-gray-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 h-full flex flex-col group cursor-pointer transition-all duration-300 overflow-hidden"
+          onClick={handleCardClick}
+        >
         {/* Course Image */}
         <div className="relative aspect-video bg-gray-100 overflow-hidden rounded-t-xl">
           {course.thumbnailUrl && !imageError ? (
@@ -293,17 +331,23 @@ export function PremiumCourseCard({
             </div>
           )}
 
-          {/* Course Type + Duration Badge - Top Left */}
+          {/* Course Type + Duration/Part Count Badge - Top Left */}
           <div className="absolute top-2 left-2 flex items-center gap-2">
             {getCourseTypeLabel(course.courseType) && (
               <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
                 {getCourseTypeLabel(course.courseType)}
               </div>
             )}
-            {durationText && (
-              <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {durationText}
+            {/* Duration badge for WEBINAR/PODCAST (single-part content) */}
+            {isSinglePartContent && durationBadgeText && (
+              <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+                {durationBadgeText}
+              </div>
+            )}
+            {/* Part count badge for ACADEMIA/MASTERCLASS (multi-part content) */}
+            {isMultiPartContent && publishedLessonCount > 0 && (
+              <div className="px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+                {publishedLessonCount} rész
               </div>
             )}
           </div>
@@ -380,6 +424,7 @@ export function PremiumCourseCard({
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </motion.div>
