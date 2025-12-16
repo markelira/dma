@@ -40,23 +40,9 @@ export default function CompanyDashboardPage() {
   const { data: targetAudiences, isLoading: audiencesLoading } = useTargetAudiences();
   const { data: instructors, isLoading: instructorsLoading } = useInstructors();
 
-  // Build hero slides
+  // Build hero slides - only non-enrolled courses
   const heroSlides = useMemo(() => {
     if (!courses) return [];
-
-    const slides: Array<{
-      id: string;
-      title: string;
-      description?: string;
-      thumbnailUrl?: string;
-      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
-      instructorNames?: string[];
-      duration?: string;
-      progress?: number;
-      isEnrolled?: boolean;
-      currentLessonId?: string;
-      firstLessonId?: string;
-    }> = [];
 
     // Helper to get first lesson ID from course (flat lessons array)
     const getFirstLessonId = (course: Course): string | undefined => {
@@ -70,136 +56,71 @@ export default function CompanyDashboardPage() {
       return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
     };
 
-    // Get instructor names helper (returns array for multiple instructors)
-    const getInstructorNames = (course: Course): string[] => {
-      if (!instructors) return [];
-      const names: string[] = [];
+    // Get enrolled course IDs to exclude from hero
+    const enrolledCourseIds = new Set(enrollments?.map(e => e.courseId) || []);
 
-      // Check single instructorId
-      if (course.instructorId) {
-        const instructor = instructors.find(i => i.id === course.instructorId);
-        if (instructor?.name) names.push(instructor.name);
-      }
+    // Filter to non-enrolled courses only
+    const nonEnrolledCourses = courses.filter(c => !enrolledCourseIds.has(c.id));
 
-      // Check instructorIds array
-      if ((course as any).instructorIds?.length) {
-        (course as any).instructorIds.forEach((id: string) => {
-          const instructor = instructors.find(i => i.id === id);
-          if (instructor?.name && !names.includes(instructor.name)) {
-            names.push(instructor.name);
-          }
-        });
-      }
+    // If no non-enrolled courses, return empty
+    if (nonEnrolledCourses.length === 0) return [];
 
-      return names;
-    };
+    const slides: Array<{
+      id: string;
+      title: string;
+      description?: string;
+      thumbnailUrl?: string;
+      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
+      duration?: string;
+      isEnrolled?: boolean;
+      firstLessonId?: string;
+    }> = [];
 
-    // 1. Latest opened course (first enrollment)
-    if (enrollments && enrollments.length > 0) {
-      const latestEnrollment = enrollments[0];
-      const enrolledCourse = courses.find(c => c.id === latestEnrollment.courseId);
-      if (enrolledCourse) {
-        slides.push({
-          id: enrolledCourse.id,
-          title: enrolledCourse.title,
-          description: enrolledCourse.description,
-          thumbnailUrl: enrolledCourse.thumbnailUrl,
-          courseType: enrolledCourse.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-          instructorNames: getInstructorNames(enrolledCourse),
-          duration: enrolledCourse.duration,
-          progress: latestEnrollment.progress,
-          isEnrolled: true,
-          currentLessonId: latestEnrollment.currentLessonId,
-          firstLessonId: latestEnrollment.firstLessonId || getFirstLessonId(enrolledCourse),
-        });
-      }
-    }
-
-    // Sort courses by createdAt (newest first)
-    const sortedCourses = [...courses].sort((a, b) => {
+    // Sort non-enrolled courses by createdAt (newest first)
+    const sortedCourses = [...nonEnrolledCourses].sort((a, b) => {
       const dateA = new Date(a.createdAt).getTime();
       const dateB = new Date(b.createdAt).getTime();
       return dateB - dateA;
     });
 
-    // 2. Latest MASTERCLASS
-    const latestMasterclass = sortedCourses.find(c => c.courseType === 'MASTERCLASS');
-    if (latestMasterclass && !slides.some(s => s.id === latestMasterclass.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestMasterclass.id);
-      slides.push({
-        id: latestMasterclass.id,
-        title: latestMasterclass.title,
-        description: latestMasterclass.description,
-        thumbnailUrl: latestMasterclass.thumbnailUrl,
-        courseType: 'MASTERCLASS',
-        instructorNames: getInstructorNames(latestMasterclass),
-        duration: latestMasterclass.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestMasterclass),
-      });
-    }
+    // Add latest of each course type (non-enrolled only)
+    const courseTypes: Array<'MASTERCLASS' | 'WEBINAR' | 'ACADEMIA' | 'PODCAST'> = ['MASTERCLASS', 'WEBINAR', 'ACADEMIA', 'PODCAST'];
 
-    // 3. Latest WEBINAR
-    const latestWebinar = sortedCourses.find(c => c.courseType === 'WEBINAR');
-    if (latestWebinar && !slides.some(s => s.id === latestWebinar.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestWebinar.id);
-      slides.push({
-        id: latestWebinar.id,
-        title: latestWebinar.title,
-        description: latestWebinar.description,
-        thumbnailUrl: latestWebinar.thumbnailUrl,
-        courseType: 'WEBINAR',
-        instructorNames: getInstructorNames(latestWebinar),
-        duration: latestWebinar.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestWebinar),
-      });
-    }
+    courseTypes.forEach(type => {
+      const latestOfType = sortedCourses.find(c => c.courseType === type);
+      if (latestOfType && !slides.some(s => s.id === latestOfType.id)) {
+        slides.push({
+          id: latestOfType.id,
+          title: latestOfType.title,
+          description: latestOfType.description,
+          thumbnailUrl: latestOfType.thumbnailUrl,
+          courseType: type,
+          duration: latestOfType.duration,
+          isEnrolled: false,
+          firstLessonId: getFirstLessonId(latestOfType),
+        });
+      }
+    });
 
-    // 4. Latest ACADEMIA
-    const latestAcademia = sortedCourses.find(c => c.courseType === 'ACADEMIA');
-    if (latestAcademia && !slides.some(s => s.id === latestAcademia.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestAcademia.id);
-      slides.push({
-        id: latestAcademia.id,
-        title: latestAcademia.title,
-        description: latestAcademia.description,
-        thumbnailUrl: latestAcademia.thumbnailUrl,
-        courseType: 'ACADEMIA',
-        instructorNames: getInstructorNames(latestAcademia),
-        duration: latestAcademia.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestAcademia),
-      });
-    }
-
-    // 5. Latest PODCAST
-    const latestPodcast = sortedCourses.find(c => c.courseType === 'PODCAST');
-    if (latestPodcast && !slides.some(s => s.id === latestPodcast.id)) {
-      const enrollment = enrollments?.find(e => e.courseId === latestPodcast.id);
-      slides.push({
-        id: latestPodcast.id,
-        title: latestPodcast.title,
-        description: latestPodcast.description,
-        thumbnailUrl: latestPodcast.thumbnailUrl,
-        courseType: 'PODCAST',
-        instructorNames: getInstructorNames(latestPodcast),
-        duration: latestPodcast.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(latestPodcast),
+    // Fill remaining slots with other non-enrolled courses (up to 5 total)
+    if (slides.length < 5) {
+      const remainingCourses = sortedCourses.filter(c => !slides.some(s => s.id === c.id));
+      remainingCourses.slice(0, 5 - slides.length).forEach(course => {
+        slides.push({
+          id: course.id,
+          title: course.title,
+          description: course.description,
+          thumbnailUrl: course.thumbnailUrl,
+          courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
+          duration: course.duration,
+          isEnrolled: false,
+          firstLessonId: getFirstLessonId(course),
+        });
       });
     }
 
     return shuffleArray(slides);
-  }, [courses, enrollments, instructors]);
+  }, [courses, enrollments]);
 
   // Build enrolled courses list (Saját listám)
   const enrolledCourses = useMemo(() => {

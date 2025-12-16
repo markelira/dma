@@ -165,7 +165,7 @@ export default function DashboardPage() {
     // Trial modal will show via the useEffect above if conditions are met
   };
 
-  // Build hero slides - 5 random courses
+  // Build hero slides - 5 random courses NOT on user's list
   const heroSlides = useMemo(() => {
     if (!courses || courses.length === 0) return [];
 
@@ -181,32 +181,17 @@ export default function DashboardPage() {
       return sortedLessons.length > 0 ? sortedLessons[0].id : undefined;
     };
 
-    // Get instructor names helper (returns array for multiple instructors)
-    const getInstructorNames = (course: Course): string[] => {
-      if (!instructors) return [];
-      const names: string[] = [];
+    // Get enrolled course IDs to exclude from hero
+    const enrolledCourseIds = new Set(enrollments?.map(e => e.courseId) || []);
 
-      // Check single instructorId
-      if (course.instructorId) {
-        const instructor = instructors.find(i => i.id === course.instructorId);
-        if (instructor?.name) names.push(instructor.name);
-      }
+    // Filter to non-enrolled courses only
+    const nonEnrolledCourses = courses.filter(c => !enrolledCourseIds.has(c.id));
 
-      // Check instructorIds array
-      if ((course as any).instructorIds?.length) {
-        (course as any).instructorIds.forEach((id: string) => {
-          const instructor = instructors.find(i => i.id === id);
-          if (instructor?.name && !names.includes(instructor.name)) {
-            names.push(instructor.name);
-          }
-        });
-      }
-
-      return names;
-    };
+    // If no non-enrolled courses, return empty (hero won't show)
+    if (nonEnrolledCourses.length === 0) return [];
 
     // Shuffle courses using Fisher-Yates algorithm (seeded with date for daily consistency)
-    const shuffled = [...courses];
+    const shuffled = [...nonEnrolledCourses];
     const today = new Date().toDateString();
     let seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -215,24 +200,20 @@ export default function DashboardPage() {
       [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
 
-    // Take first 5 random courses
+    // Take first 5 random non-enrolled courses
     return shuffled.slice(0, 5).map(course => {
-      const enrollment = enrollments?.find(e => e.courseId === course.id);
       return {
         id: course.id,
         title: course.title,
         description: course.description,
         thumbnailUrl: course.thumbnailUrl,
         courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-        instructorNames: getInstructorNames(course),
         duration: course.duration,
-        progress: enrollment?.progress,
-        isEnrolled: !!enrollment,
-        currentLessonId: enrollment?.currentLessonId,
-        firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
+        isEnrolled: false,
+        firstLessonId: getFirstLessonId(course),
       };
     });
-  }, [courses, enrollments, instructors]);
+  }, [courses, enrollments]);
 
   // Build enrolled courses list (Saját listám)
   const enrolledCourses = useMemo(() => {

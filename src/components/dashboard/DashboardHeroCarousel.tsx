@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, ChevronLeft, ChevronRight, BookOpen, Video, GraduationCap, Mic, Clock } from 'lucide-react';
+import { Play, BookOpen, Video, GraduationCap, Mic, Clock } from 'lucide-react';
 
 interface HeroSlide {
   id: string;
@@ -159,25 +159,6 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
         </motion.div>
       </AnimatePresence>
 
-      {/* Navigation Arrows */}
-      {slides.length > 1 && (
-        <>
-          <button
-            onClick={goToPrevious}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-12 h-12 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </>
-      )}
 
       {/* Content */}
       <div className="relative h-full flex items-end z-10">
@@ -213,43 +194,16 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
                 </p>
               )}
 
-              {/* Stats with instructor info */}
-              <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
-                {currentSlide.instructorNames && currentSlide.instructorNames.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    {currentSlide.instructorImageUrl && (
-                      <img
-                        src={currentSlide.instructorImageUrl}
-                        alt={currentSlide.instructorNames[0]}
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                    )}
-                    <span>{currentSlide.instructorNames.join(', ')}</span>
-                  </div>
-                )}
-                {currentSlide.duration && (
+              {/* Stats */}
+              {currentSlide.duration && (
+                <div className="flex items-center gap-4 text-gray-400 text-sm mb-4">
                   <div className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5" />
                     <span>{currentSlide.duration}</span>
                   </div>
-                )}
-              </div>
-
-              {/* Progress Bar (for enrolled courses) */}
-              {currentSlide.isEnrolled && currentSlide.progress !== undefined && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                    <span>Haladás</span>
-                    <span>{currentSlide.progress}%</span>
-                  </div>
-                  <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-brand-secondary rounded-full transition-all"
-                      style={{ width: `${currentSlide.progress}%` }}
-                    />
-                  </div>
                 </div>
               )}
+
 
               {/* CTA Button */}
               <div className="flex items-center gap-3">

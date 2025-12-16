@@ -2,18 +2,17 @@
 
 import { useMemo } from 'react'
 import Link from 'next/link'
-import { BookOpen, Clock, CheckCircle, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { BookOpen, Clock, CheckCircle, Loader2, Play } from 'lucide-react'
 import { useEnrollments } from '@/hooks/useEnrollments'
 import { useCourses } from '@/hooks/useCourseQueries'
 import { useCategories } from '@/hooks/useCategoryQueries'
 import { useInstructors } from '@/hooks/useInstructorQueries'
 import { useAuthStore } from '@/stores/authStore'
 import { DashboardSearch } from '@/components/dashboard/DashboardSearch'
-import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel'
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel'
 import type { Course } from '@/types'
 import { calculateCourseDuration } from '@/lib/carouselUtils'
-import { shuffleArray } from '@/lib/utils'
 import { COURSE_COMPLETION_THRESHOLD } from '@/lib/progress'
 
 // Helper to get first lesson ID from course (flat lessons array)
@@ -34,81 +33,12 @@ function getFirstLessonId(course: Course): string | undefined {
  * Displays enrolled courses with carousels grouped by status
  */
 export default function DashboardCoursesPage() {
+  const router = useRouter()
   const { user } = useAuthStore()
   const { data: enrollments = [], isLoading: enrollmentsLoading } = useEnrollments()
   const { data: courses = [], isLoading: coursesLoading } = useCourses()
   const { data: categories = [] } = useCategories()
   const { data: instructors = [] } = useInstructors()
-
-  // Build hero slides from enrolled courses only
-  const heroSlides = useMemo(() => {
-    if (!courses || !enrollments || enrollments.length === 0) return [];
-
-    const slides: Array<{
-      id: string;
-      title: string;
-      description?: string;
-      thumbnailUrl?: string;
-      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
-      instructorNames?: string[];
-      duration?: string;
-      progress?: number;
-      isEnrolled?: boolean;
-      currentLessonId?: string;
-      firstLessonId?: string;
-    }> = [];
-
-    // Helper to get instructor names
-    const getInstructorNames = (course: Course): string[] => {
-      if (!instructors) return [];
-      const names: string[] = [];
-
-      if (course.instructorId) {
-        const instructor = instructors.find(i => i.id === course.instructorId);
-        if (instructor?.name) names.push(instructor.name);
-      }
-
-      if ((course as any).instructorIds?.length) {
-        (course as any).instructorIds.forEach((id: string) => {
-          const instructor = instructors.find(i => i.id === id);
-          if (instructor?.name && !names.includes(instructor.name)) {
-            names.push(instructor.name);
-          }
-        });
-      }
-
-      return names;
-    };
-
-    // Build slides from enrolled courses (sorted by lastAccessedAt)
-    const sortedEnrollments = [...enrollments].sort((a, b) => {
-      const dateA = a.lastAccessedAt ? new Date(a.lastAccessedAt).getTime() : 0;
-      const dateB = b.lastAccessedAt ? new Date(b.lastAccessedAt).getTime() : 0;
-      return dateB - dateA;
-    });
-
-    // Take top 5 most recently accessed enrolled courses
-    sortedEnrollments.slice(0, 5).forEach(enrollment => {
-      const course = courses.find(c => c.id === enrollment.courseId);
-      if (!course) return;
-
-      slides.push({
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        thumbnailUrl: course.thumbnailUrl,
-        courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-        instructorNames: getInstructorNames(course),
-        duration: course.duration,
-        progress: enrollment.progress,
-        isEnrolled: true,
-        currentLessonId: enrollment.currentLessonId,
-        firstLessonId: enrollment.firstLessonId || getFirstLessonId(course),
-      });
-    });
-
-    return shuffleArray(slides);
-  }, [enrollments, courses, instructors]);
 
   // Merge enrollment data with course data
   const enrichedEnrollments = useMemo(() => {
@@ -154,6 +84,12 @@ export default function DashboardCoursesPage() {
     [enrichedEnrollments]
   )
 
+  // Most recent course for simple hero (like company admin)
+  const mostRecentCourse = useMemo(() => {
+    if (inProgressCourses.length > 0) return inProgressCourses[0]
+    return enrichedEnrollments[0]
+  }, [inProgressCourses, enrichedEnrollments])
+
   const isLoading = enrollmentsLoading || coursesLoading
 
   if (isLoading) {
@@ -193,9 +129,65 @@ export default function DashboardCoursesPage() {
 
   return (
     <div className="space-y-8">
-      {/* Hero Carousel - Enrolled Courses */}
-      {heroSlides.length > 0 && (
-        <DashboardHeroCarousel slides={heroSlides} />
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Saját tartalmaim</h1>
+        <p className="text-gray-600 mt-1">Kezeld és folytasd a tartalmaidat egy helyen</p>
+      </div>
+
+      {/* Simple Hero - Continue Watching (same style as company admin) */}
+      {mostRecentCourse && mostRecentCourse.course && (
+        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-gray-900 to-gray-800 min-h-[200px]">
+          {/* Background Image - Full cover */}
+          {mostRecentCourse.thumbnailUrl && (
+            <div className="absolute inset-0">
+              <img
+                src={mostRecentCourse.thumbnailUrl}
+                alt=""
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/70 to-gray-900/40" />
+            </div>
+          )}
+
+          <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-6">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl md:text-2xl font-bold text-white mb-2 line-clamp-2">
+                {mostRecentCourse.courseName}
+              </h2>
+
+              {/* Progress (only show if > 0 and < 100) */}
+              {mostRecentCourse.progress > 0 && mostRecentCourse.progress < 100 && (
+                <div className="mb-4">
+                  <div className="flex items-center justify-between text-sm text-gray-400 mb-1">
+                    <span>{mostRecentCourse.progress}% befejezve</span>
+                  </div>
+                  <div className="w-full max-w-xs bg-gray-700 rounded-full h-1.5">
+                    <div
+                      className="bg-brand-secondary h-1.5 rounded-full transition-all"
+                      style={{ width: `${mostRecentCourse.progress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={() => {
+                  const targetLessonId = mostRecentCourse.currentLessonId || mostRecentCourse.firstLessonId;
+                  if (targetLessonId) {
+                    router.push(`/courses/${mostRecentCourse.courseId}/player/${targetLessonId}`);
+                  } else {
+                    router.push(`/courses/${mostRecentCourse.courseId}`);
+                  }
+                }}
+                className="inline-flex items-center px-5 py-2.5 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                <Play className="w-4 h-4 mr-2 fill-current" />
+                {mostRecentCourse.progress > 0 ? 'Folytatás' : 'Indítás'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Search */}
