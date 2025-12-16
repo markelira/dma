@@ -18,14 +18,14 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
       if (!user) {
         console.log('❌ [InstructorLayout] No user found, redirecting to login')
         router.replace('/login?redirect_to=/instructor/dashboard')
-      } else if (user.role !== 'instructor') {
+      } else if (user.role?.toUpperCase() !== 'INSTRUCTOR') {
         console.log('❌ [InstructorLayout] User is not instructor, redirecting')
         router.replace('/dashboard')
       }
     }
   }, [user, isLoading, authReady, router])
 
-  if (!authReady || isLoading || !user || user.role !== 'instructor') {
+  if (!authReady || isLoading || !user || user.role?.toUpperCase() !== 'INSTRUCTOR') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">

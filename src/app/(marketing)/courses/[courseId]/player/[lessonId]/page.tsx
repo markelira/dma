@@ -21,6 +21,7 @@ import { useCourseCompletion } from '@/hooks/useCourseCompletion';
 import { CourseCompletionModal } from '@/components/course-player/CourseCompletionModal';
 import { useAuthStore } from '@/stores/authStore';
 import { fetchLesson } from '@/hooks/useLessonQueries';
+import { getDashboardPath } from '@/lib/routing';
 import { Module, Lesson, CourseType } from '@/types';
 
 /**
@@ -450,7 +451,7 @@ export default function CoursePlayerPage() {
           <div className="max-w-5xl mx-auto px-12 py-8 space-y-8">
             {/* Back Link */}
             <Link
-              href="/dashboard"
+              href={getDashboardPath(user?.role)}
               className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
               <ArrowLeftIcon size={20} />
@@ -501,7 +502,7 @@ export default function CoursePlayerPage() {
         {/* Back Link */}
         <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 bg-white">
           <Link
-            href="/dashboard"
+            href={getDashboardPath(user?.role)}
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             <ArrowLeftIcon size={20} />
