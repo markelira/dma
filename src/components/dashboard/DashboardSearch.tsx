@@ -90,9 +90,10 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
 
   // Auto-apply filters when any filter selection changes
   useEffect(() => {
-    // Skip initial mount
+    // Skip initial mount - only if no filters are active at all
     if (selectedCategories.length === 0 && selectedAudiences.length === 0 &&
-        selectedCourseTypes.length === 0 && selectedInstructors.length === 0) {
+        selectedCourseTypes.length === 0 && selectedInstructors.length === 0 &&
+        !query.trim()) {
       return;
     }
 
@@ -103,7 +104,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
       courseTypes: selectedCourseTypes,
       instructorIds: selectedInstructors,
     });
-  }, [selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors]);
+  }, [selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors, query, onFilterChange]);
 
   // Filter courses based on query and filters
   const filteredCourses = useMemo(() => {
