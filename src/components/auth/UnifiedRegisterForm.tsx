@@ -854,11 +854,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-6 h-6 text-brand-secondary" />
               <h2 className="text-2xl font-bold text-gray-900">
-                Munkatársak meghívása
+                Munkatársaim
               </h2>
             </div>
             <p className="text-sm text-gray-500 mb-6">
-              (opcionális, max. 5 fő)
+              Adj hozzá 5 munkatársat, hogy ők is a kaland részesei legyenek.
             </p>
 
             {/* Add Employee Form - Vertical layout like Step 1 */}
@@ -971,7 +971,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 ) : (
                   <>
                     <UserPlus className="w-5 h-5" />
-                    Munkatárs hozzáadása
+                    Új munkatárs hozzáadása
                   </>
                 )}
               </button>
