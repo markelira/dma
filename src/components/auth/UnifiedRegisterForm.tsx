@@ -106,6 +106,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [newEmployeeFirstName, setNewEmployeeFirstName] = useState('');
   const [newEmployeeLastName, setNewEmployeeLastName] = useState('');
   const [employeeError, setEmployeeError] = useState('');
+  const [checkingEmployeeEmail, setCheckingEmployeeEmail] = useState(false);
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: inviteData?.employeeName.split(' ')[0] || '',
@@ -126,7 +127,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   };
 
   // Employee invite helpers
-  const handleAddEmployee = () => {
+  const handleAddEmployee = async () => {
     setEmployeeError('');
 
     if (pendingEmployees.length >= 5) {
@@ -145,11 +146,36 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       return;
     }
 
-    // Check for duplicate email
+    // Check for duplicate email in pending list
     if (pendingEmployees.some(emp => emp.email.toLowerCase() === newEmployeeEmail.toLowerCase())) {
       setEmployeeError('Ez az email cím már hozzá lett adva');
       return;
     }
+
+    // Check if same as main registration email
+    if (newEmployeeEmail.trim().toLowerCase() === formData.email.trim().toLowerCase()) {
+      setEmployeeError('Nem adhatod hozzá a saját email címedet');
+      return;
+    }
+
+    // Check if email is already in use (like main email field)
+    setCheckingEmployeeEmail(true);
+    try {
+      const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
+        functions,
+        'checkEmailAvailability'
+      );
+      const result = await checkEmail({ email: newEmployeeEmail.trim().toLowerCase() });
+      if (!result.data.available) {
+        setEmployeeError('Ez az email cím már használatban van');
+        setCheckingEmployeeEmail(false);
+        return;
+      }
+    } catch (err) {
+      console.error('Employee email check error:', err);
+      // If check fails, still allow adding - backend will catch duplicates
+    }
+    setCheckingEmployeeEmail(false);
 
     setPendingEmployees(prev => [...prev, {
       email: newEmployeeEmail.trim().toLowerCase(),
@@ -456,10 +482,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       <div>
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {inviteData ? 'Regisztráció és csatlakozás' : 'Regisztráció'}
+            {inviteData ? 'Regisztráció és csatlakozás' : 'Kezdjünk bele a kalandba'}
           </h1>
           <p className="mt-2 text-sm text-gray-600">
-            Töltsd ki az adataidat
+            {inviteData ? 'Töltsd ki az adataidat' : '5 munkatársad is hozzáférhet a tartalmakhoz'}
           </p>
         </div>
 
@@ -514,6 +540,29 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
             </div>
           </div>
 
+          {/* Company Name (Optional) - Hidden for invited employees */}
+          {!inviteData && (
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companyName">
+                Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Building2 className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="companyName"
+                  type="text"
+                  className="form-input w-full py-2.5 pl-10"
+                  placeholder="Ha üresen hagyod, a neved lesz használva"
+                  value={formData.companyName}
+                  onChange={(e) => updateField('companyName', e.target.value)}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Email */}
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
@@ -554,6 +603,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               <input
                 id="phone"
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
                 className="form-input w-full py-2.5 pl-10"
                 placeholder="+36 30 123 4567"
                 value={formData.phone}
@@ -659,7 +710,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         </div>
       </div>
 
-      {/* Step 2: Optional Company Details - Hidden for invited employees */}
+      {/* Step 2: Employee Invites - Hidden for invited employees */}
       {!inviteData && currentStep === 2 && (
         <motion.div
           ref={step2Ref}
@@ -668,102 +719,76 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           transition={{ duration: 0.3 }}
           className="space-y-6 pt-8 border-t border-gray-200"
         >
+          {/* Employee Invites Section */}
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Vállalati adatok (opcionális)
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              Ezeket később is megadhatod
+            <div className="flex items-center gap-2 mb-2">
+              <Users className="w-6 h-6 text-brand-secondary" />
+              <h2 className="text-2xl font-bold text-gray-900">
+                Munkatársak meghívása
+              </h2>
+            </div>
+            <p className="text-sm text-gray-500 mb-6">
+              (opcionális, max. 5 fő)
             </p>
-          </div>
 
-          <div className="space-y-5">
-            {/* Company Name */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companyName">
-                Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Building2 className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="companyName"
-                  type="text"
-                  className="form-input w-full py-2.5 pl-10"
-                  placeholder="Ha üresen hagyod, a neved lesz használva"
-                  value={formData.companyName}
-                  onChange={(e) => updateField('companyName', e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* Billing Email */}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="billingEmail">
-                Számlázási email <span className="text-gray-400 font-normal">(opcionális)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="billingEmail"
-                  type="email"
-                  className="form-input w-full py-2.5 pl-10"
-                  placeholder="Ha üresen hagyod, a regisztrációs email lesz használva"
-                  value={formData.billingEmail}
-                  onChange={(e) => updateField('billingEmail', e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {/* Employee Invites Section */}
-            <div className="pt-6 border-t border-gray-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-brand-secondary" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Munkatársak meghívása <span className="text-gray-400 font-normal text-sm">(opcionális, max 5)</span>
-                </h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Hívd meg a munkatársaidat, hogy hozzáférjenek a tartalmakhoz
-              </p>
-
-              {/* Add Employee Form */}
-              <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <input
-                      type="text"
-                      className="form-input w-full py-2 text-sm"
-                      placeholder="Vezetéknév"
-                      value={newEmployeeLastName}
-                      onChange={(e) => setNewEmployeeLastName(e.target.value)}
-                      disabled={loading || pendingEmployees.length >= 5}
-                    />
+            {/* Add Employee Form - Vertical layout like Step 1 */}
+            <div className="space-y-5">
+              {/* Last Name */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Vezetéknév
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
                   </div>
-                  <div>
-                    <input
-                      type="text"
-                      className="form-input w-full py-2 text-sm"
-                      placeholder="Keresztnév"
-                      value={newEmployeeFirstName}
-                      onChange={(e) => setNewEmployeeFirstName(e.target.value)}
-                      disabled={loading || pendingEmployees.length >= 5}
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    className="form-input w-full py-2.5 pl-10"
+                    placeholder="Kovács"
+                    value={newEmployeeLastName}
+                    onChange={(e) => setNewEmployeeLastName(e.target.value)}
+                    disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
+                  />
                 </div>
-                <div className="flex gap-2">
+              </div>
+
+              {/* First Name */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Keresztnév
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    className="form-input w-full py-2.5 pl-10"
+                    placeholder="János"
+                    value={newEmployeeFirstName}
+                    onChange={(e) => setNewEmployeeFirstName(e.target.value)}
+                    disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
+                  />
+                </div>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Email cím
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
                   <input
                     type="email"
-                    className="form-input flex-1 py-2 text-sm"
-                    placeholder="Email cím"
+                    className="form-input w-full py-2.5 pl-10"
+                    placeholder="pelda@email.com"
                     value={newEmployeeEmail}
                     onChange={(e) => setNewEmployeeEmail(e.target.value)}
-                    disabled={loading || pendingEmployees.length >= 5}
+                    disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -771,88 +796,99 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                       }
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={handleAddEmployee}
-                    disabled={loading || pendingEmployees.length >= 5}
-                    className="px-4 py-2 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Hozzáadás
-                  </button>
                 </div>
-
-                {employeeError && (
-                  <p className="text-sm text-red-600">{employeeError}</p>
-                )}
               </div>
 
-              {/* Pending Employees List */}
-              {pendingEmployees.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <p className="text-sm font-medium text-gray-700">
-                    Hozzáadott munkatársak ({pendingEmployees.length}/5):
-                  </p>
-                  {pendingEmployees.map((employee) => (
-                    <div
-                      key={employee.email}
-                      className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center">
-                          <span className="text-xs font-medium text-brand-secondary">
-                            {employee.firstName[0]}{employee.lastName[0]}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">
-                            {employee.lastName} {employee.firstName}
-                          </p>
-                          <p className="text-xs text-gray-500">{employee.email}</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveEmployee(employee.email)}
-                        disabled={loading}
-                        className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+              {employeeError && (
+                <p className="text-sm text-red-600">{employeeError}</p>
               )}
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
+              {/* Add Employee Button */}
               <button
                 type="button"
-                onClick={handleBack}
-                disabled={loading}
-                className="flex-1 py-3 px-6 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                onClick={handleAddEmployee}
+                disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
+                className="w-full py-2.5 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <ArrowLeft className="w-5 h-5" />
-                Vissza
-              </button>
-
-              <button
-                type="button"
-                onClick={handleComplete}
-                disabled={loading}
-                className="flex-1 py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-              >
-                {loading ? (
+                {checkingEmployeeEmail ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Regisztráció...
+                    Ellenőrzés...
                   </>
                 ) : (
-                  'Regisztráció befejezése'
+                  <>
+                    <UserPlus className="w-5 h-5" />
+                    Munkatárs hozzáadása
+                  </>
                 )}
               </button>
             </div>
+
+            {/* Pending Employees List */}
+            {pendingEmployees.length > 0 && (
+              <div className="mt-6 space-y-2">
+                <p className="text-sm font-medium text-gray-700">
+                  Hozzáadott munkatársak ({pendingEmployees.length}/5):
+                </p>
+                {pendingEmployees.map((employee) => (
+                  <div
+                    key={employee.email}
+                    className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                        <span className="text-xs font-medium text-brand-secondary">
+                          {employee.firstName[0]}{employee.lastName[0]}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {employee.lastName} {employee.firstName}
+                        </p>
+                        <p className="text-xs text-gray-500">{employee.email}</p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveEmployee(employee.email)}
+                      disabled={loading}
+                      className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-4 pt-4">
+            <button
+              type="button"
+              onClick={handleBack}
+              disabled={loading}
+              className="flex-1 py-3 px-6 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Vissza
+            </button>
+
+            <button
+              type="button"
+              onClick={handleComplete}
+              disabled={loading}
+              className="flex-1 py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Regisztráció...
+                </>
+              ) : (
+                'Regisztráció befejezése'
+              )}
+            </button>
           </div>
         </motion.div>
       )}
