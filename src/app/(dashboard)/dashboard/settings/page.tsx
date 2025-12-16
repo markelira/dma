@@ -135,11 +135,9 @@ export default function SettingsPage() {
                 )}
               </div>
               <div>
-                <p className="text-lg font-semibold text-gray-900">Profilkép</p>
+                <p className="text-lg font-semibold text-gray-900">Céges logó</p>
                 <p className="text-sm text-gray-500 mt-1">
-                  {hasCompany
-                    ? "A profilkép a cég logója, amelyet a cég adminisztrátora állít be."
-                    : "Nincs beállított profilkép."}
+                  A céges logót csak a cég adminisztrátora tudja módosítani.
                 </p>
               </div>
             </div>
