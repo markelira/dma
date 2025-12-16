@@ -360,10 +360,10 @@ export default function CompanyBillingPage() {
 
         {/* Active Subscription Card */}
         {(hasActiveSubscription || isOnTrial) && (
-          <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div className="bg-gradient-to-br from-brand-secondary/5 to-brand-secondary/10 border border-brand-secondary/20 rounded-xl p-8 shadow-sm">
             <div className="flex items-start justify-between mb-4">
-              <div>
-                <div className="flex items-center gap-2 mb-2">
+              <div className="w-full">
+                <div className="flex items-center gap-2 mb-4">
                   {cancelAtPeriodEnd ? (
                     <>
                       <AlertCircle className="w-5 h-5 text-orange-500" />
@@ -371,15 +371,32 @@ export default function CompanyBillingPage() {
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      <span className="text-sm font-medium text-green-600">Aktív előfizetés</span>
+                      <CheckCircle className="w-5 h-5 text-brand-secondary" />
+                      <span className="text-sm font-medium text-brand-secondary">Előfizetésed aktív</span>
                     </>
                   )}
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Korlátlan hozzáférés
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">
+                  Választott előfizetésed: Masterclass
                 </h2>
-                <p className="text-gray-600 mt-1">Hozzáférés az összes tartalomhoz</p>
+                <ul className="text-gray-600 space-y-3 max-w-xl mb-6">
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-secondary mt-1 flex-shrink-0">✓</span>
+                    <span>Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-secondary mt-1 flex-shrink-0">✓</span>
+                    <span>Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-secondary mt-1 flex-shrink-0">✓</span>
+                    <span>5 munkatárs díjmentes hozzáadása</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-brand-secondary mt-1 flex-shrink-0">✓</span>
+                    <span>Hetente frissülő tartalmak</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
