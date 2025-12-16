@@ -302,6 +302,31 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
     setLoading(true);
 
+    // Re-check email availability before registration (prevents race condition)
+    // Email was checked in Step 1, but someone might have registered it since then
+    if (!inviteData) {
+      try {
+        console.log('[Unified Registration] Re-checking email availability...');
+        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
+          functions,
+          'checkEmailAvailability'
+        );
+        const emailCheckResult = await checkEmail({ email: formData.email.trim().toLowerCase() });
+
+        if (!emailCheckResult.data.available) {
+          console.log('[Unified Registration] Email is taken, blocking registration');
+          setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
+          setLoading(false);
+          isProcessingRef.current = false;
+          return;
+        }
+        console.log('[Unified Registration] Email is available, proceeding...');
+      } catch (emailErr) {
+        console.error('[Unified Registration] Email check error:', emailErr);
+        // Continue anyway - Firebase Auth will catch duplicates as fallback
+      }
+    }
+
     console.log('[Unified Registration] Starting registration process...');
     console.log('[Unified Registration] Form data:', {
       name: `${formData.firstName} ${formData.lastName}`,
