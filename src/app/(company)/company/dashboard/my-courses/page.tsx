@@ -60,7 +60,7 @@ export default function CompanyMyCoursesPage() {
         thumbnailUrl: course.thumbnailUrl,
         courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
         duration: course.duration,
-        isEnrolled: false, // Don't show progress on hero
+        isEnrolled: true, // Show "Folytatás" button and link to player
         firstLessonId: enrollment.firstLessonId || getFirstLessonId(course),
         currentLessonId: enrollment.currentLessonId,
       };
