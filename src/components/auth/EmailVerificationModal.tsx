@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
-import { CheckCircle, Loader2, AlertCircle, Mail } from 'lucide-react'
+import { CheckCircle, Loader2, AlertCircle, Mail, X } from 'lucide-react'
 import { OTPInput } from './OTPInput'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
@@ -11,12 +11,14 @@ import { functions } from '@/lib/firebase'
 interface EmailVerificationModalProps {
   email: string
   onVerified: () => void
+  onCancel?: () => void
   userId: string
 }
 
 export function EmailVerificationModal({
   email,
   onVerified,
+  onCancel,
   userId
 }: EmailVerificationModalProps) {
   const [code, setCode] = useState('')
@@ -181,6 +183,17 @@ export function EmailVerificationModal({
         <div className="absolute -inset-4 bg-gradient-to-tr from-brand-secondary/50 to-brand-secondary opacity-20 blur-2xl rounded-3xl"></div>
 
         <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Close button */}
+          {onCancel && (
+            <button
+              onClick={onCancel}
+              className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+              aria-label="Bezárás"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+          )}
+
           {/* Header with gradient */}
           <div className="bg-gradient-to-t from-brand-secondary to-brand-secondary/50 px-8 py-10 text-center">
             <div className="flex justify-center mb-4">
@@ -280,6 +293,16 @@ export function EmailVerificationModal({
                 A kód 15 percig érvényes. Ha nem találod az emailt,<br/>
                 nézd meg a spam mappát is.
               </p>
+
+              {/* Cancel button */}
+              {onCancel && (
+                <button
+                  onClick={onCancel}
+                  className="mt-4 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  Mégse, vissza a bejelentkezéshez
+                </button>
+              )}
             </div>
           </div>
         </div>

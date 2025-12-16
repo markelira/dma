@@ -142,6 +142,29 @@ function RegisterPageContent() {
       <EmailVerificationModal
         email={registeredEmail}
         userId={registeredUserId}
+        onCancel={async () => {
+          console.log('[Register Page] User cancelled verification');
+
+          // Clear pending verification from sessionStorage
+          sessionStorage.removeItem('pendingEmailVerification');
+
+          // Reset state
+          setIsVerifying(false);
+          setShowVerificationModal(false);
+          setRegisteredUserId(null);
+          setRegisteredEmail('');
+
+          // Log out the user
+          try {
+            await logout();
+            console.log('[Register Page] User logged out after cancellation');
+          } catch (err) {
+            console.error('[Register Page] Error logging out:', err);
+          }
+
+          // Redirect to login
+          router.push('/login');
+        }}
         onVerified={async () => {
           console.log('[Register Page] Email verified successfully');
 
