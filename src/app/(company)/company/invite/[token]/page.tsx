@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAuthStore } from '@/stores/authStore';
 import Link from 'next/link';
 import { Building2, Mail, CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { motion } from 'motion/react';
@@ -27,6 +28,7 @@ export default function InviteAcceptancePage() {
   const router = useRouter();
   const params = useParams();
   const { user, loading: authLoading } = useAuth();
+  const { user: storeUser } = useAuthStore();
   const queryClient = useQueryClient();
   const [verifying, setVerifying] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -108,6 +110,14 @@ export default function InviteAcceptancePage() {
       !error &&
       !autoAcceptTriggered
     ) {
+      // 🛡️ BLOCK COMPANY ADMINS: They should not use invite links
+      if (storeUser?.role?.toUpperCase() === 'COMPANY_ADMIN') {
+        console.log('🛡️ [INVITE PAGE] BLOCKED: Company admin cannot use invite links');
+        setError('Céges adminisztrátorként nem használhatod ezt a meghívó linket. Ez a link a munkatársak meghívására szolgál.');
+        setAutoAcceptTriggered(true);
+        return;
+      }
+
       console.log('🚀 [INVITE PAGE] AUTO-ACCEPT: User logged in with valid invite, auto-accepting...');
       setAutoAcceptTriggered(true);
 
@@ -116,7 +126,7 @@ export default function InviteAcceptancePage() {
         handleAcceptInviteAuto();
       }, 500);
     }
-  }, [user, inviteData, authLoading, verifying, accepting, accepted, error, autoAcceptTriggered]);
+  }, [user, inviteData, authLoading, verifying, accepting, accepted, error, autoAcceptTriggered, storeUser]);
 
   // Auto-accept function (doesn't redirect to login)
   const handleAcceptInviteAuto = async () => {
@@ -190,6 +200,13 @@ export default function InviteAcceptancePage() {
       console.log('⚠️ [INVITE PAGE] No user, redirecting to login with redirect_to');
       // Redirect to login with return URL
       router.push(`/login?redirect_to=/company/invite/${token}`);
+      return;
+    }
+
+    // 🛡️ BLOCK COMPANY ADMINS: They should not use invite links
+    if (storeUser?.role?.toUpperCase() === 'COMPANY_ADMIN') {
+      console.log('🛡️ [INVITE PAGE] BLOCKED: Company admin cannot use invite links');
+      setError('Céges adminisztrátorként nem használhatod ezt a meghívó linket. Ez a link a munkatársak meghívására szolgál.');
       return;
     }
 

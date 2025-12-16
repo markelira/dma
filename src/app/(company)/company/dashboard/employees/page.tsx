@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Clock,
   X,
-  Copy,
   Search,
   Filter,
   Loader2,
@@ -42,7 +41,6 @@ export default function EmployeesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'invited' | 'left'>('all');
   const [submitting, setSubmitting] = useState(false);
-  const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [removingEmployeeId, setRemovingEmployeeId] = useState<string | null>(null);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState<CompanyEmployee | null>(null);
 
@@ -291,20 +289,6 @@ export default function EmployeesPage() {
     }
   };
 
-  const copyInviteLink = async (employee: CompanyEmployee) => {
-    if (!employee.inviteToken) return;
-
-    const inviteUrl = `${window.location.origin}/company/invite/${employee.inviteToken}`;
-
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      setCopiedToken(employee.id);
-      setTimeout(() => setCopiedToken(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-    }
-  };
-
   const handleRemoveEmployee = async (employee: CompanyEmployee) => {
     if (!company?.id || !employee.id) return;
 
@@ -465,15 +449,15 @@ export default function EmployeesPage() {
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Munkatársak</h1>
-          <p className="text-gray-600">Kezeld a vállalat munkatársait és küldj meghívókat</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Munkatársaim</h1>
+          <p className="text-gray-600">Adj hozzá 5 munkatársat, hogy ők is a kaland részesei legyenek.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm"
         >
           <UserPlus className="w-5 h-5 mr-2" />
-          Új munkatárs
+          Új munkatárs hozzáadása
         </button>
       </div>
 
@@ -615,26 +599,6 @@ export default function EmployeesPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end space-x-2">
-                        {/* Copy invite link button - only for invited status */}
-                        {employee.status === 'invited' && employee.inviteToken && (
-                          <button
-                            onClick={() => copyInviteLink(employee)}
-                            className="inline-flex items-center px-3 py-1.5 text-sm text-brand-secondary hover:text-brand-secondary-hover hover:bg-brand-secondary/5 rounded-lg transition-colors"
-                          >
-                            {copiedToken === employee.id ? (
-                              <>
-                                <CheckCircle2 className="w-4 h-4 mr-1" />
-                                Másolva!
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="w-4 h-4 mr-1" />
-                                Meghívó link
-                              </>
-                            )}
-                          </button>
-                        )}
-
                         {/* Remove button - for invited and active status */}
                         {employee.status !== 'left' && (
                           <button
@@ -711,22 +675,6 @@ export default function EmployeesPage() {
               </div>
 
               <form onSubmit={handleAddEmployee} className="p-6 space-y-4">
-                {/* First Name */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Keresztnév <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.firstName}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
-                    placeholder="pl. János"
-                    required
-                    disabled={submitting}
-                  />
-                </div>
-
                 {/* Last Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -738,6 +686,22 @@ export default function EmployeesPage() {
                     onChange={(e) => setNewEmployee({ ...newEmployee, lastName: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="pl. Kovács"
+                    required
+                    disabled={submitting}
+                  />
+                </div>
+
+                {/* First Name */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Keresztnév <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newEmployee.firstName}
+                    onChange={(e) => setNewEmployee({ ...newEmployee, firstName: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
+                    placeholder="pl. János"
                     required
                     disabled={submitting}
                   />
@@ -755,21 +719,6 @@ export default function EmployeesPage() {
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
                     placeholder="janos.kovacs@pelda.hu"
                     required
-                    disabled={submitting}
-                  />
-                </div>
-
-                {/* Job Title */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pozíció (opcionális)
-                  </label>
-                  <input
-                    type="text"
-                    value={newEmployee.jobTitle}
-                    onChange={(e) => setNewEmployee({ ...newEmployee, jobTitle: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
-                    placeholder="pl. Marketing Manager"
                     disabled={submitting}
                   />
                 </div>
