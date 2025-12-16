@@ -89,6 +89,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 }) => {
   const router = useRouter();
   const step2Ref = useRef<HTMLDivElement>(null);
+  const isProcessingRef = useRef(false); // Prevent double-click race condition
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -257,6 +258,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   };
 
   const handleNext = async () => {
+    // GUARD: Prevent concurrent executions (for invited employee flow)
+    if (isProcessingRef.current) {
+      console.log('[Registration] Already processing, ignoring duplicate click');
+      return;
+    }
+
     setError('');
 
     const isValid = await validateStep1();
@@ -278,10 +285,20 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   };
 
   const handleComplete = async () => {
+    // GUARD: Prevent concurrent executions (race condition fix)
+    if (isProcessingRef.current) {
+      console.log('[Registration] Already processing, ignoring duplicate click');
+      return;
+    }
+
+    isProcessingRef.current = true; // Set immediately (synchronous)
     setError('');
 
     // Validate Step 2 (optional fields)
-    if (!validateStep2()) return;
+    if (!validateStep2()) {
+      isProcessingRef.current = false; // Reset on validation failure
+      return;
+    }
 
     setLoading(true);
 
@@ -458,8 +475,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       console.error('[Unified Registration] Error:', err);
       setError(getAuthErrorMessage(err));
       setLoading(false);
+      isProcessingRef.current = false; // Reset on error to allow retry
     }
     // Note: Don't set loading to false if successful - parent will handle the flow
+    // Note: Don't reset isProcessingRef on success - user will be redirected
   };
 
   return (

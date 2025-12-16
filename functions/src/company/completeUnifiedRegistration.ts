@@ -56,6 +56,24 @@ export const completeUnifiedRegistration = https.onCall(
     const userId = request.auth.uid;
     const { firstName, lastName, email, phone, companyName, billingEmail, industry, companySize } = request.data;
 
+    // Idempotency check - prevent duplicate registration
+    // If user already has a companyId, return existing registration data
+    const existingUser = await db.collection('users').doc(userId).get();
+    if (existingUser.exists) {
+      const userData = existingUser.data();
+      if (userData?.companyId) {
+        console.warn(`⚠️ [completeUnifiedRegistration] User ${userId} already registered with company ${userData.companyId} - returning existing data (idempotent)`);
+
+        // Return existing registration data (idempotent response)
+        return {
+          success: true,
+          companyId: userData.companyId,
+          userId: userId,
+          message: 'User already registered (idempotent)'
+        };
+      }
+    }
+
     // Validate required fields
     if (!firstName?.trim()) {
       throw new HttpsError('invalid-argument', 'First name is required');
