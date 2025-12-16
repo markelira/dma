@@ -48,7 +48,7 @@ export default function DashboardPage() {
   const savePreferences = useSaveUserPreferences();
 
   // Trial popup state
-  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial } = useTrialPopup();
+  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial, isLoading: subscriptionLoading } = useTrialPopup();
   const [showTrialModal, setShowTrialModal] = useState(false);
   const [showCompanyNoAccessModal, setShowCompanyNoAccessModal] = useState(false);
 
@@ -103,7 +103,11 @@ export default function DashboardPage() {
 
   // Check if trial popup should show (AFTER welcome popup is dismissed)
   // Company employees see different modal if company has no subscription
+  // IMPORTANT: Only check after subscription status is loaded to avoid race condition
   useEffect(() => {
+    // Don't show any modals while subscription status is still loading
+    if (subscriptionLoading) return;
+
     if (!showWelcomePopup && !hasActiveSubscription) {
       if (isCompanyEmployee) {
         // Company employee without company subscription - show contact admin modal
@@ -113,7 +117,7 @@ export default function DashboardPage() {
         setShowTrialModal(true);
       }
     }
-  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup]);
+  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading]);
 
   // Check if onboarding is needed (only if trial modal not showing)
   useEffect(() => {
