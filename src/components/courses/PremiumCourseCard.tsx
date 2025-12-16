@@ -100,17 +100,23 @@ export function PremiumCourseCard({
   const enrollmentProgress = userEnrollment?.progress || course.progress || 0;
   const enrollmentStatusValue = userEnrollment?.status;
 
-  // Calculate total duration from lessons (NEW: Mux duration support)
+  // Get total duration - prefer course-level field, fallback to calculating from lessons
   const totalDuration = useMemo(() => {
+    // First check for pre-computed course-level totalDuration (from migration)
+    if ((course as any).totalDuration && (course as any).totalDuration > 0) {
+      return (course as any).totalDuration;
+    }
+
+    // Fallback: Calculate from lessons array if available
     let allLessons: any[] = [];
 
-    // Check for flat lessons array first
     if (course.lessons && Array.isArray(course.lessons)) {
       allLessons = course.lessons;
     } else if (course.modules && Array.isArray(course.modules)) {
-      // Fallback to modules structure
       allLessons = course.modules.flatMap(m => m.lessons || []);
     }
+
+    if (allLessons.length === 0) return 0;
 
     // Map lessons to duration, prioritizing muxDuration over duration
     const lessonsWithDuration = allLessons.map(lesson => ({
@@ -118,7 +124,7 @@ export function PremiumCourseCard({
     }));
 
     return calculateCourseDuration(lessonsWithDuration); // Returns seconds
-  }, [course.lessons, course.modules]);
+  }, [(course as any).totalDuration, course.lessons, course.modules]);
 
   const durationText = totalDuration > 0 ? formatDurationHungarian(totalDuration) : null;
 
@@ -126,8 +132,14 @@ export function PremiumCourseCard({
   const isSinglePartContent = course.courseType === 'WEBINAR' || course.courseType === 'PODCAST';
   const isMultiPartContent = course.courseType === 'ACADEMIA' || course.courseType === 'MASTERCLASS';
 
-  // Count PUBLISHED lessons for multi-part content badge
+  // Get published lesson count - prefer course-level field, fallback to calculating from lessons
   const publishedLessonCount = useMemo(() => {
+    // First check for pre-computed course-level publishedLessonCount (from migration)
+    if ((course as any).publishedLessonCount && (course as any).publishedLessonCount > 0) {
+      return (course as any).publishedLessonCount;
+    }
+
+    // Fallback: Calculate from lessons array if available
     let allLessons: any[] = [];
 
     if (course.lessons && Array.isArray(course.lessons)) {
@@ -136,11 +148,13 @@ export function PremiumCourseCard({
       allLessons = (course as any).modules.flatMap((m: any) => m.lessons || []);
     }
 
+    if (allLessons.length === 0) return 0;
+
     // Filter for PUBLISHED lessons only (treat missing status as published for legacy data)
     return allLessons.filter(lesson =>
       lesson.status === 'PUBLISHED' || !lesson.status
     ).length;
-  }, [course.lessons, (course as any).modules]);
+  }, [(course as any).publishedLessonCount, course.lessons, (course as any).modules]);
 
   // Format duration for badge display (single-part content)
   const formatDurationBadge = (seconds: number): string => {

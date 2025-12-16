@@ -145,6 +145,9 @@ export function CourseCarouselRow({
                     courseType: course.courseType,
                     contentCreatedAt: course.contentCreatedAt,
                     progress: progress,
+                    // Course-level stats for badges (from migration)
+                    totalDuration: course.totalDuration,
+                    publishedLessonCount: course.publishedLessonCount,
                   }}
                   index={index}
                   categories={categories}

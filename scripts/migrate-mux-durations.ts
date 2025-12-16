@@ -2,10 +2,12 @@
  * Migration Script: Fetch and store Mux video durations
  *
  * This script fetches video durations from the Mux API for all existing lessons
- * that have a muxAssetId but no muxDuration stored.
+ * that have a muxPlaybackId but no muxDuration stored.
+ *
+ * Strategy: Look up assets by playbackId (since muxAssetId contains Upload IDs)
  *
  * Usage:
- *   npx ts-node scripts/migrate-mux-durations.ts
+ *   npx tsx scripts/migrate-mux-durations.ts
  *
  * Requirements:
  *   - Firebase Admin credentials (GOOGLE_APPLICATION_CREDENTIALS env var)
@@ -65,6 +67,9 @@ const stats: MigrationStats = {
   errors: 0,
 };
 
+// Cache: playbackId -> asset duration
+const playbackIdToDuration: Map<string, number> = new Map();
+
 /**
  * Delay helper to avoid Mux API rate limits
  */
@@ -73,20 +78,52 @@ function delay(ms: number): Promise<void> {
 }
 
 /**
- * Fetch duration from Mux API for a given asset ID
+ * Build a cache of all Mux assets indexed by playbackId
+ * This is more efficient than looking up each asset individually
  */
-async function fetchMuxDuration(assetId: string): Promise<number | null> {
-  try {
-    const asset = await mux.video.assets.retrieve(assetId);
-    return asset.duration || null;
-  } catch (error: any) {
-    if (error.status === 404) {
-      console.warn(`  ⚠️ Asset not found in Mux: ${assetId}`);
-    } else {
-      console.error(`  ❌ Error fetching asset ${assetId}:`, error.message);
+async function buildPlaybackIdCache(): Promise<void> {
+  console.log('📦 Building Mux asset cache by playbackId...');
+
+  let page = 1;
+  let hasMore = true;
+  let totalAssets = 0;
+
+  while (hasMore) {
+    try {
+      const response = await mux.video.assets.list({ limit: 100, page });
+      const assets = response.data || [];
+
+      for (const asset of assets) {
+        if (asset.playback_ids && asset.duration) {
+          for (const pb of asset.playback_ids) {
+            playbackIdToDuration.set(pb.id, asset.duration);
+          }
+        }
+        totalAssets++;
+      }
+
+      // Check if there are more pages
+      // If we got fewer than 100 results, we've reached the end
+      if (assets.length < 100) {
+        hasMore = false;
+      } else {
+        page++;
+        await delay(100); // Rate limit between pages
+      }
+    } catch (error: any) {
+      console.error(`  ❌ Error fetching assets page ${page}:`, error.message);
+      hasMore = false;
     }
-    return null;
   }
+
+  console.log(`  ✅ Cached ${playbackIdToDuration.size} playback IDs from ${totalAssets} assets\n`);
+}
+
+/**
+ * Get duration from cache for a given playbackId
+ */
+function getDurationByPlaybackId(playbackId: string): number | null {
+  return playbackIdToDuration.get(playbackId) || null;
 }
 
 /**
@@ -98,11 +135,11 @@ async function processLesson(
 ): Promise<void> {
   stats.totalLessons++;
 
-  const { muxAssetId, muxDuration, title } = lessonData;
+  const { muxPlaybackId, muxDuration, title } = lessonData;
 
-  // Skip if no muxAssetId
-  if (!muxAssetId) {
-    console.log(`  ⏭️ Skipping "${title || 'Untitled'}" - no muxAssetId`);
+  // Skip if no muxPlaybackId
+  if (!muxPlaybackId) {
+    console.log(`  ⏭️ Skipping "${title || 'Untitled'}" - no muxPlaybackId`);
     stats.skipped++;
     return;
   }
@@ -114,11 +151,11 @@ async function processLesson(
     return;
   }
 
-  // Fetch duration from Mux
-  console.log(`  🔄 Fetching duration for "${title || 'Untitled'}" (${muxAssetId})`);
-  const duration = await fetchMuxDuration(muxAssetId);
+  // Get duration from cache (by playbackId)
+  const duration = getDurationByPlaybackId(muxPlaybackId);
 
   if (duration === null) {
+    console.log(`  ⚠️ No duration found for "${title || 'Untitled'}" (playbackId: ${muxPlaybackId})`);
     stats.errors++;
     return;
   }
@@ -129,15 +166,12 @@ async function processLesson(
       muxDuration: duration,
       updatedAt: new Date().toISOString(),
     });
-    console.log(`  ✅ Updated "${title || 'Untitled'}": ${duration}s`);
+    console.log(`  ✅ Updated "${title || 'Untitled'}": ${Math.round(duration)}s`);
     stats.updated++;
   } catch (error: any) {
     console.error(`  ❌ Failed to update ${lessonPath}:`, error.message);
     stats.errors++;
   }
-
-  // Rate limit delay (100ms between API calls)
-  await delay(100);
 }
 
 /**
@@ -147,6 +181,9 @@ async function migrateMuxDurations(): Promise<void> {
   console.log('🚀 Starting Mux duration migration...\n');
 
   try {
+    // First, build the playbackId -> duration cache from Mux
+    await buildPlaybackIdCache();
+
     // Get all courses
     const coursesSnapshot = await firestore.collection('courses').get();
     console.log(`📚 Found ${coursesSnapshot.size} courses\n`);
