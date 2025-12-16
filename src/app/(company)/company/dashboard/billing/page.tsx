@@ -82,9 +82,10 @@ export default function CompanyBillingPage() {
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [downloadingId, setDownloadingId] = useState<string | null>(null)
 
-  // Check if user is company admin
-  const isCompanyAdmin = user?.role === 'COMPANY_ADMIN'
-  const isCompanyEmployee = user?.role === 'COMPANY_EMPLOYEE'
+  // Check if user is company admin (support both cases for backwards compatibility)
+  const userRole = user?.role?.toUpperCase()
+  const isCompanyAdmin = userRole === 'COMPANY_ADMIN'
+  const isCompanyEmployee = userRole === 'COMPANY_EMPLOYEE'
 
   const hasActiveSubscription = subscriptionData?.hasActiveSubscription || subscriptionData?.isActive || false
   const subscription = subscriptionData?.subscription

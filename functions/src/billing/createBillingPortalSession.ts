@@ -93,8 +93,9 @@ export const createBillingPortalSession = onCall({
 
       const companyData = companyDoc.data();
 
-      // Check if user is company admin
-      if (userData.role !== 'COMPANY_ADMIN') {
+      // Check if user is company admin (support both cases for backwards compatibility)
+      const userRole = userData.role?.toUpperCase();
+      if (userRole !== 'COMPANY_ADMIN') {
         return {
           success: false,
           error: 'A számlázás kezeléséhez adminisztrátori jogosultság szükséges. Kérjük, forduljon a vállalati adminisztrátorhoz.',

@@ -10,13 +10,14 @@
  * - COMPANY_EMPLOYEE and all other roles → /dashboard
  */
 export function getDashboardPath(role?: string): string {
-  if (role === 'company_admin') {
+  const upperRole = role?.toUpperCase();
+  if (upperRole === 'COMPANY_ADMIN') {
     return '/company/dashboard';
   }
-  if (role === 'INSTRUCTOR') {
+  if (upperRole === 'INSTRUCTOR') {
     return '/instructor/dashboard';
   }
-  if (role === 'ADMIN') {
+  if (upperRole === 'ADMIN') {
     return '/admin/dashboard';
   }
   return '/dashboard';

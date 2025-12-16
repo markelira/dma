@@ -190,7 +190,7 @@ export const completeUnifiedRegistration = https.onCall(
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         phone: phone.trim(),
-        role: 'company_admin',
+        role: 'COMPANY_ADMIN',
         companyId: companyId,
         companyRole: 'owner',
         profilePictureUrl: null,
@@ -217,7 +217,7 @@ export const completeUnifiedRegistration = https.onCall(
 
       // Step 4: Set custom claims
       const customClaims = {
-        role: 'company_admin',
+        role: 'COMPANY_ADMIN',
         companyId: companyId,
         companyRole: 'owner',
       };
