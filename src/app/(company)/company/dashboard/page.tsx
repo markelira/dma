@@ -3,7 +3,6 @@
 export const dynamic = 'force-dynamic';
 
 import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Loader2 } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
@@ -31,7 +30,6 @@ import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUti
 
 export default function CompanyDashboardPage() {
   const { user } = useAuthStore();
-  const router = useRouter();
 
   // Data hooks
   const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();

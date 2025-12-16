@@ -186,16 +186,16 @@ function RegisterPageContent() {
               console.log('[Register Page] Invited employee - redirecting to dashboard (no payment required)');
               router.push('/dashboard');
             } else {
-              // Regular registration - redirect to Stripe checkout to start trial
-              console.log('[Register Page] Redirecting new user to Stripe checkout');
-              router.push('/subscribe/start?plan=monthly');
+              // Regular registration - redirect to company dashboard (popup will show there)
+              console.log('[Register Page] Redirecting new user to company dashboard');
+              router.push('/company/dashboard');
             }
           } else {
             // Fallback if no user
             if (inviteData) {
               router.push('/dashboard');
             } else {
-              router.push('/subscribe/start?plan=monthly');
+              router.push('/company/dashboard');
             }
           }
         }}

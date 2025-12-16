@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { Loader2, Menu, X } from 'lucide-react'
 import { CompanyDashboardSidebar } from '@/components/company/CompanyDashboardSidebar'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { FreeTrialModal } from '@/components/subscription/FreeTrialModal'
+import { useTrialPopup } from '@/hooks/useTrialPopup'
 import Footer from '@/components/landing-home/ui/footer'
 import { db } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
@@ -21,6 +23,10 @@ export default function CompanyLayout({
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [companyName, setCompanyName] = useState<string | undefined>()
+
+  // Trial popup state (for company admins without subscription)
+  const { shouldShowForAuthUser, hasUsedTrial, isLoading: subscriptionLoading, dismiss: dismissTrial } = useTrialPopup()
+  const [showTrialModal, setShowTrialModal] = useState(false)
 
   // Company admin is determined by role === COMPANY_ADMIN or companyId + companyRole === 'owner' or 'admin'
   const isCompanyAdmin =
@@ -73,6 +79,26 @@ export default function CompanyLayout({
     }
     fetchCompanyName()
   }, [user?.companyId])
+
+  // Show trial popup for company admins without subscription
+  // Only shows once per session (dismissed state stored in sessionStorage)
+  useEffect(() => {
+    if (subscriptionLoading) return
+
+    if (isCompanyAdmin && shouldShowForAuthUser) {
+      setShowTrialModal(true)
+    }
+  }, [isCompanyAdmin, shouldShowForAuthUser, subscriptionLoading])
+
+  // Handle trial modal actions
+  const handleTrialStart = () => {
+    router.push('/subscribe/start?plan=monthly')
+  }
+
+  const handleTrialDismiss = () => {
+    dismissTrial()
+    setShowTrialModal(false)
+  }
 
   if (!authReady || isLoading || !user || !isCompanyAdmin) {
     return (
@@ -136,6 +162,16 @@ export default function CompanyLayout({
         <div className="lg:ml-64">
           <Footer border={true} />
         </div>
+
+        {/* Free Trial Modal - Shows for company admins without subscription */}
+        <FreeTrialModal
+          open={showTrialModal}
+          onOpenChange={setShowTrialModal}
+          variant="dashboard"
+          onStartTrial={handleTrialStart}
+          onDismiss={handleTrialDismiss}
+          hasUsedTrial={hasUsedTrial}
+        />
       </div>
     </AuthProvider>
   )

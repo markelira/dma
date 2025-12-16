@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
 import {
   Check,
-  Play,
   X as CloseIcon
 } from 'lucide-react';
 
@@ -47,18 +46,6 @@ export function FreeTrialModal({
     onOpenChange(false);
   };
 
-  // Variant-specific subheadline
-  const getSubheadline = () => {
-    switch (variant) {
-      case 'dashboard':
-        return 'Kezdd el a tanulást most!';
-      case 'course-auth':
-        return courseName ? `Hozzáférés: ${courseName}` : 'Hozzáférés a kurzushoz';
-      case 'course-unauth':
-        return courseName ? `Hozzáférés: ${courseName}` : 'Hozzáférés a kurzushoz';
-    }
-  };
-
   // Dynamic button text based on trial usage
   const getButtonText = () => {
     if (hasUsedTrial) {
@@ -68,10 +55,12 @@ export function FreeTrialModal({
   };
 
   const benefits = [
-    'Minden tartalom',
-    'Webinárok + Akadémia',
-    'Mobil hozzáférés',
-    'Nincs elköteleződés'
+    'Teljes hozzáférés 150+ struktúraépítő tartalomhoz',
+    'Több mint 200 órányi azonnal alkalmazható, működő rendszer',
+    '5 munkatárs díjmentes hozzáadása',
+    'Hetente frissülő tartalmak',
+    'Bármikor lemondható',
+    '7 napos ingyenes kipróbálás'
   ];
 
   if (!portalContainer || !open) return null;
@@ -114,37 +103,15 @@ export function FreeTrialModal({
 
                 {/* Gradient header */}
                 <div className="bg-gradient-to-t from-brand-secondary to-brand-secondary/50 px-6 pt-10 pb-8 text-center">
-                  {/* Play icon with animation */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', damping: 15, delay: 0.1 }}
-                    className="flex justify-center mb-5"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <Play className="w-8 h-8 text-white fill-white" />
-                    </div>
-                  </motion.div>
-
                   {/* Headline */}
                   <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-2xl font-bold text-white tracking-tight mb-2"
+                    transition={{ delay: 0.1 }}
+                    className="text-2xl font-bold text-white tracking-tight"
                   >
-                    FEDEZD FEL 7 NAPIG INGYEN
+                    Fedezd fel 7 napig ingyen
                   </motion.h2>
-
-                  {/* Subheadline */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="text-white/80 text-base"
-                  >
-                    {getSubheadline()}
-                  </motion.p>
                 </div>
 
                 {/* Content */}
@@ -153,15 +120,15 @@ export function FreeTrialModal({
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="grid grid-cols-2 gap-3"
+                    transition={{ delay: 0.2 }}
+                    className="grid grid-cols-2 gap-x-4 gap-y-3"
                   >
                     {benefits.map((benefit, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                          <Check className="w-4 h-4 text-green-600" />
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                          <Check className="w-3 h-3 text-green-600" />
                         </div>
-                        <span className="text-sm text-gray-700 tracking-tight">{benefit}</span>
+                        <span className="text-sm text-gray-700 leading-tight">{benefit}</span>
                       </div>
                     ))}
                   </motion.div>
@@ -170,7 +137,7 @@ export function FreeTrialModal({
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
+                    transition={{ delay: 0.25 }}
                   >
                     <Button
                       onClick={handleStartTrial}
@@ -185,7 +152,7 @@ export function FreeTrialModal({
                     <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4 }}
+                      transition={{ delay: 0.3 }}
                       className="text-sm text-gray-500 text-center"
                     >
                       Bejelentkezés szükséges a folytatáshoz
@@ -196,7 +163,7 @@ export function FreeTrialModal({
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ delay: 0.3 }}
                     className="text-center pt-4 border-t border-gray-100"
                   >
                     <p className="text-sm text-gray-500">
