@@ -107,6 +107,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [newEmployeeLastName, setNewEmployeeLastName] = useState('');
   const [employeeError, setEmployeeError] = useState('');
   const [checkingEmployeeEmail, setCheckingEmployeeEmail] = useState(false);
+  const [employeeSuccess, setEmployeeSuccess] = useState(false);
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: inviteData?.employeeName.split(' ')[0] || '',
@@ -187,6 +188,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
     setNewEmployeeEmail('');
     setNewEmployeeFirstName('');
     setNewEmployeeLastName('');
+
+    // Show success message
+    setEmployeeSuccess(true);
+    setTimeout(() => setEmployeeSuccess(false), 3000); // Hide after 3 seconds
   };
 
   const handleRemoveEmployee = (email: string) => {
@@ -747,7 +752,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     className="form-input w-full py-2.5 pl-10"
                     placeholder="Kovács"
                     value={newEmployeeLastName}
-                    onChange={(e) => setNewEmployeeLastName(e.target.value)}
+                    onChange={(e) => {
+                      setNewEmployeeLastName(e.target.value);
+                      setEmployeeError('');
+                      setEmployeeSuccess(false);
+                    }}
                     disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
                   />
                 </div>
@@ -767,7 +776,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     className="form-input w-full py-2.5 pl-10"
                     placeholder="János"
                     value={newEmployeeFirstName}
-                    onChange={(e) => setNewEmployeeFirstName(e.target.value)}
+                    onChange={(e) => {
+                      setNewEmployeeFirstName(e.target.value);
+                      setEmployeeError('');
+                      setEmployeeSuccess(false);
+                    }}
                     disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
                   />
                 </div>
@@ -787,7 +800,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     className="form-input w-full py-2.5 pl-10"
                     placeholder="pelda@email.com"
                     value={newEmployeeEmail}
-                    onChange={(e) => setNewEmployeeEmail(e.target.value)}
+                    onChange={(e) => {
+                      setNewEmployeeEmail(e.target.value);
+                      setEmployeeError('');
+                      setEmployeeSuccess(false);
+                    }}
                     disabled={loading || checkingEmployeeEmail || pendingEmployees.length >= 5}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
@@ -799,8 +816,19 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 </div>
               </div>
 
+              {/* Error message */}
               {employeeError && (
                 <p className="text-sm text-red-600">{employeeError}</p>
+              )}
+
+              {/* Success message */}
+              {employeeSuccess && (
+                <p className="text-sm text-green-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Hozzáadva!
+                </p>
               )}
 
               {/* Add Employee Button */}
