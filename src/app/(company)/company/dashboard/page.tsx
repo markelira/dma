@@ -2,13 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { Loader2 } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
 import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
-import { DashboardSearch } from '@/components/dashboard/DashboardSearch';
+import { DashboardSearch, type DashboardFilters } from '@/components/dashboard/DashboardSearch';
 import { EnrolledCourseCarousel } from '@/components/dashboard/EnrolledCourseCarousel';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { useCourses } from '@/hooks/useCourseQueries';
@@ -40,9 +40,71 @@ export default function CompanyDashboardPage() {
   const { data: targetAudiences, isLoading: audiencesLoading } = useTargetAudiences();
   const { data: instructors, isLoading: instructorsLoading } = useInstructors();
 
+  // Filter state
+  const [filters, setFilters] = useState<DashboardFilters>({
+    query: '',
+    categoryIds: [],
+    audienceIds: [],
+    courseTypes: [],
+    instructorIds: [],
+  });
+
+  // Apply user filters to all courses
+  const filteredCourses = useMemo(() => {
+    if (!courses) return [];
+
+    let result = courses;
+
+    // Apply search query
+    if (filters.query) {
+      const searchLower = filters.query.toLowerCase();
+      result = result.filter(course =>
+        course.title.toLowerCase().includes(searchLower) ||
+        course.description?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Apply category filter
+    if (filters.categoryIds.length > 0) {
+      result = result.filter(course =>
+        filters.categoryIds.some(catId =>
+          course.categoryIds?.includes(catId) ||
+          course.category?.id === catId ||
+          (course as any).categoryId === catId
+        )
+      );
+    }
+
+    // Apply audience filter
+    if (filters.audienceIds.length > 0) {
+      result = result.filter(course =>
+        filters.audienceIds.some(audId => course.targetAudienceIds?.includes(audId))
+      );
+    }
+
+    // Apply course type filter
+    if (filters.courseTypes.length > 0) {
+      result = result.filter(course =>
+        filters.courseTypes.includes(course.courseType)
+      );
+    }
+
+    // Apply instructor filter
+    if (filters.instructorIds.length > 0) {
+      result = result.filter(course =>
+        filters.instructorIds.some(instId =>
+          (course as any).instructorId === instId ||
+          (course as any).instructorIds?.includes(instId)
+        )
+      );
+    }
+
+    return result;
+  }, [courses, filters]);
+
   // Build hero slides - only non-enrolled courses
   const heroSlides = useMemo(() => {
-    if (!courses) return [];
+    if (!filteredCourses.length) return [];
 
     // Helper to get first lesson ID from course (flat lessons array)
     const getFirstLessonId = (course: Course): string | undefined => {
@@ -60,7 +122,7 @@ export default function CompanyDashboardPage() {
     const enrolledCourseIds = new Set(enrollments?.map(e => e.courseId) || []);
 
     // Filter to non-enrolled courses only
-    const nonEnrolledCourses = courses.filter(c => !enrolledCourseIds.has(c.id));
+    const nonEnrolledCourses = filteredCourses.filter(c => !enrolledCourseIds.has(c.id));
 
     // If no non-enrolled courses, return empty
     if (nonEnrolledCourses.length === 0) return [];
@@ -166,11 +228,11 @@ export default function CompanyDashboardPage() {
 
   // Build category rows - check multiple category field formats
   const categoryRows = useMemo(() => {
-    if (!categories || !courses) return [];
+    if (!categories || !filteredCourses.length) return [];
 
     return categories
       .map(category => {
-        const categoryCourses = courses.filter(course => {
+        const categoryCourses = filteredCourses.filter(course => {
           // Check array format (categoryIds)
           if (course.categoryIds?.includes(category.id)) return true;
           // Check nested object format (category.id)
@@ -185,32 +247,32 @@ export default function CompanyDashboardPage() {
         };
       })
       .filter(row => row.courses.length > 0);
-  }, [categories, courses]);
+  }, [categories, filteredCourses]);
 
   // Always prepare a "Felkapott" section with top courses (shuffled)
   const popularCourses = useMemo(() => {
-    if (!courses) return [];
-    return shufflePopularCourses(courses, 10);
-  }, [courses]);
+    if (!filteredCourses.length) return [];
+    return shufflePopularCourses(filteredCourses, 10);
+  }, [filteredCourses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
-    if (!courses) return [];
-    return sortByContentCreatedAt(courses).slice(0, 10);
-  }, [courses]);
+    if (!filteredCourses.length) return [];
+    return sortByContentCreatedAt(filteredCourses).slice(0, 10);
+  }, [filteredCourses]);
 
   // Check if we need to show a fallback "Felfedezés" section
   const showFallbackSection = useMemo(() => {
     // Show fallback if we have courses but no category/audience rows matched
-    return courses && courses.length > 0 && categoryRows.length === 0;
-  }, [courses, categoryRows]);
+    return filteredCourses.length > 0 && categoryRows.length === 0;
+  }, [filteredCourses, categoryRows]);
 
   // Build target audience rows (top 2 most popular)
   const audienceRows = useMemo(() => {
-    if (!targetAudiences || !courses) return [];
+    if (!targetAudiences || !filteredCourses.length) return [];
 
     const audienceCounts = targetAudiences.map(audience => {
-      const audienceCourses = courses.filter(course =>
+      const audienceCourses = filteredCourses.filter(course =>
         course.targetAudienceIds?.includes(audience.id)
       );
       return {
@@ -225,7 +287,7 @@ export default function CompanyDashboardPage() {
       .sort((a, b) => b.count - a.count)
       .filter(row => row.count > 0)
       .slice(0, 2);
-  }, [targetAudiences, courses]);
+  }, [targetAudiences, filteredCourses]);
 
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
@@ -245,7 +307,17 @@ export default function CompanyDashboardPage() {
       )}
 
       {/* Search Bar */}
-      <DashboardSearch className="my-2" />
+      <DashboardSearch className="my-2" onFilterChange={setFilters} />
+
+      {/* No results message when filters active but no matches */}
+      {(filters.query || filters.categoryIds.length > 0 || filters.audienceIds.length > 0 ||
+        filters.courseTypes.length > 0 || filters.instructorIds.length > 0) &&
+       filteredCourses.length === 0 && (
+        <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+          <p className="text-gray-500 mb-2">Nincs találat a megadott szűrőkkel</p>
+          <p className="text-sm text-gray-400">Próbálj más szűrőket választani</p>
+        </div>
+      )}
 
       {/* Felkapott tartalmak - most popular */}
       {popularCourses.length > 0 && (
@@ -294,10 +366,10 @@ export default function CompanyDashboardPage() {
       ))}
 
       {/* Fallback: All Courses if no categories matched */}
-      {showFallbackSection && courses && (
+      {showFallbackSection && filteredCourses.length > 0 && (
         <CourseCarouselRow
           title="Felfedezés"
-          courses={courses}
+          courses={filteredCourses}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
@@ -319,8 +391,8 @@ export default function CompanyDashboardPage() {
       ))}
 
       {/* Course Type Carousels */}
-      {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
-        const typeCourses = shuffleArray(courses.filter(c => c.courseType === type));
+      {filteredCourses.length > 0 && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
+        const typeCourses = shuffleArray(filteredCourses.filter(c => c.courseType === type));
         if (typeCourses.length === 0) return null;
 
         const typeLabels: Record<string, string> = {
@@ -344,7 +416,7 @@ export default function CompanyDashboardPage() {
       })}
 
       {/* Empty State */}
-      {heroSlides.length === 0 && enrolledCourses.length === 0 && (!courses || courses.length === 0) && (
+      {heroSlides.length === 0 && enrolledCourses.length === 0 && filteredCourses.length === 0 && (
         <div className="text-center py-16">
           <p className="text-gray-500">Nincs megjeleníthető tartalom</p>
         </div>

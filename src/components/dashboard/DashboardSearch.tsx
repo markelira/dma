@@ -49,6 +49,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const filterPanelRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -60,6 +61,32 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Close filter panel when clicking outside
+  useEffect(() => {
+    if (!showFilters) return;
+
+    const handleClickOutsideFilters = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      // Don't close if clicked inside panel
+      if (filterPanelRef.current?.contains(target)) {
+        return;
+      }
+
+      // Don't close if clicked inside Radix UI portal (dropdowns)
+      const radixPortal = (event.target as HTMLElement).closest('[data-radix-popper-content-wrapper]');
+      if (radixPortal) {
+        return;
+      }
+
+      // Clicked outside - close panel
+      setShowFilters(false);
+    };
+
+    document.addEventListener('mousedown', handleClickOutsideFilters);
+    return () => document.removeEventListener('mousedown', handleClickOutsideFilters);
+  }, [showFilters]);
 
   // Auto-apply filters when any filter selection changes
   useEffect(() => {
@@ -254,12 +281,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
           {/* Filter toggle button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={cn(
-              'flex items-center gap-1 px-3 py-2 mr-1 rounded-lg text-sm font-medium transition-colors',
-              showFilters || hasActiveFilters
-                ? 'bg-brand-secondary/10 text-brand-secondary'
-                : 'text-gray-500 hover:bg-gray-100'
-            )}
+            className="flex items-center gap-1 px-3 py-2 mr-1 rounded-lg text-sm font-medium bg-brand-secondary text-white hover:bg-brand-secondary/90 transition-colors"
           >
             <Filter className="w-4 h-4" />
             <span className="hidden sm:inline">Szűrők</span>
@@ -269,20 +291,12 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
               </span>
             )}
           </button>
-
-          {/* Search button - Hidden on mobile since filters auto-apply */}
-          <button
-            onClick={handleSearch}
-            className="hidden sm:inline-flex px-4 py-2 mr-1 bg-brand-secondary text-white rounded-lg text-sm font-medium hover:bg-brand-secondary/90 transition-colors"
-          >
-            Keresés
-          </button>
         </div>
       </div>
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className="absolute left-0 right-0 mt-2 p-4 bg-white rounded-xl border border-gray-200 shadow-lg z-20">
+        <div ref={filterPanelRef} className="absolute left-0 right-0 mt-2 p-4 bg-white rounded-xl border border-gray-200 shadow-lg z-20">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-semibold text-gray-900">Szűrők</h3>
             {hasActiveFilters && (
