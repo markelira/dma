@@ -109,7 +109,7 @@ export default function CompanyBillingPage() {
       console.log('[Billing] Starting subscription checkout...')
       const createCheckoutSessionFn = httpsCallable(functions, 'createCheckoutSession')
       const result = await createCheckoutSessionFn({
-        priceId: 'price_1SNAlsGe8tBqGEXM8vEOVhgY',  // Monthly subscription price ID
+        priceId: 'price_1SdoIlGe8tBqGEXM2uyTAihs',  // Monthly subscription price ID (14,990 HUF/mo)
         successUrl: `${window.location.origin}/company/dashboard/billing?success=true`,
         cancelUrl: `${window.location.origin}/company/dashboard/billing`
       }) as { data: { success?: boolean; data?: { url?: string } } }
