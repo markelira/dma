@@ -42,46 +42,69 @@ const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const firestore = admin.firestore();
 /**
- * Helper function to enrich course data with instructor and category information
+ * Helper to chunk array into batches (Firestore 'in' query max is 30)
  */
-const enrichCourse = async (course) => {
-    let instructor = null;
-    let category = null;
-    // Lookup instructor data
-    if (course.instructorId) {
-        try {
-            const instructorDoc = await firestore.collection('instructors').doc(course.instructorId).get();
-            if (instructorDoc.exists) {
-                const instructorData = instructorDoc.data();
-                instructor = {
-                    id: instructorDoc.id,
-                    firstName: instructorData?.firstName || 'Ismeretlen',
-                    lastName: instructorData?.lastName || 'Oktató',
-                    profilePictureUrl: instructorData?.profilePictureUrl || undefined,
-                };
-            }
-        }
-        catch (error) {
-            console.warn(`Failed to lookup instructor ${course.instructorId} for course ${course.id}:`, error);
-        }
+const chunk = (arr, size) => {
+    const chunks = [];
+    for (let i = 0; i < arr.length; i += size) {
+        chunks.push(arr.slice(i, i + size));
     }
-    // Lookup category data
-    if (course.categoryId) {
-        try {
-            const categoryDoc = await firestore.collection('categories').doc(course.categoryId).get();
-            if (categoryDoc.exists) {
-                const categoryData = categoryDoc.data();
-                category = {
-                    id: categoryDoc.id,
-                    name: categoryData?.name || 'Ismeretlen kategória',
-                };
-            }
-        }
-        catch (error) {
-            console.warn(`Failed to lookup category ${course.categoryId} for course ${course.id}:`, error);
-        }
+    return chunks;
+};
+/**
+ * Batch fetch instructors and categories for multiple courses
+ * Returns maps for O(1) lookup instead of N+1 queries
+ */
+const batchFetchEnrichmentData = async (courses) => {
+    // Collect unique IDs
+    const instructorIds = [...new Set(courses.map(c => c.instructorId).filter(Boolean))];
+    const categoryIds = [...new Set(courses.map(c => c.categoryId).filter(Boolean))];
+    console.log(`📦 Batch fetching: ${instructorIds.length} instructors, ${categoryIds.length} categories`);
+    // Batch fetch instructors (max 30 per query due to Firestore 'in' limit)
+    const instructorMap = new Map();
+    if (instructorIds.length > 0) {
+        const instructorBatches = chunk(instructorIds, 30);
+        const instructorResults = await Promise.all(instructorBatches.map(batch => firestore.collection('instructors')
+            .where(admin.firestore.FieldPath.documentId(), 'in', batch)
+            .get()));
+        instructorResults.forEach(snapshot => {
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                instructorMap.set(doc.id, {
+                    id: doc.id,
+                    firstName: data?.firstName || 'Ismeretlen',
+                    lastName: data?.lastName || 'Oktató',
+                    profilePictureUrl: data?.profilePictureUrl || undefined,
+                });
+            });
+        });
     }
-    // Return enriched course with safe fallbacks
+    // Batch fetch categories
+    const categoryMap = new Map();
+    if (categoryIds.length > 0) {
+        const categoryBatches = chunk(categoryIds, 30);
+        const categoryResults = await Promise.all(categoryBatches.map(batch => firestore.collection('categories')
+            .where(admin.firestore.FieldPath.documentId(), 'in', batch)
+            .get()));
+        categoryResults.forEach(snapshot => {
+            snapshot.docs.forEach(doc => {
+                const data = doc.data();
+                categoryMap.set(doc.id, {
+                    id: doc.id,
+                    name: data?.name || 'Ismeretlen kategória',
+                });
+            });
+        });
+    }
+    console.log(`📦 Fetched: ${instructorMap.size} instructors, ${categoryMap.size} categories`);
+    return { instructorMap, categoryMap };
+};
+/**
+ * Enrich course with pre-fetched instructor and category data (no DB calls)
+ */
+const enrichCourseWithMaps = (course, instructorMap, categoryMap) => {
+    const instructor = course.instructorId ? instructorMap.get(course.instructorId) : null;
+    const category = course.categoryId ? categoryMap.get(course.categoryId) : null;
     return {
         ...course,
         instructor: instructor ?? {
@@ -223,14 +246,13 @@ exports.getCoursesWithFilters = (0, https_1.onCall)({
             filteredCourses = filteredCourses.filter((course) => !userEnrollments.has(course.id));
             console.log(`🔍 [${queryId}] After enrollment exclusion:`, filteredCourses.length);
         }
-        // Enrich courses with instructor, category, and enrollment data
-        const enrichedCourses = await Promise.all(filteredCourses.map(async (course) => {
-            const enrichedCourse = await enrichCourse(course);
+        // Batch fetch instructor and category data (fixes N+1 query problem)
+        const { instructorMap, categoryMap } = await batchFetchEnrichmentData(filteredCourses);
+        // Enrich courses with pre-fetched data (no additional DB calls)
+        const enrichedCourses = filteredCourses.map((course) => {
+            const enrichedCourse = enrichCourseWithMaps(course, instructorMap, categoryMap);
             // Add enrollment status for authenticated users
-            let isEnrolled = false;
-            if (userId) {
-                isEnrolled = userEnrollments.has(course.id);
-            }
+            const isEnrolled = userId ? userEnrollments.has(course.id) : false;
             // Add catalog metadata
             const catalogMetadata = {
                 isEnrolled,
@@ -245,11 +267,11 @@ exports.getCoursesWithFilters = (0, https_1.onCall)({
                 ...enrichedCourse,
                 ...catalogMetadata
             };
-        }));
+        });
         console.log(`🔍 [${queryId}] After enrichment:`, enrichedCourses.length);
         // Add recommendation scoring if requested
         if (includeRecommendations && userCategories.size > 0) {
-            enrichedCourses.forEach(course => {
+            enrichedCourses.forEach((course) => {
                 if (userCategories.has(course.category?.id)) {
                     course.recommendationScore = course.popularityScore + 20;
                 }

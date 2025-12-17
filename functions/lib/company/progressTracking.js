@@ -164,7 +164,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             enrollmentDocs.push(...batchSnapshot.docs);
         }
         console.log(`📊 Found ${enrollmentDocs.length} enrollments for company users in ${companyId}`);
-        // 5. Get unique course IDs and fetch course details
+        // 5. Get unique course IDs and fetch course details (BATCH)
         const courseIds = new Set();
         enrollmentDocs.forEach(doc => {
             const data = doc.data();
@@ -172,51 +172,62 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 courseIds.add(data.courseId);
             }
         });
-        // Fetch course details and lesson counts
+        // Batch fetch course details (fixes N+1 query)
         const coursesData = new Map();
-        for (const cId of courseIds) {
-            const courseDoc = await db.collection('courses').doc(cId).get();
-            if (courseDoc.exists) {
-                const courseData = courseDoc.data();
-                const courseType = courseData?.courseType || courseData?.type;
-                // Get total lessons - check lessonCount field first, then query subcollection
-                let totalLessons = courseData?.lessonCount || 0;
-                if (totalLessons === 0) {
-                    // Query the flat lessons subcollection
-                    const lessonsSnapshot = await db
-                        .collection('courses')
-                        .doc(cId)
-                        .collection('lessons')
-                        .get();
-                    totalLessons = lessonsSnapshot.size;
-                }
-                // For ACADEMIA courses, also check modules subcollection
-                if (totalLessons === 0 && courseType === 'ACADEMIA') {
-                    const modulesSnapshot = await db
-                        .collection('courses')
-                        .doc(cId)
-                        .collection('modules')
-                        .get();
-                    for (const moduleDoc of modulesSnapshot.docs) {
-                        const moduleLessonsSnapshot = await db
+        const courseIdArray = Array.from(courseIds);
+        if (courseIdArray.length > 0) {
+            // Batch fetch courses in groups of 30
+            for (let i = 0; i < courseIdArray.length; i += 30) {
+                const batch = courseIdArray.slice(i, i + 30);
+                const coursesSnapshot = await db.collection('courses')
+                    .where(admin.firestore.FieldPath.documentId(), 'in', batch)
+                    .get();
+                // Process each course and get lesson counts
+                await Promise.all(coursesSnapshot.docs.map(async (courseDoc) => {
+                    const courseData = courseDoc.data();
+                    const courseType = courseData?.courseType || courseData?.type;
+                    const cId = courseDoc.id;
+                    // Get total lessons - check lessonCount field first, then query subcollection
+                    let totalLessons = courseData?.lessonCount || 0;
+                    if (totalLessons === 0) {
+                        // Query the flat lessons subcollection
+                        const lessonsSnapshot = await db
+                            .collection('courses')
+                            .doc(cId)
+                            .collection('lessons')
+                            .get();
+                        totalLessons = lessonsSnapshot.size;
+                    }
+                    // For ACADEMIA courses, also check modules subcollection
+                    if (totalLessons === 0 && courseType === 'ACADEMIA') {
+                        const modulesSnapshot = await db
                             .collection('courses')
                             .doc(cId)
                             .collection('modules')
-                            .doc(moduleDoc.id)
-                            .collection('lessons')
                             .get();
-                        totalLessons += moduleLessonsSnapshot.size;
+                        const moduleLessonCounts = await Promise.all(modulesSnapshot.docs.map(async (moduleDoc) => {
+                            const moduleLessonsSnapshot = await db
+                                .collection('courses')
+                                .doc(cId)
+                                .collection('modules')
+                                .doc(moduleDoc.id)
+                                .collection('lessons')
+                                .get();
+                            return moduleLessonsSnapshot.size;
+                        }));
+                        totalLessons = moduleLessonCounts.reduce((sum, count) => sum + count, 0);
+                        console.log(`📊 Counted ${totalLessons} lessons from ACADEMIA modules for course ${cId}`);
                     }
-                    console.log(`📊 Counted ${totalLessons} lessons from ACADEMIA modules for course ${cId}`);
-                }
-                coursesData.set(cId, {
-                    id: cId,
-                    title: courseData?.title || 'Unknown Course',
-                    totalLessons,
-                });
+                    coursesData.set(cId, {
+                        id: cId,
+                        title: courseData?.title || 'Unknown Course',
+                        totalLessons,
+                    });
+                }));
             }
         }
-        // 6. Get unique user IDs from enrollments and fetch user details
+        console.log(`📦 Batch fetched ${coursesData.size} courses`);
+        // 6. Get unique user IDs from enrollments and fetch user details (BATCH)
         const userIds = new Set();
         enrollmentDocs.forEach(doc => {
             const data = doc.data();
@@ -224,18 +235,25 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 userIds.add(data.userId);
             }
         });
-        // Fetch user details
+        // Batch fetch user details (fixes N+1 query)
         const usersData = new Map();
-        for (const uid of userIds) {
-            const userDoc = await db.collection('users').doc(uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                usersData.set(uid, {
-                    displayName: userData?.displayName || userData?.email || 'Unknown User',
-                    email: userData?.email || '',
+        const userIdArrayForFetch = Array.from(userIds);
+        if (userIdArrayForFetch.length > 0) {
+            for (let i = 0; i < userIdArrayForFetch.length; i += 30) {
+                const batch = userIdArrayForFetch.slice(i, i + 30);
+                const usersSnapshot = await db.collection('users')
+                    .where(admin.firestore.FieldPath.documentId(), 'in', batch)
+                    .get();
+                usersSnapshot.docs.forEach(userDoc => {
+                    const userData = userDoc.data();
+                    usersData.set(userDoc.id, {
+                        displayName: userData?.displayName || userData?.email || 'Unknown User',
+                        email: userData?.email || '',
+                    });
                 });
             }
         }
+        console.log(`📦 Batch fetched ${usersData.size} users`);
         // Use the already-fetched employee data for job titles
         // (employeesSnapshot was fetched earlier)
         const employeesDataMap = new Map();
@@ -249,7 +267,27 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 });
             }
         });
-        // 7. Build employee progress list from enrollments
+        // 7. Batch fetch all lessonProgress for company users (fixes N+1 query)
+        // Key: `${userId}_${courseId}` -> count of completed lessons
+        const completedLessonsMap = new Map();
+        if (userIdArrayForFetch.length > 0) {
+            // Query lessonProgress for all users in batches
+            for (let i = 0; i < userIdArrayForFetch.length; i += 30) {
+                const batch = userIdArrayForFetch.slice(i, i + 30);
+                const lessonProgressSnapshot = await db.collection('lessonProgress')
+                    .where('userId', 'in', batch)
+                    .where('completed', '==', true)
+                    .get();
+                // Group by userId_courseId for O(1) lookup
+                lessonProgressSnapshot.docs.forEach(doc => {
+                    const data = doc.data();
+                    const key = `${data.userId}_${data.courseId}`;
+                    completedLessonsMap.set(key, (completedLessonsMap.get(key) || 0) + 1);
+                });
+            }
+        }
+        console.log(`📦 Batch fetched lessonProgress, ${completedLessonsMap.size} unique user-course combinations`);
+        // 8. Build employee progress list from enrollments (no more N+1!)
         const employeeProgressList = [];
         const stats = {
             totalEmployees: companyUserIds.size, // Use company users count, not enrollment users
@@ -274,14 +312,9 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             const employee = employeesDataMap.get(enrollmentUserId);
             // Get progress from enrollment document (same logic as frontend)
             const progressPercent = Math.round(enrollment.progress || 0);
-            // Count completed lessons for this user in this course
-            const completedLessonsQuery = await db
-                .collection('lessonProgress')
-                .where('userId', '==', enrollmentUserId)
-                .where('courseId', '==', enrollmentCourseId)
-                .where('completed', '==', true)
-                .get();
-            const completedLessonsCount = completedLessonsQuery.size;
+            // Get completed lessons count from pre-fetched map (O(1) lookup)
+            const completedLessonsKey = `${enrollmentUserId}_${enrollmentCourseId}`;
+            const completedLessonsCount = completedLessonsMap.get(completedLessonsKey) || 0;
             // Determine status based on enrollment status and activity
             let status = 'not-started';
             if (enrollment.status === 'completed' || progressPercent === 100) {
