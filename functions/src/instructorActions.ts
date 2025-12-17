@@ -42,7 +42,7 @@ const deleteInstructorSchema = z.object({
  */
 export const getInstructors = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   minInstances: 1,
 }, async (request) => {
   try {
@@ -76,7 +76,7 @@ export const getInstructors = onCall({
  */
 export const createInstructor = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[createInstructor] Called');
@@ -157,7 +157,7 @@ export const createInstructor = onCall({
  */
 export const updateInstructor = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[updateInstructor] Called');
@@ -253,7 +253,7 @@ export const updateInstructor = onCall({
  */
 export const deleteInstructor = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[deleteInstructor] Called');

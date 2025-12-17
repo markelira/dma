@@ -34,7 +34,7 @@ function getStripeInstance(): Stripe {
  */
 export const getSubscriptionStatus = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   minInstances: 1,
 }, async (request) => {
   try {
@@ -248,7 +248,7 @@ export const getSubscriptionStatus = onCall({
  */
 export const cancelSubscription = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -369,7 +369,7 @@ export const cancelSubscription = onCall({
  */
 export const reactivateSubscription = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -440,7 +440,7 @@ export const reactivateSubscription = onCall({
  */
 export const getSubscriptionInvoices = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -490,7 +490,7 @@ export const getSubscriptionInvoices = onCall({
  */
 export const applyPromoCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {

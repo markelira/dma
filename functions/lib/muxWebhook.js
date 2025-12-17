@@ -202,7 +202,7 @@ async function processMuxEvent(event) {
  * Mux Webhook Handler - Firebase Function
  */
 exports.muxWebhook = (0, https_1.onRequest)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 60,
     maxInstances: 10,

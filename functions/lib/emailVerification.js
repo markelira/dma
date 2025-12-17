@@ -78,7 +78,7 @@ function createVerificationEmailTemplate(code) {
  */
 exports.sendEmailVerificationCode = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {
@@ -220,7 +220,7 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
  */
 exports.verifyEmailCode = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {
@@ -321,7 +321,7 @@ exports.verifyEmailCode = (0, https_1.onCall)({
  */
 exports.resendVerificationCode = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
     try {

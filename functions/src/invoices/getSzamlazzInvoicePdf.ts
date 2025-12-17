@@ -59,7 +59,7 @@ export const getSzamlazzInvoicePdf = onCall<
   Promise<GetSzamlazzInvoicePdfResponse>
 >(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     secrets: ['SZAMLAZZ_AGENT_KEY'],
   },

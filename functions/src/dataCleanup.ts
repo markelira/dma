@@ -10,7 +10,7 @@ const firestore = getFirestore();
  * Used for migrating to the new 3-tier course type system
  */
 export const deleteAllCourses = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
   maxInstances: 1,
 }, async (request) => {
   const uid = request.auth?.uid;
@@ -124,7 +124,7 @@ export const deleteAllCourses = onCall({
  * Restore soft-deleted courses by removing deletedAt field (Admin only)
  */
 export const restoreSoftDeletedCourses = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
   maxInstances: 1,
 }, async (request) => {
   const uid = request.auth?.uid;

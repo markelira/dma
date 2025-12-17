@@ -53,7 +53,7 @@ function createVerificationEmailTemplate(code: string): string {
  */
 export const sendEmailVerificationCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {
@@ -210,7 +210,7 @@ export const sendEmailVerificationCode = onCall({
  */
 export const verifyEmailCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {
@@ -330,7 +330,7 @@ export const verifyEmailCode = onCall({
  */
 export const resendVerificationCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   invoker: 'public', // Allow allUsers IAM permission for Cloud Run
 }, async (request) => {
   try {

@@ -26,7 +26,7 @@ interface RemoveEmployeeResponse {
  */
 export const removeEmployee = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     maxInstances: 10,
     timeoutSeconds: 60,

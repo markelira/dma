@@ -22,7 +22,7 @@ const getSignedUploadUrlSchema = z.object({
  */
 export const getSignedUploadUrl = onCall({
   cors: true, // Enable CORS
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[getSignedUploadUrl] Called');

@@ -10,7 +10,7 @@ const CreateTicketSchema = z.object({
   category: z.string(),
 });
 
-export const createSupportTicket = onCall(async (request) => {
+export const createSupportTicket = onCall({ region: 'europe-west1' }, async (request) => {
   if (!request.auth) {
     throw new Error('Authentication required');
   }
@@ -72,7 +72,7 @@ const RespondToTicketSchema = z.object({
   closeTicket: z.boolean().optional(),
 });
 
-export const respondToSupportTicket = onCall(async (request) => {
+export const respondToSupportTicket = onCall({ region: 'europe-west1' }, async (request) => {
   if (!request.auth) {
     throw new Error('Authentication required');
   }
@@ -155,7 +155,7 @@ const ReportLessonIssueSchema = z.object({
   url: z.string().optional(),
 });
 
-export const reportLessonIssue = onCall(async (request) => {
+export const reportLessonIssue = onCall({ region: 'europe-west1' }, async (request) => {
   if (!request.auth) {
     throw new Error('Authentication required');
   }

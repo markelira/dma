@@ -70,7 +70,7 @@ const createAuditLogEntry = async (userId, userEmail, userName, action, resource
 };
 exports.createAuditLogEntry = createAuditLogEntry;
 // Get audit logs
-exports.getAuditLogs = (0, https_1.onCall)(async (request) => {
+exports.getAuditLogs = (0, https_1.onCall)({ region: 'europe-west1' }, async (request) => {
     // Check if user is admin
     if (!request.auth) {
         throw new Error('Authentication required');
@@ -103,7 +103,7 @@ exports.getAuditLogs = (0, https_1.onCall)(async (request) => {
     }
 });
 // Get audit log statistics
-exports.getAuditLogStats = (0, https_1.onCall)(async (request) => {
+exports.getAuditLogStats = (0, https_1.onCall)({ region: 'europe-west1' }, async (request) => {
     // Check if user is admin
     if (!request.auth) {
         throw new Error('Authentication required');

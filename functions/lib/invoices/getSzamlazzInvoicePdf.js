@@ -45,7 +45,7 @@ function getSzamlazzClient() {
  * as the "order number". This function fetches the invoice PDF by that order number.
  */
 exports.getSzamlazzInvoicePdf = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     secrets: ['SZAMLAZZ_AGENT_KEY'],
 }, async (request) => {

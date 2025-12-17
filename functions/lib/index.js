@@ -119,7 +119,7 @@ const createTransporter = async () => {
 };
 exports.healthCheck = (0, https_1.onRequest)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, (req, res) => {
     res.json({
         status: 'ok',
@@ -133,7 +133,7 @@ exports.healthCheck = (0, https_1.onRequest)({
  */
 exports.checkEmailAvailability = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { email } = request.data;
@@ -164,7 +164,7 @@ exports.checkEmailAvailability = (0, https_1.onCall)({
 });
 exports.echo = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, (request) => {
     return {
         success: true,
@@ -177,7 +177,7 @@ exports.echo = (0, https_1.onCall)({
  */
 exports.firebaseLogin = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { idToken } = request.data;
@@ -241,7 +241,7 @@ exports.firebaseLogin = (0, https_1.onCall)({
  */
 exports.requestPasswordReset = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Log configuration status
@@ -503,7 +503,7 @@ exports.requestPasswordReset = (0, https_1.onCall)({
  */
 exports.resetPassword = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { token, newPassword } = request.data;
@@ -555,7 +555,7 @@ exports.resetPassword = (0, https_1.onCall)({
  */
 exports.validateResetToken = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { token } = request.data;
@@ -617,7 +617,7 @@ exports.validateResetToken = (0, https_1.onCall)({
  */
 exports.sendEmailVerification = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { email, userId } = request.data;
@@ -814,7 +814,7 @@ exports.sendEmailVerification = (0, https_1.onCall)({
  */
 exports.getUsers = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Check if user is admin
@@ -864,7 +864,7 @@ exports.getUsers = (0, https_1.onCall)({
  */
 exports.getStats = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Check if user is admin
@@ -940,7 +940,7 @@ exports.getStats = (0, https_1.onCall)({
  */
 exports.updateUserRole = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { userId, role } = request.data;
@@ -982,7 +982,7 @@ exports.updateUserRole = (0, https_1.onCall)({
  */
 exports.getCourse = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { courseId: inputCourseId } = request.data || {};
@@ -1101,7 +1101,7 @@ exports.getCourse = (0, https_1.onCall)({
  * Used by LessonImportModal for MASTERCLASS course creation
  */
 exports.getCoursesCallable = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { forImport } = request.data || {};
@@ -1239,7 +1239,7 @@ exports.getCoursesCallable = (0, https_1.onCall)({
  */
 exports.enrollInCourse = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { courseId } = request.data || {};
@@ -1301,7 +1301,7 @@ exports.enrollInCourse = (0, https_1.onCall)({
  */
 exports.verifyEmail = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { token } = request.data;
@@ -1435,7 +1435,7 @@ const newCourse_1 = require("./email/templates/newCourse");
  */
 exports.sendWelcomeEmail = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { email, firstName } = request.data;
@@ -1459,7 +1459,7 @@ exports.sendWelcomeEmail = (0, https_1.onCall)({
  */
 exports.notifyNewContent = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Check admin permission
@@ -1511,7 +1511,7 @@ exports.notifyNewContent = (0, https_1.onCall)({
  */
 exports.getCategories = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     minInstances: 1,
 }, async (request) => {
     try {
@@ -1574,7 +1574,7 @@ exports.getCategories = (0, https_1.onCall)({
  */
 exports.seedCategories = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[seedCategories] Called');
@@ -1643,7 +1643,7 @@ exports.seedCategories = (0, https_1.onCall)({
  * Create a new category (ADMIN only)
  */
 exports.createCategory = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[createCategory] Called');
@@ -1731,7 +1731,7 @@ exports.createCategory = (0, https_1.onCall)({
  * Update an existing category (ADMIN only)
  */
 exports.updateCategory = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[updateCategory] Called');
@@ -1812,7 +1812,7 @@ exports.updateCategory = (0, https_1.onCall)({
  * Includes safety check to prevent deleting categories with associated courses
  */
 exports.deleteCategory = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[deleteCategory] Called');

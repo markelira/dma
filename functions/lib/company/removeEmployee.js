@@ -47,7 +47,7 @@ const db = admin.firestore();
  * Remove an employee from a company or cancel their invitation
  */
 exports.removeEmployee = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     maxInstances: 10,
     timeoutSeconds: 60,

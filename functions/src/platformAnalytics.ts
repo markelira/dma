@@ -13,7 +13,7 @@ const firestore = admin.firestore();
  */
 export const getPlatformAnalytics = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   memory: '1GiB',
   timeoutSeconds: 120,
 }, async (request) => {

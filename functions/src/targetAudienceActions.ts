@@ -33,7 +33,7 @@ const deleteTargetAudienceSchema = z.object({
  */
 export const getTargetAudiences = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   minInstances: 1,
 }, async () => {
   try {
@@ -68,7 +68,7 @@ export const getTargetAudiences = onCall({
  */
 export const createTargetAudience = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[createTargetAudience] Called');
@@ -147,7 +147,7 @@ export const createTargetAudience = onCall({
  */
 export const updateTargetAudience = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[updateTargetAudience] Called');
@@ -237,7 +237,7 @@ export const updateTargetAudience = onCall({
  */
 export const deleteTargetAudience = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[deleteTargetAudience] Called');

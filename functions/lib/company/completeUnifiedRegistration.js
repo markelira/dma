@@ -45,7 +45,7 @@ const linkEmployeeByEmail_1 = require("./linkEmployeeByEmail");
  * Falls back to user's name if company name not provided
  */
 exports.completeUnifiedRegistration = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     cors: [
         'https://masterclass.dma.hu',

@@ -94,7 +94,7 @@ function convertToCSV(data) {
  * Generate CSV Report
  */
 exports.generateCSVReport = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 5, // Limit concurrent exports (expensive operation)
     timeoutSeconds: 300, // 5 minutes for large datasets

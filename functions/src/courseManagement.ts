@@ -53,7 +53,7 @@ const CourseSchema = z.object({
  */
 export const createCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check authentication
@@ -173,7 +173,7 @@ export const createCourse = onCall({
  */
 export const updateCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   // Diagnostic logging for CORS debugging
   logger.info('🔍 updateCourse called', {
@@ -302,7 +302,7 @@ export const updateCourse = onCall({
  */
 export const publishCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { courseId } = request.data || {};
@@ -394,7 +394,7 @@ export const publishCourse = onCall({
  */
 export const deleteCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { courseId } = request.data || {};

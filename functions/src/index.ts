@@ -89,7 +89,7 @@ const createTransporter = async () => {
 
 export const healthCheck = onRequest({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, (req, res) => {
   res.json({
     status: 'ok',
@@ -104,7 +104,7 @@ export const healthCheck = onRequest({
  */
 export const checkEmailAvailability = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { email } = request.data as { email: string };
@@ -137,7 +137,7 @@ export const checkEmailAvailability = onCall({
 
 export const echo = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, (request) => {
   return {
     success: true,
@@ -151,7 +151,7 @@ export const echo = onCall({
  */
 export const firebaseLogin = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { idToken } = request.data;
@@ -224,7 +224,7 @@ export const firebaseLogin = onCall({
  */
 export const requestPasswordReset = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Log configuration status
@@ -505,7 +505,7 @@ export const requestPasswordReset = onCall({
  */
 export const resetPassword = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { token, newPassword } = request.data;
@@ -569,7 +569,7 @@ export const resetPassword = onCall({
  */
 export const validateResetToken = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { token } = request.data;
@@ -640,7 +640,7 @@ export const validateResetToken = onCall({
  */
 export const sendEmailVerification = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { email, userId } = request.data;
@@ -850,7 +850,7 @@ export const sendEmailVerification = onCall({
  */
 export const getUsers = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check if user is admin
@@ -906,7 +906,7 @@ export const getUsers = onCall({
  */
 export const getStats = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check if user is admin
@@ -990,7 +990,7 @@ export const getStats = onCall({
  */
 export const updateUserRole = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { userId, role } = request.data
@@ -1040,7 +1040,7 @@ export const updateUserRole = onCall({
  */
 export const getCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { courseId: inputCourseId } = request.data || {};
@@ -1174,7 +1174,7 @@ export const getCourse = onCall({
  * Used by LessonImportModal for MASTERCLASS course creation
  */
 export const getCoursesCallable = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { forImport } = request.data || {};
@@ -1334,7 +1334,7 @@ export const getCoursesCallable = onCall({
  */
 export const enrollInCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { courseId } = request.data || {};
@@ -1408,7 +1408,7 @@ export const enrollInCourse = onCall({
  */
 export const verifyEmail = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { token } = request.data;
@@ -1547,7 +1547,7 @@ import { sendNewCourseEmail, sendNewCourseToSubscribers } from './email/template
  */
 export const sendWelcomeEmail = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { email, firstName } = request.data as { email: string; firstName: string };
@@ -1574,7 +1574,7 @@ export const sendWelcomeEmail = onCall({
  */
 export const notifyNewContent = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check admin permission
@@ -1641,7 +1641,7 @@ export const notifyNewContent = onCall({
  */
 export const getCategories = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   minInstances: 1,
 }, async (request) => {
   try {
@@ -1716,7 +1716,7 @@ export const getCategories = onCall({
  */
 export const seedCategories = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[seedCategories] Called');
@@ -1797,7 +1797,7 @@ export const seedCategories = onCall({
  * Create a new category (ADMIN only)
  */
 export const createCategory = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[createCategory] Called');
@@ -1900,7 +1900,7 @@ export const createCategory = onCall({
  * Update an existing category (ADMIN only)
  */
 export const updateCategory = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[updateCategory] Called');
@@ -1992,7 +1992,7 @@ export const updateCategory = onCall({
  * Includes safety check to prevent deleting categories with associated courses
  */
 export const deleteCategory = onCall({
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[deleteCategory] Called');

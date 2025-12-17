@@ -52,7 +52,7 @@ const firestore = admin.firestore();
  */
 exports.removeTeamMember = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication
@@ -137,7 +137,7 @@ exports.removeTeamMember = (0, https_1.onCall)({
  */
 exports.resendTeamInvite = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication

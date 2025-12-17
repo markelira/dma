@@ -20,7 +20,7 @@ interface SendReminderInput {
  */
 export const sendEmployeeReminder = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     maxInstances: 10, // Limit concurrent executions
     timeoutSeconds: 60, // 1 minute timeout

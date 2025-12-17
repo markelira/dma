@@ -21,7 +21,7 @@ interface EnrollEmployeesInput {
 
 export const enrollEmployeesInMasterclass = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 10, // Limit concurrent enrollments
     timeoutSeconds: 180, // 3 minutes for bulk enrollments

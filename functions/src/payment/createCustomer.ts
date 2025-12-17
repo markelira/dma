@@ -51,7 +51,7 @@ const CreateCustomerSchema = z.object({
  */
 export const createCustomer = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check

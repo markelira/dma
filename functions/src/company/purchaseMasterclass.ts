@@ -22,7 +22,7 @@ interface PurchaseMasterclassInput {
  */
 export const purchaseCompanyMasterclass = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },
@@ -182,7 +182,7 @@ export const purchaseCompanyMasterclass = https.onCall(
  */
 export const getCompanyPurchases = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },

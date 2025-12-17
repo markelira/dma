@@ -42,7 +42,7 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const v2_1 = require("firebase-functions/v2");
 exports.getPaymentHistory = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 30,
     cors: true,

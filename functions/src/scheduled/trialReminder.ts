@@ -37,7 +37,7 @@ function getPriceAmount(priceId: string | undefined): number {
 export const sendTrialReminders = onSchedule({
   schedule: '0 10 * * *', // Daily at 10:00 AM
   timeZone: 'Europe/Budapest',
-  region: 'us-central1',
+  region: 'europe-west1',
   memory: '256MiB',
   timeoutSeconds: 300, // 5 minutes
 } as ScheduleOptions, async (event) => {

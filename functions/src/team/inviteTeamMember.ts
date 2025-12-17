@@ -26,7 +26,7 @@ const firestore = admin.firestore();
  */
 export const inviteTeamMember = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<InviteTeamMemberResponse> => {
   try {
     // 1. Check authentication

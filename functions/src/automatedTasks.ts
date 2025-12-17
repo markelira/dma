@@ -19,7 +19,7 @@ const firestore = admin.firestore();
 export const calculateDailyAnalytics = onSchedule({
   schedule: '0 0 * * *', // Midnight UTC
   timeZone: 'UTC',
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (event) => {
   console.log('Starting daily analytics calculation...');
 
@@ -233,7 +233,7 @@ async function calculateUserAnalytics(userId: string): Promise<void> {
 export const generateDailyRecommendations = onSchedule({
   schedule: '0 2 * * *', // 2 AM UTC
   timeZone: 'UTC',
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (event) => {
   console.log('Starting daily recommendations generation...');
 
@@ -423,7 +423,7 @@ async function generateUserRecommendations(userId: string): Promise<void> {
  */
 export const generateRecommendationsForUser = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -454,7 +454,7 @@ export const generateRecommendationsForUser = onCall({
  */
 export const getPersonalizedRecommendations = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check

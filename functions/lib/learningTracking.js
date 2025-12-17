@@ -72,7 +72,7 @@ const TrackProgressSchema = zod_1.z.object({
  */
 exports.startLearningSession = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -125,7 +125,7 @@ exports.startLearningSession = (0, https_1.onCall)({
  */
 exports.endLearningSession = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -198,7 +198,7 @@ exports.endLearningSession = (0, https_1.onCall)({
  */
 exports.trackLearningProgress = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check

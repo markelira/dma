@@ -21,7 +21,7 @@ interface AddEmployeeData extends AddEmployeeInput {
  */
 export const addEmployee = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },
@@ -202,7 +202,7 @@ export const addEmployee = https.onCall(
  */
 export const verifyEmployeeInvite = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },
@@ -278,7 +278,7 @@ export const verifyEmployeeInvite = https.onCall(
  */
 export const acceptEmployeeInvite = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },

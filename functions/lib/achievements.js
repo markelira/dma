@@ -169,7 +169,7 @@ const ACHIEVEMENT_DEFINITIONS = [
  */
 exports.getUserAchievements = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -202,7 +202,7 @@ exports.getUserAchievements = (0, https_1.onCall)({
  */
 exports.getAllAchievements = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -262,7 +262,7 @@ exports.getAllAchievements = (0, https_1.onCall)({
  */
 exports.checkAchievements = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -334,7 +334,7 @@ exports.checkAchievements = (0, https_1.onCall)({
  */
 exports.markAchievementCelebrated = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check

@@ -52,7 +52,7 @@ const firestore = admin.firestore();
 exports.calculateDailyAnalytics = (0, scheduler_1.onSchedule)({
     schedule: '0 0 * * *', // Midnight UTC
     timeZone: 'UTC',
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (event) => {
     console.log('Starting daily analytics calculation...');
     try {
@@ -239,7 +239,7 @@ async function calculateUserAnalytics(userId) {
 exports.generateDailyRecommendations = (0, scheduler_1.onSchedule)({
     schedule: '0 2 * * *', // 2 AM UTC
     timeZone: 'UTC',
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (event) => {
     console.log('Starting daily recommendations generation...');
     try {
@@ -404,7 +404,7 @@ async function generateUserRecommendations(userId) {
  */
 exports.generateRecommendationsForUser = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -431,7 +431,7 @@ exports.generateRecommendationsForUser = (0, https_1.onCall)({
  */
 exports.getPersonalizedRecommendations = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check

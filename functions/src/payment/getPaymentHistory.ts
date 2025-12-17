@@ -16,7 +16,7 @@ interface PaymentHistoryFilter {
 
 export const getPaymentHistory = onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 30,
     cors: true,

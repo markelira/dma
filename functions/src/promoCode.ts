@@ -14,7 +14,7 @@ const firestore = admin.firestore();
  */
 export const createPromoCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -88,7 +88,7 @@ export const createPromoCode = onCall({
  */
 export const getPromoCodes = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -136,7 +136,7 @@ export const getPromoCodes = onCall({
  */
 export const deletePromoCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     if (!request.auth) {
@@ -180,7 +180,7 @@ export const deletePromoCode = onCall({
  */
 export const validatePromoCode = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     const { promoCode } = request.data;

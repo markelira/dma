@@ -51,7 +51,7 @@ const firestore = admin.firestore();
  */
 exports.enrollTeamInCourse = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication
@@ -189,7 +189,7 @@ exports.enrollTeamInCourse = (0, https_1.onCall)({
  */
 exports.getTeamEnrolledCourses = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication

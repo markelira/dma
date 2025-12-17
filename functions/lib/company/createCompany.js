@@ -81,7 +81,7 @@ async function ensureUniqueSlug(baseSlug) {
  * Create Company Function
  */
 exports.createCompany = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 5, // Limit concurrent company creations
     timeoutSeconds: 120, // 2 minutes timeout

@@ -49,7 +49,7 @@ const db = admin.firestore();
  * Add Employee to Company (Sends Invitation)
  */
 exports.addEmployee = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {
@@ -187,7 +187,7 @@ exports.addEmployee = v2_1.https.onCall({
  * Verify Employee Invite Token
  */
 exports.verifyEmployeeInvite = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {
@@ -243,7 +243,7 @@ exports.verifyEmployeeInvite = v2_1.https.onCall({
  * 🔴 CRITICAL: Uses transaction to prevent double-use of token
  */
 exports.acceptEmployeeInvite = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {

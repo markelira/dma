@@ -34,7 +34,7 @@ interface UnifiedRegistrationResponse {
  */
 export const completeUnifiedRegistration = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     cors: [
       'https://masterclass.dma.hu',

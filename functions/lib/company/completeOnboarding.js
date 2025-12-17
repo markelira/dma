@@ -45,7 +45,7 @@ const employeeInvite_1 = require("./employeeInvite");
  * Called after Firebase Auth account creation
  */
 exports.completeCompanyOnboarding = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     cors: [
         'https://masterclass.dma.hu',

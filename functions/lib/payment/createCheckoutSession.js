@@ -81,7 +81,7 @@ const CreateCheckoutSessionSchema = z.object({
  */
 exports.createCheckoutSession = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('🔵 [CF] createCheckoutSession called');

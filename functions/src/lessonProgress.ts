@@ -33,7 +33,7 @@ const MarkCompleteSchema = z.object({
  */
 export const getSyncedLessonProgress = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check authentication
@@ -111,7 +111,7 @@ export const getSyncedLessonProgress = onCall({
  */
 export const syncProgressOnDeviceSwitch = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check authentication
@@ -193,7 +193,7 @@ export const syncProgressOnDeviceSwitch = onCall({
  */
 export const markLessonComplete = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check authentication

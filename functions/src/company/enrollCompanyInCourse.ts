@@ -30,7 +30,7 @@ interface EnrollCompanyInCourseResponse {
  */
 export const enrollCompanyInCourse = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<EnrollCompanyInCourseResponse> => {
   try {
     // 1. Check authentication
@@ -192,7 +192,7 @@ export const enrollCompanyInCourse = onCall({
  */
 export const getCompanyEnrolledCourses = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<{ success: boolean; courses?: any[]; error?: string }> => {
   try {
     // 1. Check authentication

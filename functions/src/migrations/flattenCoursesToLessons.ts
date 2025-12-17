@@ -64,7 +64,7 @@ interface MigrationModule {
  */
 export const migrateCoursesToFlatLessons = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   timeoutSeconds: 540, // 9 minutes for large datasets
 }, async (request) => {
   try {
@@ -242,7 +242,7 @@ export const migrateCoursesToFlatLessons = onCall({
  */
 export const addDefaultInstructorRoles = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[addDefaultInstructorRoles] Starting migration');
@@ -348,7 +348,7 @@ export const addDefaultInstructorRoles = onCall({
  */
 export const seedDefaultTargetAudiences = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[seedDefaultTargetAudiences] Starting seeding');
@@ -456,7 +456,7 @@ export const seedDefaultTargetAudiences = onCall({
  */
 export const getMigrationStatus = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     logger.info('[getMigrationStatus] Checking migration status');

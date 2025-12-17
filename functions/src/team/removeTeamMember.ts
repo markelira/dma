@@ -25,7 +25,7 @@ const firestore = admin.firestore();
  */
 export const removeTeamMember = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<RemoveTeamMemberResponse> => {
   try {
     // 1. Check authentication
@@ -129,7 +129,7 @@ export const removeTeamMember = onCall({
  */
 export const resendTeamInvite = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<{ success: boolean; message?: string; error?: string }> => {
   try {
     // 1. Check authentication

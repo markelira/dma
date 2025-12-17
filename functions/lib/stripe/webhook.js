@@ -93,7 +93,7 @@ function getWebhookSecret() {
  */
 exports.stripeWebhook = (0, https_1.onRequest)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 60,
 }, async (req, res) => {

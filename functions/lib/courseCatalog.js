@@ -102,7 +102,7 @@ const enrichCourse = async (course) => {
  */
 exports.getCoursesWithFilters = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const queryId = Math.random().toString(36).substr(2, 9);

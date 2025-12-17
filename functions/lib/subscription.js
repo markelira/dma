@@ -69,7 +69,7 @@ function getStripeInstance() {
  */
 exports.getSubscriptionStatus = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     minInstances: 1,
 }, async (request) => {
     try {
@@ -264,7 +264,7 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
  */
 exports.cancelSubscription = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         if (!request.auth) {
@@ -367,7 +367,7 @@ exports.cancelSubscription = (0, https_1.onCall)({
  */
 exports.reactivateSubscription = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         if (!request.auth) {
@@ -426,7 +426,7 @@ exports.reactivateSubscription = (0, https_1.onCall)({
  */
 exports.getSubscriptionInvoices = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         if (!request.auth) {
@@ -470,7 +470,7 @@ exports.getSubscriptionInvoices = (0, https_1.onCall)({
  */
 exports.applyPromoCode = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         if (!request.auth) {

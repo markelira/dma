@@ -61,7 +61,7 @@ const firestore = admin.firestore();
  */
 exports.migrateCoursesToFlatLessons = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     timeoutSeconds: 540, // 9 minutes for large datasets
 }, async (request) => {
     try {
@@ -206,7 +206,7 @@ exports.migrateCoursesToFlatLessons = (0, https_1.onCall)({
  */
 exports.addDefaultInstructorRoles = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[addDefaultInstructorRoles] Starting migration');
@@ -290,7 +290,7 @@ exports.addDefaultInstructorRoles = (0, https_1.onCall)({
  */
 exports.seedDefaultTargetAudiences = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[seedDefaultTargetAudiences] Starting seeding');
@@ -380,7 +380,7 @@ exports.seedDefaultTargetAudiences = (0, https_1.onCall)({
  */
 exports.getMigrationStatus = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[getMigrationStatus] Checking migration status');

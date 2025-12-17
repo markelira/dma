@@ -42,7 +42,7 @@ const CreateBillingPortalSessionSchema = z.object({
  */
 export const createBillingPortalSession = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // 1. Authentication check

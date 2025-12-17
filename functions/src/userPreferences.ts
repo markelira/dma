@@ -52,7 +52,7 @@ const LearningGoalSchema = z.object({
  */
 export const saveUserPreferences = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -113,7 +113,7 @@ export const saveUserPreferences = onCall({
  */
 export const getUserPreferences = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -213,7 +213,7 @@ async function initializeUserGamification(userId: string): Promise<void> {
  */
 export const createLearningGoal = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -269,7 +269,7 @@ export const createLearningGoal = onCall({
  */
 export const getLearningGoals = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -312,7 +312,7 @@ export const getLearningGoals = onCall({
  */
 export const updateGoalProgress = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -376,7 +376,7 @@ export const updateGoalProgress = onCall({
  */
 export const deleteLearningGoal = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -430,7 +430,7 @@ export const deleteLearningGoal = onCall({
  */
 export const getLearningStreak = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -472,7 +472,7 @@ export const getLearningStreak = onCall({
  */
 export const updateLearningStreak = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check
@@ -624,7 +624,7 @@ function checkStreakMilestones(
  */
 export const getDashboardAnalytics = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Authentication check

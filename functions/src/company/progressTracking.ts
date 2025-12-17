@@ -76,7 +76,7 @@ interface DashboardStats {
  */
 export const getCompanyDashboard = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '1GiB',
     timeoutSeconds: 120,
     cors: true,
@@ -432,7 +432,7 @@ export const getCompanyDashboard = https.onCall(
  */
 export const getEmployeeProgressDetail = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },

@@ -18,7 +18,7 @@ const GetResourcesSchema = z.object({
  */
 export const getResourceDownloadUrls = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request) => {
   try {
     // Check authentication

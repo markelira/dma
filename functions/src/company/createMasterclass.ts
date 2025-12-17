@@ -20,7 +20,7 @@ interface CreateMasterclassInput {
 
 export const createCompanyMasterclass = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 10, // Limit concurrent purchases
     timeoutSeconds: 120, // 2 minutes timeout

@@ -48,7 +48,7 @@ const db = admin.firestore();
  * Automatically enrolls all existing employees
  */
 exports.purchaseCompanyMasterclass = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {
@@ -167,7 +167,7 @@ exports.purchaseCompanyMasterclass = v2_1.https.onCall({
  * Returns all masterclasses purchased by the company
  */
 exports.getCompanyPurchases = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {

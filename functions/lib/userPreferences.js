@@ -82,7 +82,7 @@ const LearningGoalSchema = zod_1.z.object({
  */
 exports.saveUserPreferences = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -133,7 +133,7 @@ exports.saveUserPreferences = (0, https_1.onCall)({
  */
 exports.getUserPreferences = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -222,7 +222,7 @@ async function initializeUserGamification(userId) {
  */
 exports.createLearningGoal = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -270,7 +270,7 @@ exports.createLearningGoal = (0, https_1.onCall)({
  */
 exports.getLearningGoals = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -306,7 +306,7 @@ exports.getLearningGoals = (0, https_1.onCall)({
  */
 exports.updateGoalProgress = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -358,7 +358,7 @@ exports.updateGoalProgress = (0, https_1.onCall)({
  */
 exports.deleteLearningGoal = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -402,7 +402,7 @@ exports.deleteLearningGoal = (0, https_1.onCall)({
  */
 exports.getLearningStreak = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -439,7 +439,7 @@ exports.getLearningStreak = (0, https_1.onCall)({
  */
 exports.updateLearningStreak = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check
@@ -570,7 +570,7 @@ function checkStreakMilestones(currentStreak, existingMilestones) {
  */
 exports.getDashboardAnalytics = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // Authentication check

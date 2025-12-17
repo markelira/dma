@@ -60,7 +60,7 @@ async function ensureUniqueSlug(baseSlug: string): Promise<string> {
  */
 export const createCompany = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 5, // Limit concurrent company creations
     timeoutSeconds: 120, // 2 minutes timeout

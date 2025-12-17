@@ -45,7 +45,7 @@ export const createAuditLogEntry = async (
 };
 
 // Get audit logs
-export const getAuditLogs = onCall(async (request) => {
+export const getAuditLogs = onCall({ region: 'europe-west1' }, async (request) => {
   // Check if user is admin
   if (!request.auth) {
     throw new Error('Authentication required');
@@ -83,7 +83,7 @@ export const getAuditLogs = onCall(async (request) => {
 });
 
 // Get audit log statistics
-export const getAuditLogStats = onCall(async (request) => {
+export const getAuditLogStats = onCall({ region: 'europe-west1' }, async (request) => {
   // Check if user is admin
   if (!request.auth) {
     throw new Error('Authentication required');

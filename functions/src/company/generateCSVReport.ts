@@ -72,7 +72,7 @@ function convertToCSV(data: any[]): string {
  */
 export const generateCSVReport = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 5, // Limit concurrent exports (expensive operation)
     timeoutSeconds: 300, // 5 minutes for large datasets

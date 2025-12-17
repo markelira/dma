@@ -51,7 +51,7 @@ const firestore = admin.firestore();
  */
 exports.acceptTeamInvite = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication
@@ -146,7 +146,7 @@ exports.acceptTeamInvite = (0, https_1.onCall)({
  */
 exports.declineTeamInvite = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         const { inviteToken } = request.data;
@@ -201,7 +201,7 @@ exports.declineTeamInvite = (0, https_1.onCall)({
  */
 exports.leaveTeam = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication

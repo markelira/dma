@@ -22,7 +22,7 @@ interface AssignEmployeeToMasterclassInput {
  */
 export const assignEmployeeToMasterclass = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },
@@ -165,7 +165,7 @@ export const assignEmployeeToMasterclass = https.onCall(
  */
 export const unassignEmployeeFromMasterclass = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },
@@ -242,7 +242,7 @@ export const unassignEmployeeFromMasterclass = https.onCall(
  */
 export const getCompanyMasterclasses = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
   },

@@ -73,7 +73,7 @@ function toDate(value) {
  * Returns aggregated progress for all employees using enrollments and lessonProgress collections
  */
 exports.getCompanyDashboard = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '1GiB',
     timeoutSeconds: 120,
     cors: true,
@@ -375,7 +375,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
  * Uses enrollments and lessonProgress collections
  */
 exports.getEmployeeProgressDetail = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {

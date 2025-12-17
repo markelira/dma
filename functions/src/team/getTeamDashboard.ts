@@ -23,7 +23,7 @@ const firestore = admin.firestore();
  */
 export const getTeamDashboard = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<GetTeamDashboardResponse> => {
   try {
     // 1. Check authentication
@@ -141,7 +141,7 @@ export const getTeamDashboard = onCall({
  */
 export const checkSubscriptionAccess = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<{
   success: boolean;
   hasAccess: boolean;
@@ -238,7 +238,7 @@ export const checkSubscriptionAccess = onCall({
  */
 export const getTeamMembers = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
 }, async (request): Promise<{
   success: boolean;
   members?: Array<{

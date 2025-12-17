@@ -44,7 +44,7 @@ const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const db = admin.firestore();
 exports.createCompanyMasterclass = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     maxInstances: 10, // Limit concurrent purchases
     timeoutSeconds: 120, // 2 minutes timeout

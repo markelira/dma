@@ -235,7 +235,7 @@ async function processMuxEvent(event: MuxWebhookPayload): Promise<void> {
  */
 export const muxWebhook = onRequest(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 60,
     maxInstances: 10,

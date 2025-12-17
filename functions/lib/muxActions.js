@@ -129,7 +129,7 @@ async function updateLessonWithMockPlaybackId(assetId, playbackId) {
  * Create a Mux upload URL for video uploads (Callable Cloud Function)
  */
 exports.getMuxUploadUrl = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10,
@@ -206,7 +206,7 @@ exports.getMuxUploadUrl = (0, https_1.onCall)({
  * Get Mux asset status (Callable Cloud Function)
  */
 exports.getMuxAssetStatus = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10,
@@ -302,7 +302,7 @@ exports.getMuxAssetStatus = (0, https_1.onCall)({
  * Test video upload endpoint for development (simulates Mux upload)
  */
 exports.testVideoUpload = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10
@@ -329,7 +329,7 @@ exports.testVideoUpload = (0, https_1.onCall)({
  * This function creates a Mux asset from an existing video URL
  */
 exports.migrateVideoToMux = (0, https_1.onCall)({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '1GiB',
     timeoutSeconds: 540, // 9 minutes (max for callable functions)
     maxInstances: 5,

@@ -24,7 +24,7 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-export const functions = getFunctions(app, 'us-central1');
+export const functions = getFunctions(app, 'europe-west1');
 
 // Connect to emulators in development (optional)
 if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBASE_EMULATORS === 'true') {
@@ -55,7 +55,7 @@ if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_USE_FIREBA
   if (typeof window !== 'undefined') {
     console.log("🌐 Using PRODUCTION Firebase (no emulators)");
     console.log("   Project:", firebaseConfig.projectId);
-    console.log("   Functions Region: us-central1");
+    console.log("   Functions Region: europe-west1");
     if (process.env.NODE_ENV === 'development') {
       console.warn("⚠️ To use emulators, set NEXT_PUBLIC_USE_FIREBASE_EMULATORS=true in .env.local");
     }

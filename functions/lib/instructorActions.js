@@ -71,7 +71,7 @@ const deleteInstructorSchema = zod_1.z.object({
  */
 exports.getInstructors = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
     minInstances: 1,
 }, async (request) => {
     try {
@@ -101,7 +101,7 @@ exports.getInstructors = (0, https_1.onCall)({
  */
 exports.createInstructor = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[createInstructor] Called');
@@ -168,7 +168,7 @@ exports.createInstructor = (0, https_1.onCall)({
  */
 exports.updateInstructor = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[updateInstructor] Called');
@@ -246,7 +246,7 @@ exports.updateInstructor = (0, https_1.onCall)({
  */
 exports.deleteInstructor = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[deleteInstructor] Called');

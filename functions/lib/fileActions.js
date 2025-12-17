@@ -55,7 +55,7 @@ const getSignedUploadUrlSchema = z.object({
  */
 exports.getSignedUploadUrl = (0, https_1.onCall)({
     cors: true, // Enable CORS
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         v2_1.logger.info('[getSignedUploadUrl] Called');

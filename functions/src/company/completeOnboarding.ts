@@ -31,7 +31,7 @@ interface OnboardingResponse {
  */
 export const completeCompanyOnboarding = https.onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     cors: [
       'https://masterclass.dma.hu',

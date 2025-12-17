@@ -151,7 +151,7 @@ async function updateLessonWithMockPlaybackId(assetId: string, playbackId: strin
  */
 export const getMuxUploadUrl = onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10,
@@ -248,7 +248,7 @@ export const getMuxUploadUrl = onCall(
  */
 export const getMuxAssetStatus = onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10,
@@ -359,7 +359,7 @@ export const getMuxAssetStatus = onCall(
  */
 export const testVideoUpload = onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '512MiB',
     timeoutSeconds: 120,
     maxInstances: 10
@@ -391,7 +391,7 @@ export const testVideoUpload = onCall(
  */
 export const migrateVideoToMux = onCall(
   {
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '1GiB',
     timeoutSeconds: 540, // 9 minutes (max for callable functions)
     maxInstances: 5,

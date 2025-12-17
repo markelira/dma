@@ -48,7 +48,7 @@ const db = admin.firestore();
  * Only company admins can assign employees to courses the company has purchased
  */
 exports.assignEmployeeToMasterclass = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {
@@ -151,7 +151,7 @@ exports.assignEmployeeToMasterclass = v2_1.https.onCall({
  * Unassign Employee from Masterclass
  */
 exports.unassignEmployeeFromMasterclass = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {
@@ -207,7 +207,7 @@ exports.unassignEmployeeFromMasterclass = v2_1.https.onCall({
  * Returns all masterclasses the company has purchased
  */
 exports.getCompanyMasterclasses = v2_1.https.onCall({
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     cors: true,
 }, async (request) => {

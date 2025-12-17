@@ -52,7 +52,7 @@ interface EnrichedInvoice {
  */
 export const getStripeInvoices = onCall({
   cors: true,
-  region: 'us-central1',
+  region: 'europe-west1',
   memory: '256MiB',
 }, async (request) => {
   try {

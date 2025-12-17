@@ -50,7 +50,7 @@ const firestore = admin.firestore();
  */
 exports.getTeamDashboard = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication
@@ -146,7 +146,7 @@ exports.getTeamDashboard = (0, https_1.onCall)({
  */
 exports.checkSubscriptionAccess = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication
@@ -223,7 +223,7 @@ exports.checkSubscriptionAccess = (0, https_1.onCall)({
  */
 exports.getTeamMembers = (0, https_1.onCall)({
     cors: true,
-    region: 'us-central1',
+    region: 'europe-west1',
 }, async (request) => {
     try {
         // 1. Check authentication

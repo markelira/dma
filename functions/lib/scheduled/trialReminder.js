@@ -69,7 +69,7 @@ function getPriceAmount(priceId) {
 exports.sendTrialReminders = (0, scheduler_1.onSchedule)({
     schedule: '0 10 * * *', // Daily at 10:00 AM
     timeZone: 'Europe/Budapest',
-    region: 'us-central1',
+    region: 'europe-west1',
     memory: '256MiB',
     timeoutSeconds: 300, // 5 minutes
 }, async (event) => {
