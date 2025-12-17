@@ -92,91 +92,65 @@ async function linkEmployeeByEmail(userId, email) {
         }
         // 3. Get company name for response
         const companyDoc = await db.collection('companies').doc(companyId).get();
-        const companyName = companyDoc.data()?.name || 'Unknown Company';
-        // 4. Update employee document to link with user
-        await employeeRef.update({
+        const companyData = companyDoc.data();
+        const companyName = companyData?.name || 'Unknown Company';
+        const purchasedMasterclasses = companyData?.purchasedMasterclasses || [];
+        // 4. Prepare all Firestore updates in a single batch (reduces network round-trips)
+        const batch = db.batch();
+        const userRef = db.collection('users').doc(userId);
+        // Employee document update
+        batch.update(employeeRef, {
             userId,
             status: 'active',
             inviteAcceptedAt: firestore_1.FieldValue.serverTimestamp(),
             inviteToken: firestore_1.FieldValue.delete(),
             inviteExpiresAt: firestore_1.FieldValue.delete(),
+            ...(purchasedMasterclasses.length > 0 && { enrolledMasterclasses: purchasedMasterclasses }),
         });
-        console.log('✅ [linkEmployeeByEmail] Employee document updated to active');
-        // 5. Set custom claims for COMPANY_EMPLOYEE role
-        try {
-            await admin.auth().setCustomUserClaims(userId, {
-                role: 'COMPANY_EMPLOYEE',
-                companyId: companyId,
-                companyRole: 'employee', // Include companyRole in JWT for permission checks
-            });
-            console.log('✅ [linkEmployeeByEmail] Custom claims set for employee');
-        }
-        catch (claimsError) {
-            console.error('❌ [linkEmployeeByEmail] Error setting custom claims:', claimsError.message);
-            // Don't throw - employee was already linked successfully
-        }
-        // 6. Update user document with company info
-        try {
-            const userRef = db.collection('users').doc(userId);
-            await userRef.update({
-                companyId: companyId,
-                companyRole: 'employee',
-                role: 'COMPANY_EMPLOYEE',
-                updatedAt: firestore_1.FieldValue.serverTimestamp(),
-            });
-            console.log('✅ [linkEmployeeByEmail] User document updated with company info');
-        }
-        catch (userError) {
-            console.error('❌ [linkEmployeeByEmail] Error updating user document:', userError.message);
-            // Don't throw - employee was already linked successfully
-        }
-        // 7. Auto-enroll in company-purchased masterclasses
-        try {
-            const companyData = companyDoc.data();
-            const purchasedMasterclasses = companyData?.purchasedMasterclasses || [];
-            if (purchasedMasterclasses.length > 0) {
-                // Update employee with enrolled masterclasses
-                await employeeRef.update({
-                    enrolledMasterclasses: purchasedMasterclasses,
-                });
-                // Create progress records
-                const batch = db.batch();
-                for (const masterclassId of purchasedMasterclasses) {
-                    const progressId = `${userId}_${masterclassId}`;
-                    const progressRef = db.collection('userProgress').doc(progressId);
-                    batch.set(progressRef, {
-                        userId,
-                        masterclassId,
-                        companyId,
-                        currentModule: 1,
-                        completedModules: [],
-                        status: 'active',
-                        enrolledAt: firestore_1.FieldValue.serverTimestamp(),
-                        lastActivityAt: firestore_1.FieldValue.serverTimestamp(),
-                    });
-                }
-                await batch.commit();
-                console.log(`✅ [linkEmployeeByEmail] Auto-enrolled in ${purchasedMasterclasses.length} masterclasses`);
-            }
-        }
-        catch (enrollError) {
-            console.error('❌ [linkEmployeeByEmail] Error auto-enrolling:', enrollError.message);
-            // Don't throw - linking was successful
-        }
-        // 8. Log activity
-        try {
-            await db.collection('companies').doc(companyId).collection('activity').add({
-                type: 'employee_joined',
-                employeeId,
+        // User document update
+        batch.update(userRef, {
+            companyId: companyId,
+            companyRole: 'employee',
+            role: 'COMPANY_EMPLOYEE',
+            updatedAt: firestore_1.FieldValue.serverTimestamp(),
+        });
+        // Auto-enroll in company-purchased masterclasses (progress records)
+        for (const masterclassId of purchasedMasterclasses) {
+            const progressId = `${userId}_${masterclassId}`;
+            const progressRef = db.collection('userProgress').doc(progressId);
+            batch.set(progressRef, {
                 userId,
-                employeeName: employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`,
-                joinedVia: 'registration',
-                timestamp: firestore_1.FieldValue.serverTimestamp(),
+                masterclassId,
+                companyId,
+                currentModule: 1,
+                completedModules: [],
+                status: 'active',
+                enrolledAt: firestore_1.FieldValue.serverTimestamp(),
+                lastActivityAt: firestore_1.FieldValue.serverTimestamp(),
             });
         }
-        catch (activityError) {
-            // Non-critical, don't throw
+        // 5. Run batch commit and custom claims in parallel
+        const claimsPromise = admin.auth().setCustomUserClaims(userId, {
+            role: 'COMPANY_EMPLOYEE',
+            companyId: companyId,
+            companyRole: 'employee',
+        }).catch((err) => {
+            console.error('❌ [linkEmployeeByEmail] Error setting custom claims:', err.message);
+        });
+        await Promise.all([batch.commit(), claimsPromise]);
+        console.log('✅ [linkEmployeeByEmail] Batch updates + custom claims completed');
+        if (purchasedMasterclasses.length > 0) {
+            console.log(`✅ [linkEmployeeByEmail] Auto-enrolled in ${purchasedMasterclasses.length} masterclasses`);
         }
+        // 6. Log activity (fire-and-forget, non-blocking)
+        db.collection('companies').doc(companyId).collection('activity').add({
+            type: 'employee_joined',
+            employeeId,
+            userId,
+            employeeName: employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`,
+            joinedVia: 'registration',
+            timestamp: firestore_1.FieldValue.serverTimestamp(),
+        }).catch(() => { });
         console.log('🎉 [linkEmployeeByEmail] Employee successfully linked to company');
         return {
             linked: true,

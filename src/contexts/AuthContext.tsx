@@ -17,6 +17,7 @@ import { auth, db, functions } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/stores/authStore';
 
 export enum UserRole {
   STUDENT = 'student',
@@ -186,23 +187,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      // VALIDATION LOG 4: Track onAuthStateChanged triggers
-      const triggerCount = ((window as any).__authStateChangedCount || 0) + 1;
-      (window as any).__authStateChangedCount = triggerCount;
-
-      console.log('🔍 [VALIDATION] onAuthStateChanged TRIGGER #' + triggerCount, {
-        hasUser: !!firebaseUser,
-        uid: firebaseUser?.uid,
-        timestamp: Date.now()
-      });
-
       if (firebaseUser) {
-        const tokenResult = await firebaseUser.getIdTokenResult(false);
-        console.log('🔍 [VALIDATION] Token claims at trigger #' + triggerCount, {
-          role: tokenResult.claims.role,
-          companyId: tokenResult.claims.companyId,
-          companyRole: tokenResult.claims.companyRole
-        });
+        // Skip fetch if Zustand store was updated within last 5 seconds
+        // This prevents duplicate fetches after registration/login
+        const storeState = useAuthStore.getState();
+        const lastUpdated = storeState.lastUpdated;
+        const now = Date.now();
+
+        if (lastUpdated && (now - lastUpdated) < 5000 && storeState.user?.uid === firebaseUser.uid) {
+          console.log('⚡ [AuthContext] Skipping fetch - store recently updated');
+          setLoading(false);
+          return;
+        }
 
         const enrichedUser = await fetchUserData(firebaseUser);
         setUser(enrichedUser);

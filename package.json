@@ -7,6 +7,7 @@
     "dev:emulators": "concurrently \"firebase emulators:start --only firestore,functions,auth,storage\" \"next dev\"",
     "dev:full": "concurrently \"firebase emulators:start --only functions,firestore,auth,storage\" \"next dev\"",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
@@ -131,6 +132,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
     "@firebase/rules-unit-testing": "^4.0.1",
+    "@next/bundle-analyzer": "^16.0.10",
     "@playwright/test": "^1.54.2",
     "@storybook/addon-a11y": "^9.0.15",
     "@storybook/addon-docs": "^9.0.15",

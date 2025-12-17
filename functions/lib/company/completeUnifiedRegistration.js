@@ -124,7 +124,11 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             finalSlug = `${slug}-${Date.now()}`;
             console.log(`⚠️ [completeUnifiedRegistration] Slug collision detected, using: ${finalSlug}`);
         }
-        // Step 1: Create company document
+        // Pre-generate company ID for batch write
+        const companyRef = db.collection('companies').doc();
+        const companyId = companyRef.id;
+        const fullName = `${firstName.trim()} ${lastName.trim()}`;
+        // Prepare all documents for batch write (single network round-trip)
         const companyData = {
             name: finalCompanyName,
             slug: finalSlug,
@@ -142,11 +146,6 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         if (companySize) {
             companyData.companySize = companySize;
         }
-        const companyRef = await db.collection('companies').add(companyData);
-        const companyId = companyRef.id;
-        console.log('✅ [completeUnifiedRegistration] Company document created:', companyId);
-        // Step 2: Create company admin document
-        const fullName = `${firstName.trim()} ${lastName.trim()}`;
         const adminData = {
             userId,
             companyId,
@@ -163,14 +162,6 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             addedBy: userId,
             addedAt: firestore_1.FieldValue.serverTimestamp(),
         };
-        await db
-            .collection('companies')
-            .doc(companyId)
-            .collection('admins')
-            .doc(userId)
-            .set(adminData);
-        console.log('✅ [completeUnifiedRegistration] Company admin document created');
-        // Step 3: Create user document in users collection
         const userDocData = {
             id: userId,
             uid: userId,
@@ -191,15 +182,13 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             createdAt: firestore_1.FieldValue.serverTimestamp(),
             updatedAt: firestore_1.FieldValue.serverTimestamp(),
         };
-        console.log('🔍 [completeUnifiedRegistration] Writing user document to Firestore:', {
-            path: `users/${userId}`,
-            companyId: companyId,
-            role: 'COMPANY_ADMIN',
-            companyRole: 'owner',
-            phone: phone.trim()
-        });
-        await db.collection('users').doc(userId).set(userDocData);
-        console.log('✅ [completeUnifiedRegistration] User document written successfully');
+        // Batch write: company + admin + user documents in single network round-trip
+        const batch = db.batch();
+        batch.set(companyRef, companyData);
+        batch.set(db.collection('companies').doc(companyId).collection('admins').doc(userId), adminData);
+        batch.set(db.collection('users').doc(userId), userDocData);
+        await batch.commit();
+        console.log('✅ [completeUnifiedRegistration] Batch write completed: company, admin, user docs');
         // Step 4: Set custom claims
         const customClaims = {
             role: 'COMPANY_ADMIN',
@@ -209,9 +198,6 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         console.log('🔍 [completeUnifiedRegistration] Setting custom claims:', customClaims);
         await auth.setCustomUserClaims(userId, customClaims);
         console.log('✅ [completeUnifiedRegistration] Custom claims set successfully');
-        // Verify claims were set by reading them back
-        const userRecordVerify = await auth.getUser(userId);
-        console.log('🔍 [completeUnifiedRegistration] Verified custom claims from Firebase Auth:', userRecordVerify.customClaims);
         // Step 5: Check for pending employee invite
         let linkedToInvite = false;
         try {

@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
 
+// Bundle analyzer for performance debugging
+// Run with: ANALYZE=true npm run build
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig = {
   reactStrictMode: false, // Disabled for Framer Motion animations compatibility
   generateBuildId: async () => {
@@ -8,6 +14,14 @@ const nextConfig = {
     return process.env.VERCEL_GIT_COMMIT_SHA || 'development';
   },
   images: {
+    // Modern formats for better compression (AVIF is 50% smaller than WebP)
+    formats: ['image/avif', 'image/webp'],
+    // Optimized device sizes for common breakpoints
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Image sizes for srcset generation
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Cache optimized images for 30 days
+    minimumCacheTTL: 2592000,
     domains: [
       'images.unsplash.com',
       'source.unsplash.com',
@@ -63,4 +77,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withBundleAnalyzer(nextConfig);

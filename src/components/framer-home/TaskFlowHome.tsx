@@ -3,24 +3,67 @@
 import dynamic from 'next/dynamic';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
 import { NetflixCourseCarousel } from '@/components/home/NetflixCourseCarousel';
-import { WhyDMASection } from '@/components/home/WhyDMASection';
-import { FeaturesEditorial, TartalmakHeader } from '@/components/home/FeaturesEditorial';
-import { BenefitsEditorial } from '@/components/home/BenefitsEditorial';
-import { AllCoursesShowcase } from '@/components/home/AllCoursesShowcase';
-import { CategoriesEditorial } from '@/components/home/CategoriesEditorial';
-import { PricingEditorial } from '@/components/home/PricingEditorial';
-import { TestimonialsEditorial } from '@/components/home/TestimonialsEditorial';
-import Footer from '@/components/landing-home/ui/footer';
-import HomepageFAQ from '@/components/landing-home/HomepageFAQ';
 
 // Loading placeholder for sections
 const SectionLoader = () => (
   <div className="w-full h-96 bg-gray-100 animate-pulse" />
 );
 
+// Above-fold: Hero section
 const MainHero = dynamic(
   () => import('@framer/main-hero').then(m => m.default.Responsive || m.default),
   { ssr: false, loading: SectionLoader }
+);
+
+// Below-fold sections - lazy loaded for performance
+const WhyDMASection = dynamic(
+  () => import('@/components/home/WhyDMASection').then(m => m.WhyDMASection),
+  { ssr: false, loading: SectionLoader }
+);
+
+const FeaturesEditorial = dynamic(
+  () => import('@/components/home/FeaturesEditorial').then(m => m.FeaturesEditorial),
+  { ssr: false, loading: SectionLoader }
+);
+
+const TartalmakHeader = dynamic(
+  () => import('@/components/home/FeaturesEditorial').then(m => m.TartalmakHeader),
+  { ssr: false }
+);
+
+const AllCoursesShowcase = dynamic(
+  () => import('@/components/home/AllCoursesShowcase').then(m => m.AllCoursesShowcase),
+  { ssr: false, loading: SectionLoader }
+);
+
+const BenefitsEditorial = dynamic(
+  () => import('@/components/home/BenefitsEditorial').then(m => m.BenefitsEditorial),
+  { ssr: false, loading: SectionLoader }
+);
+
+const CategoriesEditorial = dynamic(
+  () => import('@/components/home/CategoriesEditorial').then(m => m.CategoriesEditorial),
+  { ssr: false, loading: SectionLoader }
+);
+
+const PricingEditorial = dynamic(
+  () => import('@/components/home/PricingEditorial').then(m => m.PricingEditorial),
+  { ssr: false, loading: SectionLoader }
+);
+
+const TestimonialsEditorial = dynamic(
+  () => import('@/components/home/TestimonialsEditorial').then(m => m.TestimonialsEditorial),
+  { ssr: false, loading: SectionLoader }
+);
+
+const HomepageFAQ = dynamic(
+  () => import('@/components/landing-home/HomepageFAQ'),
+  { ssr: false, loading: SectionLoader }
+);
+
+const Footer = dynamic(
+  () => import('@/components/landing-home/ui/footer'),
+  { ssr: false }
 );
 
 // Common props for full-width Framer sections

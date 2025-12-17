@@ -67,6 +67,7 @@ interface PremiumCourseCardProps {
   enrollment?: Enrollment; // NEW: Explicit enrollment data for this course
   showProgress?: boolean; // NEW: Force show progress bar
   userId?: string; // NEW: User ID for enrollment detection
+  priority?: boolean; // LCP optimization - prioritize loading for above-fold images
 }
 
 export function PremiumCourseCard({
@@ -77,7 +78,8 @@ export function PremiumCourseCard({
   enrollments,
   enrollment,
   showProgress,
-  userId
+  userId,
+  priority = false
 }: PremiumCourseCardProps) {
   const router = useRouter();
   const { user } = useAuthStore();
@@ -331,7 +333,8 @@ export function PremiumCourseCard({
               alt={course.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="(max-width: 768px) 280px, 320px"
+              priority={priority}
               onError={() => setImageError(true)}
             />
           ) : (

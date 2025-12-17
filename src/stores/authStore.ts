@@ -32,6 +32,7 @@ interface AuthState {
   isLoading: boolean
   authReady: boolean
   error: string | null
+  lastUpdated: number | null // Timestamp of last store update (prevents duplicate fetches)
   setUser: (user: User | null) => void
   setToken: (token: string | null) => void
   setAuth: (user: User, token: string) => void
@@ -51,13 +52,15 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       authReady: false,
       error: null,
-      setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false }),
+      lastUpdated: null,
+      setUser: (user) => set({ user, isAuthenticated: !!user, isLoading: false, lastUpdated: Date.now() }),
       setToken: (token) => set({ accessToken: token }),
-      setAuth: (user, token) => set({ 
-        user, 
-        accessToken: token, 
-        isAuthenticated: true, 
-        isLoading: false 
+      setAuth: (user, token) => set({
+        user,
+        accessToken: token,
+        isAuthenticated: true,
+        isLoading: false,
+        lastUpdated: Date.now()
       }),
       clearAuth: () => set({ 
         user: null, 

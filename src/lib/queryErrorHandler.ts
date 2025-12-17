@@ -128,9 +128,12 @@ export const createQueryClientWithErrorHandling = () => {
         // Exponential backoff delay
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
         
-        // Stale time based on data type
-        staleTime: 5 * 60 * 1000, // 5 minutes default
-        
+        // Stale time based on data type - increased for better caching
+        staleTime: 10 * 60 * 1000, // 10 minutes default
+
+        // Keep data in memory longer (garbage collection time)
+        gcTime: 30 * 60 * 1000, // 30 minutes
+
         // Refetch on reconnect for important queries
         refetchOnReconnect: 'always',
         
@@ -180,36 +183,64 @@ export const createQueryClientWithErrorHandling = () => {
 export const queryConfigs = {
   // User data - highly cached, important for UX
   user: {
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
     refetchOnWindowFocus: true,
     retry: 3
   },
-  
-  // Course content - moderately cached
+
+  // Course content - longer cache since courses rarely change
   course: {
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
     refetchOnWindowFocus: false,
     retry: 2
   },
-  
+
+  // Course list/catalog - can be cached longer
+  courseList: {
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
+    refetchOnWindowFocus: false,
+    retry: 2
+  },
+
+  // Player data - moderate cache
+  player: {
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
+    refetchOnWindowFocus: false,
+    retry: 2
+  },
+
   // Video/media URLs - short cache due to signed URLs
   media: {
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes
     refetchOnWindowFocus: false,
     retry: 3
   },
-  
-  // Progress data - always fresh
+
+  // Progress data - keep relatively fresh but not too aggressive
   progress: {
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 60 * 1000, // 1 minute
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: true,
-    refetchInterval: 60 * 1000, // 1 minute
     retry: 2
   },
-  
+
+  // Categories/instructors - rarely change, cache aggressively
+  static: {
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    refetchOnWindowFocus: false,
+    retry: 2
+  },
+
   // Real-time data - always fresh
   realtime: {
     staleTime: 0,
+    gcTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: true,
     refetchInterval: 30 * 1000, // 30 seconds
     retry: 1

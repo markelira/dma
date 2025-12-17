@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { ImageIcon } from "lucide-react";
 
@@ -10,6 +11,7 @@ interface CourseThumbnailProps {
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
   fallback?: boolean;
+  priority?: boolean;
 }
 
 const sizeClasses = {
@@ -19,12 +21,13 @@ const sizeClasses = {
   xl: "w-64 h-48",
 };
 
-export function CourseThumbnail({ 
-  src, 
-  alt = "Tartalom kép", 
+export function CourseThumbnail({
+  src,
+  alt = "Tartalom kép",
   className,
   size = "md",
-  fallback = true 
+  fallback = true,
+  priority = false
 }: CourseThumbnailProps) {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -40,13 +43,14 @@ export function CourseThumbnail({
   };
 
   // Replace known missing placeholder path to local default asset
-  if (src && src.includes('course-placeholder.png')) {
-    src = '/images/course-card-default.svg'
+  let imageSrc = src;
+  if (imageSrc && imageSrc.includes('course-placeholder.png')) {
+    imageSrc = '/images/course-card-default.svg'
   }
 
-  if (!src || error) {
+  if (!imageSrc || error) {
     if (!fallback) return null;
-    
+
     return (
       <div className={cn(
         "flex items-center justify-center bg-muted rounded-lg",
@@ -65,13 +69,16 @@ export function CourseThumbnail({
           <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
         </div>
       )}
-      <img
-        src={src}
+      <Image
+        src={imageSrc}
         alt={alt}
+        fill
         className={cn(
-          "w-full h-full object-cover transition-opacity duration-200",
+          "object-cover transition-opacity duration-200",
           loading ? "opacity-0" : "opacity-100"
         )}
+        sizes="(max-width: 768px) 100vw, 256px"
+        priority={priority}
         onLoad={handleLoad}
         onError={handleError}
       />

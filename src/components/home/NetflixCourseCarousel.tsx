@@ -175,6 +175,7 @@ export function NetflixCourseCarousel() {
                     index={index}
                     categories={categoryObjects}
                     instructors={instructors}
+                    priority={index < 4} // Prioritize first 4 images for LCP
                   />
                 </div>
               ))

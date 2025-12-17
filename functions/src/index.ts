@@ -2299,6 +2299,13 @@ export {
 } from './courseCatalog';
 
 // ============================================
+// PLAYER DATA (PERFORMANCE OPTIMIZED)
+// ============================================
+
+// Export batched player data function for reduced latency
+export { getPlayerData } from './playerData';
+
+// ============================================
 // DATABASE MIGRATIONS
 // ============================================
 

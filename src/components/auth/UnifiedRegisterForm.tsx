@@ -24,6 +24,7 @@ import { httpsCallable } from 'firebase/functions';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
 import { updateAuthStoreFromFirebase } from '@/lib/updateAuthStore';
 import { useAuthStore } from '@/stores/authStore';
+import { markAsRecentlyRegistered } from '@/hooks/useSubscriptionStatus';
 
 interface UnifiedRegistrationData {
   // Step 1: Personal info (all required)
@@ -487,40 +488,21 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         console.log('[Unified Registration] Company ID:', result.data.companyId);
         console.log('[Unified Registration] Linked to invite:', result.data.linkedToInvite);
 
+        // Mark as recently registered to skip expensive subscription status check
+        // This saves 2-3 seconds on post-registration redirect
+        markAsRecentlyRegistered();
+
         // CRITICAL: Force token refresh to pick up new custom claims
-        console.log('[Unified Registration] Forcing token refresh to get custom claims...');
-        await userCredential.user.getIdToken(true);
-        await userCredential.user.reload();
+        // Run token refresh and user reload in parallel for faster execution
+        await Promise.all([
+          userCredential.user.getIdToken(true),
+          userCredential.user.reload()
+        ]);
         console.log('[Unified Registration] ✅ Token refreshed');
 
-        // VALIDATION LOG 2: Check custom claims AFTER token refresh
-        const refreshedToken = await userCredential.user.getIdTokenResult(true);
-        console.log('🔍 [VALIDATION] POST-TOKEN-REFRESH:', {
-          customClaims: refreshedToken.claims,
-          hasCompanyId: !!refreshedToken.claims.companyId,
-          companyId: refreshedToken.claims.companyId,
-          role: refreshedToken.claims.role,
-          companyRole: refreshedToken.claims.companyRole,
-          timestamp: Date.now()
-        });
-
-        // FIX: Manually update Zustand store with fresh custom claims
-        // This prevents race condition where store has stale data before redirect
-        console.log('[Unified Registration] Updating Zustand store with fresh claims...');
+        // Update Zustand store with fresh custom claims
         await updateAuthStoreFromFirebase(userCredential.user);
         console.log('[Unified Registration] ✅ Store updated');
-
-        // VALIDATION: Verify store was updated correctly
-        const storeState = useAuthStore.getState();
-        console.log('🔍 [VALIDATION] STORE STATE AFTER UPDATE:', {
-          storeCompanyId: storeState.user?.companyId,
-          storeRole: storeState.user?.role,
-          storeCompanyRole: storeState.user?.companyRole,
-          tokenCompanyId: refreshedToken.claims.companyId,
-          tokenRole: refreshedToken.claims.role,
-          match: storeState.user?.companyId === refreshedToken.claims.companyId,
-          timestamp: Date.now()
-        });
 
         // Send employee invites if any were added (non-blocking for faster UX)
         if (pendingEmployees.length > 0) {
@@ -543,37 +525,25 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           }
         }
 
-        // Send verification email BEFORE showing modal
-        console.log('[Unified Registration] Sending email verification code...');
-        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
-        try {
-          const verificationResult = await sendEmailVerificationCode({}) as any;
-          console.log('[Unified Registration] ✅ Verification email sent:', verificationResult.data);
-
-          // In emulator mode, log the code for testing
-          if (verificationResult.data.code) {
-            console.log('🔐 VERIFICATION CODE (emulator):', verificationResult.data.code);
-          }
-        } catch (emailError: any) {
-          console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
-          // Don't block registration - user can use resend button
-        }
-
-        // VALIDATION LOG 3: Check auth state BEFORE showing modal
-        const currentUser = auth.currentUser;
-        const currentToken = await currentUser?.getIdTokenResult(false);
-        console.log('🔍 [VALIDATION] AUTH STATE BEFORE MODAL:', {
-          firebaseAuthHasUser: !!currentUser,
-          tokenCompanyId: currentToken?.claims.companyId,
-          tokenRole: currentToken?.claims.role,
-          timestamp: Date.now()
-        });
-
-        // Notify parent component to show verification modal
+        // Show modal IMMEDIATELY (better perceived performance)
         if (onRegistrationComplete) {
-          console.log('[Unified Registration] Notifying parent component...');
+          console.log('[Unified Registration] Showing verification modal immediately...');
           onRegistrationComplete(userCredential.user.uid, formData.email.trim());
         }
+
+        // Send verification email in background (fire-and-forget)
+        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+        sendEmailVerificationCode({})
+          .then((result: any) => {
+            console.log('[Unified Registration] ✅ Verification email sent:', result.data);
+            if (result.data.code) {
+              console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
+            }
+          })
+          .catch((emailError: any) => {
+            console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
+            // User can use Resend button in modal
+          });
 
       } else {
         throw new Error('Registration failed: Cloud Function returned success: false');
