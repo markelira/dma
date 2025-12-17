@@ -149,7 +149,7 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           }
         }
 
-        // Fetch source course names for imported lessons (MASTERCLASS)
+        // Fetch source course names for imported lessons (MASTERCLASS) - PARALLELIZED
         const sourceCourseNames: Record<string, string> = {};
         if (courseType === 'MASTERCLASS') {
           const sourceCourseIds = new Set<string>();
@@ -159,20 +159,30 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
             }
           });
 
-          // Fetch source course names
-          for (const sourceCourseId of Array.from(sourceCourseIds)) {
-            try {
-              const sourceDoc = await getDoc(doc(db, 'courses', sourceCourseId));
-              if (sourceDoc.exists()) {
-                sourceCourseNames[sourceCourseId] = sourceDoc.data().title || 'Ismeretlen tartalom';
+          // Fetch source course names in parallel
+          const sourceCourseResults = await Promise.all(
+            Array.from(sourceCourseIds).map(async (sourceCourseId) => {
+              try {
+                const sourceDoc = await getDoc(doc(db, 'courses', sourceCourseId));
+                if (sourceDoc.exists()) {
+                  return { id: sourceCourseId, title: sourceDoc.data().title || 'Ismeretlen tartalom' };
+                }
+              } catch (e) {
+                console.error('Error fetching source course:', sourceCourseId, e);
               }
-            } catch (e) {
-              console.error('Error fetching source course:', sourceCourseId, e);
+              return null;
+            })
+          );
+
+          // Build map from results
+          sourceCourseResults.forEach((result) => {
+            if (result) {
+              sourceCourseNames[result.id] = result.title;
             }
-          }
+          });
         }
 
-        // Fetch instructor data (supports multiple instructors)
+        // Fetch instructor data (supports multiple instructors) - PARALLELIZED
         let instructor: Instructor | null = null;
         const instructors: Instructor[] = [];
 
@@ -184,32 +194,41 @@ export const usePlayerData = (courseId: string | undefined, lessonId: string | u
           allInstructorIds.push(courseData.instructorId);
         }
 
-        // Fetch all instructors
-        for (const instructorId of allInstructorIds) {
-          try {
-            const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
-            if (instructorDoc.exists()) {
-              const instructorData = instructorDoc.data();
-              const inst = {
-                id: instructorDoc.id,
-                name: instructorData.name || 'Ismeretlen',
-                title: instructorData.title,
-                bio: instructorData.bio,
-                profilePictureUrl: instructorData.profilePictureUrl,
-                role: instructorData.role || 'MENTOR',
-                createdAt: instructorData.createdAt,
-                updatedAt: instructorData.updatedAt,
-              } as Instructor;
-              instructors.push(inst);
-              // Set first instructor as the primary one (for backwards compatibility)
-              if (!instructor) {
-                instructor = inst;
+        // Fetch all instructors in parallel
+        const instructorResults = await Promise.all(
+          allInstructorIds.map(async (instructorId) => {
+            try {
+              const instructorDoc = await getDoc(doc(db, 'instructors', instructorId));
+              if (instructorDoc.exists()) {
+                const instructorData = instructorDoc.data();
+                return {
+                  id: instructorDoc.id,
+                  name: instructorData.name || 'Ismeretlen',
+                  title: instructorData.title,
+                  bio: instructorData.bio,
+                  profilePictureUrl: instructorData.profilePictureUrl,
+                  role: instructorData.role || 'MENTOR',
+                  createdAt: instructorData.createdAt,
+                  updatedAt: instructorData.updatedAt,
+                } as Instructor;
               }
+            } catch (e) {
+              console.error('Error fetching instructor:', instructorId, e);
             }
-          } catch (e) {
-            console.error('Error fetching instructor:', instructorId, e);
+            return null;
+          })
+        );
+
+        // Build instructors array from results (preserves order)
+        instructorResults.forEach((inst) => {
+          if (inst) {
+            instructors.push(inst);
+            // Set first instructor as the primary one (for backwards compatibility)
+            if (!instructor) {
+              instructor = inst;
+            }
           }
-        }
+        });
 
         return {
           success: true,
