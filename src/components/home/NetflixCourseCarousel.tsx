@@ -137,14 +137,14 @@ export function NetflixCourseCarousel() {
         </div>
 
         {/* Carousel Container */}
-        <div className="relative group">
+        <div className="relative group/nav">
           {/* Left Arrow */}
           {canScrollLeft && (
             <button
               onClick={() => scroll('left')}
               className="absolute -left-4 top-1/2 -translate-y-1/2 z-10
                 w-12 h-12 bg-black/70 backdrop-blur-sm rounded-full
-                opacity-0 group-hover:opacity-100 transition-all duration-300
+                opacity-0 group-hover/nav:opacity-100 transition-all duration-300
                 hidden md:flex items-center justify-center
                 hover:bg-black/90 hover:scale-110"
             >
@@ -155,32 +155,30 @@ export function NetflixCourseCarousel() {
           {/* Scrollable Track */}
           <div
             ref={scrollRef}
-            className="overflow-x-auto scrollbar-hide scroll-smooth -mx-2 px-2"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12"
+            style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            <div className="flex gap-6 pb-4">
-              {loading ? (
-                // Loading skeletons
-                [...Array(4)].map((_, i) => (
-                  <div key={i} className="flex-shrink-0 w-[280px] md:w-[320px]">
-                    <div className="aspect-video bg-gray-800 rounded-xl animate-pulse" />
-                    <div className="h-5 bg-gray-800 rounded mt-4 w-3/4 animate-pulse" />
-                    <div className="h-4 bg-gray-800 rounded mt-2 w-1/2 animate-pulse" />
-                  </div>
-                ))
-              ) : (
-                courses.map((course, index) => (
-                  <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px]">
-                    <PremiumCourseCard
-                      course={course}
-                      index={index}
-                      categories={categoryObjects}
-                      instructors={instructors}
-                    />
-                  </div>
-                ))
-              )}
-            </div>
+            {loading ? (
+              // Loading skeletons
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-[280px] md:w-[320px]" style={{ scrollSnapAlign: 'start' }}>
+                  <div className="aspect-video bg-gray-800 rounded-xl animate-pulse" />
+                  <div className="h-5 bg-gray-800 rounded mt-4 w-3/4 animate-pulse" />
+                  <div className="h-4 bg-gray-800 rounded mt-2 w-1/2 animate-pulse" />
+                </div>
+              ))
+            ) : (
+              courses.map((course, index) => (
+                <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px]" style={{ scrollSnapAlign: 'start' }}>
+                  <PremiumCourseCard
+                    course={course}
+                    index={index}
+                    categories={categoryObjects}
+                    instructors={instructors}
+                  />
+                </div>
+              ))
+            )}
           </div>
 
           {/* Right Arrow */}
@@ -189,7 +187,7 @@ export function NetflixCourseCarousel() {
               onClick={() => scroll('right')}
               className="absolute -right-4 top-1/2 -translate-y-1/2 z-10
                 w-12 h-12 bg-black/70 backdrop-blur-sm rounded-full
-                opacity-0 group-hover:opacity-100 transition-all duration-300
+                opacity-0 group-hover/nav:opacity-100 transition-all duration-300
                 hidden md:flex items-center justify-center
                 hover:bg-black/90 hover:scale-110"
             >
