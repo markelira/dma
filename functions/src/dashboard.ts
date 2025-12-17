@@ -50,6 +50,7 @@ function calculateTrend(current: number, previous: number): number {
  * Retrieves enrollment statistics and trends for the authenticated user
  */
 export const getDashboardStats = onCall<typeof GetDashboardStatsSchema>(
+  { region: 'europe-west1' },
   async (request): Promise<DashboardStatsResponse> => {
     try {
       // 1. Authentication check

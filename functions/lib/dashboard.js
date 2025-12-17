@@ -61,7 +61,7 @@ function calculateTrend(current, previous) {
  *
  * Retrieves enrollment statistics and trends for the authenticated user
  */
-exports.getDashboardStats = (0, https_1.onCall)(async (request) => {
+exports.getDashboardStats = (0, https_1.onCall)({ region: 'europe-west1' }, async (request) => {
     try {
         // 1. Authentication check
         if (!request.auth) {
