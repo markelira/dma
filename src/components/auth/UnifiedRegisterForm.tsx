@@ -175,7 +175,9 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       }
     } catch (err) {
       console.error('Employee email check error:', err);
-      // If check fails, still allow adding - backend will catch duplicates
+      setEmployeeError('Nem sikerült ellenőrizni az email címet. Kérlek próbáld újra.');
+      setCheckingEmployeeEmail(false);
+      return;
     }
     setCheckingEmployeeEmail(false);
 
@@ -520,24 +522,24 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           timestamp: Date.now()
         });
 
-        // Send employee invites if any were added
+        // Send employee invites if any were added (non-blocking for faster UX)
         if (pendingEmployees.length > 0) {
-          console.log('[Unified Registration] Sending employee invites:', pendingEmployees.length);
+          console.log('[Unified Registration] Sending employee invites (background):', pendingEmployees.length);
           const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
 
+          // Fire and forget - don't await to avoid blocking the verification modal
           for (const employee of pendingEmployees) {
-            try {
-              await addEmployee({
-                companyId: result.data.companyId,
-                email: employee.email,
-                firstName: employee.firstName,
-                lastName: employee.lastName
-              });
+            addEmployee({
+              companyId: result.data.companyId,
+              email: employee.email,
+              firstName: employee.firstName,
+              lastName: employee.lastName
+            }).then(() => {
               console.log(`[Unified Registration] ✅ Invite sent to ${employee.email}`);
-            } catch (inviteError: any) {
+            }).catch((inviteError: any) => {
               console.error(`[Unified Registration] ⚠️ Failed to invite ${employee.email}:`, inviteError);
               // Don't block registration - invites can be resent later
-            }
+            });
           }
         }
 
@@ -732,9 +734,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               </div>
               <input
                 id="phone"
+                name="phone"
                 type="tel"
                 inputMode="tel"
-                autoComplete="tel"
+                autoComplete="off"
                 className="form-input w-full py-2.5 pl-10"
                 placeholder="+36 30 123 4567"
                 value={formData.phone}
@@ -851,15 +854,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         >
           {/* Employee Invites Section */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
+            <div className="flex items-center gap-2 mb-6">
               <Users className="w-6 h-6 text-brand-secondary" />
               <h2 className="text-2xl font-bold text-gray-900">
-                Munkatársaim
+                Munkatársak meghívása (opcionális, max. 5 fő)
               </h2>
             </div>
-            <p className="text-sm text-gray-500 mb-6">
-              Adj hozzá 5 munkatársat, hogy ők is a kaland részesei legyenek.
-            </p>
 
             {/* Add Employee Form - Vertical layout like Step 1 */}
             <div className="space-y-5">
