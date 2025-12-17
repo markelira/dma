@@ -74,7 +74,8 @@ function toDate(value) {
  */
 exports.getCompanyDashboard = v2_1.https.onCall({
     region: 'us-central1',
-    memory: '512MiB',
+    memory: '1GiB',
+    timeoutSeconds: 120,
     cors: true,
 }, async (request) => {
     if (!request.auth) {

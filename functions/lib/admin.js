@@ -39,6 +39,11 @@ const admin = __importStar(require("firebase-admin"));
 if (!admin.apps.length) {
     admin.initializeApp();
 }
+// Use HTTP/1.1 REST API instead of gRPC for faster cold starts
+// See: https://firebase.google.com/docs/functions/tips
+admin.firestore().settings({
+    preferRest: true
+});
 exports.auth = admin.auth();
 exports.firestore = admin.firestore();
 //# sourceMappingURL=admin.js.map

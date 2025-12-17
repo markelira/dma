@@ -55,8 +55,8 @@ export const useCourseProgress = (courseId: string) => {
       };
     },
     enabled: !!user && !!courseId,
-    staleTime: 30 * 1000, // 30 seconds
-    gcTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes - user is watching video, progress doesn't change externally
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
