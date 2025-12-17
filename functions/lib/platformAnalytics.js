@@ -58,14 +58,20 @@ exports.getPlatformAnalytics = (0, https_1.onCall)({
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         // Get real-time platform statistics
-        const [coursesSnapshot, usersSnapshot, enrollmentsSnapshot, reviewsSnapshot, todayUsersSnapshot, newCoursesSnapshot] = await Promise.all([
+        // Use count() aggregation for simple counts (avoids fetching all documents)
+        // Still fetch full docs where we need to iterate (enrollments for completion rate, reviews for avg rating)
+        const [coursesSnapshot, usersCountSnapshot, enrollmentsSnapshot, reviewsSnapshot, todayUsersCountSnapshot, newCoursesCountSnapshot] = await Promise.all([
             firestore.collection('courses').where('status', '==', 'PUBLISHED').get(),
-            firestore.collection('users').get(),
-            firestore.collection('enrollments').get(),
-            firestore.collection('reviews').where('approved', '==', true).get(),
-            firestore.collection('users').where('lastLoginAt', '>=', todayStart).get(),
-            firestore.collection('courses').where('createdAt', '>=', monthStart).get()
+            firestore.collection('users').count().get(), // Just need total count
+            firestore.collection('enrollments').get(), // Need to iterate for completion rate
+            firestore.collection('reviews').where('approved', '==', true).get(), // Need to iterate for avg rating
+            firestore.collection('users').where('lastLoginAt', '>=', todayStart).count().get(), // Just need count
+            firestore.collection('courses').where('createdAt', '>=', monthStart).count().get() // Just need count
         ]);
+        // Extract counts from aggregation snapshots
+        const totalUsers = usersCountSnapshot.data().count;
+        const activeUsersToday = todayUsersCountSnapshot.data().count;
+        const newCoursesThisMonth = newCoursesCountSnapshot.data().count;
         // Calculate enrollment completion rates
         let totalEnrollments = 0;
         let completedEnrollments = 0;
@@ -88,18 +94,18 @@ exports.getPlatformAnalytics = (0, https_1.onCall)({
         });
         const averageRating = ratingCount > 0 ? totalRating / ratingCount : 4.8;
         const completionRate = totalEnrollments > 0 ? (completedEnrollments / totalEnrollments) * 100 : 84;
-        // Platform analytics response
+        // Platform analytics response (using count() aggregation results)
         const analytics = {
-            activeUsersToday: todayUsersSnapshot.size,
-            newCoursesThisMonth: newCoursesSnapshot.size,
+            activeUsersToday: activeUsersToday,
+            newCoursesThisMonth: newCoursesThisMonth,
             averageCompletionRate: Math.round(completionRate * 10) / 10,
             averageRating: Math.round(averageRating * 10) / 10,
             totalEnrollments: totalEnrollments,
-            totalUsers: usersSnapshot.size,
+            totalUsers: totalUsers,
             totalCourses: coursesSnapshot.size,
             totalReviews: reviewsSnapshot.size,
-            engagementRate: todayUsersSnapshot.size > 0 ? Math.round((todayUsersSnapshot.size / usersSnapshot.size) * 100) : 5,
-            platformGrowth: newCoursesSnapshot.size > 0 ? `+${Math.round((newCoursesSnapshot.size / coursesSnapshot.size) * 100)}%` : '+12%'
+            engagementRate: activeUsersToday > 0 ? Math.round((activeUsersToday / totalUsers) * 100) : 5,
+            platformGrowth: newCoursesThisMonth > 0 ? `+${Math.round((newCoursesThisMonth / coursesSnapshot.size) * 100)}%` : '+12%'
         };
         console.log(`✅ Platform analytics calculated:`, analytics);
         return {
