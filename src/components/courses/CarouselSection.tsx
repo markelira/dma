@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
-import { ChevronLeft, ChevronRight, Video, BookOpen, GraduationCap, Mic } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Video, BookOpen, GraduationCap, Mic, Loader2 } from 'lucide-react'
 import { PremiumCourseCard } from './PremiumCourseCard'
 import type { Course } from '@/types'
 
@@ -70,13 +70,33 @@ export function CarouselSection({
   backgroundColor = 'light',
 }: CarouselSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const visibilityRef = useRef<HTMLDivElement>(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
 
   const config = TYPE_CONFIG[courseType]
   const Icon = config.icon
   const isDark = backgroundColor === 'dark'
+
+  // Lazy loading: only render cards when carousel is near viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect() // Only need to load once
+        }
+      },
+      { rootMargin: '300px' } // Load 300px before visible
+    )
+
+    if (visibilityRef.current) {
+      observer.observe(visibilityRef.current)
+    }
+    return () => observer.disconnect()
+  }, [])
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -87,6 +107,7 @@ export function CarouselSection({
   }
 
   useEffect(() => {
+    if (!isVisible) return // Don't set up scroll listeners until visible
     checkScroll()
     const container = scrollContainerRef.current
     if (container) {
@@ -97,7 +118,7 @@ export function CarouselSection({
         window.removeEventListener('resize', checkScroll)
       }
     }
-  }, [courses])
+  }, [courses, isVisible])
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -108,8 +129,29 @@ export function CarouselSection({
 
   if (!courses || courses.length === 0) return null
 
+  // Show placeholder until carousel scrolls into view
+  if (!isVisible) {
+    return (
+      <section ref={visibilityRef} className="mb-16">
+        <div className="flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
+          <div className="flex items-center gap-4">
+            <div className={`p-3 rounded-xl bg-gradient-to-br ${config.gradient} shadow-lg`}>
+              <Icon className="w-6 h-6 text-white" />
+            </div>
+            <h2 className={`text-2xl md:text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              {title}
+            </h2>
+          </div>
+        </div>
+        <div className="h-[320px] flex items-center justify-center bg-gray-50 rounded-xl mx-4 sm:mx-5 md:mx-6 lg:mx-12 xl:mx-20">
+          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        </div>
+      </section>
+    )
+  }
+
   return (
-    <section className="mb-16">
+    <section ref={visibilityRef} className="mb-16">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4 sm:mb-6 px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         <div className="flex items-center gap-4">

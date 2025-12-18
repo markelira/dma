@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { motion } from 'motion/react'
-import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Sparkles, Loader2 } from 'lucide-react'
 import { db } from '@/lib/firebase'
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
 import { httpsCallable } from 'firebase/functions'
@@ -42,12 +42,34 @@ export function NetflixCourseCarousel() {
   const [categoryObjects, setCategoryObjects] = useState<Array<{ id: string; name: string }>>([])
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
+  const [isVisible, setIsVisible] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const visibilityRef = useRef<HTMLDivElement>(null)
 
   const { data: instructors = [] } = useInstructors()
 
-  // Fetch categories
+  // Lazy loading: only fetch and render when carousel is near viewport
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '300px' }
+    )
+
+    if (visibilityRef.current) {
+      observer.observe(visibilityRef.current)
+    }
+    return () => observer.disconnect()
+  }, [])
+
+  // Fetch categories - only when visible
+  useEffect(() => {
+    if (!isVisible) return
+
     const fetchCategories = async () => {
       try {
         const getCategories = httpsCallable(fbFunctions, 'getCategories')
@@ -63,10 +85,12 @@ export function NetflixCourseCarousel() {
     }
 
     fetchCategories()
-  }, [])
+  }, [isVisible])
 
-  // Fetch latest courses
+  // Fetch latest courses - only when visible
   useEffect(() => {
+    if (!isVisible) return
+
     const coursesQuery = query(
       collection(db, 'courses'),
       orderBy('createdAt', 'desc'),
@@ -87,7 +111,7 @@ export function NetflixCourseCarousel() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [isVisible])
 
   // Scroll navigation
   const scroll = (direction: 'left' | 'right') => {
@@ -120,8 +144,26 @@ export function NetflixCourseCarousel() {
     return null
   }
 
+  // Show placeholder until carousel scrolls into view
+  if (!isVisible) {
+    return (
+      <section ref={visibilityRef} className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+              Tartalmaink
+            </h2>
+          </div>
+          <div className="h-[320px] flex items-center justify-center bg-gray-100 rounded-xl">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   return (
-    <section className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
+    <section ref={visibilityRef} className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">

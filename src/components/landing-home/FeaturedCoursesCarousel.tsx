@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { collection, query, where, limit, getDocs, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { PremiumCourseCard } from "@/components/courses/PremiumCourseCard";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import AOS from "aos";
 
 interface Course {
@@ -40,7 +40,9 @@ export default function FeaturedCoursesCarousel() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [loading, setLoading] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const visibilityRef = useRef<HTMLDivElement>(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
 
@@ -52,7 +54,27 @@ export default function FeaturedCoursesCarousel() {
     });
   }, []);
 
+  // Lazy loading: only fetch and render when carousel is near viewport
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    if (visibilityRef.current) {
+      observer.observe(visibilityRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
     const fetchData = async () => {
       try {
         // Fetch featured courses (or fallback to recent courses if no featured flag)
@@ -98,7 +120,7 @@ export default function FeaturedCoursesCarousel() {
     };
 
     fetchData();
-  }, []);
+  }, [isVisible]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -132,9 +154,30 @@ export default function FeaturedCoursesCarousel() {
     }
   };
 
+  // Show placeholder until carousel scrolls into view
+  if (!isVisible) {
+    return (
+      <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
+              Kiemelt kurzusok
+            </h2>
+            <p className="mx-auto max-w-2xl text-lg text-gray-600 md:text-xl">
+              Kezdd el a tanulást a legkedveltebb és leghatékonyabb kurzusainkkal
+            </p>
+          </div>
+          <div className="h-[320px] flex items-center justify-center bg-white/50 rounded-xl">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   if (loading) {
     return (
-      <section className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24">
+      <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
             <div className="h-12 w-64 mx-auto bg-gray-200 rounded-lg animate-pulse mb-4" />
@@ -150,7 +193,7 @@ export default function FeaturedCoursesCarousel() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
+    <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section Header */}
         <div className="mb-12 text-center" data-aos="fade-up">

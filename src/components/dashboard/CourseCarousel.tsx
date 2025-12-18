@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { CarouselCourseCard } from './CarouselCourseCard';
 import { useCoursesCatalog } from '@/hooks/useCoursesCatalog';
 
@@ -13,6 +13,26 @@ interface CourseCarouselProps {
 
 export function CourseCarousel({ courseType, title }: CourseCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const visibilityRef = useRef<HTMLDivElement>(null);
+
+  // Lazy loading: only render when carousel is near viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px' }
+    );
+
+    if (visibilityRef.current) {
+      observer.observe(visibilityRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
 
   const { data, isLoading } = useCoursesCatalog({
     limit: 12,
@@ -32,9 +52,23 @@ export function CourseCarousel({ courseType, title }: CourseCarouselProps) {
     setCurrentIndex((prev) => Math.min(maxIndex, prev + cardsPerView));
   };
 
+  // Show placeholder until carousel scrolls into view
+  if (!isVisible) {
+    return (
+      <div ref={visibilityRef} className="rounded-xl bg-white shadow-md border border-gray-100 p-6">
+        <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+        </div>
+        <div className="h-80 flex items-center justify-center">
+          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        </div>
+      </div>
+    );
+  }
+
   if (isLoading) {
     return (
-      <div className="rounded-xl bg-white shadow-md border border-gray-100 p-6">
+      <div ref={visibilityRef} className="rounded-xl bg-white shadow-md border border-gray-100 p-6">
         <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-6" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {[1, 2, 3, 4].map((i) => (
@@ -50,7 +84,7 @@ export function CourseCarousel({ courseType, title }: CourseCarouselProps) {
   }
 
   return (
-    <div className="rounded-xl bg-white shadow-md border border-gray-100 overflow-hidden">
+    <div ref={visibilityRef} className="rounded-xl bg-white shadow-md border border-gray-100 overflow-hidden">
       <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">{title}</h2>
