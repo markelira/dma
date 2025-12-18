@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
 
 // Enrollment type for progress tracking
@@ -33,8 +33,28 @@ export function CourseCarouselRow({
   emptyMessage = 'Nincs megjeleníthető tartalom'
 }: CourseCarouselRowProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const visibilityRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Lazy loading: only render cards when carousel is near viewport
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect(); // Only need to load once
+        }
+      },
+      { rootMargin: '300px' } // Load 300px before visible
+    );
+
+    if (visibilityRef.current) {
+      observer.observe(visibilityRef.current);
+    }
+    return () => observer.disconnect();
+  }, []);
 
   const checkScroll = () => {
     if (scrollContainerRef.current) {
@@ -45,6 +65,7 @@ export function CourseCarouselRow({
   };
 
   useEffect(() => {
+    if (!isVisible) return; // Don't set up scroll listeners until visible
     checkScroll();
     const container = scrollContainerRef.current;
     if (container) {
@@ -55,7 +76,7 @@ export function CourseCarouselRow({
         window.removeEventListener('resize', checkScroll);
       };
     }
-  }, [courses]);
+  }, [courses, isVisible]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -75,8 +96,22 @@ export function CourseCarouselRow({
     );
   }
 
+  // Show placeholder until carousel scrolls into view
+  if (!isVisible) {
+    return (
+      <section ref={visibilityRef} className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        </div>
+        <div className="h-[280px] flex items-center justify-center bg-gray-50 rounded-xl">
+          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="mb-8">
+    <section ref={visibilityRef} className="mb-8">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
