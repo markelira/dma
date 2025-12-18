@@ -166,7 +166,7 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
             id: userId,
             uid: userId,
             email: email.trim().toLowerCase(),
-            emailVerified: false, // Will be updated after email verification
+            emailVerified: true, // User has verified email before this function is called
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             phone: phone.trim(),

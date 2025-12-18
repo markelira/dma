@@ -287,12 +287,20 @@ export const verifyEmailCode = onCall({
     });
     logger.info(`Firebase Auth emailVerified flag updated for user ${userId}`);
 
-    // Update user document in Firestore
-    await firestore.collection('users').doc(userId).update({
-      emailVerified: true,
-      emailVerifiedAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    });
+    // Update user document in Firestore (if it exists)
+    // Note: Document may not exist yet if user is verifying before registration is complete
+    const userDocRef = firestore.collection('users').doc(userId);
+    const userDoc = await userDocRef.get();
+    if (userDoc.exists) {
+      await userDocRef.update({
+        emailVerified: true,
+        emailVerifiedAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      logger.info(`User document updated with emailVerified for user ${userId}`);
+    } else {
+      logger.info(`User document not yet created for ${userId}, skipping Firestore update (will be set during registration completion)`);
+    }
 
     // Mark code as used
     await firestore
