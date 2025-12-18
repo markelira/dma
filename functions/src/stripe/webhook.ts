@@ -682,6 +682,8 @@ async function updateCompanySubscription(
       updateData.plan = 'active';
     } else if (status === 'trialing') {
       updateData.plan = 'trialing';
+    } else if (status === 'past_due') {
+      updateData.plan = 'past_due';
     } else if (status === 'canceled' || status === 'none') {
       updateData.plan = 'canceled';
     }
