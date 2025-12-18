@@ -288,8 +288,13 @@ export const getCompanyDashboard = https.onCall(
 
           usersSnapshot.docs.forEach(userDoc => {
             const userData = userDoc.data();
+            // Construct name from firstName + lastName if displayName is not set
+            const firstName = userData?.firstName || '';
+            const lastName = userData?.lastName || '';
+            const fullName = `${firstName} ${lastName}`.trim();
+
             usersData.set(userDoc.id, {
-              displayName: userData?.displayName || userData?.email || 'Unknown User',
+              displayName: userData?.displayName || fullName || userData?.email || 'Unknown User',
               email: userData?.email || '',
             });
           });
