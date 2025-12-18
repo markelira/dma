@@ -1,16 +1,17 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  Shield, 
-  AlertTriangle, 
-  Home, 
-  RefreshCw, 
+// FIXED: Use Zustand auth store instead of the old AuthContext
+import { useAuthStore } from '@/stores/authStore';
+import {
+  Shield,
+  AlertTriangle,
+  Home,
+  RefreshCw,
   ArrowLeft,
   Mail,
   Phone
@@ -18,15 +19,17 @@ import {
 
 export default function UnauthorizedPage() {
   const router = useRouter();
-  const { user, refreshUser, loading } = useAuth();
+  const { user, isLoading: loading } = useAuthStore();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleRefreshPermissions = async () => {
     try {
-      await refreshUser();
-      // After refresh, try to go back to where they came from
-      router.back();
+      setIsRefreshing(true);
+      // Reload the page to refresh auth state from Firebase
+      window.location.reload();
     } catch (error) {
       console.error('Error refreshing permissions:', error);
+      setIsRefreshing(false);
     }
   };
 
@@ -98,13 +101,13 @@ export default function UnauthorizedPage() {
                 </div>
 
                 {user && (
-                  <Button 
+                  <Button
                     onClick={handleRefreshPermissions}
                     variant="outline"
-                    disabled={loading}
+                    disabled={isRefreshing || loading}
                     className="w-full"
                   >
-                    <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-4 h-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
                     Jogosultságok frissítése
                   </Button>
                 )}

@@ -108,8 +108,9 @@ export const useNetworkErrorHandling = () => {
   const { handleError, ...errorHandling } = useErrorHandling('NetworkHandler')
 
   const handleNetworkError = useCallback((error: any, queryKey?: string[]) => {
-    // Determine if it's a network error
-    const isNetworkError = !navigator.onLine || 
+    // Determine if it's a network error - FIXED: Added SSR guard for navigator
+    const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+    const isNetworkError = isOffline ||
                           error?.code === 'NETWORK_ERROR' ||
                           error?.message?.includes('fetch')
 

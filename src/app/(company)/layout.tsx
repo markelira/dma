@@ -7,7 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { Loader2, Menu, X } from 'lucide-react'
 import { CompanyDashboardSidebar } from '@/components/company/CompanyDashboardSidebar'
-import { AuthProvider } from '@/contexts/AuthContext'
+// REMOVED: Duplicate AuthProvider - already wrapped in root layout
+// import { AuthProvider } from '@/contexts/AuthContext'
 import { FreeTrialModal } from '@/components/subscription/FreeTrialModal'
 import { useTrialPopup } from '@/hooks/useTrialPopup'
 import Footer from '@/components/landing-home/ui/footer'
@@ -116,63 +117,62 @@ export default function CompanyLayout({
     )
   }
 
+  // FIXED: Removed duplicate AuthProvider wrapper - root layout already provides auth
   return (
-    <AuthProvider>
-      <div className="min-h-screen bg-gray-50">
-        {/* Mobile Sidebar Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
-        {/* Sidebar - Fixed on all screens */}
-        <aside
-          className={`
-            fixed top-0 left-0 z-50 h-screen w-64 transform bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out
-            lg:translate-x-0
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          `}
-        >
-          <CompanyDashboardSidebar
-            companyName={companyName}
-            onNavigate={() => setSidebarOpen(false)}
-          />
-        </aside>
-
-        {/* Mobile Menu Button - Floating */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
-        >
-          {sidebarOpen ? (
-            <X className="h-6 w-6 text-gray-700" />
-          ) : (
-            <Menu className="h-6 w-6 text-gray-700" />
-          )}
-        </button>
-
-        {/* Main Content - with left margin for fixed sidebar on desktop */}
-        <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-hidden">
-          {children}
-        </main>
-
-        {/* Footer */}
-        <div className="lg:ml-64">
-          <Footer border={true} />
-        </div>
-
-        {/* Free Trial Modal - Shows for company admins without subscription */}
-        <FreeTrialModal
-          open={showTrialModal}
-          onOpenChange={setShowTrialModal}
-          variant="dashboard"
-          onStartTrial={handleTrialStart}
-          onDismiss={handleTrialDismiss}
-          hasUsedTrial={hasUsedTrial}
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
         />
+      )}
+
+      {/* Sidebar - Fixed on all screens */}
+      <aside
+        className={`
+          fixed top-0 left-0 z-50 h-screen w-64 transform bg-white border-r border-gray-200 transition-transform duration-300 ease-in-out
+          lg:translate-x-0
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
+        <CompanyDashboardSidebar
+          companyName={companyName}
+          onNavigate={() => setSidebarOpen(false)}
+        />
+      </aside>
+
+      {/* Mobile Menu Button - Floating */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
+      >
+        {sidebarOpen ? (
+          <X className="h-6 w-6 text-gray-700" />
+        ) : (
+          <Menu className="h-6 w-6 text-gray-700" />
+        )}
+      </button>
+
+      {/* Main Content - with left margin for fixed sidebar on desktop */}
+      <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-hidden">
+        {children}
+      </main>
+
+      {/* Footer */}
+      <div className="lg:ml-64">
+        <Footer border={true} />
       </div>
-    </AuthProvider>
+
+      {/* Free Trial Modal - Shows for company admins without subscription */}
+      <FreeTrialModal
+        open={showTrialModal}
+        onOpenChange={setShowTrialModal}
+        variant="dashboard"
+        onStartTrial={handleTrialStart}
+        onDismiss={handleTrialDismiss}
+        hasUsedTrial={hasUsedTrial}
+      />
+    </div>
   )
 }

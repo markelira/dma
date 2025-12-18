@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { TargetAudience } from '@/types';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
-import { useAuthStore } from '@/stores/authStore';
+// REMOVED: useAuthStore - no longer needed for public data queries
 import { toast } from 'sonner';
 
 // Response types
@@ -57,7 +57,8 @@ interface DeleteTargetAudienceInput {
  * Public endpoint - no authentication required
  */
 export const useTargetAudiences = () => {
-  const { authReady } = useAuthStore();
+  // FIXED: Removed authReady dependency - target audiences are public data
+  // No need to wait for Firebase Auth for public endpoints
 
   return useQuery<TargetAudience[]>({
     queryKey: ['target-audiences'],
@@ -79,8 +80,7 @@ export const useTargetAudiences = () => {
         throw error;
       }
     },
-    // Wait for Firebase Auth to initialize before calling the function
-    enabled: authReady,
+    // FIXED: Removed enabled: authReady - this is public data, fetch immediately
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: 1,

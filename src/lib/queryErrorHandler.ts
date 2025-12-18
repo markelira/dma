@@ -25,8 +25,9 @@ interface ApiError {
 const classifyApiError = (error: any): { type: ErrorType; severity: ErrorSeverity } => {
   const status = error?.status || error?.response?.status
 
-  // Network errors
-  if (!navigator.onLine || error?.code === 'NETWORK_ERROR' || error?.name === 'NetworkError') {
+  // Network errors - FIXED: Added SSR guard for navigator
+  const isOffline = typeof navigator !== 'undefined' && !navigator.onLine
+  if (isOffline || error?.code === 'NETWORK_ERROR' || error?.name === 'NetworkError') {
     return { type: ErrorType.NETWORK, severity: ErrorSeverity.MEDIUM }
   }
 

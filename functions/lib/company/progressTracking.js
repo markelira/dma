@@ -227,17 +227,10 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             }
         }
         console.log(`📦 Batch fetched ${coursesData.size} courses`);
-        // 6. Get unique user IDs from enrollments and fetch user details (BATCH)
-        const userIds = new Set();
-        enrollmentDocs.forEach(doc => {
-            const data = doc.data();
-            if (data.userId) {
-                userIds.add(data.userId);
-            }
-        });
-        // Batch fetch user details (fixes N+1 query)
+        // 6. Fetch user details for ALL company users (not just those with enrollments)
+        // This is needed to get watchlist data for users who haven't enrolled yet
         const usersData = new Map();
-        const userIdArrayForFetch = Array.from(userIds);
+        const userIdArrayForFetch = Array.from(companyUserIds);
         if (userIdArrayForFetch.length > 0) {
             for (let i = 0; i < userIdArrayForFetch.length; i += 30) {
                 const batch = userIdArrayForFetch.slice(i, i + 30);
@@ -246,9 +239,14 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                     .get();
                 usersSnapshot.docs.forEach(userDoc => {
                     const userData = userDoc.data();
+                    // Construct name from firstName + lastName if displayName is not set
+                    const firstName = userData?.firstName || '';
+                    const lastName = userData?.lastName || '';
+                    const fullName = `${firstName} ${lastName}`.trim();
                     usersData.set(userDoc.id, {
-                        displayName: userData?.displayName || userData?.email || 'Unknown User',
+                        displayName: userData?.displayName || fullName || userData?.email || 'Unknown User',
                         email: userData?.email || '',
+                        watchlist: userData?.watchlist || [],
                     });
                 });
             }
@@ -366,6 +364,65 @@ exports.getCompanyDashboard = v2_1.https.onCall({
             totalProgress += progressPercent;
             progressCount++;
         }
+        // Track which user-course combinations have enrollments (to avoid duplicate watchlist entries)
+        const enrolledUserCourses = new Set();
+        employeeProgressList.forEach(ep => {
+            enrolledUserCourses.add(`${ep.employeeId}_${ep.masterclassId}`);
+        });
+        // 9. Add watchlist entries for courses not enrolled
+        // Loop through all company users and their watchlists
+        for (const companyUserId of companyUserIds) {
+            const user = usersData.get(companyUserId);
+            const employee = employeesDataMap.get(companyUserId);
+            if (!user?.watchlist || user.watchlist.length === 0)
+                continue;
+            for (const watchlistCourseId of user.watchlist) {
+                // Skip if already enrolled in this course
+                const enrollmentKey = `${employee?.employeeId || companyUserId}_${watchlistCourseId}`;
+                if (enrolledUserCourses.has(enrollmentKey))
+                    continue;
+                // Get course details (fetch if not already in cache)
+                let course = coursesData.get(watchlistCourseId);
+                if (!course) {
+                    // Fetch course if not in our batch (user may have added to watchlist before company purchase)
+                    try {
+                        const courseDoc = await db.collection('courses').doc(watchlistCourseId).get();
+                        if (courseDoc.exists) {
+                            const courseData = courseDoc.data();
+                            course = {
+                                id: watchlistCourseId,
+                                title: courseData?.title || 'Unknown Course',
+                                totalLessons: courseData?.lessonCount || 0,
+                            };
+                            coursesData.set(watchlistCourseId, course);
+                        }
+                    }
+                    catch (e) {
+                        // Skip if course not found
+                        continue;
+                    }
+                }
+                if (!course)
+                    continue;
+                employeeProgressList.push({
+                    employeeId: employee?.employeeId || companyUserId,
+                    employeeName: employee?.fullName || user.displayName || 'Unknown User',
+                    email: user.email || '',
+                    jobTitle: employee?.jobTitle,
+                    masterclassId: watchlistCourseId,
+                    masterclassTitle: course.title,
+                    currentLesson: 0,
+                    completedLessons: 0,
+                    totalLessons: course.totalLessons,
+                    progressPercent: 0,
+                    status: 'watchlist',
+                    lastActivityAt: undefined,
+                    enrolledAt: new Date(), // Use current date as placeholder
+                    daysActive: 0,
+                });
+            }
+        }
+        console.log(`📋 Added watchlist entries, total progress records: ${employeeProgressList.length}`);
         // Set active employees count
         stats.activeEmployees = activeUserIds.size;
         // Calculate average progress

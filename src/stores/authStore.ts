@@ -106,9 +106,12 @@ export const useAuthStore = create<AuthState>()(
           timestamp: Date.now()
         })
         if (state) {
+          // FIXED: Only set isLoading to false, but DON'T set authReady here
+          // Let the AuthProvider set authReady after Firebase's onAuthStateChanged fires
+          // This prevents the race condition where stale cached data triggers incorrect redirects
           state.isLoading = false
-          state.authReady = true  // Set authReady after rehydration completes
-          console.log('🔄 [DIAGNOSTIC] Zustand rehydration COMPLETE - authReady set to TRUE', {
+          // REMOVED: state.authReady = true - this was causing race conditions
+          console.log('🔄 [DIAGNOSTIC] Zustand rehydration COMPLETE - waiting for Firebase auth', {
             hasUser: !!state.user,
             userId: state.user?.id,
             authReady: state.authReady,

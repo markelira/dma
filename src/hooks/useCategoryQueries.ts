@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Category } from '@/types'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
-import { useAuthStore } from '@/stores/authStore'
+// REMOVED: useAuthStore - no longer needed for public data queries
 
 interface GetCategoriesResponse {
   success: boolean
@@ -14,7 +14,8 @@ interface GetCategoriesResponse {
 const CATEGORY_ORDER = ['Ügyvezetés', 'HR', 'Marketing', 'Értékesítés', 'Működés'];
 
 export const useCategories = () => {
-  const { authReady } = useAuthStore()
+  // FIXED: Removed authReady dependency - categories are public data
+  // No need to wait for Firebase Auth for public endpoints
 
   return useQuery<Category[]>({
     queryKey: ['categories'],
@@ -47,9 +48,7 @@ export const useCategories = () => {
         throw error
       }
     },
-    // Wait for Firebase Auth to initialize before calling the function
-    // This ensures the auth context is ready (even if user is not logged in)
-    enabled: authReady,
+    // FIXED: Removed enabled: authReady - this is public data, fetch immediately
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     retry: 1,

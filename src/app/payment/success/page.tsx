@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { CheckCircle, ArrowRight, Download } from 'lucide-react';
+import { CheckCircle, ArrowRight, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import confetti from 'canvas-confetti';
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [courseId, setCourseId] = useState<string | null>(null);
@@ -90,5 +90,23 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function SuccessLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+    </div>
+  );
+}
+
+// Wrap in Suspense for useSearchParams
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<SuccessLoading />}>
+      <PaymentSuccessPageContent />
+    </Suspense>
   );
 }
