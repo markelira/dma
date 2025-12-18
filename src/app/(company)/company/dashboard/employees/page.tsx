@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import {
@@ -10,24 +10,17 @@ import {
   CheckCircle2,
   Clock,
   X,
-  Filter,
   Loader2,
   AlertCircle,
-  UserMinus,
-  TrendingUp,
-  Award,
-  AlertTriangle,
-  Download,
-  Target
+  UserMinus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import Link from 'next/link';
-import { Company, CompanyEmployee, AddEmployeeInput, DashboardStats, EmployeeProgress, CompanyDashboardData } from '@/types/company';
+import { Company, CompanyEmployee, AddEmployeeInput, EmployeeProgress, CompanyDashboardData } from '@/types/company';
 import { useRemoveEmployee } from '@/hooks/useCompanyActions';
-import { StatCard } from '@/components/dashboard/StatCard';
 
 export default function EmployeesPage() {
   const router = useRouter();
@@ -58,14 +51,10 @@ export default function EmployeesPage() {
   });
 
   // Progress tracking state
-  const [progressData, setProgressData] = useState<CompanyDashboardData | null>(null);
-  const [progressStats, setProgressStats] = useState<DashboardStats | null>(null);
   const [progressEmployees, setProgressEmployees] = useState<EmployeeProgress[]>([]);
-  const [masterclasses, setMasterclasses] = useState<{ id: string; title: string; duration: number }[]>([]);
-  const [selectedMasterclass, setSelectedMasterclass] = useState<string>('all');
-  const [progressStatusFilter, setProgressStatusFilter] = useState<string>('all');
+  const [progressStatusFilter, setProgressStatusFilter] = useState<string>('in-progress');
+  const [selectedEmployee, setSelectedEmployee] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(false);
-  const [sendingReminder, setSendingReminder] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -148,22 +137,14 @@ export default function EmployeesPage() {
       try {
         const getCompanyDashboard = httpsCallable(functions, 'getCompanyDashboard');
 
-        const input: any = { companyId: user.companyId };
-        if (selectedMasterclass !== 'all') {
-          input.masterclassId = selectedMasterclass;
-        }
-
-        const result = await getCompanyDashboard(input);
+        const result = await getCompanyDashboard({ companyId: user.companyId });
         const data = result.data as CompanyDashboardData;
 
-        setProgressData(data);
-        setProgressStats(data.stats);
         setProgressEmployees(data.employees.map((emp: any) => ({
           ...emp,
           lastActivityAt: emp.lastActivityAt ? new Date(emp.lastActivityAt) : undefined,
           enrolledAt: new Date(emp.enrolledAt),
         })));
-        setMasterclasses(data.masterclasses);
       } catch (err: any) {
         console.error('Error loading progress data:', err);
       } finally {
@@ -172,7 +153,7 @@ export default function EmployeesPage() {
     };
 
     loadProgressData();
-  }, [user, authLoading, selectedMasterclass]);
+  }, [user, authLoading]);
 
   const loadMore = async () => {
     if (!company || !lastDoc || !hasMore || loadingMore) return;
@@ -308,62 +289,63 @@ export default function EmployeesPage() {
     }
   };
 
-  // Progress tracking helper functions
-  const handleExportCSV = async () => {
-    if (!user?.companyId) return;
-
-    try {
-      const generateCSV = httpsCallable(functions, 'generateCSVReport');
-
-      const input: any = { companyId: user.companyId };
-      if (selectedMasterclass !== 'all') {
-        input.masterclassId = selectedMasterclass;
+  // Computed values for filters
+  const uniqueEmployees = useMemo(() => {
+    const seen = new Map<string, { id: string; name: string }>();
+    progressEmployees.forEach((emp) => {
+      if (!seen.has(emp.employeeId)) {
+        seen.set(emp.employeeId, { id: emp.employeeId, name: emp.employeeName });
       }
+    });
+    return Array.from(seen.values());
+  }, [progressEmployees]);
 
-      const result = await generateCSV(input);
-      const data = result.data as any;
+  const inProgressCount = progressEmployees.filter(e =>
+    e.status === 'active' || e.status === 'at-risk' || e.status === 'in-progress' || e.status === 'not-started'
+  ).length;
 
-      if (data.success && data.downloadUrl) {
-        window.open(data.downloadUrl, '_blank');
-      }
-    } catch (err: any) {
-      console.error('Error exporting CSV:', err);
-      alert('Hiba történt az export során: ' + (err.message || 'Ismeretlen hiba'));
-    }
-  };
+  const watchlistCount = progressEmployees.filter(e => e.status === 'watchlist').length;
 
-  const handleSendReminder = async (employeeId: string, masterclassId?: string) => {
-    if (!user?.companyId) return;
-
-    const key = `${employeeId}-${masterclassId || 'all'}`;
-    try {
-      setSendingReminder(key);
-      const sendReminder = httpsCallable(functions, 'sendEmployeeReminder');
-
-      const result = await sendReminder({
-        companyId: user.companyId,
-        employeeId,
-        masterclassId,
-      });
-
-      const data = result.data as any;
-      if (data.success) {
-        alert('Emlékeztető sikeresen elküldve!');
-      }
-    } catch (err: any) {
-      console.error('Error sending reminder:', err);
-      alert('Hiba történt az emlékeztető küldése során: ' + (err.message || 'Ismeretlen hiba'));
-    } finally {
-      setSendingReminder(null);
-    }
-  };
-
+  const completedCount = progressEmployees.filter(e => e.status === 'completed').length;
 
   // Filtered progress data
-  const filteredProgressData = progressEmployees.filter((emp) => {
-    if (progressStatusFilter === 'all') return true;
-    return emp.status === progressStatusFilter;
-  });
+  const filteredProgressData = useMemo(() => {
+    return progressEmployees.filter((emp) => {
+      // Employee filter
+      if (selectedEmployee !== 'all' && emp.employeeId !== selectedEmployee) {
+        return false;
+      }
+
+      // Status filter
+      if (progressStatusFilter === 'in-progress') {
+        return emp.status === 'active' || emp.status === 'at-risk' || emp.status === 'in-progress' || emp.status === 'not-started';
+      }
+      if (progressStatusFilter === 'watchlist') {
+        return emp.status === 'watchlist';
+      }
+      if (progressStatusFilter === 'completed') {
+        return emp.status === 'completed';
+      }
+
+      return true;
+    });
+  }, [progressEmployees, selectedEmployee, progressStatusFilter]);
+
+  // Sorted progress data
+  const sortedProgressData = useMemo(() => {
+    return [...filteredProgressData].sort((a, b) => {
+      const statusOrder: Record<string, number> = { 'watchlist': 0, 'not-started': 1, 'in-progress': 1, 'active': 1, 'at-risk': 1, 'completed': 2 };
+      const aOrder = statusOrder[a.status] ?? 1;
+      const bOrder = statusOrder[b.status] ?? 1;
+
+      if (aOrder !== bOrder) return aOrder - bOrder;
+
+      // Within in-progress, sort by percentage ascending
+      if (aOrder === 1) return a.progressPercent - b.progressPercent;
+
+      return 0;
+    });
+  }, [filteredProgressData]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -706,117 +688,67 @@ export default function EmployeesPage() {
       <div className="mt-12 pt-8 border-t border-gray-200">
         {/* Section Header */}
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Tanulási Haladás</h2>
-          <p className="text-gray-600">Kövesd nyomon az alkalmazottak tanulási előrehaladását</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Nyomonkövetés</h2>
+          <p className="text-gray-600">Legyél naprakész munkatársaid előrehaladásával</p>
         </div>
 
-        {/* Progress Stats Cards */}
-        {progressStats && (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-5 mb-6">
-            <StatCard
-              icon={Users}
-              label="Összes alkalmazott"
-              value={progressStats.totalEmployees}
-              isLoading={loadingProgress}
-            />
-            <StatCard
-              icon={TrendingUp}
-              label="Aktív"
-              value={progressStats.activeEmployees}
-              isLoading={loadingProgress}
-            />
-            <StatCard
-              icon={AlertTriangle}
-              label="Lemaradásban"
-              value={progressStats.atRiskCount}
-              isLoading={loadingProgress}
-            />
-            <StatCard
-              icon={Award}
-              label="Befejezések"
-              value={progressStats.completedCourses}
-              isLoading={loadingProgress}
-            />
-            <StatCard
-              icon={Target}
-              label="Átlagos haladás"
-              value={progressStats.averageProgress}
-              suffix="%"
-              isLoading={loadingProgress}
-            />
-          </div>
-        )}
 
-        {/* Progress Filters */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 mb-6">
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">Szűrők:</span>
-            </div>
-
-            <select
-              value={selectedMasterclass}
-              onChange={(e) => setSelectedMasterclass(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent text-sm"
+        {/* Status Filter Buttons */}
+        <div className="flex items-center gap-3 mb-4">
+          {[
+            { value: 'in-progress', label: 'Folyamatban', count: inProgressCount },
+            { value: 'watchlist', label: 'Saját listán', count: watchlistCount },
+            { value: 'completed', label: 'Befejezve', count: completedCount },
+          ].map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setProgressStatusFilter(option.value)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                progressStatusFilter === option.value
+                  ? 'bg-red-100 text-red-700 border border-red-200'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
             >
-              <option value="all">Minden képzés</option>
-              {masterclasses.map((mc) => (
-                <option key={mc.id} value={mc.id}>
-                  {mc.title}
-                </option>
-              ))}
-            </select>
+              {option.label} ({option.count})
+            </button>
+          ))}
+        </div>
 
-            <div className="flex items-center gap-2">
-              {[
-                { value: 'all', label: 'Mind' },
-                { value: 'active', label: 'Aktív' },
-                { value: 'at-risk', label: 'Lemaradásban' },
-                { value: 'completed', label: 'Befejezett' },
-                { value: 'not-started', label: 'Nem kezdett' },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setProgressStatusFilter(option.value)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                    progressStatusFilter === option.value
-                      ? 'bg-brand-secondary text-white'
-                      : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-
-            <div className="sm:ml-auto">
-              <button
-                onClick={handleExportCSV}
-                disabled={loadingProgress}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export CSV
-              </button>
-            </div>
-          </div>
+        {/* Employee Filter */}
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <button
+            onClick={() => setSelectedEmployee('all')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              selectedEmployee === 'all'
+                ? 'bg-red-100 text-red-700 border border-red-200'
+                : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+            }`}
+          >
+            Minden munkatársam
+          </button>
+          {uniqueEmployees.map((emp) => (
+            <button
+              key={emp.id}
+              onClick={() => setSelectedEmployee(emp.id)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                selectedEmployee === emp.id
+                  ? 'bg-red-100 text-red-700 border border-red-200'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              {emp.name}
+            </button>
+          ))}
         </div>
 
         {/* Employee Progress Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-bold text-gray-900">
-              Alkalmazotti haladás ({filteredProgressData.length})
-            </h3>
-          </div>
-
           {loadingProgress ? (
             <div className="p-12 text-center">
               <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-brand-secondary" />
               <p className="text-gray-600">Betöltés...</p>
             </div>
-          ) : filteredProgressData.length === 0 ? (
+          ) : sortedProgressData.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-gray-400" />
@@ -834,30 +766,18 @@ export default function EmployeesPage() {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Alkalmazott
+                      Név
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Képzés
+                      Tartalom
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Haladás
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Leckék
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Státusz
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Utolsó aktivitás
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Műveletek
-                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {filteredProgressData.map((emp) => (
+                  {sortedProgressData.map((emp) => (
                     <tr key={`${emp.employeeId}-${emp.masterclassId}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -870,10 +790,6 @@ export default function EmployeesPage() {
                             <div className="text-sm font-medium text-gray-900">
                               {emp.employeeName}
                             </div>
-                            <div className="text-xs text-gray-500">{emp.email}</div>
-                            {emp.jobTitle && (
-                              <div className="text-xs text-gray-400">{emp.jobTitle}</div>
-                            )}
                           </div>
                         </div>
                       </td>
@@ -881,72 +797,28 @@ export default function EmployeesPage() {
                         <div className="text-sm text-gray-900">{emp.masterclassTitle}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-1 w-24">
-                            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full transition-all ${
-                                  emp.progressPercent === 100
-                                    ? 'bg-green-500'
-                                    : emp.status === 'at-risk'
-                                    ? 'bg-red-500'
-                                    : 'bg-brand-secondary/50'
-                                }`}
-                                style={{ width: `${emp.progressPercent}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div className="text-sm font-medium text-gray-900 min-w-[3rem] text-right">
-                            {emp.progressPercent}%
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {emp.completedLessons} / {emp.totalLessons}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {emp.status === 'completed' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                        {emp.status === 'watchlist' ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
+                            Saját listán
+                          </span>
+                        ) : emp.status === 'completed' ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-green-100 text-green-700">
                             Befejezve
                           </span>
-                        ) : emp.status === 'at-risk' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            Lemaradásban
-                          </span>
-                        ) : emp.status === 'active' ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary-hover">
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                            Aktív
-                          </span>
                         ) : (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            <Clock className="w-3 h-3 mr-1" />
-                            Nem kezdett
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {emp.lastActivityAt
-                          ? new Date(emp.lastActivityAt).toLocaleDateString('hu-HU')
-                          : 'Nincs'}
-                        {emp.daysActive > 0 && (
-                          <div className="text-xs text-gray-400">{emp.daysActive} napja</div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        {emp.status === 'at-risk' && (
-                          <button
-                            onClick={() => handleSendReminder(emp.employeeId, emp.masterclassId)}
-                            disabled={sendingReminder === `${emp.employeeId}-${emp.masterclassId}`}
-                            className="inline-flex items-center px-3 py-1.5 text-sm text-brand-secondary hover:text-brand-secondary-hover hover:bg-brand-secondary/5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            <Mail className="w-4 h-4 mr-1" />
-                            {sendingReminder === `${emp.employeeId}-${emp.masterclassId}` ? 'Küldés...' : 'Emlékeztető'}
-                          </button>
+                          <div className="flex items-center space-x-3">
+                            <div className="flex-1 w-24">
+                              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full bg-amber-400 transition-all"
+                                  style={{ width: `${emp.progressPercent}%` }}
+                                />
+                              </div>
+                            </div>
+                            <span className="text-sm font-medium text-amber-600">
+                              {emp.progressPercent}%
+                            </span>
+                          </div>
                         )}
                       </td>
                     </tr>
