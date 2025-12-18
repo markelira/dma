@@ -21,7 +21,8 @@ import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useGamificationData, useSaveUserPreferences } from '@/hooks/useGamification';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import type { UserPreferences, Course } from '@/types';
-import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils';
+import { sortByContentCreatedAt } from '@/lib/carouselUtils';
+import { shuffleArray } from '@/lib/utils';
 
 /**
  * DMA Dashboard - Netflix-Style Content Browser
@@ -261,35 +262,33 @@ export default function DashboardPage() {
       .filter((e): e is NonNullable<typeof e> => e !== null);
   }, [enrollments, courses, instructors]);
 
-  // Build category rows - check multiple category field formats
+  // Build category rows - shuffled for variety
   const categoryRows = useMemo(() => {
     if (!categories || !courses) return [];
 
     return categories
       .map(category => {
-        const categoryCourses = courses
-          .filter(course => {
-            // Check array format (categoryIds)
-            if (course.categoryIds?.includes(category.id)) return true;
-            // Check nested object format (category.id)
-            if (course.category?.id === category.id) return true;
-            // Check string format (categoryId) - fallback for older data
-            if ((course as any).categoryId === category.id) return true;
-            return false;
-          })
-          .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
+        const categoryCourses = courses.filter(course => {
+          // Check array format (categoryIds)
+          if (course.categoryIds?.includes(category.id)) return true;
+          // Check nested object format (category.id)
+          if (course.category?.id === category.id) return true;
+          // Check string format (categoryId) - fallback for older data
+          if ((course as any).categoryId === category.id) return true;
+          return false;
+        });
         return {
           category,
-          courses: categoryCourses,
+          courses: shuffleArray(categoryCourses),
         };
       })
       .filter(row => row.courses.length > 0);
   }, [categories, courses]);
 
-  // Always prepare a "Felkapott" section with top courses (shuffled)
+  // Always prepare a "Felkapott" section with courses (fully shuffled for variety)
   const popularCourses = useMemo(() => {
     if (!courses) return [];
-    return shufflePopularCourses(courses, 10);
+    return shuffleArray([...courses]).slice(0, 10);
   }, [courses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
@@ -304,17 +303,15 @@ export default function DashboardPage() {
     return courses && courses.length > 0 && categoryRows.length === 0;
   }, [courses, categoryRows]);
 
-  // Build target audience rows (top 2 most popular)
+  // Build target audience rows (top 2 most popular) - shuffled for variety
   const audienceRows = useMemo(() => {
     if (!targetAudiences || !courses) return [];
 
     const audienceCounts = targetAudiences.map(audience => {
-      const audienceCourses = courses
-        .filter(course => course.targetAudienceIds?.includes(audience.id))
-        .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0));
+      const audienceCourses = courses.filter(course => course.targetAudienceIds?.includes(audience.id));
       return {
         audience,
-        courses: audienceCourses,
+        courses: shuffleArray(audienceCourses),
         count: audienceCourses.length,
       };
     });
@@ -530,11 +527,11 @@ export default function DashboardPage() {
           />
         ))}
 
-        {/* Fallback: All Courses if no categories matched */}
+        {/* Fallback: All Courses if no categories matched - shuffled for variety */}
         {showFallbackSection && courses && (
           <CourseCarouselRow
             title="Felfedezés"
-            courses={[...courses].sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))}
+            courses={shuffleArray([...courses])}
             categories={categories || []}
             instructors={instructors || []}
             enrollments={enrollments || []}
@@ -555,9 +552,9 @@ export default function DashboardPage() {
           />
         ))}
 
-        {/* Course Type Carousels */}
+        {/* Course Type Carousels - shuffled for variety */}
         {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
-          const typeCourses = courses.filter(c => c.courseType === type);
+          const typeCourses = shuffleArray(courses.filter(c => c.courseType === type));
           if (typeCourses.length === 0) return null;
 
           const typeLabels: Record<string, string> = {
