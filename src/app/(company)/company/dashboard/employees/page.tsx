@@ -730,7 +730,7 @@ export default function EmployeesPage() {
         <div className="flex items-center gap-3 mb-4">
           {[
             { value: 'in-progress', label: 'Folyamatban', count: inProgressCount },
-            { value: 'not-started', label: 'Nem kezdte el', count: notStartedCount },
+            { value: 'not-started', label: 'Saját listán', count: notStartedCount },
             { value: 'completed', label: 'Befejezve', count: completedCount },
           ].map((option) => (
             <button
@@ -813,9 +813,11 @@ export default function EmployeesPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Tartalom
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Haladás
-                    </th>
+                    {progressStatusFilter !== 'not-started' && (
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Haladás
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
@@ -838,31 +840,33 @@ export default function EmployeesPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">{emp.masterclassTitle}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {emp.status === 'completed' ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-green-100 text-green-700">
-                            Befejezve
-                          </span>
-                        ) : emp.progressPercent === 0 ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
-                            Nem kezdte el
-                          </span>
-                        ) : (
-                          <div className="flex items-center space-x-3">
-                            <div className="flex-1 w-24">
-                              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-amber-400 transition-all"
-                                  style={{ width: `${emp.progressPercent}%` }}
-                                />
-                              </div>
-                            </div>
-                            <span className="text-sm font-medium text-amber-600">
-                              {emp.progressPercent}%
+                      {progressStatusFilter !== 'not-started' && (
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {emp.status === 'completed' ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-green-100 text-green-700">
+                              Befejezve
                             </span>
-                          </div>
-                        )}
-                      </td>
+                          ) : emp.progressPercent === 0 ? (
+                            <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
+                              Saját listán
+                            </span>
+                          ) : (
+                            <div className="flex items-center space-x-3">
+                              <div className="flex-1 w-24">
+                                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-amber-400 transition-all"
+                                    style={{ width: `${emp.progressPercent}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <span className="text-sm font-medium text-amber-600">
+                                {emp.progressPercent}%
+                              </span>
+                            </div>
+                          )}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
