@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Clock,
   X,
-  Search,
   Filter,
   Loader2,
   AlertCircle,
@@ -38,8 +37,6 @@ export default function EmployeesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'invited' | 'left'>('all');
   const [submitting, setSubmitting] = useState(false);
   const [removingEmployeeId, setRemovingEmployeeId] = useState<string | null>(null);
   const [showRemoveConfirm, setShowRemoveConfirm] = useState<CompanyEmployee | null>(null);
@@ -361,24 +358,6 @@ export default function EmployeesPage() {
     }
   };
 
-  const filteredEmployees = employees.filter(emp => {
-    // Status filter
-    if (statusFilter !== 'all' && emp.status !== statusFilter) {
-      return false;
-    }
-
-    // Search filter
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      return (
-        emp.fullName.toLowerCase().includes(search) ||
-        emp.email.toLowerCase().includes(search) ||
-        emp.jobTitle?.toLowerCase().includes(search)
-      );
-    }
-
-    return true;
-  });
 
   // Filtered progress data
   const filteredProgressData = progressEmployees.filter((emp) => {
@@ -392,24 +371,23 @@ export default function EmployeesPage() {
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
             <CheckCircle2 className="w-3 h-3 mr-1" />
-            Aktív
+            AKTÍV
           </span>
         );
       case 'invited':
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
             <Clock className="w-3 h-3 mr-1" />
-            Meghívott
+            MEGHÍVVA
           </span>
         );
       case 'left':
+      default:
         return (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Kilépett
+            INAKTÍV
           </span>
         );
-      default:
-        return null;
     }
   };
 
@@ -438,12 +416,6 @@ export default function EmployeesPage() {
     );
   }
 
-  const stats = {
-    total: employees.length,
-    active: employees.filter(e => e.status === 'active').length,
-    invited: employees.filter(e => e.status === 'invited').length
-  };
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -461,68 +433,6 @@ export default function EmployeesPage() {
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <StatCard
-          icon={Users}
-          label="Összes munkatárs"
-          value={stats.total}
-          isLoading={loading}
-        />
-        <StatCard
-          icon={TrendingUp}
-          label="Aktív"
-          value={stats.active}
-          isLoading={loading}
-        />
-        <StatCard
-          icon={Clock}
-          label="Meghívott"
-          value={stats.invited}
-          isLoading={loading}
-        />
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Keresés név, email vagy pozíció szerint..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-secondary focus:border-transparent"
-            />
-          </div>
-
-          {/* Status Filter */}
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
-            {[
-              { value: 'all', label: 'Mind' },
-              { value: 'active', label: 'Aktív' },
-              { value: 'invited', label: 'Meghívott' },
-              { value: 'left', label: 'Kilépett' },
-            ].map((option) => (
-              <button
-                key={option.value}
-                onClick={() => setStatusFilter(option.value as any)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  statusFilter === option.value
-                    ? 'bg-brand-secondary text-white'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'
-                }`}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Employee Table */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
@@ -533,41 +443,35 @@ export default function EmployeesPage() {
                   Név
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Pozíció
+                  E-mail
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Státusz
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Képzések
-                </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Műveletek
-                </th>
+                <th className="px-6 py-3"></th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-100">
-              {filteredEmployees.length === 0 ? (
+              {employees.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={4} className="px-6 py-12 text-center">
                     <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                       <Users className="w-8 h-8 text-gray-400" />
                     </div>
-                    <p className="text-gray-600 font-medium">
-                      {searchTerm || statusFilter !== 'all'
-                        ? 'Nincs találat a keresési feltételekkel'
-                        : 'Még nincs hozzáadott munkatárs'}
+                    <p className="text-gray-600 font-medium mb-4">
+                      Még nincs hozzáadott munkatársad
                     </p>
-                    {!searchTerm && statusFilter === 'all' && (
-                      <p className="text-sm text-gray-500 mt-1">Kezdd el az első meghívó küldésével!</p>
-                    )}
+                    <button
+                      onClick={() => setShowAddModal(true)}
+                      className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors"
+                    >
+                      <UserPlus className="w-5 h-5 mr-2" />
+                      Első munkatárs hozzáadása
+                    </button>
                   </td>
                 </tr>
               ) : (
-                filteredEmployees.map((employee) => (
+                employees.map((employee) => (
                   <tr key={employee.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -587,42 +491,25 @@ export default function EmployeesPage() {
                       <div className="text-sm text-gray-900">{employee.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-600">{employee.jobTitle || '-'}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(employee.status)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {employee.enrolledMasterclasses?.length || 0}
-                      </div>
-                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end space-x-2">
-                        {/* Remove button - for invited and active status */}
-                        {employee.status !== 'left' && (
-                          <button
-                            onClick={() => setShowRemoveConfirm(employee)}
-                            disabled={removingEmployeeId === employee.id}
-                            className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                            title={employee.status === 'invited' ? 'Meghívó visszavonása' : 'Eltávolítás'}
-                          >
-                            {removingEmployeeId === employee.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
-                            ) : employee.status === 'invited' ? (
-                              <>
-                                <X className="w-4 h-4 mr-1" />
-                                Visszavonás
-                              </>
-                            ) : (
-                              <>
-                                <UserMinus className="w-4 h-4 mr-1" />
-                                Eltávolítás
-                              </>
-                            )}
-                          </button>
-                        )}
-                      </div>
+                      {employee.status !== 'left' && (
+                        <button
+                          onClick={() => setShowRemoveConfirm(employee)}
+                          disabled={removingEmployeeId === employee.id}
+                          className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          {removingEmployeeId === employee.id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <>
+                              <UserMinus className="w-4 h-4 mr-1" />
+                              Eltávolítás
+                            </>
+                          )}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -632,7 +519,7 @@ export default function EmployeesPage() {
         </div>
 
         {/* Load More Button */}
-        {hasMore && filteredEmployees.length > 0 && (
+        {hasMore && employees.length > 0 && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button
               onClick={loadMore}
@@ -787,23 +674,11 @@ export default function EmployeesPage() {
                 </div>
 
                 <h3 className="text-lg font-bold text-gray-900 mb-2">
-                  {showRemoveConfirm.status === 'invited'
-                    ? 'Meghívó visszavonása'
-                    : 'Munkatárs eltávolítása'}
+                  Munkatárs eltávolítása
                 </h3>
 
                 <p className="text-gray-600 mb-6">
-                  {showRemoveConfirm.status === 'invited' ? (
-                    <>
-                      Biztosan visszavonod <span className="font-medium">{showRemoveConfirm.fullName}</span> meghívóját?
-                      A meghívó link többé nem lesz érvényes.
-                    </>
-                  ) : (
-                    <>
-                      Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> munkatársat a vállalatból?
-                      A munkatárs elveszíti hozzáférését a vállalati tartalmakhoz.
-                    </>
-                  )}
+                  Biztosan eltávolítod <span className="font-medium">{showRemoveConfirm.fullName}</span> munkatársad az előfizetésből? Minden tartalomhoz való hozzáférését el fogja veszíteni.
                 </p>
 
                 <div className="flex space-x-3">
@@ -817,17 +692,8 @@ export default function EmployeesPage() {
                     onClick={() => handleRemoveEmployee(showRemoveConfirm)}
                     className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors inline-flex items-center justify-center"
                   >
-                    {showRemoveConfirm.status === 'invited' ? (
-                      <>
-                        <X className="w-4 h-4 mr-2" />
-                        Visszavonás
-                      </>
-                    ) : (
-                      <>
-                        <UserMinus className="w-4 h-4 mr-2" />
-                        Eltávolítás
-                      </>
-                    )}
+                    <UserMinus className="w-4 h-4 mr-2" />
+                    Eltávolítás
                   </button>
                 </div>
               </div>
