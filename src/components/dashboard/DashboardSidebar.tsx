@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuthStore } from '@/stores/authStore'
 import { motion } from 'motion/react'
 import {
   Home,
@@ -157,7 +157,7 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
 
 export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
   const pathname = usePathname()
-  const { user, loading, logout } = useAuth()
+  const { user, isLoading: loading, logout } = useAuthStore()
   const router = useRouter()
   
   const handleLogout = async () => {
