@@ -124,8 +124,8 @@ export function FreeTrialModal({
                     className="grid grid-cols-2 gap-x-4 gap-y-3"
                   >
                     {benefits.map((benefit, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                      <div key={index} className="flex items-center gap-2">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
                           <Check className="w-3 h-3 text-green-600" />
                         </div>
                         <span className="text-sm text-gray-700 leading-tight">{benefit}</span>
