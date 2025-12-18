@@ -14,6 +14,7 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { sortByContentCreatedAt } from '@/lib/carouselUtils';
+import { shuffleArray } from '@/lib/utils';
 import type { Course } from '@/types';
 
 // Helper to get first lesson ID from course (flat lessons array)
@@ -137,7 +138,7 @@ export default function AkademiaPage() {
     });
   }, [filteredCourses, instructors, enrollments]);
 
-  // Build category rows
+  // Build category rows - shuffled for variety
   const categoryRows = useMemo(() => {
     if (!categories || !filteredCourses.length) return [];
 
@@ -149,17 +150,15 @@ export default function AkademiaPage() {
           if ((course as any).categoryId === category.id) return true;
           return false;
         });
-        return { category, courses: categoryCourses };
+        return { category, courses: shuffleArray(categoryCourses) };
       })
       .filter(row => row.courses.length > 0);
   }, [categories, filteredCourses]);
 
-  // Popular courses
+  // Popular courses - shuffled for variety
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return [...filteredCourses]
-      .sort((a, b) => (b.enrollmentCount || 0) - (a.enrollmentCount || 0))
-      .slice(0, 10);
+    return shuffleArray([...filteredCourses]).slice(0, 10);
   }, [filteredCourses]);
 
   // Newest courses

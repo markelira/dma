@@ -17,7 +17,7 @@ import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import type { Course } from '@/types';
 import { shuffleArray } from '@/lib/utils';
-import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils';
+import { sortByContentCreatedAt } from '@/lib/carouselUtils';
 
 /**
  * Company Dashboard - Netflix-Style Content Browser
@@ -259,10 +259,10 @@ export default function CompanyDashboardPage() {
       .filter(row => row.courses.length > 0);
   }, [categories, filteredCourses]);
 
-  // Always prepare a "Felkapott" section with top courses (shuffled)
+  // Always prepare a "Felkapott" section with courses (fully shuffled for variety)
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return shufflePopularCourses(filteredCourses, 10);
+    return shuffleArray([...filteredCourses]).slice(0, 10);
   }, [filteredCourses]);
 
   // Newest courses (for "Legújabb tartalmak" section)

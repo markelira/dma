@@ -10,6 +10,7 @@ import { useCategories } from '@/hooks/useCategoryQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { useEnrollments } from '@/hooks/useEnrollments';
 import { shuffleArray } from '@/lib/utils';
+import { sortByContentCreatedAt } from '@/lib/carouselUtils';
 import type { Course } from '@/types';
 
 interface CategoryCoursesPageProps {
@@ -125,12 +126,8 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
       return names;
     };
 
-    // Sort by createdAt (newest first) and take top 5
-    const sortedCourses = [...filteredCourses].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA;
-    }).slice(0, 5);
+    // Sort by contentCreatedAt (newest first) and take top 5
+    const sortedCourses = sortByContentCreatedAt(filteredCourses).slice(0, 5);
 
     return sortedCourses.map(course => {
       const enrollment = enrollments?.find(e => e.courseId === course.id);
@@ -150,7 +147,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
     });
   }, [filteredCourses, instructors, enrollments]);
 
-  // Build category rows
+  // Build category rows - shuffled for variety
   const categoryRows = useMemo(() => {
     if (!categories || !filteredCourses.length) return [];
 
@@ -162,7 +159,7 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
           if ((course as any).categoryId === category.id) return true;
           return false;
         });
-        return { category, courses: categoryCourses };
+        return { category, courses: shuffleArray(categoryCourses) };
       })
       .filter(row => row.courses.length > 0);
   }, [categories, filteredCourses]);
@@ -173,12 +170,10 @@ export function CategoryCoursesPage({ courseType, title, description }: Category
     return shuffleArray([...filteredCourses]).slice(0, 10);
   }, [filteredCourses]);
 
-  // Newest courses in this category
+  // Newest courses in this category - sorted by contentCreatedAt
   const newestCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return [...filteredCourses]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, 10);
+    return sortByContentCreatedAt(filteredCourses).slice(0, 10);
   }, [filteredCourses]);
 
   const isLoading = coursesLoading || categoriesLoading || instructorsLoading || enrollmentsLoading;
