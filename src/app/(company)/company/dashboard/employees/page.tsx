@@ -42,6 +42,7 @@ export default function EmployeesPage() {
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const EMPLOYEES_PER_PAGE = 50;
+  const MAX_EMPLOYEES = 5;
 
   const [newEmployee, setNewEmployee] = useState({
     email: '',
@@ -55,6 +56,11 @@ export default function EmployeesPage() {
   const [progressStatusFilter, setProgressStatusFilter] = useState<string>('in-progress');
   const [selectedEmployee, setSelectedEmployee] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(false);
+
+  // Progress tracking pagination
+  const [progressPageSize, setProgressPageSize] = useState<number>(10);
+  const [progressCurrentPage, setProgressCurrentPage] = useState(1);
+  const PAGE_SIZE_OPTIONS = [10, 25, 50, 100, 0]; // 0 = all
 
   useEffect(() => {
     const fetchData = async () => {
@@ -259,6 +265,8 @@ export default function EmployeesPage() {
 
       if (err.code === 'already-exists') {
         setError('Ez az email cím már szerepel a munkatársak között');
+      } else if (err.code === 'resource-exhausted') {
+        setError(`Elérted a maximális ${MAX_EMPLOYEES} munkatárs limitet. Távolíts el valakit, ha újat szeretnél hozzáadni.`);
       } else {
         setError(err.message || 'Hiba történt a munkatárs hozzáadása során');
       }
@@ -300,11 +308,15 @@ export default function EmployeesPage() {
     return Array.from(seen.values());
   }, [progressEmployees]);
 
+  // "Folyamatban" - exclude 0% progress (those go to "Saját listán")
   const inProgressCount = progressEmployees.filter(e =>
-    e.status === 'active' || e.status === 'at-risk' || e.status === 'in-progress' || e.status === 'not-started'
+    (e.status === 'active' || e.status === 'at-risk' || e.status === 'in-progress') && e.progressPercent > 0
   ).length;
 
-  const watchlistCount = progressEmployees.filter(e => e.status === 'watchlist').length;
+  // "Saját listán" - enrolled with 0% progress (not started yet)
+  const notStartedCount = progressEmployees.filter(e =>
+    e.progressPercent === 0 && e.status !== 'completed' && e.status !== 'watchlist'
+  ).length;
 
   const completedCount = progressEmployees.filter(e => e.status === 'completed').length;
 
@@ -318,10 +330,12 @@ export default function EmployeesPage() {
 
       // Status filter
       if (progressStatusFilter === 'in-progress') {
-        return emp.status === 'active' || emp.status === 'at-risk' || emp.status === 'in-progress' || emp.status === 'not-started';
+        // Only show items with progress > 0%
+        return (emp.status === 'active' || emp.status === 'at-risk' || emp.status === 'in-progress') && emp.progressPercent > 0;
       }
-      if (progressStatusFilter === 'watchlist') {
-        return emp.status === 'watchlist';
+      if (progressStatusFilter === 'not-started') {
+        // Enrolled but 0% progress (not started yet)
+        return emp.progressPercent === 0 && emp.status !== 'completed' && emp.status !== 'watchlist';
       }
       if (progressStatusFilter === 'completed') {
         return emp.status === 'completed';
@@ -346,6 +360,19 @@ export default function EmployeesPage() {
       return 0;
     });
   }, [filteredProgressData]);
+
+  // Paginated progress data
+  const paginatedProgressData = useMemo(() => {
+    if (progressPageSize === 0) return sortedProgressData; // Show all
+    const start = (progressCurrentPage - 1) * progressPageSize;
+    return sortedProgressData.slice(start, start + progressPageSize);
+  }, [sortedProgressData, progressCurrentPage, progressPageSize]);
+
+  const totalProgressPages = progressPageSize === 0 ? 1 : Math.ceil(sortedProgressData.length / progressPageSize);
+
+  // Employee limit calculation
+  const activeEmployeeCount = employees.filter(e => e.status !== 'left').length;
+  const remainingSlots = MAX_EMPLOYEES - activeEmployeeCount;
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -404,11 +431,17 @@ export default function EmployeesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Munkatársaim</h1>
-          <p className="text-gray-600">Adj hozzá 5 munkatársat, hogy ők is a kaland részesei legyenek.</p>
+          <p className="text-gray-600">
+            {remainingSlots > 0
+              ? `Még ${remainingSlots} munkatársat adhatsz hozzá (${activeEmployeeCount}/${MAX_EMPLOYEES})`
+              : `Elérted a maximális ${MAX_EMPLOYEES} munkatárs limitet`
+            }
+          </p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm"
+          disabled={remainingSlots <= 0}
+          className="inline-flex items-center px-4 py-2 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <UserPlus className="w-5 h-5 mr-2" />
           Új munkatárs hozzáadása
@@ -697,12 +730,15 @@ export default function EmployeesPage() {
         <div className="flex items-center gap-3 mb-4">
           {[
             { value: 'in-progress', label: 'Folyamatban', count: inProgressCount },
-            { value: 'watchlist', label: 'Saját listán', count: watchlistCount },
+            { value: 'not-started', label: 'Nem kezdte el', count: notStartedCount },
             { value: 'completed', label: 'Befejezve', count: completedCount },
           ].map((option) => (
             <button
               key={option.value}
-              onClick={() => setProgressStatusFilter(option.value)}
+              onClick={() => {
+                setProgressStatusFilter(option.value);
+                setProgressCurrentPage(1); // Reset page when filter changes
+              }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 progressStatusFilter === option.value
                   ? 'bg-red-100 text-red-700 border border-red-200'
@@ -717,7 +753,10 @@ export default function EmployeesPage() {
         {/* Employee Filter */}
         <div className="flex flex-wrap items-center gap-2 mb-6">
           <button
-            onClick={() => setSelectedEmployee('all')}
+            onClick={() => {
+              setSelectedEmployee('all');
+              setProgressCurrentPage(1);
+            }}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               selectedEmployee === 'all'
                 ? 'bg-red-100 text-red-700 border border-red-200'
@@ -729,7 +768,10 @@ export default function EmployeesPage() {
           {uniqueEmployees.map((emp) => (
             <button
               key={emp.id}
-              onClick={() => setSelectedEmployee(emp.id)}
+              onClick={() => {
+                setSelectedEmployee(emp.id);
+                setProgressCurrentPage(1);
+              }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 selectedEmployee === emp.id
                   ? 'bg-red-100 text-red-700 border border-red-200'
@@ -748,7 +790,7 @@ export default function EmployeesPage() {
               <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-brand-secondary" />
               <p className="text-gray-600">Betöltés...</p>
             </div>
-          ) : sortedProgressData.length === 0 ? (
+          ) : paginatedProgressData.length === 0 ? (
             <div className="p-12 text-center">
               <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-gray-400" />
@@ -777,7 +819,7 @@ export default function EmployeesPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-100">
-                  {sortedProgressData.map((emp) => (
+                  {paginatedProgressData.map((emp) => (
                     <tr key={`${emp.employeeId}-${emp.masterclassId}`} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -797,13 +839,13 @@ export default function EmployeesPage() {
                         <div className="text-sm text-gray-900">{emp.masterclassTitle}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {emp.status === 'watchlist' ? (
-                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
-                            Saját listán
-                          </span>
-                        ) : emp.status === 'completed' ? (
+                        {emp.status === 'completed' ? (
                           <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-green-100 text-green-700">
                             Befejezve
+                          </span>
+                        ) : emp.progressPercent === 0 ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-lg text-sm font-medium bg-gray-100 text-gray-700">
+                            Nem kezdte el
                           </span>
                         ) : (
                           <div className="flex items-center space-x-3">
@@ -825,6 +867,52 @@ export default function EmployeesPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {sortedProgressData.length > 0 && (
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Sorok száma:</span>
+                <select
+                  value={progressPageSize}
+                  onChange={(e) => {
+                    setProgressPageSize(Number(e.target.value));
+                    setProgressCurrentPage(1);
+                  }}
+                  className="px-2 py-1 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-secondary"
+                >
+                  {PAGE_SIZE_OPTIONS.map(size => (
+                    <option key={size} value={size}>{size === 0 ? 'Mind' : size}</option>
+                  ))}
+                </select>
+                <span className="text-sm text-gray-500 ml-2">
+                  ({sortedProgressData.length} összesen)
+                </span>
+              </div>
+
+              {totalProgressPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setProgressCurrentPage(p => Math.max(1, p - 1))}
+                    disabled={progressCurrentPage === 1}
+                    className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Előző
+                  </button>
+                  <span className="text-sm text-gray-600">
+                    {progressCurrentPage} / {totalProgressPages}
+                  </span>
+                  <button
+                    onClick={() => setProgressCurrentPage(p => Math.min(totalProgressPages, p + 1))}
+                    disabled={progressCurrentPage === totalProgressPages}
+                    className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Következő
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

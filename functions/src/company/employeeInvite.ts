@@ -122,6 +122,24 @@ export const addEmployee = https.onCall(
         }
       }
 
+      // 2c. Check employee limit (max 5 employees per company)
+      const MAX_EMPLOYEES = 5;
+      const activeEmployeesSnapshot = await db
+        .collection('companies')
+        .doc(companyId)
+        .collection('employees')
+        .where('status', 'in', ['invited', 'active']) // Don't count 'left' employees
+        .get();
+
+      if (activeEmployeesSnapshot.size >= MAX_EMPLOYEES) {
+        throw new HttpsError(
+          'resource-exhausted',
+          `Maximum ${MAX_EMPLOYEES} munkatársat adhatsz hozzá. Távolíts el valakit, ha újat szeretnél hozzáadni.`
+        );
+      }
+
+      console.log(`📊 [addEmployee] Employee count: ${activeEmployeesSnapshot.size}/${MAX_EMPLOYEES}`);
+
       // 3. Generate secure invite token
       const inviteToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date();
