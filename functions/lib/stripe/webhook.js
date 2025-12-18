@@ -693,7 +693,7 @@ async function handleSubscriptionDeleted(subscription) {
 }
 /**
  * Handle invoice.payment_succeeded
- * Reactivates subscription after successful payment
+ * Reactivates subscription after successful payment across all storage locations
  */
 async function handleInvoicePaymentSucceeded(invoice, stripe) {
     try {
@@ -707,7 +707,36 @@ async function handleInvoicePaymentSucceeded(invoice, stripe) {
         // Get subscription to check status
         const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
         if (subscription.status === 'active') {
+            // 1. Update team subscription (legacy)
             await (0, createTeam_1.updateTeamSubscription)(subscription.id, 'active');
+            // 2. Update company subscription (B2B)
+            await updateCompanySubscription(subscription.id, 'active');
+            // 3. Update subscriptions collection AND user document
+            const subscriptionsSnapshot = await firestore
+                .collection('subscriptions')
+                .where('stripeSubscriptionId', '==', subscription.id)
+                .limit(1)
+                .get();
+            if (!subscriptionsSnapshot.empty) {
+                const subscriptionDoc = subscriptionsSnapshot.docs[0];
+                const subscriptionData = subscriptionDoc.data();
+                // Update subscription document
+                await subscriptionDoc.ref.update({
+                    status: 'active',
+                    currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+                    updatedAt: new Date().toISOString(),
+                });
+                // Update user's subscriptionStatus to restore access
+                if (subscriptionData.userId) {
+                    await firestore.collection('users').doc(subscriptionData.userId).update({
+                        subscriptionStatus: 'active',
+                        updatedAt: new Date().toISOString(),
+                    });
+                    v2_1.logger.info('[handleInvoicePaymentSucceeded] User subscriptionStatus updated to active', {
+                        userId: subscriptionData.userId,
+                    });
+                }
+            }
         }
         v2_1.logger.info('[handleInvoicePaymentSucceeded] Subscription reactivated', {
             subscriptionId: subscription.id,
@@ -757,7 +786,7 @@ async function handleInvoicePaymentSucceeded(invoice, stripe) {
 }
 /**
  * Handle invoice.payment_failed
- * Marks subscription as past_due
+ * Marks subscription as past_due across all storage locations
  */
 async function handleInvoicePaymentFailed(invoice) {
     try {
@@ -768,10 +797,37 @@ async function handleInvoicePaymentFailed(invoice) {
         if (!invoice.subscription) {
             return;
         }
-        // Update team to past_due status
-        await (0, createTeam_1.updateTeamSubscription)(invoice.subscription, 'past_due');
+        const subscriptionId = invoice.subscription;
+        // 1. Update team to past_due status (legacy)
+        await (0, createTeam_1.updateTeamSubscription)(subscriptionId, 'past_due');
+        // 2. Update company subscription (B2B)
+        await updateCompanySubscription(subscriptionId, 'past_due');
+        // 3. Update subscriptions collection AND user document
+        const subscriptionsSnapshot = await firestore
+            .collection('subscriptions')
+            .where('stripeSubscriptionId', '==', subscriptionId)
+            .limit(1)
+            .get();
+        if (!subscriptionsSnapshot.empty) {
+            const subscriptionDoc = subscriptionsSnapshot.docs[0];
+            await subscriptionDoc.ref.update({
+                status: 'past_due',
+                updatedAt: new Date().toISOString(),
+            });
+            // Update user's subscriptionStatus to revoke access
+            const subscriptionData = subscriptionDoc.data();
+            if (subscriptionData.userId) {
+                await firestore.collection('users').doc(subscriptionData.userId).update({
+                    subscriptionStatus: 'past_due',
+                    updatedAt: new Date().toISOString(),
+                });
+                v2_1.logger.info('[handleInvoicePaymentFailed] User subscriptionStatus updated to past_due', {
+                    userId: subscriptionData.userId,
+                });
+            }
+        }
         v2_1.logger.info('[handleInvoicePaymentFailed] Subscription marked as past_due', {
-            subscriptionId: invoice.subscription,
+            subscriptionId: subscriptionId,
         });
         // Send payment failed email (non-blocking)
         try {

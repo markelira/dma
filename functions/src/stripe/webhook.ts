@@ -782,7 +782,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
 
 /**
  * Handle invoice.payment_succeeded
- * Reactivates subscription after successful payment
+ * Reactivates subscription after successful payment across all storage locations
  */
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, stripe: Stripe): Promise<void> {
   try {
@@ -799,7 +799,41 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, stripe: St
     const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
 
     if (subscription.status === 'active') {
+      // 1. Update team subscription (legacy)
       await updateTeamSubscription(subscription.id, 'active');
+
+      // 2. Update company subscription (B2B)
+      await updateCompanySubscription(subscription.id, 'active');
+
+      // 3. Update subscriptions collection AND user document
+      const subscriptionsSnapshot = await firestore
+        .collection('subscriptions')
+        .where('stripeSubscriptionId', '==', subscription.id)
+        .limit(1)
+        .get();
+
+      if (!subscriptionsSnapshot.empty) {
+        const subscriptionDoc = subscriptionsSnapshot.docs[0];
+        const subscriptionData = subscriptionDoc.data();
+
+        // Update subscription document
+        await subscriptionDoc.ref.update({
+          status: 'active',
+          currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+          updatedAt: new Date().toISOString(),
+        });
+
+        // Update user's subscriptionStatus to restore access
+        if (subscriptionData.userId) {
+          await firestore.collection('users').doc(subscriptionData.userId).update({
+            subscriptionStatus: 'active',
+            updatedAt: new Date().toISOString(),
+          });
+          logger.info('[handleInvoicePaymentSucceeded] User subscriptionStatus updated to active', {
+            userId: subscriptionData.userId,
+          });
+        }
+      }
     }
 
     logger.info('[handleInvoicePaymentSucceeded] Subscription reactivated', {
@@ -853,7 +887,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice, stripe: St
 
 /**
  * Handle invoice.payment_failed
- * Marks subscription as past_due
+ * Marks subscription as past_due across all storage locations
  */
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void> {
   try {
@@ -866,11 +900,43 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void
       return;
     }
 
-    // Update team to past_due status
-    await updateTeamSubscription(invoice.subscription as string, 'past_due');
+    const subscriptionId = invoice.subscription as string;
+
+    // 1. Update team to past_due status (legacy)
+    await updateTeamSubscription(subscriptionId, 'past_due');
+
+    // 2. Update company subscription (B2B)
+    await updateCompanySubscription(subscriptionId, 'past_due');
+
+    // 3. Update subscriptions collection AND user document
+    const subscriptionsSnapshot = await firestore
+      .collection('subscriptions')
+      .where('stripeSubscriptionId', '==', subscriptionId)
+      .limit(1)
+      .get();
+
+    if (!subscriptionsSnapshot.empty) {
+      const subscriptionDoc = subscriptionsSnapshot.docs[0];
+      await subscriptionDoc.ref.update({
+        status: 'past_due',
+        updatedAt: new Date().toISOString(),
+      });
+
+      // Update user's subscriptionStatus to revoke access
+      const subscriptionData = subscriptionDoc.data();
+      if (subscriptionData.userId) {
+        await firestore.collection('users').doc(subscriptionData.userId).update({
+          subscriptionStatus: 'past_due',
+          updatedAt: new Date().toISOString(),
+        });
+        logger.info('[handleInvoicePaymentFailed] User subscriptionStatus updated to past_due', {
+          userId: subscriptionData.userId,
+        });
+      }
+    }
 
     logger.info('[handleInvoicePaymentFailed] Subscription marked as past_due', {
-      subscriptionId: invoice.subscription,
+      subscriptionId: subscriptionId,
     });
 
     // Send payment failed email (non-blocking)
