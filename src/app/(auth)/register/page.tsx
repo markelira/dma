@@ -11,6 +11,39 @@ import Link from 'next/link';
 import { Building2 } from 'lucide-react';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
 import { getDashboardPath } from '@/lib/routing';
+import { updateAuthStoreFromFirebase } from '@/stores/authStore';
+
+interface UnifiedRegistrationInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+  billingEmail: string;
+  industry?: string;
+  companySize?: string;
+}
+
+interface UnifiedRegistrationResponse {
+  success: boolean;
+  companyId: string;
+  userId: string;
+  linkedToInvite?: boolean;
+  message?: string;
+}
+
+interface AddEmployeeInput {
+  companyId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
+interface AddEmployeeResponse {
+  success: boolean;
+  inviteId?: string;
+  message?: string;
+}
 
 interface InviteData {
   valid: boolean;
@@ -168,6 +201,78 @@ function RegisterPageContent() {
         onVerified={async () => {
           console.log('[Register Page] Email verified successfully');
 
+          const currentUser = auth.currentUser;
+          if (!currentUser) {
+            console.error('[Register Page] No current user after verification');
+            router.push('/login');
+            return;
+          }
+
+          // Get pending registration data from sessionStorage
+          const pendingDataStr = sessionStorage.getItem('pendingRegistrationData');
+
+          if (pendingDataStr) {
+            try {
+              const pendingData = JSON.parse(pendingDataStr);
+              console.log('[Register Page] Found pending registration data, completing registration...');
+
+              // NOW call completeUnifiedRegistration to create Firestore documents
+              const completeRegistration = httpsCallable<UnifiedRegistrationInput, UnifiedRegistrationResponse>(
+                functions,
+                'completeUnifiedRegistration'
+              );
+
+              const result = await completeRegistration({
+                firstName: pendingData.firstName,
+                lastName: pendingData.lastName,
+                email: pendingData.email,
+                phone: pendingData.phone,
+                companyName: pendingData.companyName,
+                billingEmail: pendingData.billingEmail,
+                industry: pendingData.industry,
+                companySize: pendingData.companySize
+              });
+
+              console.log('[Register Page] ✅ Registration completed:', result.data);
+
+              if (result.data.success) {
+                // Send employee invites if any were added
+                if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
+                  console.log('[Register Page] Sending employee invites:', pendingData.pendingEmployees.length);
+                  const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
+
+                  for (const employee of pendingData.pendingEmployees) {
+                    addEmployee({
+                      companyId: result.data.companyId,
+                      email: employee.email,
+                      firstName: employee.firstName,
+                      lastName: employee.lastName
+                    }).then(() => {
+                      console.log(`[Register Page] ✅ Invite sent to ${employee.email}`);
+                    }).catch((inviteError: any) => {
+                      console.error(`[Register Page] ⚠️ Failed to invite ${employee.email}:`, inviteError);
+                    });
+                  }
+                }
+
+                // Force token refresh to pick up new custom claims
+                await currentUser.getIdToken(true);
+                await currentUser.reload();
+                console.log('[Register Page] ✅ Token refreshed');
+
+                // Update Zustand store with fresh custom claims
+                await updateAuthStoreFromFirebase(currentUser);
+                console.log('[Register Page] ✅ Store updated');
+              }
+
+              // Clear pending data
+              sessionStorage.removeItem('pendingRegistrationData');
+            } catch (err) {
+              console.error('[Register Page] Error completing registration:', err);
+              // Still continue to clear state and redirect
+            }
+          }
+
           // Clear pending verification from sessionStorage
           sessionStorage.removeItem('pendingEmailVerification');
           console.log('[Register Page] Cleared pending verification from sessionStorage');
@@ -175,28 +280,14 @@ function RegisterPageContent() {
           setIsVerifying(false);
           setShowVerificationModal(false);
 
-          // Force token refresh to pick up emailVerified: true
-          const currentUser = auth.currentUser;
-          if (currentUser) {
-            console.log('[Register Page] Refreshing token for auto-login');
-            await currentUser.getIdToken(true);
-
-            // Check if this is an invited employee (they don't need to pay)
-            if (inviteData) {
-              console.log('[Register Page] Invited employee - redirecting to dashboard (no payment required)');
-              router.push('/dashboard');
-            } else {
-              // Regular registration - redirect to company dashboard (popup will show there)
-              console.log('[Register Page] Redirecting new user to company dashboard');
-              router.push('/company/dashboard');
-            }
+          // Check if this is an invited employee (they don't need to pay)
+          if (inviteData) {
+            console.log('[Register Page] Invited employee - redirecting to dashboard (no payment required)');
+            router.push('/dashboard');
           } else {
-            // Fallback if no user
-            if (inviteData) {
-              router.push('/dashboard');
-            } else {
-              router.push('/company/dashboard');
-            }
+            // Regular registration - redirect to company dashboard (popup will show there)
+            console.log('[Register Page] Redirecting new user to company dashboard');
+            router.push('/company/dashboard');
           }
         }}
       />

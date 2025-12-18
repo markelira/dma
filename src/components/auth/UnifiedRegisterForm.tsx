@@ -449,15 +449,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
       console.log('[Unified Registration] ✅ Display name updated');
 
-      // Step 3: Call Cloud Function to create company and user
-      console.log('[Unified Registration] Step 3: Calling completeUnifiedRegistration...');
+      // Step 3: Store registration data for AFTER email verification
+      // We DON'T create Firestore documents yet - only after email is verified
+      console.log('[Unified Registration] Step 3: Storing registration data for after verification...');
 
-      const completeRegistration = httpsCallable<UnifiedRegistrationInput, UnifiedRegistrationResponse>(
-        functions,
-        'completeUnifiedRegistration'
-      );
-
-      const functionInput: UnifiedRegistrationInput = {
+      const pendingRegistrationData = {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim().toLowerCase(),
@@ -465,89 +461,40 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         companyName: formData.companyName.trim(),
         billingEmail: formData.billingEmail.trim(),
         industry: formData.industry,
-        companySize: formData.companySize
+        companySize: formData.companySize,
+        pendingEmployees: pendingEmployees.map(emp => ({
+          firstName: emp.firstName,
+          lastName: emp.lastName,
+          email: emp.email
+        }))
       };
 
-      console.log('[Unified Registration] Calling Cloud Function with input:', functionInput);
+      // Store in sessionStorage - will be used after email verification
+      sessionStorage.setItem('pendingRegistrationData', JSON.stringify(pendingRegistrationData));
+      console.log('[Unified Registration] ✅ Registration data stored in sessionStorage');
 
-      // VALIDATION LOG 1: Check custom claims BEFORE Cloud Function
-      const preCloudFunctionToken = await userCredential.user.getIdTokenResult(false);
-      console.log('🔍 [VALIDATION] PRE-CLOUD-FUNCTION STATE:', {
-        userId: userCredential.user.uid,
-        customClaims: preCloudFunctionToken.claims,
-        hasCompanyId: !!preCloudFunctionToken.claims.companyId,
-        timestamp: Date.now()
-      });
+      // Mark as recently registered to skip expensive subscription status check
+      markAsRecentlyRegistered();
 
-      const result = await completeRegistration(functionInput);
-
-      console.log('[Unified Registration] ✅ Cloud Function returned:', result);
-
-      if (result.data.success) {
-        console.log('[Unified Registration] ✅ Registration successful');
-        console.log('[Unified Registration] Company ID:', result.data.companyId);
-        console.log('[Unified Registration] Linked to invite:', result.data.linkedToInvite);
-
-        // Mark as recently registered to skip expensive subscription status check
-        // This saves 2-3 seconds on post-registration redirect
-        markAsRecentlyRegistered();
-
-        // CRITICAL: Force token refresh to pick up new custom claims
-        // Run token refresh and user reload in parallel for faster execution
-        await Promise.all([
-          userCredential.user.getIdToken(true),
-          userCredential.user.reload()
-        ]);
-        console.log('[Unified Registration] ✅ Token refreshed');
-
-        // Update Zustand store with fresh custom claims
-        await updateAuthStoreFromFirebase(userCredential.user);
-        console.log('[Unified Registration] ✅ Store updated');
-
-        // Send employee invites if any were added (non-blocking for faster UX)
-        if (pendingEmployees.length > 0) {
-          console.log('[Unified Registration] Sending employee invites (background):', pendingEmployees.length);
-          const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
-
-          // Fire and forget - don't await to avoid blocking the verification modal
-          for (const employee of pendingEmployees) {
-            addEmployee({
-              companyId: result.data.companyId,
-              email: employee.email,
-              firstName: employee.firstName,
-              lastName: employee.lastName
-            }).then(() => {
-              console.log(`[Unified Registration] ✅ Invite sent to ${employee.email}`);
-            }).catch((inviteError: any) => {
-              console.error(`[Unified Registration] ⚠️ Failed to invite ${employee.email}:`, inviteError);
-              // Don't block registration - invites can be resent later
-            });
-          }
-        }
-
-        // Show modal IMMEDIATELY (better perceived performance)
-        if (onRegistrationComplete) {
-          console.log('[Unified Registration] Showing verification modal immediately...');
-          onRegistrationComplete(userCredential.user.uid, formData.email.trim());
-        }
-
-        // Send verification email in background (fire-and-forget)
-        const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
-        sendEmailVerificationCode({})
-          .then((result: any) => {
-            console.log('[Unified Registration] ✅ Verification email sent:', result.data);
-            if (result.data.code) {
-              console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
-            }
-          })
-          .catch((emailError: any) => {
-            console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
-            // User can use Resend button in modal
-          });
-
-      } else {
-        throw new Error('Registration failed: Cloud Function returned success: false');
+      // Show verification modal IMMEDIATELY
+      if (onRegistrationComplete) {
+        console.log('[Unified Registration] Showing verification modal immediately...');
+        onRegistrationComplete(userCredential.user.uid, formData.email.trim());
       }
+
+      // Send verification email in background (fire-and-forget)
+      const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
+      sendEmailVerificationCode({})
+        .then((result: any) => {
+          console.log('[Unified Registration] ✅ Verification email sent:', result.data);
+          if (result.data.code) {
+            console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
+          }
+        })
+        .catch((emailError: any) => {
+          console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
+          // User can use Resend button in modal
+        });
 
     } catch (err: any) {
       console.error('[Unified Registration] Error:', err);
@@ -824,12 +771,15 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         >
           {/* Employee Invites Section */}
           <div>
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-2">
               <Users className="w-6 h-6 text-brand-secondary" />
               <h2 className="text-2xl font-bold text-gray-900">
-                Munkatársak meghívása (opcionális, max. 5 fő)
+                Munkatársak meghívása
               </h2>
             </div>
+            <p className="text-sm text-gray-600 mb-6">
+              opcionális, max. 5 fő
+            </p>
 
             {/* Add Employee Form - Vertical layout like Step 1 */}
             <div className="space-y-5">

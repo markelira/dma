@@ -40,6 +40,23 @@ export default function LoginPage() {
   const isTrialFlow = searchParams?.get('trial') === 'true';
 
   useEffect(() => {
+    // Check for pending registration data (user registered but didn't verify email)
+    const pendingRegistrationData = typeof window !== 'undefined'
+      ? sessionStorage.getItem('pendingRegistrationData')
+      : null;
+
+    // If there's pending registration data, redirect to register page to complete verification
+    if (pendingRegistrationData && user && !isLoading) {
+      console.log('[Login Page] Found pending registration data, redirecting to complete verification');
+      // Set pending email verification so register page shows modal
+      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+        userId: user.id,
+        email: user.email
+      }));
+      router.push('/register');
+      return;
+    }
+
     // Compute role-based default redirect
     const redirectTo = redirectToParam || getDashboardPath(user?.role);
 
