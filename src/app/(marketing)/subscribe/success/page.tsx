@@ -35,11 +35,13 @@ function SubscribeSuccessContent() {
     setReady(true)
   }, [refetchSubscription, updateSubscriptionStatus])
 
-  // Auto-redirect to homepage after 3 seconds
+  // Auto-redirect to dashboard after 3 seconds
   useEffect(() => {
     if (!ready) return
     const timer = setTimeout(() => {
-      router.push('/')
+      // Set flag to show welcome popup on dashboard
+      sessionStorage.setItem('showWelcomePopup', 'true')
+      router.push('/company/dashboard')
     }, 3000)
     return () => clearTimeout(timer)
   }, [ready, router])

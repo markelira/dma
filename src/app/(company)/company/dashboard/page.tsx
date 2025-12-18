@@ -2,8 +2,9 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuthStore } from '@/stores/authStore';
+import { WelcomePopup } from '@/components/dashboard/WelcomePopup';
 import { Loader2 } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
 import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow';
@@ -46,6 +47,17 @@ export default function CompanyDashboardPage() {
     courseTypes: [],
     instructorIds: [],
   });
+
+  // Welcome popup after successful checkout
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  useEffect(() => {
+    const shouldShow = sessionStorage.getItem('showWelcomePopup');
+    if (shouldShow === 'true') {
+      setShowWelcome(true);
+      sessionStorage.removeItem('showWelcomePopup');
+    }
+  }, []);
 
   // Apply user filters to all courses
   const filteredCourses = useMemo(() => {
@@ -419,6 +431,9 @@ export default function CompanyDashboardPage() {
           <p className="text-gray-500">Nincs megjeleníthető tartalom</p>
         </div>
       )}
+
+      {/* Welcome popup after successful checkout */}
+      {showWelcome && <WelcomePopup onDismiss={() => setShowWelcome(false)} />}
     </div>
   );
 }
