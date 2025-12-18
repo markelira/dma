@@ -299,6 +299,29 @@ export default function CompanyDashboardPage() {
       .slice(0, 2);
   }, [targetAudiences, filteredCourses]);
 
+  // Memoize course type rows to prevent re-shuffling on every render
+  const courseTypeRows = useMemo(() => {
+    if (!filteredCourses.length) return [];
+
+    const typeLabels: Record<string, string> = {
+      'WEBINAR': 'Webinár',
+      'ACADEMIA': 'Akadémia',
+      'MASTERCLASS': 'Masterclass',
+      'PODCAST': 'Podcast'
+    };
+
+    return ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST']
+      .map(type => {
+        const typeCourses = shuffleArray(filteredCourses.filter(c => c.courseType === type));
+        return {
+          type,
+          label: typeLabels[type],
+          courses: typeCourses,
+        };
+      })
+      .filter(row => row.courses.length > 0);
+  }, [filteredCourses]);
+
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
   if (isLoading) {
@@ -402,29 +425,17 @@ export default function CompanyDashboardPage() {
       ))}
 
       {/* Course Type Carousels */}
-      {filteredCourses.length > 0 && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
-        const typeCourses = shuffleArray(filteredCourses.filter(c => c.courseType === type));
-        if (typeCourses.length === 0) return null;
-
-        const typeLabels: Record<string, string> = {
-          'WEBINAR': 'Webinár',
-          'ACADEMIA': 'Akadémia',
-          'MASTERCLASS': 'Masterclass',
-          'PODCAST': 'Podcast'
-        };
-
-        return (
-          <CourseCarouselRow
-            key={type}
-            title={typeLabels[type]}
-            courses={typeCourses}
-            categories={categories || []}
-            instructors={instructors || []}
-            enrollments={enrollments || []}
-            viewAllLink={`/company/dashboard/${type.toLowerCase()}`}
-          />
-        );
-      })}
+      {courseTypeRows.map(({ type, label, courses: typeCourses }) => (
+        <CourseCarouselRow
+          key={type}
+          title={label}
+          courses={typeCourses}
+          categories={categories || []}
+          instructors={instructors || []}
+          enrollments={enrollments || []}
+          viewAllLink={`/company/dashboard/${type.toLowerCase()}`}
+        />
+      ))}
 
       {/* Empty State */}
       {heroSlides.length === 0 && enrolledCourses.length === 0 && filteredCourses.length === 0 && (
