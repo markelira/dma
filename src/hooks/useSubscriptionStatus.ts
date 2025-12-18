@@ -71,10 +71,11 @@ interface SubscriptionStatusResponse {
 }
 
 export const useSubscriptionStatus = () => {
-  const { isAuthenticated, updateSubscriptionStatus } = useAuthStore()
+  const { isAuthenticated, updateSubscriptionStatus, companyId } = useAuthStore()
 
   // Check if this is a recently registered user - skip expensive Cloud Function call
-  const isNewUser = isRecentlyRegistered()
+  // BUT: Don't skip for employees (they have companyId) - they inherit company subscription
+  const isNewUser = isRecentlyRegistered() && !companyId
 
   const query = useQuery<SubscriptionStatusResponse, Error>({
     queryKey: ['subscription-status'],
