@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useAuthStore } from '@/stores/authStore'
-import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,7 +15,6 @@ import Image from 'next/image'
 
 export default function CompanySettingsPage() {
   const { user, setUser } = useAuthStore()
-  const { refreshUser } = useAuth()
 
   // Profile states
   const [firstName, setFirstName] = useState(user?.firstName || '')
@@ -167,8 +165,8 @@ export default function CompanySettingsPage() {
         })
       }
 
+      // Update local user state (Zustand store - will automatically update sidebar)
       setUser({ ...user, firstName, lastName })
-      await refreshUser()
       toast.success('Beállítások sikeresen mentve')
     } catch (error) {
       console.error('Error saving settings:', error)

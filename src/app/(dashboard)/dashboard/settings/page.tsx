@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/stores/authStore'
-import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +14,6 @@ import Image from 'next/image'
 
 export default function SettingsPage() {
   const { user, setUser } = useAuthStore()
-  const { refreshUser } = useAuth()
 
   // Profile states
   const [firstName, setFirstName] = useState(user?.firstName || '')
@@ -82,15 +80,12 @@ export default function SettingsPage() {
         updatedAt: new Date().toISOString()
       })
 
-      // Update local user state
+      // Update local user state (Zustand store - will automatically update sidebar)
       setUser({
         ...user,
         firstName,
         lastName
       })
-
-      // Refresh AuthContext so sidebar updates
-      await refreshUser()
 
       toast.success('Beállítások sikeresen mentve')
     } catch (error) {
