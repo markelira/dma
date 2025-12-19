@@ -93,6 +93,18 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if there's pending registration data - redirect to complete verification
+    // This prevents the "Felhasználói adatok nem találhatók" error flash
+    const pendingRegistrationData = sessionStorage.getItem('pendingRegistrationData');
+    if (pendingRegistrationData) {
+      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+        userId: '',
+        email: email
+      }));
+      router.push('/register');
+      return;
+    }
+
     // Remove onSuccess callback - let useEffect handle redirect
     // This prevents duplicate redirects racing each other
     loginMutation.mutate({ email, password });

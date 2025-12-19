@@ -15,8 +15,7 @@ import {
   ArrowRight,
   ArrowLeft,
   UserPlus,
-  X,
-  Users
+  X
 } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
@@ -771,12 +770,9 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         >
           {/* Employee Invites Section */}
           <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-6 h-6 text-brand-secondary" />
-              <h2 className="text-2xl font-bold text-gray-900">
-                Munkatársak meghívása
-              </h2>
-            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Munkatársak meghívása
+            </h2>
             <p className="text-sm text-gray-600 mb-6">
               opcionális, max. 5 fő
             </p>
