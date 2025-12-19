@@ -190,11 +190,18 @@ export const useLessonProgress = () => {
               const enrollmentId = `${user.uid}_${courseId}`
               const enrollmentRef = doc(db, 'enrollments', enrollmentId)
 
-              await updateDoc(enrollmentRef, {
+              const enrollmentUpdateData: Record<string, any> = {
                 progress: progressPercentage,
                 lastAccessedAt: serverTimestamp(),
                 status: enrollmentStatus
-              }).catch(() => {
+              }
+
+              // Set completedAt when course is completed
+              if (enrollmentStatus === 'completed') {
+                enrollmentUpdateData.completedAt = serverTimestamp()
+              }
+
+              await updateDoc(enrollmentRef, enrollmentUpdateData).catch(() => {
                 // Enrollment might not exist yet, that's okay
                 console.log('📝 Enrollment not found, skipping progress update')
               })

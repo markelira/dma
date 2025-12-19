@@ -70,7 +70,7 @@ export function calculateCourseProgress(
  * Determine enrollment status based on progress percentage
  */
 export function getStatusFromProgress(progress: number): EnrollmentStatus {
-  if (progress >= 100) {
+  if (progress >= 99) {
     return ENROLLMENT_STATUS.COMPLETED
   }
   if (progress > 0) {
