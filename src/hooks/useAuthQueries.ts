@@ -93,6 +93,32 @@ export function useLogin() {
         })
 
         if (!userDoc.exists()) {
+          // Check if this is a user who hasn't completed email verification
+          const pendingRegistrationData = typeof window !== 'undefined'
+            ? sessionStorage.getItem('pendingRegistrationData')
+            : null;
+
+          if (pendingRegistrationData) {
+            try {
+              const pendingData = JSON.parse(pendingRegistrationData);
+              if (pendingData.email && pendingData.email.toLowerCase() === email.toLowerCase()) {
+                // User registered but didn't verify - set up verification modal
+                console.log('[useLogin] User has pending verification, redirecting to complete it');
+                sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+                  userId: userCredential.user.uid,
+                  email: email
+                }));
+                // Redirect to register page which will show verification modal
+                window.location.href = '/register';
+                // Return a response to prevent further processing
+                return { success: false, needsVerification: true } as any;
+              }
+            } catch (e) {
+              // Invalid JSON, proceed to throw error
+              console.error('[useLogin] Error parsing pendingRegistrationData:', e);
+            }
+          }
+
           console.error('❌ [DIAGNOSTIC] User document NOT FOUND in Firestore for uid:', userCredential.user.uid)
           throw new Error('Felhasználói adatok nem találhatók')
         }
