@@ -93,16 +93,25 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if there's pending registration data - redirect to complete verification
+    // Check if there's pending registration data for THIS email - redirect to complete verification
     // This prevents the "Felhasználói adatok nem találhatók" error flash
     const pendingRegistrationData = sessionStorage.getItem('pendingRegistrationData');
     if (pendingRegistrationData) {
-      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
-        userId: '',
-        email: email
-      }));
-      router.push('/register');
-      return;
+      try {
+        const pendingData = JSON.parse(pendingRegistrationData);
+        // Only redirect if the login email matches the pending registration email
+        if (pendingData.email && pendingData.email.toLowerCase() === email.toLowerCase()) {
+          sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
+            userId: '',
+            email: email
+          }));
+          router.push('/register');
+          return;
+        }
+      } catch (err) {
+        // Invalid JSON, ignore and proceed with normal login
+        console.error('[Login] Error parsing pendingRegistrationData:', err);
+      }
     }
 
     // Remove onSuccess callback - let useEffect handle redirect
