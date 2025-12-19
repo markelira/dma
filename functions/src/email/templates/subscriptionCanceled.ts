@@ -1,6 +1,6 @@
 /**
  * Subscription Canceled Email Template
- * Sent when user cancels their subscription
+ * Sent when user cancels their subscription or it expires
  */
 
 import { sendEmail } from '../emailService';
@@ -9,7 +9,6 @@ import {
   createHeading,
   createParagraph,
   createButtonRow,
-  createAlertBox,
   generatePlainText,
 } from './base';
 
@@ -19,7 +18,7 @@ interface SubscriptionCanceledData {
   firstName: string;
   email: string;
   planName: string;
-  accessUntil: string; // Date when access ends
+  accessUntil: string;
   reactivateUrl?: string;
 }
 
@@ -29,50 +28,33 @@ interface SubscriptionCanceledData {
 export async function sendSubscriptionCanceledEmail(
   data: SubscriptionCanceledData
 ): Promise<{ success: boolean; error?: string }> {
-  const { firstName, email, planName, accessUntil, reactivateUrl } = data;
+  const { firstName, email } = data;
 
-  const subject = 'Előfizetésed lemondva';
-  const resubscribeUrl = reactivateUrl || `${APP_URL}/register`;
+  const subject = 'Itt a vége - DMA Masterclass';
 
   const content = `
-    ${createHeading('Előfizetésed lemondva', 2)}
-    ${createParagraph(`Szia <strong>${firstName}</strong>,`)}
-    ${createParagraph(`Megerősítjük, hogy a <strong>${planName}</strong> előfizetésed lemondásra került.`)}
+    ${createHeading(`Szia ${firstName}!`, 2)}
+    ${createParagraph('Előfizetésedet lemondtad vagy lejárt.')}
+    ${createParagraph('Sajnáljuk, hogy elhagyod a fedélzetet. Előfizetésed a Struktúraépítő streaming platformon lejárt, így a fordulónapod után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.')}
+    ${createParagraph('Ha mégis folytatnád, akkor kattints a gombra.')}
 
-    ${createAlertBox(`A hozzáférésed <strong>${accessUntil}</strong>-ig aktív marad. Utána nem éred el a prémium tartalmakat.`, 'warning')}
-
-    ${createParagraph('Sajnáljuk, hogy mész! Ha meggondoltad magad, bármikor újra előfizethetsz:')}
-
-    ${createButtonRow({ text: 'Újra előfizetek', url: resubscribeUrl, variant: 'primary' })}
-
-    <tr>
-      <td style="padding: 16px 0;">
-        <p style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
-          Szeretnénk tudni, miért döntöttél így?
-        </p>
-      </td>
-    </tr>
-    ${createParagraph('Visszajelzésed segít nekünk jobbá tenni a platformot. Ha van időd, írj nekünk pár sort a support@dma.hu címre.')}
-
-    ${createParagraph('Köszönjük, hogy velünk voltál!', { muted: true })}
+    ${createButtonRow({ text: 'FOLYTATOM', url: `${APP_URL}/subscribe/start`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
     showUnsubscribe: true,
-    preheader: `Előfizetésed lemondva - hozzáférésed ${accessUntil}-ig tart`,
+    preheader: 'Előfizetésed lejárt - folytasd a kalandot!',
   });
 
   const textContent = generatePlainText({
     greeting: `Szia ${firstName}!`,
     paragraphs: [
-      `Megerősítjük, hogy a ${planName} előfizetésed lemondásra került.`,
-      `A hozzáférésed ${accessUntil}-ig aktív marad. Utána nem éred el a prémium tartalmakat.`,
-      'Sajnáljuk, hogy mész! Ha meggondoltad magad, bármikor újra előfizethetsz.',
-      'Szeretnénk tudni, miért döntöttél így? Visszajelzésed segít nekünk jobbá tenni a platformot. Ha van időd, írj nekünk pár sort a support@dma.hu címre.',
-      'Köszönjük, hogy velünk voltál!',
+      'Előfizetésedet lemondtad vagy lejárt.',
+      'Sajnáljuk, hogy elhagyod a fedélzetet. Előfizetésed a Struktúraépítő streaming platformon lejárt, így a fordulónapod után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.',
+      'Ha mégis folytatnád, akkor kattints a gombra.',
     ],
-    ctaText: 'Újra előfizetek',
-    ctaUrl: resubscribeUrl,
+    ctaText: 'FOLYTATOM',
+    ctaUrl: `${APP_URL}/subscribe/start`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 
