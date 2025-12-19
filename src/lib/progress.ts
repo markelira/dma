@@ -18,7 +18,7 @@ export type EnrollmentStatus = typeof ENROLLMENT_STATUS[keyof typeof ENROLLMENT_
 export const IN_PROGRESS_STATUSES = ['in_progress', 'ACTIVE', 'active'] as const
 
 // Lesson completion threshold (percentage)
-export const LESSON_COMPLETION_THRESHOLD = 90
+export const LESSON_COMPLETION_THRESHOLD = 99.5
 
 // Course completion threshold (percentage)
 export const COURSE_COMPLETION_THRESHOLD = 99.5
