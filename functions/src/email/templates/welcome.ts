@@ -9,7 +9,6 @@ import {
   createHeading,
   createParagraph,
   createButtonRow,
-  createFeatureList,
   generatePlainText,
 } from './base';
 
@@ -26,51 +25,29 @@ interface WelcomeEmailData {
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<{ success: boolean; error?: string }> {
   const { firstName, email } = data;
 
-  const subject = 'Üdv a DMA Masterclass-on!';
+  const subject = 'Üdv a Struktúraépítők között - DMA Masterclass';
 
   const content = `
     ${createHeading(`Szia ${firstName}!`, 2)}
-    ${createParagraph('Örülünk, hogy csatlakoztál a DMA Masterclass közösségéhez! Most már hozzáférsz a struktúraépítő streaming platformunkhoz.')}
+    ${createParagraph('A Struktúra építő streaming platformon több mint 150 cégépítési tartalmat fedezhetsz fel, hogy vállalkozásod végre strukturált és önjáró legyen.')}
+    ${createParagraph('Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.')}
 
-    <tr>
-      <td style="padding: 16px 0;">
-        <p style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
-          Amit a platformon találsz:
-        </p>
-      </td>
-    </tr>
-    ${createFeatureList([
-      'Exkluzív videós tartalmak a struktúraépítésről',
-      'Gyakorlati tudás tapasztalt szakértőktől',
-      'Folyamatosan bővülő tartalom könyvtár',
-      'Közösség hasonló érdeklődésűekkel',
-    ])}
-
-    ${createParagraph('Kezdd el felfedezni a tartalmakat:')}
-
-    ${createButtonRow({ text: 'Tovább a platformra', url: `${APP_URL}/dashboard`, variant: 'primary' })}
-
-    ${createParagraph('Ha bármilyen kérdésed van, írj nekünk bátran a support@dma.hu címre.', { muted: true })}
+    ${createButtonRow({ text: 'KEZD EL 7 NAPIG INGYEN', url: `${APP_URL}/subscribe/start`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
     showUnsubscribe: true,
-    preheader: 'Örülünk, hogy csatlakoztál! Fedezd fel a prémium tartalmakat.',
+    preheader: 'Üdv a Struktúraépítők között! Fedezd fel a 150+ cégépítési tartalmat.',
   });
 
   const textContent = generatePlainText({
     greeting: `Szia ${firstName}!`,
     paragraphs: [
-      'Örülünk, hogy csatlakoztál a DMA Masterclass közösségéhez! Most már hozzáférsz a struktúraépítő streaming platformunkhoz.',
-      'Amit a platformon találsz:',
-      '- Exkluzív videós tartalmak a struktúraépítésről',
-      '- Gyakorlati tudás tapasztalt szakértőktől',
-      '- Folyamatosan bővülő tartalom könyvtár',
-      '- Közösség hasonló érdeklődésűekkel',
-      'Ha bármilyen kérdésed van, írj nekünk bátran a support@dma.hu címre.',
+      'A Struktúra építő streaming platformon több mint 150 cégépítési tartalmat fedezhetsz fel, hogy vállalkozásod végre strukturált és önjáró legyen.',
+      'Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.',
     ],
-    ctaText: 'Tovább a platformra',
-    ctaUrl: `${APP_URL}/dashboard`,
+    ctaText: 'KEZD EL 7 NAPIG INGYEN',
+    ctaUrl: `${APP_URL}/subscribe/start`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 
