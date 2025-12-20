@@ -12,7 +12,7 @@ import {
   generatePlainText,
 } from './base';
 
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 
 interface SubscriptionStartedData {
   firstName: string;

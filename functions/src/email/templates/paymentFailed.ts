@@ -13,7 +13,7 @@ import {
   generatePlainText,
 } from './base';
 
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 
 interface PaymentFailedData {
   firstName: string;
@@ -46,7 +46,7 @@ export async function sendPaymentFailedEmail(
   const subject = 'Fizetési hiba - intézkedés szükséges';
   const formattedAmount = formatAmount(amount, currency);
 
-  const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/beallitasok/szamlazas`;
+  const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/company/dashboard/billing`;
 
   const content = `
     ${createHeading('Fizetési hiba', 2)}

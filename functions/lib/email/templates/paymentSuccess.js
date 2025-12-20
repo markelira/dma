@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendPaymentSuccessEmail = sendPaymentSuccessEmail;
 const emailService_1 = require("../emailService");
 const base_1 = require("./base");
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 /**
  * Format amount with currency
  */
@@ -56,11 +56,11 @@ async function sendPaymentSuccessEmail(data) {
       </td>
     </tr>
 
-    ${invoiceUrl ? (0, base_1.createButtonRow)({ text: 'Számla megtekintése', url: invoiceUrl, variant: 'secondary' }) : ''}
+    ${(0, base_1.createButtonRow)({ text: 'Számla megtekintése', url: `${APP_URL}/company/dashboard/billing`, variant: 'secondary' })}
 
     ${(0, base_1.createParagraph)('Az előfizetésed továbbra is aktív. Folytasd a tartalmak felfedezését:')}
 
-    ${(0, base_1.createButtonRow)({ text: 'Tovább a platformra', url: `${APP_URL}/dashboard`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'Tovább a platformra', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
 
     ${(0, base_1.createParagraph)('Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.', { muted: true })}
   `;
@@ -79,7 +79,7 @@ async function sendPaymentSuccessEmail(data) {
             'Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.',
         ].filter(Boolean),
         ctaText: 'Tovább a platformra',
-        ctaUrl: `${APP_URL}/dashboard`,
+        ctaUrl: `${APP_URL}/company/dashboard`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

@@ -39,6 +39,7 @@ const firestore_1 = require("firebase-admin/firestore");
 const v2_1 = require("firebase-functions/v2");
 const https_1 = require("firebase-functions/v2/https");
 const linkEmployeeByEmail_1 = require("./linkEmployeeByEmail");
+const welcome_1 = require("../email/templates/welcome");
 /**
  * Complete unified registration - creates company and user for all new registrations
  * Everyone gets COMPANY_ADMIN role with a Company document
@@ -220,6 +221,20 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         console.log(`   User ID: ${userId}`);
         console.log(`   Company: ${finalCompanyName}`);
         console.log(`   Linked to invite: ${linkedToInvite}`);
+        // Send welcome email (fire-and-forget, non-blocking)
+        (0, welcome_1.sendWelcomeEmail)({
+            firstName: firstName.trim(),
+            email: email.trim().toLowerCase(),
+        }).then((result) => {
+            if (result.success) {
+                console.log(`📧 [completeUnifiedRegistration] Welcome email sent to ${email}`);
+            }
+            else {
+                console.warn(`⚠️ [completeUnifiedRegistration] Failed to send welcome email:`, result.error);
+            }
+        }).catch((err) => {
+            console.warn(`⚠️ [completeUnifiedRegistration] Error sending welcome email:`, err.message);
+        });
         return {
             success: true,
             companyId,

@@ -144,7 +144,7 @@ export function NewVideoPlayer({
   };
 
   return (
-    <div className="w-full rounded-lg overflow-hidden relative">
+    <div className="w-full max-w-full rounded-lg overflow-hidden relative">
       <MuxPlayer
         ref={playerRef}
         playbackId={playbackId || undefined}
@@ -161,6 +161,7 @@ export function NewVideoPlayer({
         style={{
           width: '100%',
           aspectRatio: '16/9',
+          maxHeight: 'calc(100dvh - 200px)',
           borderRadius: '0.5rem',
           // Transparent controls - no black background
           '--media-primary-color': '#FFFFFF',

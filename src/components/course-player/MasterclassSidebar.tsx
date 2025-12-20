@@ -102,7 +102,7 @@ export function MasterclassSidebar({
   };
 
   return (
-    <div className="flex h-full w-96 flex-col bg-white border-r border-gray-200">
+    <div className="flex h-full w-72 lg:w-80 xl:w-96 flex-col bg-white border-r border-gray-200">
       {/* Course Header */}
       <div className="flex-shrink-0 border-b border-gray-200 p-6">
         <h1 className="text-xl font-bold text-gray-900 leading-tight mb-3">

@@ -2278,6 +2278,7 @@ export {
   generateDailyRecommendations,
   generateRecommendationsForUser,
   getPersonalizedRecommendations,
+  sendRegistrationReminders,
 } from './automatedTasks';
 
 // ============================================

@@ -42,6 +42,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.linkEmployeeByEmail = linkEmployeeByEmail;
 const admin = __importStar(require("firebase-admin"));
 const firestore_1 = require("firebase-admin/firestore");
+const employeeWelcome_1 = require("../email/templates/employeeWelcome");
+const employeeJoined_1 = require("../email/templates/employeeJoined");
 const db = admin.firestore();
 /**
  * Link a newly registered user to a company if they have a pending invite
@@ -151,6 +153,53 @@ async function linkEmployeeByEmail(userId, email) {
             joinedVia: 'registration',
             timestamp: firestore_1.FieldValue.serverTimestamp(),
         }).catch(() => { });
+        // 7. Send employee welcome email (fire-and-forget, non-blocking)
+        const employeeFirstName = employeeData.firstName || employeeData.fullName?.split(' ')[0] || 'Kollega';
+        const employeeFullName = employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`;
+        (0, employeeWelcome_1.sendEmployeeWelcomeEmail)({
+            firstName: employeeFirstName,
+            email: email.toLowerCase(),
+            companyName,
+        }).then((result) => {
+            if (result.success) {
+                console.log('📧 [linkEmployeeByEmail] Employee welcome email sent');
+            }
+            else {
+                console.warn('⚠️ [linkEmployeeByEmail] Failed to send welcome email:', result.error);
+            }
+        }).catch((err) => {
+            console.warn('⚠️ [linkEmployeeByEmail] Error sending welcome email:', err.message);
+        });
+        // 8. Notify admin that employee joined (fire-and-forget, non-blocking)
+        if (employeeData.invitedBy) {
+            db.collection('users').doc(employeeData.invitedBy).get().then(async (adminDoc) => {
+                if (adminDoc.exists) {
+                    const adminData = adminDoc.data();
+                    const adminEmail = adminData?.email;
+                    const adminFirstName = adminData?.firstName || adminData?.displayName?.split(' ')[0] || 'Adminisztrátor';
+                    if (adminEmail) {
+                        try {
+                            const result = await (0, employeeJoined_1.sendEmployeeJoinedEmail)({
+                                adminFirstName,
+                                adminEmail,
+                                employeeFullName,
+                            });
+                            if (result.success) {
+                                console.log('📧 [linkEmployeeByEmail] Admin notification email sent to', adminEmail);
+                            }
+                            else {
+                                console.warn('⚠️ [linkEmployeeByEmail] Failed to send admin notification:', result.error);
+                            }
+                        }
+                        catch (err) {
+                            console.warn('⚠️ [linkEmployeeByEmail] Error sending admin notification:', err.message);
+                        }
+                    }
+                }
+            }).catch((err) => {
+                console.warn('⚠️ [linkEmployeeByEmail] Error fetching admin for notification:', err.message);
+            });
+        }
         console.log('🎉 [linkEmployeeByEmail] Employee successfully linked to company');
         return {
             linked: true,

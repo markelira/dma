@@ -22,12 +22,12 @@ export function MobileBottomTabs({
   courseType,
 }: MobileBottomTabsProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden">
-      <div className="grid grid-cols-2">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden pb-safe">
+      <div className="grid grid-cols-2 h-[56px]">
         {/* Video Tab */}
         <button
           onClick={() => onTabChange('video')}
-          className={`flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
+          className={`flex items-center justify-center gap-2 h-full font-medium transition-colors ${
             activeTab === 'video'
               ? 'text-brand-secondary bg-brand-secondary/5 border-t-2 border-brand-secondary'
               : 'text-gray-600 border-t-2 border-transparent'
@@ -40,7 +40,7 @@ export function MobileBottomTabs({
         {/* Lessons Tab */}
         <button
           onClick={() => onTabChange('lessons')}
-          className={`flex items-center justify-center gap-2 py-4 font-medium transition-colors ${
+          className={`flex items-center justify-center gap-2 h-full font-medium transition-colors ${
             activeTab === 'lessons'
               ? 'text-brand-secondary bg-brand-secondary/5 border-t-2 border-brand-secondary'
               : 'text-gray-600 border-t-2 border-transparent'

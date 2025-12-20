@@ -14,7 +14,7 @@ import {
   generatePlainText,
 } from './base';
 
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 
 interface TrialEndingData {
   firstName: string;
@@ -47,7 +47,7 @@ export async function sendTrialEndingEmail(
 
   const subject = `Próbaidőszakod ${daysRemaining} nap múlva lejár`;
   const formattedAmount = formatAmount(amount, currency);
-  const managementUrl = cancelUrl || `${APP_URL}/beallitasok/szamlazas`;
+  const managementUrl = cancelUrl || `${APP_URL}/company/dashboard/billing`;
 
   const content = `
     ${createHeading(`Még ${daysRemaining} nap a próbaidőszakodból!`, 2)}
@@ -72,7 +72,7 @@ export async function sendTrialEndingEmail(
 
     ${createParagraph('Folytasd a tartalmak felfedezését:')}
 
-    ${createButtonRow({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/dashboard/osszes-tartalom`, variant: 'primary' })}
+    ${createButtonRow({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
 
     ${createParagraph(`Ha mégsem szeretnéd folytatni, <a href="${managementUrl}" style="color: #252F5B;">itt mondhatod le</a> a próbaidőszak lejárta előtt.`, { muted: true })}
   `;
@@ -95,7 +95,7 @@ export async function sendTrialEndingEmail(
       `Ha mégsem szeretnéd folytatni, itt mondhatod le: ${managementUrl}`,
     ],
     ctaText: 'Megnézem a tartalmakat',
-    ctaUrl: `${APP_URL}/dashboard/osszes-tartalom`,
+    ctaUrl: `${APP_URL}/company/dashboard`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

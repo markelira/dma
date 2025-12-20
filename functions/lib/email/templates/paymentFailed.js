@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendPaymentFailedEmail = sendPaymentFailedEmail;
 const emailService_1 = require("../emailService");
 const base_1 = require("./base");
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 /**
  * Format amount with currency
  */
@@ -24,7 +24,7 @@ async function sendPaymentFailedEmail(data) {
     const { firstName, email, amount, currency, planName, updatePaymentUrl, retryDate } = data;
     const subject = 'Fizetési hiba - intézkedés szükséges';
     const formattedAmount = formatAmount(amount, currency);
-    const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/beallitasok/szamlazas`;
+    const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/company/dashboard/billing`;
     const content = `
     ${(0, base_1.createHeading)('Fizetési hiba', 2)}
     ${(0, base_1.createParagraph)(`Szia <strong>${firstName}</strong>,`)}

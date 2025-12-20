@@ -12,7 +12,7 @@ import {
   generatePlainText,
 } from './base';
 
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 
 interface PaymentSuccessData {
   firstName: string;
@@ -77,11 +77,11 @@ export async function sendPaymentSuccessEmail(
       </td>
     </tr>
 
-    ${invoiceUrl ? createButtonRow({ text: 'Számla megtekintése', url: invoiceUrl, variant: 'secondary' }) : ''}
+    ${createButtonRow({ text: 'Számla megtekintése', url: `${APP_URL}/company/dashboard/billing`, variant: 'secondary' })}
 
     ${createParagraph('Az előfizetésed továbbra is aktív. Folytasd a tartalmak felfedezését:')}
 
-    ${createButtonRow({ text: 'Tovább a platformra', url: `${APP_URL}/dashboard`, variant: 'primary' })}
+    ${createButtonRow({ text: 'Tovább a platformra', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
 
     ${createParagraph('Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.', { muted: true })}
   `;
@@ -102,7 +102,7 @@ export async function sendPaymentSuccessEmail(
       'Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.',
     ].filter(Boolean),
     ctaText: 'Tovább a platformra',
-    ctaUrl: `${APP_URL}/dashboard`,
+    ctaUrl: `${APP_URL}/company/dashboard`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

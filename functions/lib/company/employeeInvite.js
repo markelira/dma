@@ -437,51 +437,29 @@ exports.acceptEmployeeInvite = v2_1.https.onCall({
  */
 async function sendInvitationEmail(to, data) {
     const { sendEmail } = require('../email/emailService');
-    const { wrapInBaseTemplate, createHeading, createParagraph, createButtonRow, createFeatureList, createAlertBox, generatePlainText, } = require('../email/templates/base');
-    const subject = `${data.companyName} meghívott a DMA Masterclass-ra`;
+    const { wrapInBaseTemplate, createHeading, createParagraph, createButtonRow, generatePlainText, } = require('../email/templates/base');
+    const subject = 'Meghívód érkezett - DMA Masterclass';
     // Build email content using base template
     const content = `
-    ${createHeading('Csatlakozz a csapathoz!', 2)}
-    ${createParagraph(`Szia <strong>${data.firstName}</strong>,`)}
-    ${createParagraph(`A(z) <strong>${data.companyName}</strong> meghívott, hogy csatlakozz hozzájuk a DMA Masterclass platformon.`)}
+    ${createHeading(`Szia ${data.firstName}!`, 2)}
+    ${createParagraph('Meghívást kaptál a Struktúraépítő streaming platformhoz.')}
+    ${createParagraph('Mivel egy jófej főnököd van, ezért mostantól te is hozzáférést kaptál több mint 150 cégépítési tartalomhoz. Neked teljesen ingyen biztosítjuk a felületet és amíg aktív előfizetésetek van, addig 200+ óra cégépítési tartalomhoz férhettek hozzá.')}
+    ${createParagraph('Regisztrálj és hozd létre a saját fiókod!')}
 
-    <tr>
-      <td style="padding: 16px 0;">
-        <p style="font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 16px; font-weight: 600; color: #111827; margin: 0 0 12px 0;">
-          Mit kapsz:
-        </p>
-      </td>
-    </tr>
-    ${createFeatureList([
-        'Hozzáférés az összes prémium tartalomhoz',
-        'Interaktív gyakorlatok és feladatok',
-        'Szakértői támogatás',
-        'Tanúsítvány a sikeres befejezés után',
-    ])}
-
-    ${createButtonRow({ text: 'Regisztrálj és csatlakozz', url: data.inviteUrl, variant: 'primary' })}
-
-    ${createAlertBox('Ez a meghívó <strong>7 napon belül</strong> jár le.', 'warning')}
-
-    ${createParagraph('Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.', { muted: true })}
+    ${createButtonRow({ text: 'REGISZTRÁLOK', url: data.inviteUrl, variant: 'primary' })}
   `;
     const htmlContent = wrapInBaseTemplate(content, {
         showUnsubscribe: false, // Transactional email
-        preheader: `${data.companyName} meghívott a DMA Masterclass platformra`,
+        preheader: 'Meghívást kaptál a Struktúraépítő streaming platformhoz!',
     });
     const textContent = generatePlainText({
-        greeting: `Szia ${data.firstName},`,
+        greeting: `Szia ${data.firstName}!`,
         paragraphs: [
-            `A(z) ${data.companyName} meghívott, hogy csatlakozz hozzájuk a DMA Masterclass platformon.`,
-            'Mit kapsz:',
-            '- Hozzáférés az összes prémium tartalomhoz',
-            '- Interaktív gyakorlatok és feladatok',
-            '- Szakértői támogatás',
-            '- Tanúsítvány a sikeres befejezés után',
-            'Ez a meghívó 7 napon belül jár le.',
-            'Ha nem te kérted ezt a meghívót, egyszerűen hagyd figyelmen kívül ezt az emailt.',
+            'Meghívást kaptál a Struktúraépítő streaming platformhoz.',
+            'Mivel egy jófej főnököd van, ezért mostantól te is hozzáférést kaptál több mint 150 cégépítési tartalomhoz. Neked teljesen ingyen biztosítjuk a felületet és amíg aktív előfizetésetek van, addig 200+ óra cégépítési tartalomhoz férhettek hozzá.',
+            'Regisztrálj és hozd létre a saját fiókod!',
         ],
-        ctaText: 'Regisztrálj és csatlakozz',
+        ctaText: 'REGISZTRÁLOK',
         ctaUrl: data.inviteUrl,
         signOff: 'Üdvözlettel, A DMA csapat',
     });

@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = void 0;
+exports.sendRegistrationReminders = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = void 0;
 /**
  * Automated Background Tasks
  * Scheduled functions for analytics calculation and recommendations
@@ -41,6 +41,8 @@ exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser 
 const admin = __importStar(require("firebase-admin"));
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const https_1 = require("firebase-functions/v2/https");
+const registrationReminder_1 = require("./email/templates/registrationReminder");
+const registrationReminder1Day_1 = require("./email/templates/registrationReminder1Day");
 const firestore = admin.firestore();
 // ============================================================================
 // SCHEDULED ANALYTICS CALCULATION
@@ -470,6 +472,96 @@ exports.getPersonalizedRecommendations = (0, https_1.onCall)({
             success: false,
             error: error instanceof Error ? error.message : 'Hiba történt a javaslatok lekérdezésekor',
         };
+    }
+});
+// ============================================================================
+// REGISTRATION REMINDER EMAILS
+// ============================================================================
+/**
+ * Helper function to send reminders to users registered on a specific date
+ */
+async function sendRemindersForDate(daysAgo, sendEmailFn) {
+    const now = new Date();
+    const targetDate = new Date(now);
+    targetDate.setDate(targetDate.getDate() - daysAgo);
+    targetDate.setHours(0, 0, 0, 0);
+    const targetDateEnd = new Date(targetDate);
+    targetDateEnd.setHours(23, 59, 59, 999);
+    console.log(`Looking for users registered ${daysAgo} day(s) ago: ${targetDate.toISOString()} to ${targetDateEnd.toISOString()}`);
+    const usersSnapshot = await firestore.collection('users')
+        .where('createdAt', '>=', targetDate.toISOString())
+        .where('createdAt', '<=', targetDateEnd.toISOString())
+        .get();
+    console.log(`Found ${usersSnapshot.size} users registered ${daysAgo} day(s) ago`);
+    let sentCount = 0;
+    let skippedCount = 0;
+    for (const userDoc of usersSnapshot.docs) {
+        const userData = userDoc.data();
+        const userId = userDoc.id;
+        // Only company admins/owners
+        const isCompanyAdmin = userData.role === 'COMPANY_ADMIN' ||
+            userData.companyRole === 'owner' ||
+            (userData.companyId && userData.companyRole !== 'employee');
+        if (!isCompanyAdmin) {
+            skippedCount++;
+            continue;
+        }
+        // Check if user has an active subscription
+        const subscriptionSnapshot = await firestore.collection('subscriptions')
+            .where('userId', '==', userId)
+            .where('status', 'in', ['active', 'trialing'])
+            .limit(1)
+            .get();
+        if (!subscriptionSnapshot.empty) {
+            skippedCount++;
+            continue;
+        }
+        // Send reminder email
+        if (userData.email) {
+            try {
+                const result = await sendEmailFn({ email: userData.email });
+                if (result.success) {
+                    sentCount++;
+                    console.log(`Sent ${daysAgo}-day reminder to ${userData.email}`);
+                }
+                else {
+                    console.warn(`Failed to send ${daysAgo}-day reminder to ${userData.email}:`, result.error);
+                }
+            }
+            catch (emailError) {
+                console.error(`Error sending ${daysAgo}-day reminder to ${userData.email}:`, emailError.message);
+            }
+        }
+    }
+    return { sent: sentCount, skipped: skippedCount };
+}
+/**
+ * Send reminder emails to company admins who haven't subscribed
+ * - 1-day reminder: registered yesterday
+ * - 7-day reminder: registered a week ago
+ * Runs daily at 9 AM Budapest time
+ */
+exports.sendRegistrationReminders = (0, scheduler_1.onSchedule)({
+    schedule: '0 9 * * *', // 9 AM daily
+    timeZone: 'Europe/Budapest',
+    region: 'europe-west1',
+}, async (event) => {
+    console.log('Starting registration reminder emails...');
+    try {
+        // Send 1-day reminders
+        console.log('--- Processing 1-day reminders ---');
+        const oneDayResults = await sendRemindersForDate(1, registrationReminder1Day_1.sendRegistrationReminder1DayEmail);
+        // Send 7-day reminders
+        console.log('--- Processing 7-day reminders ---');
+        const sevenDayResults = await sendRemindersForDate(7, registrationReminder_1.sendRegistrationReminderEmail);
+        console.log('Registration reminders completed:', {
+            '1-day': oneDayResults,
+            '7-day': sevenDayResults,
+        });
+    }
+    catch (error) {
+        console.error('Registration reminder error:', error);
+        throw error;
     }
 });
 //# sourceMappingURL=automatedTasks.js.map

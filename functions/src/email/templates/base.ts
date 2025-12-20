@@ -25,7 +25,7 @@ export interface ButtonOptions {
   variant?: 'primary' | 'urgent' | 'secondary';
 }
 
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 
 // Brand colors
 const colors = {
@@ -126,11 +126,11 @@ export function wrapInBaseTemplate(content: string, options: BaseTemplateOptions
   const unsubscribeHtml = showUnsubscribe ? `
     <tr>
       <td style="padding-top: 16px;">
-        <a href="${APP_URL}/beallitasok/ertesitesek" style="color: ${colors.textTertiary}; font-size: 14px; text-decoration: underline;">
+        <a href="${APP_URL}/company/dashboard/billing" style="color: ${colors.textTertiary}; font-size: 14px; text-decoration: underline;">
           Leiratkozás
         </a>
         <span style="color: ${colors.textTertiary}; margin: 0 8px;">|</span>
-        <a href="${APP_URL}/beallitasok" style="color: ${colors.textTertiary}; font-size: 14px; text-decoration: underline;">
+        <a href="${APP_URL}/company/dashboard/billing" style="color: ${colors.textTertiary}; font-size: 14px; text-decoration: underline;">
           Beállítások
         </a>
       </td>

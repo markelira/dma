@@ -422,7 +422,7 @@ export default function CoursePlayerPage() {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="hidden md:flex h-screen overflow-hidden">
+      <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] overflow-hidden">
         {/* Sidebar - Masterclass style or traditional module-based */}
         {useMasterclassSidebar ? (
           <MasterclassSidebar
@@ -448,7 +448,7 @@ export default function CoursePlayerPage() {
 
         {/* Main Content */}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-5xl mx-auto px-12 py-8 space-y-8">
+          <div className="w-full px-6 lg:px-8 xl:px-12 py-6 lg:py-8 space-y-6 lg:space-y-8">
             {/* Back Link */}
             <Link
               href={getDashboardPath(user?.role)}
@@ -498,7 +498,7 @@ export default function CoursePlayerPage() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden h-screen overflow-hidden flex flex-col">
+      <div className="md:hidden min-h-[100dvh] flex flex-col">
         {/* Back Link */}
         <div className="flex-shrink-0 border-b border-gray-200 px-6 py-4 bg-white">
           <Link
@@ -511,7 +511,7 @@ export default function CoursePlayerPage() {
         </div>
 
         {/* Tab Content */}
-        <div className="flex-1 overflow-y-auto pb-20">
+        <div className="flex-1 overflow-y-auto pb-[72px]">
           {/* Video Tab Content */}
           {mobileTab === 'video' && (
             <div className="p-6 space-y-6">

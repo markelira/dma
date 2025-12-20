@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendTrialEndingEmail = sendTrialEndingEmail;
 const emailService_1 = require("../emailService");
 const base_1 = require("./base");
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 /**
  * Format amount with currency
  */
@@ -24,7 +24,7 @@ async function sendTrialEndingEmail(data) {
     const { firstName, email, planName, trialEndDate, daysRemaining, amount, currency, cancelUrl } = data;
     const subject = `Próbaidőszakod ${daysRemaining} nap múlva lejár`;
     const formattedAmount = formatAmount(amount, currency);
-    const managementUrl = cancelUrl || `${APP_URL}/beallitasok/szamlazas`;
+    const managementUrl = cancelUrl || `${APP_URL}/company/dashboard/billing`;
     const content = `
     ${(0, base_1.createHeading)(`Még ${daysRemaining} nap a próbaidőszakodból!`, 2)}
     ${(0, base_1.createParagraph)(`Szia <strong>${firstName}</strong>,`)}
@@ -48,7 +48,7 @@ async function sendTrialEndingEmail(data) {
 
     ${(0, base_1.createParagraph)('Folytasd a tartalmak felfedezését:')}
 
-    ${(0, base_1.createButtonRow)({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/dashboard/osszes-tartalom`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
 
     ${(0, base_1.createParagraph)(`Ha mégsem szeretnéd folytatni, <a href="${managementUrl}" style="color: #252F5B;">itt mondhatod le</a> a próbaidőszak lejárta előtt.`, { muted: true })}
   `;
@@ -69,7 +69,7 @@ async function sendTrialEndingEmail(data) {
             `Ha mégsem szeretnéd folytatni, itt mondhatod le: ${managementUrl}`,
         ],
         ctaText: 'Megnézem a tartalmakat',
-        ctaUrl: `${APP_URL}/dashboard/osszes-tartalom`,
+        ctaUrl: `${APP_URL}/company/dashboard`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

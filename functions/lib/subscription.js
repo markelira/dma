@@ -46,6 +46,7 @@ const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const stripe_1 = __importDefault(require("stripe"));
+const companySubscriptionCanceled_1 = require("./email/templates/companySubscriptionCanceled");
 const firestore = admin.firestore();
 // Lazy Stripe initialization - will be initialized on first request
 let stripe = null;
@@ -350,6 +351,57 @@ exports.cancelSubscription = (0, https_1.onCall)({
             updatedAt: new Date().toISOString()
         });
         v2_1.logger.info(`Subscription ${subscriptionId} marked for cancellation`);
+        // Notify company employees if this is a company subscription (fire-and-forget)
+        (async () => {
+            try {
+                // Check if user has a company
+                const userDoc = await firestore.collection('users').doc(userId).get();
+                const userData = userDoc.data();
+                const companyId = userData?.companyId;
+                if (companyId && userData?.companyRole === 'owner') {
+                    // Get company name
+                    const companyDoc = await firestore.collection('companies').doc(companyId).get();
+                    const companyName = companyDoc.data()?.name || 'A cég';
+                    // Get all active employees
+                    const employeesSnapshot = await firestore
+                        .collection('companies')
+                        .doc(companyId)
+                        .collection('employees')
+                        .where('status', '==', 'active')
+                        .get();
+                    // Send notification to each employee
+                    for (const employeeDoc of employeesSnapshot.docs) {
+                        const employeeData = employeeDoc.data();
+                        const employeeUserId = employeeData.userId;
+                        if (employeeUserId) {
+                            // Get employee's user data for email
+                            const employeeUserDoc = await firestore.collection('users').doc(employeeUserId).get();
+                            const employeeUserData = employeeUserDoc.data();
+                            if (employeeUserData?.email) {
+                                const employeeFirstName = employeeData.firstName || employeeUserData.firstName || 'Kollega';
+                                await (0, companySubscriptionCanceled_1.sendCompanySubscriptionCanceledEmail)({
+                                    employeeFirstName,
+                                    employeeEmail: employeeUserData.email,
+                                    companyName,
+                                }).then((result) => {
+                                    if (result.success) {
+                                        v2_1.logger.info(`Company cancellation email sent to employee ${employeeUserId}`);
+                                    }
+                                    else {
+                                        v2_1.logger.warn(`Failed to send cancellation email to employee ${employeeUserId}:`, result.error);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                    v2_1.logger.info(`Notified ${employeesSnapshot.size} employees about subscription cancellation`);
+                }
+            }
+            catch (notifyError) {
+                v2_1.logger.warn('Error notifying employees about cancellation:', notifyError.message);
+                // Don't throw - main cancellation was successful
+            }
+        })();
         return {
             success: true,
             message: 'Az előfizetés lemondva. A jelenlegi időszak végéig még hozzáférhet.',

@@ -7,6 +7,7 @@ import * as admin from 'firebase-admin';
 import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import Stripe from 'stripe';
+import { sendCompanySubscriptionCanceledEmail } from './email/templates/companySubscriptionCanceled';
 
 const firestore = admin.firestore();
 
@@ -350,6 +351,63 @@ export const cancelSubscription = onCall({
     });
 
     logger.info(`Subscription ${subscriptionId} marked for cancellation`);
+
+    // Notify company employees if this is a company subscription (fire-and-forget)
+    (async () => {
+      try {
+        // Check if user has a company
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        const userData = userDoc.data();
+        const companyId = userData?.companyId;
+
+        if (companyId && userData?.companyRole === 'owner') {
+          // Get company name
+          const companyDoc = await firestore.collection('companies').doc(companyId).get();
+          const companyName = companyDoc.data()?.name || 'A cég';
+
+          // Get all active employees
+          const employeesSnapshot = await firestore
+            .collection('companies')
+            .doc(companyId)
+            .collection('employees')
+            .where('status', '==', 'active')
+            .get();
+
+          // Send notification to each employee
+          for (const employeeDoc of employeesSnapshot.docs) {
+            const employeeData = employeeDoc.data();
+            const employeeUserId = employeeData.userId;
+
+            if (employeeUserId) {
+              // Get employee's user data for email
+              const employeeUserDoc = await firestore.collection('users').doc(employeeUserId).get();
+              const employeeUserData = employeeUserDoc.data();
+
+              if (employeeUserData?.email) {
+                const employeeFirstName = employeeData.firstName || employeeUserData.firstName || 'Kollega';
+
+                await sendCompanySubscriptionCanceledEmail({
+                  employeeFirstName,
+                  employeeEmail: employeeUserData.email,
+                  companyName,
+                }).then((result) => {
+                  if (result.success) {
+                    logger.info(`Company cancellation email sent to employee ${employeeUserId}`);
+                  } else {
+                    logger.warn(`Failed to send cancellation email to employee ${employeeUserId}:`, result.error);
+                  }
+                });
+              }
+            }
+          }
+
+          logger.info(`Notified ${employeesSnapshot.size} employees about subscription cancellation`);
+        }
+      } catch (notifyError: any) {
+        logger.warn('Error notifying employees about cancellation:', notifyError.message);
+        // Don't throw - main cancellation was successful
+      }
+    })();
 
     return {
       success: true,

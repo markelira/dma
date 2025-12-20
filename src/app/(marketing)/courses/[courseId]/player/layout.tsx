@@ -50,13 +50,14 @@ export default function PlayerLayout({
         footer { display: none !important; }
         /* Reset body padding from marketing layout */
         .pt-\\[74px\\] { padding-top: 0 !important; }
-        /* Ensure full height */
+        /* Ensure full height - allow vertical scroll if needed */
         #__next, body, html {
-          height: 100% !important;
-          overflow: hidden !important;
+          height: 100%;
+          min-height: 100%;
+          overflow-x: hidden;
         }
       `}</style>
-      <div className="fixed inset-0 z-50 bg-white">
+      <div className="min-h-screen bg-white relative z-50">
         {children}
       </div>
     </>

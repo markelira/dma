@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendWelcomeEmail = sendWelcomeEmail;
 const emailService_1 = require("../emailService");
 const base_1 = require("./base");
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 /**
  * Send welcome email to new user
  */
@@ -19,7 +19,7 @@ async function sendWelcomeEmail(data) {
     ${(0, base_1.createParagraph)('A Struktúra építő streaming platformon több mint 150 cégépítési tartalmat fedezhetsz fel, hogy vállalkozásod végre strukturált és önjáró legyen.')}
     ${(0, base_1.createParagraph)('Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.')}
 
-    ${(0, base_1.createButtonRow)({ text: 'KEZD EL 7 NAPIG INGYEN', url: `${APP_URL}/subscribe/start`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'KEZD EL 7 NAPIG INGYEN', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -32,7 +32,7 @@ async function sendWelcomeEmail(data) {
             'Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.',
         ],
         ctaText: 'KEZD EL 7 NAPIG INGYEN',
-        ctaUrl: `${APP_URL}/subscribe/start`,
+        ctaUrl: `${APP_URL}/company/dashboard/billing`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

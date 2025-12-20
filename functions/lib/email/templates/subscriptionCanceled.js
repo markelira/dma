@@ -7,7 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendSubscriptionCanceledEmail = sendSubscriptionCanceledEmail;
 const emailService_1 = require("../emailService");
 const base_1 = require("./base");
-const APP_URL = process.env.APP_URL || 'https://academion.hu';
+const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
 /**
  * Send subscription canceled email
  */
@@ -20,7 +20,7 @@ async function sendSubscriptionCanceledEmail(data) {
     ${(0, base_1.createParagraph)('Sajnáljuk, hogy elhagyod a fedélzetet. Előfizetésed a Struktúraépítő streaming platformon lejárt, így a fordulónapod után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.')}
     ${(0, base_1.createParagraph)('Ha mégis folytatnád, akkor kattints a gombra.')}
 
-    ${(0, base_1.createButtonRow)({ text: 'FOLYTATOM', url: `${APP_URL}/subscribe/start`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'FOLYTATOM', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -34,7 +34,7 @@ async function sendSubscriptionCanceledEmail(data) {
             'Ha mégis folytatnád, akkor kattints a gombra.',
         ],
         ctaText: 'FOLYTATOM',
-        ctaUrl: `${APP_URL}/subscribe/start`,
+        ctaUrl: `${APP_URL}/company/dashboard/billing`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

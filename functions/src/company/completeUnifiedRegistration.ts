@@ -4,6 +4,7 @@ import { https } from 'firebase-functions/v2';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { Company, CompanyAdmin } from '../types/company';
 import { linkEmployeeByEmail } from './linkEmployeeByEmail';
+import { sendWelcomeEmail } from '../email/templates/welcome';
 
 interface UnifiedRegistrationInput {
   // Required fields
@@ -236,6 +237,20 @@ export const completeUnifiedRegistration = https.onCall(
       console.log(`   User ID: ${userId}`);
       console.log(`   Company: ${finalCompanyName}`);
       console.log(`   Linked to invite: ${linkedToInvite}`);
+
+      // Send welcome email (fire-and-forget, non-blocking)
+      sendWelcomeEmail({
+        firstName: firstName.trim(),
+        email: email.trim().toLowerCase(),
+      }).then((result) => {
+        if (result.success) {
+          console.log(`📧 [completeUnifiedRegistration] Welcome email sent to ${email}`);
+        } else {
+          console.warn(`⚠️ [completeUnifiedRegistration] Failed to send welcome email:`, result.error);
+        }
+      }).catch((err) => {
+        console.warn(`⚠️ [completeUnifiedRegistration] Error sending welcome email:`, err.message);
+      });
 
       return {
         success: true,

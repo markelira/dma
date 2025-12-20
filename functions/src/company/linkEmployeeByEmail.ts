@@ -8,6 +8,8 @@
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { CompanyEmployee } from '../types/company';
+import { sendEmployeeWelcomeEmail } from '../email/templates/employeeWelcome';
+import { sendEmployeeJoinedEmail } from '../email/templates/employeeJoined';
 
 const db = admin.firestore();
 
@@ -145,6 +147,53 @@ export async function linkEmployeeByEmail(
       joinedVia: 'registration',
       timestamp: FieldValue.serverTimestamp(),
     }).catch(() => { /* Non-critical */ });
+
+    // 7. Send employee welcome email (fire-and-forget, non-blocking)
+    const employeeFirstName = employeeData.firstName || employeeData.fullName?.split(' ')[0] || 'Kollega';
+    const employeeFullName = employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`;
+    sendEmployeeWelcomeEmail({
+      firstName: employeeFirstName,
+      email: email.toLowerCase(),
+      companyName,
+    }).then((result) => {
+      if (result.success) {
+        console.log('📧 [linkEmployeeByEmail] Employee welcome email sent');
+      } else {
+        console.warn('⚠️ [linkEmployeeByEmail] Failed to send welcome email:', result.error);
+      }
+    }).catch((err) => {
+      console.warn('⚠️ [linkEmployeeByEmail] Error sending welcome email:', err.message);
+    });
+
+    // 8. Notify admin that employee joined (fire-and-forget, non-blocking)
+    if (employeeData.invitedBy) {
+      db.collection('users').doc(employeeData.invitedBy).get().then(async (adminDoc) => {
+        if (adminDoc.exists) {
+          const adminData = adminDoc.data();
+          const adminEmail = adminData?.email;
+          const adminFirstName = adminData?.firstName || adminData?.displayName?.split(' ')[0] || 'Adminisztrátor';
+
+          if (adminEmail) {
+            try {
+              const result = await sendEmployeeJoinedEmail({
+                adminFirstName,
+                adminEmail,
+                employeeFullName,
+              });
+              if (result.success) {
+                console.log('📧 [linkEmployeeByEmail] Admin notification email sent to', adminEmail);
+              } else {
+                console.warn('⚠️ [linkEmployeeByEmail] Failed to send admin notification:', result.error);
+              }
+            } catch (err: any) {
+              console.warn('⚠️ [linkEmployeeByEmail] Error sending admin notification:', err.message);
+            }
+          }
+        }
+      }).catch((err) => {
+        console.warn('⚠️ [linkEmployeeByEmail] Error fetching admin for notification:', err.message);
+      });
+    }
 
     console.log('🎉 [linkEmployeeByEmail] Employee successfully linked to company');
 

@@ -6,6 +6,7 @@ import * as admin from 'firebase-admin';
 import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import * as z from 'zod';
+import { sendNewContentAvailableEmail } from './email/templates/newContentAvailable';
 
 const firestore = admin.firestore();
 
@@ -377,6 +378,42 @@ export const publishCourse = onCall({
     });
 
     logger.info(`Course published: ${courseId} by user ${userId}`);
+
+    // Notify all registered users about new content (fire-and-forget)
+    const courseTitle = courseData?.title || 'Új tartalom';
+    (async () => {
+      try {
+        // Get all users with email
+        const usersSnapshot = await firestore.collection('users').get();
+        let sentCount = 0;
+
+        for (const userDoc of usersSnapshot.docs) {
+          const userData = userDoc.data();
+          if (userData.email) {
+            const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
+
+            sendNewContentAvailableEmail({
+              firstName,
+              email: userData.email,
+              courseTitle,
+              courseId,
+            }).then((result) => {
+              if (!result.success) {
+                logger.warn(`Failed to send new content email to ${userData.email}:`, result.error);
+              }
+            }).catch((err) => {
+              logger.warn(`Error sending new content email to ${userData.email}:`, err.message);
+            });
+
+            sentCount++;
+          }
+        }
+
+        logger.info(`New content notification sent to ${sentCount} users for course ${courseId}`);
+      } catch (notifyError: any) {
+        logger.warn('Error sending new content notifications:', notifyError.message);
+      }
+    })();
 
     return {
       success: true,

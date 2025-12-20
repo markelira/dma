@@ -42,6 +42,7 @@ const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
+const newContentAvailable_1 = require("./email/templates/newContentAvailable");
 const firestore = admin.firestore();
 // Validation schema for course data
 const CourseSchema = z.object({
@@ -372,6 +373,38 @@ exports.publishCourse = (0, https_1.onCall)({
             updatedAt: new Date().toISOString(),
         });
         v2_1.logger.info(`Course published: ${courseId} by user ${userId}`);
+        // Notify all registered users about new content (fire-and-forget)
+        const courseTitle = courseData?.title || 'Új tartalom';
+        (async () => {
+            try {
+                // Get all users with email
+                const usersSnapshot = await firestore.collection('users').get();
+                let sentCount = 0;
+                for (const userDoc of usersSnapshot.docs) {
+                    const userData = userDoc.data();
+                    if (userData.email) {
+                        const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
+                        (0, newContentAvailable_1.sendNewContentAvailableEmail)({
+                            firstName,
+                            email: userData.email,
+                            courseTitle,
+                            courseId,
+                        }).then((result) => {
+                            if (!result.success) {
+                                v2_1.logger.warn(`Failed to send new content email to ${userData.email}:`, result.error);
+                            }
+                        }).catch((err) => {
+                            v2_1.logger.warn(`Error sending new content email to ${userData.email}:`, err.message);
+                        });
+                        sentCount++;
+                    }
+                }
+                v2_1.logger.info(`New content notification sent to ${sentCount} users for course ${courseId}`);
+            }
+            catch (notifyError) {
+                v2_1.logger.warn('Error sending new content notifications:', notifyError.message);
+            }
+        })();
         return {
             success: true,
             message: 'Kurzus sikeresen publikálva'

@@ -154,7 +154,7 @@ export function NetflixPlayerLayout({
     return (
       <>
         {/* ========== MOBILE LAYOUT ========== */}
-        <div className="md:hidden h-screen flex flex-col bg-black">
+        <div className="md:hidden min-h-[100dvh] flex flex-col bg-black">
           {/* Mobile Top Bar */}
           <div className="flex-shrink-0 bg-gray-900 px-4 py-3 border-b border-gray-800">
             <div className="flex items-center gap-3">
@@ -206,7 +206,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex h-screen bg-black overflow-hidden">
+        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel */}
           <WebinarSidePanel
             courseTitle={course.title}
@@ -218,7 +218,7 @@ export function NetflixPlayerLayout({
           />
 
           {/* Right Side - Video and Controls */}
-          <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
               <div className="flex items-center gap-4">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors">
@@ -269,7 +269,7 @@ export function NetflixPlayerLayout({
     return (
       <>
         {/* ========== MOBILE LAYOUT ========== */}
-        <div className="md:hidden h-screen flex flex-col bg-white">
+        <div className="md:hidden min-h-[100dvh] flex flex-col bg-white">
           {/* Mobile Top Bar */}
           <div className="flex-shrink-0 bg-gray-900 px-4 py-3 border-b border-gray-800">
             <div className="flex items-center gap-3">
@@ -284,7 +284,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Mobile Tab Content */}
-          <div className="flex-1 overflow-y-auto pb-20">
+          <div className="flex-1 overflow-y-auto pb-[72px]">
             {/* Video Tab Content */}
             {mobileTab === 'video' && (
               <div className="flex flex-col">
@@ -415,7 +415,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex h-screen bg-black overflow-hidden">
+        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel with Lesson Navigation */}
           <AcademiaSidePanel
             courseTitle={course.title}
@@ -428,7 +428,7 @@ export function NetflixPlayerLayout({
           />
 
           {/* Right Side - Video and Controls */}
-          <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
               <div className="flex items-center gap-4">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors">
@@ -519,7 +519,7 @@ export function NetflixPlayerLayout({
     return (
       <>
         {/* ========== MOBILE LAYOUT ========== */}
-        <div className="md:hidden h-screen flex flex-col bg-white">
+        <div className="md:hidden min-h-[100dvh] flex flex-col bg-white">
           {/* Mobile Top Bar */}
           <div className="flex-shrink-0 bg-gray-900 px-4 py-3 border-b border-gray-800">
             <div className="flex items-center gap-3">
@@ -534,7 +534,7 @@ export function NetflixPlayerLayout({
           </div>
 
           {/* Mobile Tab Content */}
-          <div className="flex-1 overflow-y-auto pb-20">
+          <div className="flex-1 overflow-y-auto pb-[72px]">
             {/* Video Tab Content */}
             {mobileTab === 'video' && (
               <div className="flex flex-col">
@@ -686,7 +686,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex h-screen bg-black overflow-hidden">
+        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel with Lesson Navigation */}
           <MasterclassSidePanel
             courseTitle={course.title}
@@ -699,7 +699,7 @@ export function NetflixPlayerLayout({
           />
 
           {/* Right Side - Video and Controls */}
-          <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             {/* Top bar with back link and title */}
             <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
               <div className="flex items-center gap-4">
@@ -815,7 +815,7 @@ export function NetflixPlayerLayout({
     return (
       <>
         {/* ========== MOBILE LAYOUT ========== */}
-        <div className="md:hidden h-screen flex flex-col bg-black">
+        <div className="md:hidden min-h-[100dvh] flex flex-col bg-black">
           {/* Mobile Top Bar */}
           <div className="flex-shrink-0 bg-gray-900 px-4 py-3 border-b border-gray-800">
             <div className="flex items-center gap-3">
@@ -867,7 +867,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex h-screen bg-black overflow-hidden">
+        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel */}
           <PodcastSidePanel
             courseTitle={course.title}
@@ -879,7 +879,7 @@ export function NetflixPlayerLayout({
           />
 
           {/* Right Side - Video and Controls */}
-          <div className="flex-1 flex flex-col h-screen overflow-hidden">
+          <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
             <div className="bg-black/80 px-6 py-4 flex-shrink-0 border-b border-gray-800">
               <div className="flex items-center gap-4">
                 <Link href="/dashboard" className="inline-flex items-center gap-2 text-white/80 hover:text-red-400 font-medium transition-colors">
