@@ -35,7 +35,7 @@ import { shuffleArray } from '@/lib/utils';
  */
 
 export default function DashboardPage() {
-  const { user } = useAuthStore();
+  const { user, authReady } = useAuthStore();
   const router = useRouter();
 
   // Data hooks
@@ -104,10 +104,11 @@ export default function DashboardPage() {
 
   // Check if trial popup should show (AFTER welcome popup is dismissed)
   // Company employees see different modal if company has no subscription
-  // IMPORTANT: Only check after subscription status is loaded to avoid race condition
+  // IMPORTANT: Wait for BOTH authReady AND subscription status to avoid race condition
+  // (authReady ensures companyId is loaded from Firestore before showing modal)
   useEffect(() => {
-    // Don't show any modals while subscription status is still loading
-    if (subscriptionLoading) return;
+    // Don't show any modals while auth or subscription status is still loading
+    if (!authReady || subscriptionLoading) return;
 
     if (!showWelcomePopup && !hasActiveSubscription) {
       if (isCompanyEmployee) {
@@ -118,7 +119,7 @@ export default function DashboardPage() {
         setShowTrialModal(true);
       }
     }
-  }, [shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading]);
+  }, [authReady, shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading]);
 
   // Check if onboarding is needed (only if trial modal not showing)
   useEffect(() => {
