@@ -4,26 +4,70 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Building2, X as CloseIcon } from 'lucide-react';
+import { Building2, X as CloseIcon, Mail, Loader2, CheckCircle } from 'lucide-react';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '@/lib/firebase';
 
 interface CompanyEmployeeNoAccessModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  companyId?: string;
+  employeeName?: string;
 }
 
 export function CompanyEmployeeNoAccessModal({
   open,
   onOpenChange,
+  companyId,
+  employeeName,
 }: CompanyEmployeeNoAccessModalProps) {
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+  const [isNotifying, setIsNotifying] = useState(false);
+  const [notifySuccess, setNotifySuccess] = useState(false);
+  const [notifyError, setNotifyError] = useState<string | null>(null);
 
   useEffect(() => {
     setPortalContainer(document.body);
     return () => setPortalContainer(null);
   }, []);
 
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!open) {
+      setNotifySuccess(false);
+      setNotifyError(null);
+    }
+  }, [open]);
+
   const handleClose = () => {
     onOpenChange(false);
+  };
+
+  const handleNotifyBoss = async () => {
+    if (!companyId) {
+      setNotifyError('Hiba: Nincs cégazonosító');
+      return;
+    }
+
+    setIsNotifying(true);
+    setNotifyError(null);
+
+    try {
+      const notifyCompanyAdminFn = httpsCallable(functions, 'notifyCompanyAdmin');
+      const result = await notifyCompanyAdminFn({ companyId });
+      const data = result.data as { success: boolean; error?: string };
+
+      if (data.success) {
+        setNotifySuccess(true);
+      } else {
+        setNotifyError(data.error || 'Hiba történt az értesítés küldésekor');
+      }
+    } catch (error: any) {
+      console.error('Error notifying company admin:', error);
+      setNotifyError('Hiba történt az értesítés küldésekor. Próbáld újra később.');
+    } finally {
+      setIsNotifying(false);
+    }
   };
 
   if (!portalContainer || !open) return null;
@@ -113,12 +157,60 @@ export function CompanyEmployeeNoAccessModal({
                     </p>
                   </motion.div>
 
-                  {/* Close Button */}
+                  {/* Success message */}
+                  {notifySuccess && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg"
+                    >
+                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                      <p className="text-sm text-green-700">
+                        Értesítés elküldve a cégvezetődnek!
+                      </p>
+                    </motion.div>
+                  )}
+
+                  {/* Error message */}
+                  {notifyError && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-3 bg-red-50 border border-red-200 rounded-lg"
+                    >
+                      <p className="text-sm text-red-700">{notifyError}</p>
+                    </motion.div>
+                  )}
+
+                  {/* Buttons */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.35 }}
+                    className="space-y-3"
                   >
+                    {/* Notify Boss Button */}
+                    {!notifySuccess && companyId && (
+                      <Button
+                        onClick={handleNotifyBoss}
+                        disabled={isNotifying}
+                        className="w-full h-12 text-base font-semibold bg-gradient-to-t from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white transition-all shadow-lg shadow-amber-500/20"
+                      >
+                        {isNotifying ? (
+                          <>
+                            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                            Küldés...
+                          </>
+                        ) : (
+                          <>
+                            <Mail className="w-5 h-5 mr-2" />
+                            Főnök értesítése
+                          </>
+                        )}
+                      </Button>
+                    )}
+
+                    {/* Close Button */}
                     <Button
                       onClick={handleClose}
                       variant="outline"
