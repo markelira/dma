@@ -137,62 +137,19 @@ export default function CompanyDashboardPage() {
     // If no non-enrolled courses, return empty
     if (nonEnrolledCourses.length === 0) return [];
 
-    const slides: Array<{
-      id: string;
-      title: string;
-      description?: string;
-      thumbnailUrl?: string;
-      courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
-      duration?: string;
-      isEnrolled?: boolean;
-      firstLessonId?: string;
-    }> = [];
+    // Shuffle first, then take 5 random courses
+    const randomCourses = shuffleArray(nonEnrolledCourses).slice(0, 5);
 
-    // Sort non-enrolled courses by createdAt (newest first)
-    const sortedCourses = [...nonEnrolledCourses].sort((a, b) => {
-      const dateA = new Date(a.createdAt).getTime();
-      const dateB = new Date(b.createdAt).getTime();
-      return dateB - dateA;
-    });
-
-    // Add latest of each course type (non-enrolled only)
-    const courseTypes: Array<'MASTERCLASS' | 'WEBINAR' | 'ACADEMIA' | 'PODCAST'> = ['MASTERCLASS', 'WEBINAR', 'ACADEMIA', 'PODCAST'];
-
-    courseTypes.forEach(type => {
-      const latestOfType = sortedCourses.find(c => c.courseType === type);
-      if (latestOfType && !slides.some(s => s.id === latestOfType.id)) {
-        slides.push({
-          id: latestOfType.id,
-          title: latestOfType.title,
-          description: latestOfType.description,
-          thumbnailUrl: latestOfType.thumbnailUrl,
-          courseType: type,
-          duration: latestOfType.duration,
-          isEnrolled: false,
-          firstLessonId: getFirstLessonId(latestOfType),
-        });
-      }
-    });
-
-    // Fill remaining slots with other non-enrolled courses (up to 5 total)
-    if (slides.length < 5) {
-      const remainingCourses = sortedCourses.filter(c => !slides.some(s => s.id === c.id));
-      remainingCourses.slice(0, 5 - slides.length).forEach(course => {
-        slides.push({
-          id: course.id,
-          title: course.title,
-          description: course.description,
-          thumbnailUrl: course.thumbnailUrl,
-          courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
-          duration: course.duration,
-          isEnrolled: false,
-          firstLessonId: getFirstLessonId(course),
-        });
-      });
-    }
-
-    // Shuffle slides randomly on each page load
-    return shuffleArray(slides);
+    return randomCourses.map(course => ({
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      thumbnailUrl: course.thumbnailUrl,
+      courseType: course.courseType as 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST' | undefined,
+      duration: course.duration,
+      isEnrolled: false,
+      firstLessonId: getFirstLessonId(course),
+    }));
   }, [courses, enrollments]);
 
   // Build enrolled courses list (Saját listám)

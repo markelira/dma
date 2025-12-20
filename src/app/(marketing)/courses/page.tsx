@@ -16,6 +16,7 @@ import { CourseCarouselRow } from '@/components/dashboard/CourseCarouselRow'
 import { useInstructors } from '@/hooks/useInstructorQueries'
 import { useEnrollments } from '@/hooks/useEnrollments'
 import { sortByContentCreatedAt, shufflePopularCourses } from '@/lib/carouselUtils'
+import { shuffleArray } from '@/lib/utils'
 
 interface Course {
   id: string
@@ -246,18 +247,10 @@ export default function CoursesPage() {
   const heroSlides = useMemo(() => {
     if (!courses || courses.length === 0) return [];
 
-    // Shuffle courses using Fisher-Yates with date seed
-    const shuffled = [...courses];
-    const today = new Date().toDateString();
-    let seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      seed = (seed * 9301 + 49297) % 233280;
-      const j = Math.floor((seed / 233280) * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
+    // Shuffle courses randomly and take 5 for hero
+    const randomCourses = shuffleArray(courses).slice(0, 5);
 
-    // Take first 5
-    return shuffled.slice(0, 5).map(course => {
+    return randomCourses.map(course => {
       const enrollment = enrollments?.find(e => e.courseId === course.id);
       return {
         id: course.id,

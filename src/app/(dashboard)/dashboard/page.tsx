@@ -195,18 +195,10 @@ export default function DashboardPage() {
     // If no non-enrolled courses, return empty (hero won't show)
     if (nonEnrolledCourses.length === 0) return [];
 
-    // Shuffle courses using Fisher-Yates algorithm (seeded with date for daily consistency)
-    const shuffled = [...nonEnrolledCourses];
-    const today = new Date().toDateString();
-    let seed = today.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      seed = (seed * 9301 + 49297) % 233280;
-      const j = Math.floor((seed / 233280) * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
+    // Shuffle courses randomly and take 5 for hero
+    const randomCourses = shuffleArray(nonEnrolledCourses).slice(0, 5);
 
-    // Take first 5 random non-enrolled courses
-    return shuffled.slice(0, 5).map(course => {
+    return randomCourses.map(course => {
       return {
         id: course.id,
         title: course.title,
@@ -449,6 +441,8 @@ export default function DashboardPage() {
       <CompanyEmployeeNoAccessModal
         open={showCompanyNoAccessModal}
         onOpenChange={setShowCompanyNoAccessModal}
+        companyId={user?.companyId}
+        employeeName={user?.firstName ? `${user.lastName || ''} ${user.firstName}`.trim() : undefined}
       />
 
       {/* Onboarding Wizard - Shows only if trial modal not showing */}

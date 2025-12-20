@@ -41,15 +41,10 @@ export default function CompanyMyCoursesPage() {
   const heroSlides = useMemo(() => {
     if (!courses || !enrollments || enrollments.length === 0) return [];
 
-    // Sort enrollments by lastAccessedAt (most recent first)
-    const sortedEnrollments = [...enrollments].sort((a, b) => {
-      const dateA = a.lastAccessedAt ? new Date(a.lastAccessedAt).getTime() : 0;
-      const dateB = b.lastAccessedAt ? new Date(b.lastAccessedAt).getTime() : 0;
-      return dateB - dateA;
-    });
+    // Shuffle enrollments first, then take 5 random ones
+    const randomEnrollments = shuffleArray(enrollments).slice(0, 5);
 
-    // Take top 5 most recently accessed enrolled courses
-    const slides = sortedEnrollments.slice(0, 5).map(enrollment => {
+    return randomEnrollments.map(enrollment => {
       const course = courses.find(c => c.id === enrollment.courseId);
       if (!course) return null;
 
@@ -65,9 +60,6 @@ export default function CompanyMyCoursesPage() {
         currentLessonId: enrollment.currentLessonId,
       };
     }).filter((s): s is NonNullable<typeof s> => s !== null);
-
-    // Shuffle slides randomly on each page load
-    return shuffleArray(slides);
   }, [enrollments, courses]);
 
   // Build enrolled course lists for carousel rows
