@@ -191,6 +191,7 @@ export default function CompanyDashboardPage() {
       });
     }
 
+    // Shuffle slides randomly on each page load
     return shuffleArray(slides);
   }, [courses, enrollments]);
 

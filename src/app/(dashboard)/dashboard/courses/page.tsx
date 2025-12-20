@@ -68,6 +68,7 @@ export default function DashboardCoursesPage() {
       };
     }).filter((s): s is NonNullable<typeof s> => s !== null);
 
+    // Shuffle slides randomly on each page load
     return shuffleArray(slides);
   }, [enrollments, courses]);
 

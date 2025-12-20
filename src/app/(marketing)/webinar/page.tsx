@@ -117,8 +117,8 @@ export default function WebinarPage() {
       return names;
     };
 
-    // Sort by contentCreatedAt (newest first) and take top 5
-    const sortedCourses = sortByContentCreatedAt(filteredCourses).slice(0, 5);
+    // Shuffle courses randomly on each page load
+    const sortedCourses = shuffleArray(filteredCourses).slice(0, 5);
 
     return sortedCourses.map(course => {
       const enrollment = enrollments?.find(e => e.courseId === course.id);
