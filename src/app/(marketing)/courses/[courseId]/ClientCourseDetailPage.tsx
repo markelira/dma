@@ -43,8 +43,8 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const [showCompanyNoAccessModal, setShowCompanyNoAccessModal] = useState(false);
   const [trialVariant, setTrialVariant] = useState<'course-auth' | 'course-unauth'>('course-auth');
 
-  // Check if user is company employee
-  const isCompanyEmployee = user?.role === 'COMPANY_EMPLOYEE';
+  // Check if user is company employee (they have companyId and companyRole 'employee')
+  const isCompanyEmployee = !!(user?.companyId && user?.companyRole === 'employee');
   const { data: subscription, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const searchParams = useSearchParams();
   const queryClient = useQueryClient();
@@ -596,10 +596,13 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         )}
 
         {/* Company Employee No Access Modal - for company employees without company subscription */}
-        {isCompanyEmployee && !subscription?.isActive && (
+        {/* Wait for authReady to ensure companyId is loaded from Firestore */}
+        {authReady && isCompanyEmployee && !subscription?.isActive && (
           <CompanyEmployeeNoAccessModal
             open={showCompanyNoAccessModal}
             onOpenChange={setShowCompanyNoAccessModal}
+            companyId={user?.companyId}
+            employeeName={user?.firstName ? `${user.lastName || ''} ${user.firstName}`.trim() : undefined}
           />
         )}
 
