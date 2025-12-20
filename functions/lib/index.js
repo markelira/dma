@@ -1101,125 +1101,110 @@ exports.getCourse = (0, https_1.onCall)({
  * Used by LessonImportModal for MASTERCLASS course creation
  */
 exports.getCoursesCallable = (0, https_1.onCall)({
+    cors: true,
     region: 'europe-west1',
+    timeoutSeconds: 60,
 }, async (request) => {
     try {
-        const { forImport } = request.data || {};
-        v2_1.logger.info('[getCoursesCallable] Called', { forImport });
+        const { forImport, includeLessons } = request.data || {};
+        v2_1.logger.info('[getCoursesCallable] Called', { forImport, includeLessons });
         // Build query - optionally filter by PUBLISHED status for import
         let query = firestore.collection('courses');
         if (forImport) {
             query = query.where('status', '==', 'PUBLISHED');
         }
         const snapshot = await query.get();
-        const courses = [];
         v2_1.logger.info(`[getCoursesCallable] Query returned ${snapshot.docs.length} documents`);
+        // Collect unique instructor and category IDs for batch fetching
+        const instructorIds = new Set();
+        const categoryIds = new Set();
         for (const doc of snapshot.docs) {
-            const courseData = doc.data();
-            // DIAGNOSTIC: Log course data structure
-            v2_1.logger.info(`[getCoursesCallable] Processing course: ${doc.id}`, {
-                title: courseData.title,
-                status: courseData.status,
-                hasEmbeddedLessons: Array.isArray(courseData.lessons),
-                embeddedLessonsCount: courseData.lessons?.length || 0,
-                hasModulesArray: Array.isArray(courseData.modules),
-                modulesCount: courseData.modules?.length || 0,
-            });
-            // Get instructor data
-            let instructor = null;
-            if (courseData?.instructorId) {
-                const instructorDoc = await firestore.collection('instructors').doc(courseData.instructorId).get();
-                if (instructorDoc.exists) {
-                    const instructorData = instructorDoc.data();
-                    instructor = {
-                        id: instructorDoc.id,
-                        name: instructorData?.name || 'Ismeretlen Oktató',
-                        title: instructorData?.title || null,
-                        profilePictureUrl: instructorData?.profilePictureUrl || null,
-                    };
-                }
-            }
-            // Get category data
-            let category = null;
-            if (courseData?.categoryId) {
-                const categoryDoc = await firestore.collection('categories').doc(courseData.categoryId).get();
-                if (categoryDoc.exists) {
-                    const categoryData = categoryDoc.data();
-                    category = {
-                        id: categoryDoc.id,
-                        name: categoryData?.name || 'Ismeretlen kategória',
-                    };
-                }
-            }
-            // Get lessons - either from embedded array or from the course document
-            // Lessons are stored as embedded array in the course document (flat structure)
-            let lessons = courseData.lessons || [];
-            let lessonsSource = 'embedded';
-            // If no embedded lessons, check for modules with lessons (legacy structure)
-            if (lessons.length === 0 && courseData.modules && Array.isArray(courseData.modules)) {
-                lessons = courseData.modules.flatMap((module) => (module.lessons || []).map((lesson) => ({
-                    ...lesson,
-                    moduleName: module.title,
-                })));
-                lessonsSource = 'modules_array';
-            }
-            // If still no lessons, check for modules subcollection
-            if (lessons.length === 0) {
-                const modulesSnapshot = await firestore.collection('courses').doc(doc.id).collection('modules').get();
-                if (!modulesSnapshot.empty) {
-                    v2_1.logger.info(`[getCoursesCallable] Course ${doc.id} has ${modulesSnapshot.size} modules in subcollection`);
-                    for (const moduleDoc of modulesSnapshot.docs) {
-                        const moduleData = moduleDoc.data();
-                        // First check if lessons are embedded in module document
-                        let moduleLessons = moduleData.lessons || [];
-                        v2_1.logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} embedded lessons`);
-                        // If no embedded lessons, check for lessons subcollection inside module
-                        if (moduleLessons.length === 0) {
-                            const lessonsSubSnapshot = await firestore
-                                .collection('courses').doc(doc.id)
-                                .collection('modules').doc(moduleDoc.id)
-                                .collection('lessons').get();
-                            if (!lessonsSubSnapshot.empty) {
-                                moduleLessons = lessonsSubSnapshot.docs.map(lessonDoc => ({
-                                    id: lessonDoc.id,
-                                    ...lessonDoc.data()
-                                }));
-                                v2_1.logger.info(`[getCoursesCallable] Module ${moduleDoc.id} has ${moduleLessons.length} lessons in subcollection`);
-                            }
-                        }
-                        lessons.push(...moduleLessons.map((lesson) => ({
-                            ...lesson,
-                            moduleName: moduleData.title || moduleData.name,
-                            moduleId: moduleDoc.id,
-                        })));
-                    }
-                    if (lessons.length > 0) {
-                        lessonsSource = 'modules_subcollection';
-                    }
-                }
-            }
-            // If STILL no lessons, check for direct lessons subcollection (flat structure)
-            if (lessons.length === 0) {
-                const lessonsSnapshot = await firestore.collection('courses').doc(doc.id).collection('lessons').get();
-                if (!lessonsSnapshot.empty) {
-                    lessons = lessonsSnapshot.docs.map(lessonDoc => ({
-                        id: lessonDoc.id,
-                        ...lessonDoc.data()
-                    }));
-                    lessonsSource = 'lessons_subcollection';
-                }
-            }
-            v2_1.logger.info(`[getCoursesCallable] Course ${doc.id} lessons: ${lessons.length} from ${lessonsSource}`);
-            courses.push({
-                id: doc.id,
-                ...courseData,
-                lessons, // Ensure lessons are always included
-                instructor,
-                category
-            });
+            const data = doc.data();
+            if (data.instructorId)
+                instructorIds.add(data.instructorId);
+            if (data.categoryId)
+                categoryIds.add(data.categoryId);
         }
-        const coursesWithLessons = courses.filter(c => c.lessons && c.lessons.length > 0);
-        v2_1.logger.info(`[getCoursesCallable] Summary: ${courses.length} total courses, ${coursesWithLessons.length} with lessons`);
+        // Batch fetch all instructors
+        const instructorsMap = new Map();
+        if (instructorIds.size > 0) {
+            const instructorDocs = await Promise.all(Array.from(instructorIds).map(id => firestore.collection('instructors').doc(id).get()));
+            for (const doc of instructorDocs) {
+                if (doc.exists) {
+                    const data = doc.data();
+                    instructorsMap.set(doc.id, {
+                        id: doc.id,
+                        name: data?.name || 'Ismeretlen Oktató',
+                        firstName: data?.firstName || '',
+                        lastName: data?.lastName || '',
+                        title: data?.title || null,
+                        profilePictureUrl: data?.profilePictureUrl || null,
+                    });
+                }
+            }
+        }
+        // Batch fetch all categories
+        const categoriesMap = new Map();
+        if (categoryIds.size > 0) {
+            const categoryDocs = await Promise.all(Array.from(categoryIds).map(id => firestore.collection('categories').doc(id).get()));
+            for (const doc of categoryDocs) {
+                if (doc.exists) {
+                    const data = doc.data();
+                    categoriesMap.set(doc.id, {
+                        id: doc.id,
+                        name: data?.name || 'Ismeretlen kategória',
+                    });
+                }
+            }
+        }
+        // Process courses - only fetch lessons if explicitly requested (forImport)
+        const courses = [];
+        // For admin list view, skip expensive lesson fetching
+        if (!includeLessons && !forImport) {
+            for (const doc of snapshot.docs) {
+                const courseData = doc.data();
+                courses.push({
+                    id: doc.id,
+                    ...courseData,
+                    lessons: [], // Skip lessons for admin list
+                    instructor: courseData.instructorId ? instructorsMap.get(courseData.instructorId) || null : null,
+                    category: courseData.categoryId ? categoriesMap.get(courseData.categoryId) || null : null,
+                });
+            }
+        }
+        else {
+            // Full lesson fetching for import modal
+            for (const doc of snapshot.docs) {
+                const courseData = doc.data();
+                // Get lessons from embedded array or modules array (fast)
+                let lessons = courseData.lessons || [];
+                if (lessons.length === 0 && courseData.modules && Array.isArray(courseData.modules)) {
+                    lessons = courseData.modules.flatMap((module) => (module.lessons || []).map((lesson) => ({
+                        ...lesson,
+                        moduleName: module.title,
+                    })));
+                }
+                // Only check subcollections if no embedded lessons found
+                if (lessons.length === 0) {
+                    // Check direct lessons subcollection first (most common)
+                    const lessonsSnapshot = await firestore.collection('courses').doc(doc.id).collection('lessons').get();
+                    if (!lessonsSnapshot.empty) {
+                        lessons = lessonsSnapshot.docs.map(lessonDoc => ({
+                            id: lessonDoc.id,
+                            ...lessonDoc.data()
+                        }));
+                    }
+                }
+                courses.push({
+                    id: doc.id,
+                    ...courseData,
+                    lessons,
+                    instructor: courseData.instructorId ? instructorsMap.get(courseData.instructorId) || null : null,
+                    category: courseData.categoryId ? categoriesMap.get(courseData.categoryId) || null : null,
+                });
+            }
+        }
+        v2_1.logger.info(`[getCoursesCallable] Returning ${courses.length} courses`);
         return {
             success: true,
             courses,

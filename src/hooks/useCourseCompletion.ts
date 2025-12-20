@@ -83,17 +83,32 @@ export function useCourseCompletion(
     if (!courseId || !user) return
 
     const prevProgress = previousProgressRef.current
+    const isAtThreshold = progress >= COURSE_COMPLETION_THRESHOLD
+    const hasNotTriggered = !hasTriggeredRef.current
+    const hasNotSeen = !hasSeenCompletion(courseId)
 
-    // Check if we just transitioned to completion threshold
+    // Case 1: Transition from incomplete to complete
     if (
       prevProgress !== null &&
       prevProgress < COURSE_COMPLETION_THRESHOLD &&
-      progress >= COURSE_COMPLETION_THRESHOLD &&
-      !hasTriggeredRef.current &&
-      !hasSeenCompletion(courseId)
+      isAtThreshold &&
+      hasNotTriggered &&
+      hasNotSeen
     ) {
-      // User just completed the course!
-      console.log('🎉 Course completed!', { courseId, progress })
+      console.log('🎉 Course completed! (transition detected)', { courseId, progress })
+      setJustCompleted(true)
+      hasTriggeredRef.current = true
+    }
+
+    // Case 2: Initial load when already complete but celebration not seen
+    // This handles page refresh after completing last lesson
+    if (
+      prevProgress === null &&
+      isAtThreshold &&
+      hasNotTriggered &&
+      hasNotSeen
+    ) {
+      console.log('🎉 Course completed! (initial load)', { courseId, progress })
       setJustCompleted(true)
       hasTriggeredRef.current = true
     }
