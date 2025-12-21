@@ -168,24 +168,32 @@ export const exportUserData = onCall({
     });
 
     // 8. Company associations (if employee)
-    const employeeSnapshot = await firestore
-      .collectionGroup('employees')
-      .where('userId', '==', userId)
-      .get();
+    // Note: This requires a collection group index on employees.userId
+    // If index doesn't exist, skip this data with a warning
+    try {
+      const employeeSnapshot = await firestore
+        .collectionGroup('employees')
+        .where('userId', '==', userId)
+        .get();
 
-    exportData.companyAssociations = employeeSnapshot.docs.map(doc => {
-      const data = doc.data();
-      // Get company ID from document path
-      const pathParts = doc.ref.path.split('/');
-      const companyId = pathParts[1];
-      return {
-        companyId: companyId,
-        role: data.role,
-        employeeName: data.employeeName,
-        employeeEmail: data.employeeEmail,
-        enrolledAt: data.enrolledAt,
-      };
-    });
+      exportData.companyAssociations = employeeSnapshot.docs.map(doc => {
+        const data = doc.data();
+        // Get company ID from document path
+        const pathParts = doc.ref.path.split('/');
+        const companyId = pathParts[1];
+        return {
+          companyId: companyId,
+          role: data.role,
+          employeeName: data.employeeName,
+          employeeEmail: data.employeeEmail,
+          enrolledAt: data.enrolledAt,
+        };
+      });
+    } catch (indexError: unknown) {
+      logger.warn('[GDPR] Company associations skipped - index may not exist:', indexError);
+      exportData.companyAssociations = [];
+      exportData.companyAssociationsNote = 'Company data could not be retrieved. Contact support if needed.';
+    }
 
     logger.info(`[GDPR] Data export completed for user: ${userId}`, {
       enrollments: (exportData.enrollments as unknown[]).length,

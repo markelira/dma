@@ -12,6 +12,7 @@ import { auth, db, storage } from '@/lib/firebase'
 import { doc, updateDoc, getDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 import Image from 'next/image'
+import { PrivacySettings } from '@/components/settings/PrivacySettings'
 
 export default function CompanySettingsPage() {
   const { user, setUser } = useAuthStore()
@@ -336,6 +337,12 @@ export default function CompanySettingsPage() {
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Privacy & Data Settings (GDPR) */}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Adatvédelem</h2>
+          <PrivacySettings />
         </div>
       </div>
     </div>
