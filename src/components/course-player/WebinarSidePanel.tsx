@@ -34,7 +34,7 @@ export function WebinarSidePanel({
   const [selectedInstructorIndex, setSelectedInstructorIndex] = React.useState(0);
 
   return (
-    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] h-full overflow-y-auto border-r border-gray-800">
+    <aside className="w-[380px] flex-shrink-0 bg-[#1a1a1a] min-h-full h-full overflow-y-auto border-r border-gray-800">
       <div className="p-6 space-y-6">
         {/* Mentor/Guest Section - Carousel */}
         {displayInstructors.length > 0 && (
