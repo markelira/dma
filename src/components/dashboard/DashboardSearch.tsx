@@ -245,9 +245,9 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
             className="flex-1 px-3 py-3 text-gray-900 placeholder-gray-500 bg-transparent outline-none"
           />
 
-          {/* Active filter badges */}
+          {/* Active filter badges - hidden on mobile */}
           {hasActiveFilters && (
-            <div className="flex items-center gap-1 mr-2">
+            <div className="hidden sm:flex items-center gap-1 mr-2">
               {selectedCategoryNames.slice(0, 1).map((name, i) => (
                 <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-brand-secondary/10 text-brand-secondary">
                   {name}
@@ -282,7 +282,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
           {/* Filter toggle button */}
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1 px-3 py-2 mr-1 rounded-lg text-sm font-medium bg-brand-secondary text-white hover:bg-brand-secondary/90 transition-colors"
+            className="flex-shrink-0 flex items-center gap-1 px-2 sm:px-3 py-2 mr-1 rounded-lg text-sm font-medium bg-brand-secondary text-white hover:bg-brand-secondary/90 transition-colors"
           >
             <Filter className="w-4 h-4" />
             <span className="hidden sm:inline">Szűrők</span>

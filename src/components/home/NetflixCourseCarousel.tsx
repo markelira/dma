@@ -166,13 +166,13 @@ export function NetflixCourseCarousel() {
     <section ref={visibilityRef} className="w-full bg-[rgb(249,250,251)] py-10 sm:py-12 md:py-14">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
         {/* Section Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-2">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Tartalmaink
           </h2>
           <Link
             href="/courses"
-            className="text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
+            className="hidden sm:block text-gray-600 hover:text-gray-900 transition-colors text-sm font-medium"
           >
             Összes megtekintése →
           </Link>
@@ -237,6 +237,17 @@ export function NetflixCourseCarousel() {
               <ChevronRight className="w-6 h-6 text-gray-900" />
             </button>
           )}
+        </div>
+
+        {/* Mobile View All Link */}
+        <div className="sm:hidden mt-6 text-center">
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-secondary text-white rounded-xl font-medium hover:bg-brand-secondary-hover transition-colors"
+          >
+            Összes megtekintése
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
 
         {/* Empty state */}

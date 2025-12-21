@@ -79,16 +79,20 @@ export function RelatedCoursesSection({
         </button>
       </div>
 
-      {/* Fixed grid - no carousel */}
+      {/* Fixed grid - no carousel, limit to 2 cards on mobile */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {courses.slice(0, 4).map((course, index) => (
-          <PremiumCourseCard
+          <div
             key={course.id}
-            course={course}
-            index={index}
-            categories={categories}
-            instructors={instructors}
-          />
+            className={index >= 2 ? 'hidden sm:block' : ''}
+          >
+            <PremiumCourseCard
+              course={course}
+              index={index}
+              categories={categories}
+              instructors={instructors}
+            />
+          </div>
         ))}
       </div>
     </motion.section>

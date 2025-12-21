@@ -368,7 +368,7 @@ export default function CompanyBillingPage() {
                 </p>
                 <div className="bg-brand-secondary/10 rounded-lg p-3 text-sm text-brand-secondary-hover">
                   <p className="font-medium mb-1">Próbaidőszak után:</p>
-                  <p>14 990 Ft / hónap, automatikus megújítással</p>
+                  <p><span className="whitespace-nowrap">14 990 Ft / hónap</span>, automatikus megújítással</p>
                 </div>
               </div>
             </div>

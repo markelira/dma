@@ -48,7 +48,7 @@ export function FramerNavbarWrapper() {
           />
 
           {/* Dropdown Panel - positioned below navbar */}
-          <div className="fixed top-20 left-4 right-4 z-[9999] lg:hidden mt-2">
+          <div className="fixed top-16 left-4 right-4 z-[9999] lg:hidden mt-3">
             <div
               className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden max-h-[calc(100vh-120px)] overflow-y-auto"
             >
@@ -139,32 +139,16 @@ export function FramerNavbarWrapper() {
                   </>
                 )}
 
-                {/* User Links (if authenticated) */}
-                {isAuthenticated && user && (
+                {/* User Links (if authenticated) - Admin only */}
+                {isAuthenticated && user && user.role === 'ADMIN' && (
                   <>
                     <div className="h-px bg-gray-100 my-2 mx-4" />
                     <Link
-                      href={user.role === 'INSTRUCTOR' ? '/instructor/dashboard' : user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard'}
+                      href="/admin"
                       onClick={closeMobileMenu}
                       className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
                     >
-                      Irányítópult
-                    </Link>
-                    {user.role === 'ADMIN' && (
-                      <Link
-                        href="/admin"
-                        onClick={closeMobileMenu}
-                        className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
-                      >
-                        Admin Felület
-                      </Link>
-                    )}
-                    <Link
-                      href="/account"
-                      onClick={closeMobileMenu}
-                      className="flex items-center px-4 py-3 text-gray-600 font-medium hover:bg-gray-50 hover:text-gray-900 rounded-xl transition-colors min-h-[48px]"
-                    >
-                      Fiókom
+                      Admin Felület
                     </Link>
                   </>
                 )}

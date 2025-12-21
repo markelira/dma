@@ -134,14 +134,14 @@ export function NetflixStyleHero({
 
   return (
     <div className="relative min-h-[500px] overflow-hidden">
-      {/* Background Image - fixed height */}
-      <div className="absolute inset-0 h-[70vh] min-h-[500px]">
+      {/* Background Image - responsive height */}
+      <div className="absolute inset-0 h-[50vh] sm:h-[60vh] md:h-[70vh] min-h-[400px] sm:min-h-[500px]">
         {imageUrl ? (
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover"
+            className="object-cover object-top sm:object-center"
             priority
           />
         ) : (
