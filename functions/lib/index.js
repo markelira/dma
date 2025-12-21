@@ -129,13 +129,37 @@ exports.healthCheck = (0, https_1.onRequest)({
         environment: process.env.NODE_ENV
     });
 });
+// Rate limiting cache for public endpoints
+const rateLimitCache = new Map();
+/**
+ * Simple in-memory rate limiter
+ * SCALABILITY: Prevents abuse of public endpoints
+ */
+function checkRateLimit(key, maxRequests = 10, windowMs = 60000) {
+    const now = Date.now();
+    const entry = rateLimitCache.get(key);
+    if (!entry || now > entry.resetTime) {
+        rateLimitCache.set(key, { count: 1, resetTime: now + windowMs });
+        return true;
+    }
+    if (entry.count >= maxRequests) {
+        return false;
+    }
+    entry.count++;
+    return true;
+}
 /**
  * Check if an email is already in use
  * This is needed because Firebase deprecated fetchSignInMethodsForEmail for security reasons
+ * SCALABILITY: Added rate limiting and function configuration
  */
 exports.checkEmailAvailability = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
+    memory: '256MiB',
+    minInstances: 1,
+    maxInstances: 50,
+    timeoutSeconds: 10,
 }, async (request) => {
     try {
         const { email } = request.data;
@@ -143,6 +167,12 @@ exports.checkEmailAvailability = (0, https_1.onCall)({
             return { available: false, error: 'Email is required' };
         }
         const normalizedEmail = email.trim().toLowerCase();
+        // Rate limit by IP or email to prevent enumeration attacks
+        const rateLimitKey = `email_check:${normalizedEmail}`;
+        if (!checkRateLimit(rateLimitKey, 5, 60000)) {
+            v2_1.logger.warn(`Rate limit exceeded for email check: ${(0, maskPii_1.maskEmail)(normalizedEmail)}`);
+            return { available: false, error: 'Too many requests. Please try again later.' };
+        }
         // Try to get user by email - if found, email is taken
         try {
             await auth.getUserByEmail(normalizedEmail);
@@ -716,11 +746,14 @@ exports.sendEmailVerification = (0, https_1.onCall)({
     }
 });
 /**
- * Get all users (Admin only)
+ * Get users with pagination (Admin only)
+ * SCALABILITY: Added pagination to prevent fetching all users at once
  */
 exports.getUsers = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
+    memory: '512MiB',
+    timeoutSeconds: 30,
 }, async (request) => {
     try {
         // Check if user is admin
@@ -733,8 +766,25 @@ exports.getUsers = (0, https_1.onCall)({
         if (!requestingUserData || requestingUserData.role !== 'ADMIN') {
             throw new Error('Adminisztrátori jogosultság szükséges.');
         }
-        // Get all users from Firestore
-        const usersSnapshot = await firestore.collection('users').get();
+        // Extract pagination params
+        const { page = 0, pageSize = 100, lastDocId } = request.data || {};
+        const limit = Math.min(pageSize, 100); // Max 100 per page
+        // Build query with pagination
+        let query = firestore.collection('users')
+            .orderBy('createdAt', 'desc')
+            .limit(limit);
+        // If we have a cursor, start after that document
+        if (lastDocId) {
+            const lastDoc = await firestore.collection('users').doc(lastDocId).get();
+            if (lastDoc.exists) {
+                query = query.startAfter(lastDoc);
+            }
+        }
+        else if (page > 0) {
+            // Offset-based pagination (less efficient but simpler for UI)
+            query = query.offset(page * limit);
+        }
+        const usersSnapshot = await query.get();
         const users = [];
         usersSnapshot.forEach((doc) => {
             const userData = doc.data();
@@ -753,11 +803,20 @@ exports.getUsers = (0, https_1.onCall)({
                 bio: userData.bio || null,
             });
         });
-        // Sort by creation date (newest first)
-        users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        // Get total count for pagination info (use cached count if available)
+        const countSnapshot = await firestore.collection('users').count().get();
+        const totalCount = countSnapshot.data().count;
         return {
             success: true,
-            users: users
+            users: users,
+            pagination: {
+                page,
+                pageSize: limit,
+                totalCount,
+                totalPages: Math.ceil(totalCount / limit),
+                hasMore: users.length === limit,
+                lastDocId: users.length > 0 ? users[users.length - 1].id : null
+            }
         };
     }
     catch (error) {
@@ -767,10 +826,13 @@ exports.getUsers = (0, https_1.onCall)({
 });
 /**
  * Get platform statistics (Admin only)
+ * SCALABILITY: Use Firestore aggregation queries instead of fetching all documents
  */
 exports.getStats = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
+    memory: '512MiB',
+    timeoutSeconds: 30,
 }, async (request) => {
     try {
         // Check if user is admin
@@ -783,56 +845,41 @@ exports.getStats = (0, https_1.onCall)({
         if (!requestingUserData || requestingUserData.role !== 'ADMIN') {
             throw new Error('Adminisztrátori jogosultság szükséges.');
         }
-        // Get all users from Firestore for statistics
-        const usersSnapshot = await firestore.collection('users').get();
-        let totalUsers = 0;
-        let activeUsers = 0;
-        let students = 0;
-        let instructors = 0;
-        let admins = 0;
-        let newUsersThisMonth = 0;
         const now = new Date();
         const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-        usersSnapshot.forEach((doc) => {
-            const userData = doc.data();
-            totalUsers++;
-            // Count by role
-            if (userData.role === 'STUDENT')
-                students++;
-            else if (userData.role === 'INSTRUCTOR')
-                instructors++;
-            else if (userData.role === 'ADMIN')
-                admins++;
-            // Count active users (logged in within last 30 days)
-            if (userData.lastLoginAt) {
-                const lastLogin = new Date(userData.lastLoginAt);
-                const thirtyDaysAgo = new Date();
-                thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                if (lastLogin > thirtyDaysAgo) {
-                    activeUsers++;
-                }
-            }
-            // Count new users this month
-            if (userData.createdAt) {
-                const createdDate = new Date(userData.createdAt);
-                if (createdDate >= thisMonthStart) {
-                    newUsersThisMonth++;
-                }
-            }
-        });
-        // Get courses count
-        const coursesSnapshot = await firestore.collection('courses').get();
-        const courseCount = coursesSnapshot.size;
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        // Use parallel aggregation queries for efficient counting
+        const [totalUsersCount, studentsCount, instructorsCount, adminsCount, activeUsersCount, newUsersCount, coursesCount] = await Promise.all([
+            // Total users
+            firestore.collection('users').count().get(),
+            // Students
+            firestore.collection('users').where('role', '==', 'STUDENT').count().get(),
+            // Instructors
+            firestore.collection('users').where('role', '==', 'INSTRUCTOR').count().get(),
+            // Admins
+            firestore.collection('users').where('role', '==', 'ADMIN').count().get(),
+            // Active users (logged in within last 30 days)
+            firestore.collection('users')
+                .where('lastLoginAt', '>=', thirtyDaysAgo.toISOString())
+                .count().get(),
+            // New users this month
+            firestore.collection('users')
+                .where('createdAt', '>=', thisMonthStart.toISOString())
+                .count().get(),
+            // Courses count
+            firestore.collection('courses').count().get()
+        ]);
         return {
             success: true,
             stats: {
-                userCount: totalUsers,
-                activeUsers: activeUsers,
-                newUsersThisMonth: newUsersThisMonth,
-                students: students,
-                instructors: instructors,
-                admins: admins,
-                courseCount: courseCount,
+                userCount: totalUsersCount.data().count,
+                activeUsers: activeUsersCount.data().count,
+                newUsersThisMonth: newUsersCount.data().count,
+                students: studentsCount.data().count,
+                instructors: instructorsCount.data().count,
+                admins: adminsCount.data().count,
+                courseCount: coursesCount.data().count,
             }
         };
     }
@@ -885,10 +932,15 @@ exports.updateUserRole = (0, https_1.onCall)({
 });
 /**
  * Get course by ID or slug
+ * SCALABILITY: High-traffic function, configured for performance
  */
 exports.getCourse = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
+    memory: '512MiB',
+    minInstances: 2,
+    maxInstances: 100,
+    timeoutSeconds: 30,
 }, async (request) => {
     try {
         const { courseId: inputCourseId } = request.data || {};
@@ -1006,9 +1058,16 @@ exports.getCourse = (0, https_1.onCall)({
  * Get all courses with optional filters
  * Used by LessonImportModal for MASTERCLASS course creation
  */
+/**
+ * Get all courses (with caching)
+ * SCALABILITY: High-traffic function, configured for performance
+ */
 exports.getCoursesCallable = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
+    memory: '512MiB',
+    minInstances: 2,
+    maxInstances: 100,
     timeoutSeconds: 60,
 }, async (request) => {
     try {

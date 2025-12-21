@@ -32,11 +32,15 @@ function getStripeInstance(): Stripe {
 
 /**
  * Get user's subscription status
+ * SCALABILITY: High-traffic function, configured for performance
  */
 export const getSubscriptionStatus = onCall({
   cors: true,
   region: 'europe-west1',
-  minInstances: 1,
+  memory: '512MiB',
+  minInstances: 2,
+  maxInstances: 100,
+  timeoutSeconds: 30,
 }, async (request) => {
   try {
     if (!request.auth) {

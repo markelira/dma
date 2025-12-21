@@ -163,6 +163,8 @@ export const useAdvancedProgressSync = ({
   const unsubscribeRef = useRef<(() => void) | null>(null)
   const pendingUpdatesRef = useRef<Partial<ProgressSyncData>[]>([])
   const lastSyncVersionRef = useRef<number>(0)
+  // SCALABILITY: Use ref to avoid recreating listener on every progressData change
+  const progressDataRef = useRef<ProgressSyncData | null>(null)
   
   // Default sync options
   const defaultSyncOptions: SyncOptions = {
@@ -223,6 +225,11 @@ export const useAdvancedProgressSync = ({
     const device = generateDeviceInfo()
     setDeviceInfo(device)
   }, [generateDeviceInfo])
+
+  // SCALABILITY: Keep progressDataRef in sync to avoid listener recreation
+  useEffect(() => {
+    progressDataRef.current = progressData
+  }, [progressData])
 
   // Monitor online status
   useEffect(() => {
@@ -429,19 +436,21 @@ export const useAdvancedProgressSync = ({
   }, [syncStatus.isOnline, syncToServer])
 
   // Set up real-time sync listener
+  // SCALABILITY: Removed progressData from deps to prevent listener recreation on every update
   useEffect(() => {
     if (!user || !defaultSyncOptions.enableRealTimeSync) return
 
     const db = getFirestore()
     const progressDocRef = doc(db, 'lessonProgress', `${user.id}_${lessonId}`)
 
-    const unsubscribe = onSnapshot(progressDocRef, (doc) => {
-      if (doc.exists()) {
-        const remoteData = doc.data() as ProgressSyncData
-        
-        // Check for conflicts
-        if (progressData && remoteData.syncVersion !== lastSyncVersionRef.current) {
-          const resolvedData = resolveConflicts(progressData, remoteData)
+    const unsubscribe = onSnapshot(progressDocRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        const remoteData = docSnapshot.data() as ProgressSyncData
+
+        // Check for conflicts using ref to avoid dependency on progressData
+        const currentProgressData = progressDataRef.current
+        if (currentProgressData && remoteData.syncVersion !== lastSyncVersionRef.current) {
+          const resolvedData = resolveConflicts(currentProgressData, remoteData)
           setProgressData(resolvedData)
           lastSyncVersionRef.current = resolvedData.syncVersion
         } else {
@@ -458,7 +467,8 @@ export const useAdvancedProgressSync = ({
 
     unsubscribeRef.current = unsubscribe
     return unsubscribe
-  }, [user, lessonId, defaultSyncOptions.enableRealTimeSync, progressData, resolveConflicts, onSyncError])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, lessonId, defaultSyncOptions.enableRealTimeSync, onSyncError])
 
   // Set up periodic sync
   useEffect(() => {
