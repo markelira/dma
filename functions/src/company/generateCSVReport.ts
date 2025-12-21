@@ -125,6 +125,14 @@ export const generateCSVReport = https.onCall(
       const companyName = companyData?.name || 'Company';
       const purchasedMasterclasses = companyData?.purchasedMasterclasses || [];
 
+      // SECURITY: Validate masterclassId belongs to this company (prevent IDOR)
+      if (masterclassId && !purchasedMasterclasses.includes(masterclassId)) {
+        throw new HttpsError(
+          'permission-denied',
+          'This masterclass is not owned by your company'
+        );
+      }
+
       // Filter to specific masterclass if requested
       const masterclassesToTrack = masterclassId
         ? [masterclassId]

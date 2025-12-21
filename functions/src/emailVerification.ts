@@ -16,6 +16,7 @@ import {
   createCodeDisplay,
   createAlertBox,
 } from './email/templates/base';
+import { maskEmail } from './utils/maskPii';
 
 const firestore = admin.firestore();
 
@@ -155,7 +156,7 @@ export const sendEmailVerificationCode = onCall({
       });
 
       if (result.success) {
-        logger.info(`Verification email sent to ${email}`);
+        logger.info(`Verification email sent to ${maskEmail(email)}`);
         return {
           success: true,
           message: 'Elküldtük az email megerősítő kódot',

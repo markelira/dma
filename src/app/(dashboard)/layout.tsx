@@ -9,8 +9,7 @@ import { Loader2, Menu, X } from 'lucide-react'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
-// REMOVED: Duplicate AuthProvider - already wrapped in root layout
-// import { AuthProvider } from '@/contexts/AuthContext'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import Footer from '@/components/landing-home/ui/footer'
 
 export default function DashboardRouteGroupLayout({
@@ -143,7 +142,9 @@ export default function DashboardRouteGroupLayout({
 
       {/* Main Content Area - offset by sidebar width on desktop */}
       <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

@@ -50,7 +50,10 @@ const formatTime = (seconds: number): string => {
   return `${mins}:${secs.toString().padStart(2, '0')}`;
 };
 
-export function NewVideoPlayer({
+/**
+ * Wrapped in React.memo to prevent unnecessary re-renders when parent updates
+ */
+export const NewVideoPlayer = React.memo(function NewVideoPlayer({
   src,
   poster,
   autoPlay = false,
@@ -210,5 +213,5 @@ export function NewVideoPlayer({
       )}
     </div>
   );
-}
+});
 

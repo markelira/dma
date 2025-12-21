@@ -46,6 +46,7 @@ const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
 const emailService_1 = require("./email/emailService");
 const base_1 = require("./email/templates/base");
+const maskPii_1 = require("./utils/maskPii");
 const firestore = admin.firestore();
 /**
  * Generate a 4-digit verification code
@@ -166,7 +167,7 @@ exports.sendEmailVerificationCode = (0, https_1.onCall)({
                 html: emailContent,
             });
             if (result.success) {
-                v2_1.logger.info(`Verification email sent to ${email}`);
+                v2_1.logger.info(`Verification email sent to ${(0, maskPii_1.maskEmail)(email)}`);
                 return {
                     success: true,
                     message: 'Elküldtük az email megerősítő kódot',

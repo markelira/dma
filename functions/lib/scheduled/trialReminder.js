@@ -44,6 +44,7 @@ const admin = __importStar(require("firebase-admin"));
 const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v2_1 = require("firebase-functions/v2");
 const trialEnding_1 = require("../email/templates/trialEnding");
+const maskPii_1 = require("../utils/maskPii");
 const firestore = admin.firestore();
 // Stripe price IDs mapped to amounts (in HUF)
 const PRICE_AMOUNTS = {
@@ -148,7 +149,7 @@ exports.sendTrialReminders = (0, scheduler_1.onSchedule)({
                 });
                 if (result.success) {
                     emailsSent++;
-                    v2_1.logger.info('[sendTrialReminders] Email sent', { userId, email: userData.email });
+                    v2_1.logger.info('[sendTrialReminders] Email sent', { userId, email: (0, maskPii_1.maskEmail)(userData.email) });
                 }
                 else {
                     emailsFailed++;
@@ -234,7 +235,7 @@ exports.sendTrialReminders = (0, scheduler_1.onSchedule)({
                     emailsSent++;
                     v2_1.logger.info('[sendTrialReminders] Company email sent', {
                         companyId: doc.id,
-                        email: userData.email,
+                        email: (0, maskPii_1.maskEmail)(userData.email),
                     });
                 }
                 else {

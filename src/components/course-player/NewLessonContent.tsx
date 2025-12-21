@@ -38,8 +38,10 @@ function formatTextContent(content: string): string {
  * NewLessonContent Component
  * Displays lesson information below the video player
  * Includes: title, breadcrumb, description, learning outcomes
+ *
+ * Wrapped in React.memo to prevent unnecessary re-renders
  */
-export function NewLessonContent({
+export const NewLessonContent = React.memo(function NewLessonContent({
   lesson,
   moduleName,
   moduleNumber,
@@ -140,5 +142,5 @@ export function NewLessonContent({
       )}
     </div>
   );
-}
+});
 

@@ -16,6 +16,7 @@ import {
   createAlertBox,
   generatePlainText
 } from './email/templates/base';
+import { maskEmail } from './utils/maskPii';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -259,7 +260,7 @@ export const requestPasswordReset = onCall({
       .get();
 
     if (recentAttempts.size >= 3) {
-      logger.warn(`Rate limit exceeded for email: ${email}`);
+      logger.warn(`Rate limit exceeded for email: ${maskEmail(email)}`);
       throw new Error('Túl sok jelszó visszaállítási kérés. Kérjük, próbálja újra 1 óra múlva.');
     }
 
@@ -343,7 +344,7 @@ export const requestPasswordReset = onCall({
         };
 
         await sgMail.send(msg);
-        logger.info('Email sent via SendGrid to:', email);
+        logger.info('Email sent via SendGrid to:', maskEmail(email));
 
         return {
           success: true,
@@ -355,7 +356,7 @@ export const requestPasswordReset = onCall({
           code: error.code,
           statusCode: error.response?.statusCode,
           body: error.response?.body,
-          to: email,
+          to: maskEmail(email),
           from: FROM_EMAIL
         });
       }
@@ -719,7 +720,7 @@ export const sendEmailVerification = onCall({
         };
 
         await sgMail.send(msg);
-        logger.info('Verification email sent via SendGrid to:', email);
+        logger.info('Verification email sent via SendGrid to:', maskEmail(email));
 
         return {
           success: true,
@@ -1509,7 +1510,7 @@ export const notifyCompanyAdmin = onCall({
       sentAt: new Date().toISOString(),
     });
 
-    logger.info(`[notifyCompanyAdmin] Email sent to ${adminEmail} from employee ${userId}`);
+    logger.info(`[notifyCompanyAdmin] Email sent to ${maskEmail(adminEmail)} from employee ${userId}`);
 
     return {
       success: true,

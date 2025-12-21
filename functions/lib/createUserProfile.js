@@ -47,6 +47,7 @@ const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
 const linkEmployeeByEmail_1 = require("./company/linkEmployeeByEmail");
+const maskPii_1 = require("./utils/maskPii");
 const firestore = admin.firestore();
 // Input validation schema
 const CreateUserProfileSchema = z.object({
@@ -74,7 +75,7 @@ exports.createUserProfile = (0, https_1.onCall)({
         // Input validation
         const validatedData = CreateUserProfileSchema.parse(request.data);
         const { uid, email, firstName, lastName, role } = validatedData;
-        v2_1.logger.info(`Creating user profile for uid: ${uid}, email: ${email}`);
+        v2_1.logger.info(`Creating user profile for uid: ${uid}, email: ${(0, maskPii_1.maskEmail)(email)}`);
         // Check if user document already exists
         const existingUser = await firestore.collection('users').doc(uid).get();
         if (existingUser.exists) {

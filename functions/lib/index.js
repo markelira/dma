@@ -50,6 +50,7 @@ const uuid_1 = require("uuid");
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const zod_1 = require("zod");
 const base_1 = require("./email/templates/base");
+const maskPii_1 = require("./utils/maskPii");
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -264,7 +265,7 @@ exports.requestPasswordReset = (0, https_1.onCall)({
             .where('attemptedAt', '>=', oneHourAgo.toISOString())
             .get();
         if (recentAttempts.size >= 3) {
-            v2_1.logger.warn(`Rate limit exceeded for email: ${email}`);
+            v2_1.logger.warn(`Rate limit exceeded for email: ${(0, maskPii_1.maskEmail)(email)}`);
             throw new Error('Túl sok jelszó visszaállítási kérés. Kérjük, próbálja újra 1 óra múlva.');
         }
         // Log this attempt
@@ -338,7 +339,7 @@ exports.requestPasswordReset = (0, https_1.onCall)({
                     text: textContent,
                 };
                 await mail_1.default.send(msg);
-                v2_1.logger.info('Email sent via SendGrid to:', email);
+                v2_1.logger.info('Email sent via SendGrid to:', (0, maskPii_1.maskEmail)(email));
                 return {
                     success: true,
                     message: 'Ha a megadott email cím regisztrálva van, küldtünk egy jelszó visszaállítási linket.'
@@ -350,7 +351,7 @@ exports.requestPasswordReset = (0, https_1.onCall)({
                     code: error.code,
                     statusCode: error.response?.statusCode,
                     body: error.response?.body,
-                    to: email,
+                    to: (0, maskPii_1.maskEmail)(email),
                     from: FROM_EMAIL
                 });
             }
@@ -679,7 +680,7 @@ exports.sendEmailVerification = (0, https_1.onCall)({
                     html: htmlContent,
                 };
                 await mail_1.default.send(msg);
-                v2_1.logger.info('Verification email sent via SendGrid to:', email);
+                v2_1.logger.info('Verification email sent via SendGrid to:', (0, maskPii_1.maskEmail)(email));
                 return {
                     success: true,
                     message: 'Megerősítő email elküldve.'
@@ -1357,7 +1358,7 @@ exports.notifyCompanyAdmin = (0, https_1.onCall)({
             date: todayStr,
             sentAt: new Date().toISOString(),
         });
-        v2_1.logger.info(`[notifyCompanyAdmin] Email sent to ${adminEmail} from employee ${userId}`);
+        v2_1.logger.info(`[notifyCompanyAdmin] Email sent to ${(0, maskPii_1.maskEmail)(adminEmail)} from employee ${userId}`);
         return {
             success: true,
             message: 'Értesítés sikeresen elküldve'

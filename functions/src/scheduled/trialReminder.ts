@@ -9,6 +9,7 @@ import * as admin from 'firebase-admin';
 import { onSchedule, ScheduleOptions } from 'firebase-functions/v2/scheduler';
 import { logger } from 'firebase-functions/v2';
 import { sendTrialEndingEmail } from '../email/templates/trialEnding';
+import { maskEmail } from '../utils/maskPii';
 
 const firestore = admin.firestore();
 
@@ -132,7 +133,7 @@ export const sendTrialReminders = onSchedule({
 
         if (result.success) {
           emailsSent++;
-          logger.info('[sendTrialReminders] Email sent', { userId, email: userData.email });
+          logger.info('[sendTrialReminders] Email sent', { userId, email: maskEmail(userData.email) });
         } else {
           emailsFailed++;
           logger.error('[sendTrialReminders] Failed to send email', {
@@ -229,7 +230,7 @@ export const sendTrialReminders = onSchedule({
           emailsSent++;
           logger.info('[sendTrialReminders] Company email sent', {
             companyId: doc.id,
-            email: userData.email,
+            email: maskEmail(userData.email),
           });
         } else {
           emailsFailed++;

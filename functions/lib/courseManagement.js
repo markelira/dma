@@ -43,6 +43,7 @@ const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
 const newContentAvailable_1 = require("./email/templates/newContentAvailable");
+const maskPii_1 = require("./utils/maskPii");
 const firestore = admin.firestore();
 // Validation schema for course data
 const CourseSchema = z.object({
@@ -391,10 +392,10 @@ exports.publishCourse = (0, https_1.onCall)({
                             courseId,
                         }).then((result) => {
                             if (!result.success) {
-                                v2_1.logger.warn(`Failed to send new content email to ${userData.email}:`, result.error);
+                                v2_1.logger.warn(`Failed to send new content email to ${(0, maskPii_1.maskEmail)(userData.email)}:`, result.error);
                             }
                         }).catch((err) => {
-                            v2_1.logger.warn(`Error sending new content email to ${userData.email}:`, err.message);
+                            v2_1.logger.warn(`Error sending new content email to ${(0, maskPii_1.maskEmail)(userData.email)}:`, err.message);
                         });
                         sentCount++;
                     }

@@ -11,6 +11,7 @@ import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import * as z from 'zod';
 import { linkEmployeeByEmail } from './company/linkEmployeeByEmail';
+import { maskEmail } from './utils/maskPii';
 
 const firestore = admin.firestore();
 
@@ -44,7 +45,7 @@ export const createUserProfile = onCall({
 
     const { uid, email, firstName, lastName, role } = validatedData;
 
-    logger.info(`Creating user profile for uid: ${uid}, email: ${email}`);
+    logger.info(`Creating user profile for uid: ${uid}, email: ${maskEmail(email)}`);
 
     // Check if user document already exists
     const existingUser = await firestore.collection('users').doc(uid).get();

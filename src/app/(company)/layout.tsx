@@ -14,6 +14,7 @@ import { useTrialPopup } from '@/hooks/useTrialPopup'
 import Footer from '@/components/landing-home/ui/footer'
 import { db } from '@/lib/firebase'
 import { doc, getDoc } from 'firebase/firestore'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function CompanyLayout({
   children,
@@ -161,7 +162,9 @@ export default function CompanyLayout({
 
       {/* Main Content - with left margin for fixed sidebar on desktop */}
       <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-x-hidden">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
 
       {/* Footer */}

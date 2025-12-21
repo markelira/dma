@@ -80,6 +80,12 @@ export const createCheckoutSession = onCall({
       throw new Error('Felhasználói adatok nem találhatók');
     }
 
+    // SECURITY: Require email verification before subscription
+    if (userData.emailVerified !== true) {
+      logger.warn(`User ${userId} attempted checkout without email verification`);
+      throw new Error('Az email címed nincs még megerősítve. Kérjük, erősítsd meg az email címedet a fizetés előtt.');
+    }
+
     // Get or create Stripe customer
     let stripeCustomerId = userData.stripeCustomerId;
 

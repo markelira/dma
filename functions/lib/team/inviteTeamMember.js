@@ -44,6 +44,7 @@ const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
 const v2_1 = require("firebase-functions/v2");
 const team_1 = require("../types/team");
+const maskPii_1 = require("../utils/maskPii");
 const firestore = admin.firestore();
 /**
  * Invite a team member
@@ -60,7 +61,7 @@ exports.inviteTeamMember = (0, https_1.onCall)({
         }
         const { teamId, email } = request.data;
         const userId = request.auth.uid;
-        v2_1.logger.info('[inviteTeamMember] Inviting member', { teamId, email, inviterId: userId });
+        v2_1.logger.info('[inviteTeamMember] Inviting member', { teamId, email: (0, maskPii_1.maskEmail)(email), inviterId: userId });
         // 2. Validate input
         if (!teamId || !email) {
             throw new https_1.HttpsError('invalid-argument', 'Team ID és email cím szükséges');
@@ -115,7 +116,7 @@ exports.inviteTeamMember = (0, https_1.onCall)({
             else if (existingMember.status === 'removed') {
                 // Re-invite removed member - we'll update the existing document
                 existingMemberRef = existingMemberSnapshot.docs[0].ref;
-                v2_1.logger.info('[inviteTeamMember] Re-inviting previously removed member', { email });
+                v2_1.logger.info('[inviteTeamMember] Re-inviting previously removed member', { email: (0, maskPii_1.maskEmail)(email) });
             }
         }
         // 5b. Check if this email belongs to an existing user (for logging purposes)
@@ -129,7 +130,7 @@ exports.inviteTeamMember = (0, https_1.onCall)({
             // Check if user is already in another team
             if (existingUserData.teamId && existingUserData.teamId !== teamId) {
                 v2_1.logger.info('[inviteTeamMember] User is in another team, but invite will still be sent', {
-                    email,
+                    email: (0, maskPii_1.maskEmail)(email),
                     existingTeamId: existingUserData.teamId,
                 });
                 // Note: We still send the invite - user will see error when trying to accept
@@ -275,7 +276,7 @@ async function sendInvitationEmail(data) {
             text: textContent,
         });
         if (result.success) {
-            v2_1.logger.info('[sendInvitationEmail] Email sent successfully', { to: data.to });
+            v2_1.logger.info('[sendInvitationEmail] Email sent successfully', { to: (0, maskPii_1.maskEmail)(data.to) });
         }
         else {
             throw new Error(result.error || 'Failed to send email');

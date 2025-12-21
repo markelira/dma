@@ -17,6 +17,7 @@ import {
   hasActiveSubscription,
   isTeamOwner,
 } from '../types/team';
+import { maskEmail } from '../utils/maskPii';
 
 const firestore = admin.firestore();
 
@@ -37,7 +38,7 @@ export const inviteTeamMember = onCall({
     const { teamId, email } = request.data as { teamId: string; email: string };
     const userId = request.auth.uid;
 
-    logger.info('[inviteTeamMember] Inviting member', { teamId, email, inviterId: userId });
+    logger.info('[inviteTeamMember] Inviting member', { teamId, email: maskEmail(email), inviterId: userId });
 
     // 2. Validate input
     if (!teamId || !email) {
@@ -109,7 +110,7 @@ export const inviteTeamMember = onCall({
       } else if (existingMember.status === 'removed') {
         // Re-invite removed member - we'll update the existing document
         existingMemberRef = existingMemberSnapshot.docs[0].ref;
-        logger.info('[inviteTeamMember] Re-inviting previously removed member', { email });
+        logger.info('[inviteTeamMember] Re-inviting previously removed member', { email: maskEmail(email) });
       }
     }
 
@@ -125,7 +126,7 @@ export const inviteTeamMember = onCall({
       // Check if user is already in another team
       if (existingUserData.teamId && existingUserData.teamId !== teamId) {
         logger.info('[inviteTeamMember] User is in another team, but invite will still be sent', {
-          email,
+          email: maskEmail(email),
           existingTeamId: existingUserData.teamId,
         });
         // Note: We still send the invite - user will see error when trying to accept
@@ -303,7 +304,7 @@ async function sendInvitationEmail(data: {
     });
 
     if (result.success) {
-      logger.info('[sendInvitationEmail] Email sent successfully', { to: data.to });
+      logger.info('[sendInvitationEmail] Email sent successfully', { to: maskEmail(data.to) });
     } else {
       throw new Error(result.error || 'Failed to send email');
     }

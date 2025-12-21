@@ -16,8 +16,10 @@ interface NewLessonNavigationProps {
  * NewLessonNavigation Component
  * Displays previous/next lesson navigation buttons
  * Matches the screenshot design exactly
+ *
+ * Wrapped in React.memo to prevent unnecessary re-renders
  */
-export function NewLessonNavigation({
+export const NewLessonNavigation = React.memo(function NewLessonNavigation({
   hasPrevious,
   hasNext,
   onPrevious,
@@ -56,5 +58,5 @@ export function NewLessonNavigation({
       )}
     </div>
   );
-}
+});
 

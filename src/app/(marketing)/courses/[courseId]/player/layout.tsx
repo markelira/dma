@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect } from 'react'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function PlayerLayout({
   children,
@@ -62,7 +63,9 @@ export default function PlayerLayout({
         }
       `}</style>
       <div className="h-[100dvh] bg-white relative z-50">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </div>
     </>
   )

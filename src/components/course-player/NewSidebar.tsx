@@ -24,8 +24,10 @@ interface NewSidebarProps {
  * NewSidebar Component
  * Displays course navigation with modules/lessons in accordion format
  * Matches the screenshot design exactly
+ *
+ * Wrapped in React.memo to prevent unnecessary re-renders when parent updates
  */
-export function NewSidebar({
+export const NewSidebar = React.memo(function NewSidebar({
   courseTitle,
   modules,
   currentLessonId,
@@ -183,5 +185,5 @@ export function NewSidebar({
       </div>
     </div>
   );
-}
+});
 

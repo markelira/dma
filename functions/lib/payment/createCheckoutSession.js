@@ -107,6 +107,11 @@ exports.createCheckoutSession = (0, https_1.onCall)({
         if (!userData) {
             throw new Error('Felhasználói adatok nem találhatók');
         }
+        // SECURITY: Require email verification before subscription
+        if (userData.emailVerified !== true) {
+            v2_1.logger.warn(`User ${userId} attempted checkout without email verification`);
+            throw new Error('Az email címed nincs még megerősítve. Kérjük, erősítsd meg az email címedet a fizetés előtt.');
+        }
         // Get or create Stripe customer
         let stripeCustomerId = userData.stripeCustomerId;
         if (!stripeCustomerId) {

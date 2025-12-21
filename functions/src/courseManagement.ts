@@ -7,6 +7,7 @@ import { onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 import * as z from 'zod';
 import { sendNewContentAvailableEmail } from './email/templates/newContentAvailable';
+import { maskEmail } from './utils/maskPii';
 
 const firestore = admin.firestore();
 
@@ -399,10 +400,10 @@ export const publishCourse = onCall({
               courseId,
             }).then((result) => {
               if (!result.success) {
-                logger.warn(`Failed to send new content email to ${userData.email}:`, result.error);
+                logger.warn(`Failed to send new content email to ${maskEmail(userData.email)}:`, result.error);
               }
             }).catch((err) => {
-              logger.warn(`Error sending new content email to ${userData.email}:`, err.message);
+              logger.warn(`Error sending new content email to ${maskEmail(userData.email)}:`, err.message);
             });
 
             sentCount++;
