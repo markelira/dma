@@ -1,9 +1,20 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { httpsCallable } from 'firebase/functions'
-import { functions } from '@/lib/firebase'
+import { functions, db } from '@/lib/firebase'
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  Timestamp,
+} from 'firebase/firestore'
+import { formatDistanceToNow } from 'date-fns'
+import { hu } from 'date-fns/locale'
 import {
   Users,
   CreditCard,
@@ -12,27 +23,21 @@ import {
   Building2,
   Activity,
   Percent,
-  UserCheck,
-  Clock,
   AlertTriangle,
   Loader2,
   ChevronDown,
   ChevronUp,
+  UserPlus,
+  BookOpen,
 } from 'lucide-react'
 import {
-  AreaChart,
-  Area,
   BarChart,
   Bar,
-  PieChart,
-  Pie,
-  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts'
 import { cn } from '@/lib/utils'
 
@@ -81,6 +86,19 @@ interface AnalyticsData {
   conversionRate: number
 }
 
+// Activity types
+interface ActivityItem {
+  id: string
+  type: 'registration' | 'enrollment' | 'payment'
+  description: string
+  timestamp: Date
+  metadata?: {
+    email?: string
+    courseName?: string
+    amount?: number
+  }
+}
+
 // Format currency in Hungarian Forints
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('hu-HU', {
@@ -88,17 +106,6 @@ function formatCurrency(value: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value) + ' Ft'
-}
-
-// Format large numbers
-function formatNumber(value: number): string {
-  if (value >= 1000000) {
-    return (value / 1000000).toFixed(1) + 'M'
-  }
-  if (value >= 1000) {
-    return (value / 1000).toFixed(1) + 'K'
-  }
-  return value.toString()
 }
 
 // Stat Card Component
@@ -161,121 +168,180 @@ function StatCard({
   )
 }
 
-// MRR Trend Chart
-function MRRTrendChart({ data }: { data: Array<{ date: string; amount: number }> }) {
-  // Format date for display (YYYY-MM to Month name)
-  const formattedData = data.map((item) => ({
-    ...item,
-    month: new Date(item.date + '-01').toLocaleDateString('hu-HU', { month: 'short' }),
-  }))
+// Live Activity Section
+function LiveActivitySection() {
+  const [activities, setActivities] = useState<ActivityItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const now = new Date()
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000)
+
+    // Users (registrations) listener
+    const usersQuery = query(
+      collection(db, 'users'),
+      where('createdAt', '>=', twentyFourHoursAgo),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    )
+
+    // Enrollments listener
+    const enrollmentsQuery = query(
+      collection(db, 'enrollments'),
+      where('enrolledAt', '>=', twentyFourHoursAgo),
+      orderBy('enrolledAt', 'desc'),
+      limit(20)
+    )
+
+    // Payments listener
+    const paymentsQuery = query(
+      collection(db, 'payments'),
+      where('status', '==', 'completed'),
+      where('createdAt', '>=', twentyFourHoursAgo),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    )
+
+    let userActivities: ActivityItem[] = []
+    let enrollmentActivities: ActivityItem[] = []
+    let paymentActivities: ActivityItem[] = []
+
+    const updateMergedActivities = () => {
+      const merged = [...userActivities, ...enrollmentActivities, ...paymentActivities]
+        .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+        .slice(0, 15)
+      setActivities(merged)
+      setIsLoading(false)
+    }
+
+    // Users listener
+    const unsubUsers = onSnapshot(usersQuery, (snapshot) => {
+      userActivities = snapshot.docs.map((doc) => {
+        const data = doc.data()
+        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt)
+        return {
+          id: `user-${doc.id}`,
+          type: 'registration' as const,
+          description: `Új regisztráció: ${data.email || data.displayName || 'Ismeretlen'}`,
+          timestamp: createdAt,
+          metadata: { email: data.email },
+        }
+      })
+      updateMergedActivities()
+    }, (error) => {
+      console.error('Error fetching user activities:', error)
+      setIsLoading(false)
+    })
+
+    // Enrollments listener
+    const unsubEnrollments = onSnapshot(enrollmentsQuery, (snapshot) => {
+      enrollmentActivities = snapshot.docs.map((doc) => {
+        const data = doc.data()
+        const enrolledAt = data.enrolledAt?.toDate?.() || new Date(data.enrolledAt)
+        return {
+          id: `enrollment-${doc.id}`,
+          type: 'enrollment' as const,
+          description: `Új beiratkozás: ${data.courseName || data.courseTitle || 'Kurzus'}`,
+          timestamp: enrolledAt,
+          metadata: { courseName: data.courseName || data.courseTitle },
+        }
+      })
+      updateMergedActivities()
+    }, (error) => {
+      console.error('Error fetching enrollment activities:', error)
+    })
+
+    // Payments listener
+    const unsubPayments = onSnapshot(paymentsQuery, (snapshot) => {
+      paymentActivities = snapshot.docs.map((doc) => {
+        const data = doc.data()
+        const createdAt = data.createdAt?.toDate?.() || new Date(data.createdAt)
+        const amount = data.amount || data.totalAmount || 0
+        return {
+          id: `payment-${doc.id}`,
+          type: 'payment' as const,
+          description: `Sikeres fizetés: ${formatCurrency(amount)}`,
+          timestamp: createdAt,
+          metadata: { amount },
+        }
+      })
+      updateMergedActivities()
+    }, (error) => {
+      console.error('Error fetching payment activities:', error)
+    })
+
+    return () => {
+      unsubUsers()
+      unsubEnrollments()
+      unsubPayments()
+    }
+  }, [])
+
+  const getActivityIcon = (type: ActivityItem['type']) => {
+    switch (type) {
+      case 'registration':
+        return <UserPlus className="w-4 h-4 text-blue-600" />
+      case 'enrollment':
+        return <BookOpen className="w-4 h-4 text-green-600" />
+      case 'payment':
+        return <CreditCard className="w-4 h-4 text-emerald-600" />
+    }
+  }
+
+  const getActivityBg = (type: ActivityItem['type']) => {
+    switch (type) {
+      case 'registration':
+        return 'bg-blue-50'
+      case 'enrollment':
+        return 'bg-green-50'
+      case 'payment':
+        return 'bg-emerald-50'
+    }
+  }
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">Bevétel alakulása (12 hónap)</h3>
-      <ResponsiveContainer width="100%" height={280}>
-        <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-          <defs>
-            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#112a4b" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#112a4b" stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
-          <XAxis
-            dataKey="month"
-            tick={{ fill: '#6B7280', fontSize: 12 }}
-            axisLine={{ stroke: '#E5E7EB' }}
-            tickLine={false}
-          />
-          <YAxis
-            tick={{ fill: '#6B7280', fontSize: 12 }}
-            axisLine={false}
-            tickLine={false}
-            tickFormatter={(value) => formatNumber(value)}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: '#fff',
-              border: '1px solid #E5E7EB',
-              borderRadius: '8px',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            }}
-            formatter={(value: number) => [formatCurrency(value), 'Bevétel']}
-          />
-          <Area
-            type="monotone"
-            dataKey="amount"
-            stroke="#112a4b"
-            strokeWidth={2}
-            fillOpacity={1}
-            fill="url(#colorRevenue)"
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
-
-// Revenue by Plan Chart
-function RevenueByPlanChart({ data }: { data: { monthly: number; sixMonth: number; yearly: number } }) {
-  const chartData = [
-    { name: 'Havi', value: data.monthly, color: '#112a4b' },
-    { name: '6 hónapos', value: data.sixMonth, color: '#1a3d6e' },
-    { name: 'Éves', value: data.yearly, color: '#10B981' },
-  ].filter((item) => item.value > 0)
-
-  const total = chartData.reduce((sum, item) => sum + item.value, 0)
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">MRR csomagonként</h3>
-      <div className="flex items-center">
-        <ResponsiveContainer width="50%" height={200}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              innerRadius={50}
-              outerRadius={80}
-              paddingAngle={2}
-              dataKey="value"
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: '#fff',
-                border: '1px solid #E5E7EB',
-                borderRadius: '8px',
-              }}
-              formatter={(value: number) => [formatCurrency(value), 'MRR']}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="flex-1 space-y-3">
-          {chartData.map((item) => (
-            <div key={item.name} className="flex items-center justify-between">
-              <div className="flex items-center">
-                <div
-                  className="w-3 h-3 rounded-full mr-2"
-                  style={{ backgroundColor: item.color }}
-                />
-                <span className="text-sm text-gray-700">{item.name}</span>
-              </div>
-              <div className="text-right">
-                <div className="text-sm font-medium text-gray-900">
-                  {formatCurrency(item.value)}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {total > 0 ? Math.round((item.value / total) * 100) : 0}%
-                </div>
-              </div>
-            </div>
-          ))}
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+      <div className="flex items-center justify-between p-6 pb-4">
+        <h3 className="text-lg font-bold text-gray-900">Legutóbbi aktivitások</h3>
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+          </span>
+          <span className="text-xs font-medium text-green-600 uppercase tracking-wide">LIVE</span>
         </div>
+      </div>
+
+      <div className="px-6 pb-6">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+          </div>
+        ) : activities.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-40 text-gray-500">
+            <Activity className="w-8 h-8 mb-2 text-gray-400" />
+            <p className="text-sm">Nincs aktivitás az elmúlt 24 órában</p>
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className={cn('p-2 rounded-lg', getActivityBg(activity.type))}>
+                  {getActivityIcon(activity.type)}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900 truncate">{activity.description}</p>
+                </div>
+                <div className="text-xs text-gray-500 whitespace-nowrap">
+                  {formatDistanceToNow(activity.timestamp, { addSuffix: false, locale: hu })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
@@ -318,151 +384,6 @@ function UserGrowthChart({ data }: { data: Array<{ date: string; count: number }
           <Bar dataKey="count" fill="#112a4b" radius={[4, 4, 0, 0]} maxBarSize={20} />
         </BarChart>
       </ResponsiveContainer>
-    </div>
-  )
-}
-
-// Subscription Breakdown Table
-function SubscriptionBreakdown({
-  subscriptions,
-}: {
-  subscriptions: AnalyticsData['subscriptions']
-}) {
-  const rows = [
-    {
-      type: 'Egyéni',
-      count: subscriptions.individual.count,
-      mrr: subscriptions.individual.mrr,
-      details: 'Direkt előfizetések',
-    },
-    {
-      type: 'Csapat',
-      count: subscriptions.team.count,
-      mrr: subscriptions.team.mrr,
-      details: `Átl. ${subscriptions.team.avgSize} fő/csapat`,
-    },
-    {
-      type: 'Vállalat (B2B)',
-      count: subscriptions.company.count,
-      mrr: subscriptions.company.mrr,
-      details: `${subscriptions.company.employees} alkalmazott`,
-    },
-    {
-      type: 'Próba időszak',
-      count: subscriptions.trial.count,
-      mrr: 0,
-      details: 'Konvertálás alatt',
-    },
-  ]
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-900">Előfizetés bontás</h3>
-        <div className="text-sm text-gray-500">
-          Össz: <span className="font-medium text-gray-900">{subscriptions.total}</span> előfizető
-        </div>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Típus
-              </th>
-              <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Darab
-              </th>
-              <th className="text-right py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                MRR
-              </th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Részletek
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr key={row.type} className="border-b border-gray-100 last:border-0">
-                <td className="py-3 px-4 text-sm font-medium text-gray-900">{row.type}</td>
-                <td className="py-3 px-4 text-sm text-gray-700 text-right">{row.count}</td>
-                <td className="py-3 px-4 text-sm text-gray-700 text-right">
-                  {row.mrr > 0 ? formatCurrency(row.mrr) : '-'}
-                </td>
-                <td className="py-3 px-4 text-sm text-gray-500">{row.details}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {subscriptions.churn.thisMonth > 0 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-          <div className="flex items-center text-amber-600">
-            <AlertTriangle className="w-4 h-4 mr-2" />
-            <span className="text-sm">
-              {subscriptions.churn.thisMonth} lemondás ebben a hónapban
-            </span>
-          </div>
-          <div className="text-sm text-gray-500">
-            Churn rate: <span className="font-medium">{subscriptions.churn.rate}%</span>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-// Company Metrics
-function CompanyMetrics({ companies }: { companies: AnalyticsData['companies'] }) {
-  const seatUtilization =
-    companies.seats.purchased > 0
-      ? Math.round((companies.seats.used / companies.seats.purchased) * 100)
-      : 0
-
-  return (
-    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-bold text-gray-900 mb-4">B2B Metrikák</h3>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center text-gray-600 mb-2">
-            <Building2 className="w-4 h-4 mr-2" />
-            <span className="text-xs font-medium uppercase">Cégek</span>
-          </div>
-          <div className="text-2xl font-bold text-gray-900">{companies.total}</div>
-          <div className="text-xs text-gray-500 mt-1">
-            {companies.active} aktív, {companies.suspended} felfüggesztett
-          </div>
-        </div>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center text-gray-600 mb-2">
-            <Users className="w-4 h-4 mr-2" />
-            <span className="text-xs font-medium uppercase">Alkalmazottak</span>
-          </div>
-          <div className="text-2xl font-bold text-gray-900">{companies.totalEmployees}</div>
-          <div className="text-xs text-gray-500 mt-1">
-            Átl. {companies.avgEmployees} fő/cég
-          </div>
-        </div>
-        <div className="col-span-2 p-4 bg-gray-50 rounded-lg">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center text-gray-600">
-              <CreditCard className="w-4 h-4 mr-2" />
-              <span className="text-xs font-medium uppercase">Masterclass helyek</span>
-            </div>
-            <span className="text-xs font-medium text-gray-700">{seatUtilization}% kihasználtság</span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-[#112a4b] h-2 rounded-full transition-all"
-              style={{ width: `${seatUtilization}%` }}
-            />
-          </div>
-          <div className="flex justify-between text-xs text-gray-500 mt-2">
-            <span>{companies.seats.used} foglalt</span>
-            <span>{companies.seats.purchased} összes</span>
-          </div>
-        </div>
-      </div>
     </div>
   )
 }
@@ -681,22 +602,13 @@ export function AnalyticsDashboard() {
         />
       </div>
 
-      {/* Revenue Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MRRTrendChart data={data.trends.revenueGrowth} />
-        <RevenueByPlanChart data={data.revenue.byPlan} />
-      </div>
+      {/* Live Activity Section */}
+      <LiveActivitySection />
 
       {/* User Growth & User Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <UserGrowthChart data={data.trends.userGrowth} />
         <UserBreakdown users={data.users} />
-      </div>
-
-      {/* Subscription & Company Metrics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SubscriptionBreakdown subscriptions={data.subscriptions} />
-        <CompanyMetrics companies={data.companies} />
       </div>
 
       {/* System Status (Collapsible) */}
