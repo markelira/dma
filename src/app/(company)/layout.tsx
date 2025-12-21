@@ -156,7 +156,7 @@ export default function CompanyLayout({
       </button>
 
       {/* Main Content - with left margin for fixed sidebar on desktop */}
-      <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-hidden">
+      <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-x-hidden">
         {children}
       </main>
 

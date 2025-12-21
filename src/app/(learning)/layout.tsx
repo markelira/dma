@@ -9,7 +9,7 @@ export default function LearningLayout({
 }) {
   // Use a simple div wrapper to avoid HTML/body conflicts
   return (
-    <div className="min-h-screen bg-gray-100 overflow-hidden">
+    <div className="min-h-screen bg-gray-100 overflow-x-hidden">
       {children}
     </div>
   )

@@ -157,7 +157,7 @@ export default function FeaturedCoursesCarousel() {
   // Show placeholder until carousel scrolls into view
   if (!isVisible) {
     return (
-      <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
+      <section ref={visibilityRef} className="relative bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl lg:text-6xl">
@@ -177,7 +177,7 @@ export default function FeaturedCoursesCarousel() {
 
   if (loading) {
     return (
-      <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24">
+      <section ref={visibilityRef} className="relative bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24">
         <div className="mx-auto max-w-7xl px-6">
           <div className="text-center">
             <div className="h-12 w-64 mx-auto bg-gray-200 rounded-lg animate-pulse mb-4" />
@@ -193,7 +193,7 @@ export default function FeaturedCoursesCarousel() {
   }
 
   return (
-    <section ref={visibilityRef} className="relative overflow-hidden bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
+    <section ref={visibilityRef} className="relative bg-gradient-to-br from-[var(--unframer-blue-10)] to-[var(--unframer-beige-10)] py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section Header */}
         <div className="mb-12 text-center" data-aos="fade-up">

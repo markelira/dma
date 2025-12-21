@@ -111,7 +111,7 @@ export function EnrolledCourseCarousel({
   // Show placeholder until carousel scrolls into view
   if (!isVisible) {
     return (
-      <section ref={visibilityRef} className="mb-8 overflow-hidden">
+      <section ref={visibilityRef} className="mb-8">
         <div className="flex items-center gap-2 mb-4">
           {icon}
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
@@ -125,7 +125,7 @@ export function EnrolledCourseCarousel({
   }
 
   return (
-    <section ref={visibilityRef} className="mb-8 overflow-hidden">
+    <section ref={visibilityRef} className="mb-8">
       {/* Section Header */}
       <div className="flex items-center gap-2 mb-4">
         {icon}
@@ -160,7 +160,7 @@ export function EnrolledCourseCarousel({
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pl-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-6"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {enrollments.map((enrollment, index) => {
@@ -176,7 +176,7 @@ export function EnrolledCourseCarousel({
             return (
               <div
                 key={enrollment.id}
-                className="flex-shrink-0 w-[280px] md:w-[300px]"
+                className="flex-shrink-0 w-[280px] md:w-[320px]"
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <PremiumCourseCard
