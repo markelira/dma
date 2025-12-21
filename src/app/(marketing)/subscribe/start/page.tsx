@@ -15,23 +15,14 @@ export default function SubscribeStartPage() {
   const router = useRouter();
   const { user, isLoading: authLoading, authReady } = useAuth();
   const { createCheckoutSession } = useStripe();
-  const { data: subscription } = useSubscriptionStatus();
+  const { data: subscription, isLoading: subscriptionLoading } = useSubscriptionStatus();
   const [error, setError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const checkoutInitiated = useRef(false);
 
-  // Check if user already has active subscription - redirect to dashboard if so
   useEffect(() => {
-    if (subscription?.isActive) {
-      const dashboardPath = getDashboardPath((user as any)?.role);
-      console.log('[SubscribeStart] User already has active subscription, redirecting to', dashboardPath);
-      router.push(dashboardPath);
-    }
-  }, [subscription, router, user]);
-
-  useEffect(() => {
-    // Wait for auth to be ready
-    if (!authReady || authLoading) return;
+    // Wait for everything to load before making decisions
+    if (!authReady || authLoading || subscriptionLoading) return;
 
     // If not authenticated, redirect to login with return URL
     if (!user) {
@@ -41,13 +32,22 @@ export default function SubscribeStartPage() {
       return;
     }
 
+    // Check if user already has active subscription - redirect to dashboard if so
+    // Only check AFTER subscription status is loaded (not loading)
+    if (subscription?.isActive) {
+      const dashboardPath = getDashboardPath((user as any)?.role);
+      console.log('[SubscribeStart] User already has active subscription, redirecting to', dashboardPath);
+      router.push(dashboardPath);
+      return;
+    }
+
     // Prevent multiple checkout attempts
     if (checkoutInitiated.current) return;
     checkoutInitiated.current = true;
 
-    // User is authenticated - create Stripe checkout session
+    // User is authenticated and does NOT have subscription - create Stripe checkout session
     const startCheckout = async () => {
-      console.log('[SubscribeStart] User authenticated, creating checkout session');
+      console.log('[SubscribeStart] User authenticated, no subscription, creating checkout session');
       setIsRedirecting(true);
 
       try {
@@ -72,7 +72,7 @@ export default function SubscribeStartPage() {
     };
 
     startCheckout();
-  }, [user, authLoading, authReady, router, createCheckoutSession]);
+  }, [user, authLoading, authReady, subscriptionLoading, subscription, router, createCheckoutSession]);
 
   // Error state
   if (error) {
@@ -111,7 +111,9 @@ export default function SubscribeStartPage() {
             ? 'Betöltés...'
             : !user
               ? 'Átirányítás a bejelentkezéshez...'
-              : 'Fizetési oldal betöltése...'}
+              : subscriptionLoading
+                ? 'Előfizetés ellenőrzése...'
+                : 'Fizetési oldal betöltése...'}
         </p>
         <p className="text-gray-400 text-sm mt-2">
           Kérjük, ne zárja be az oldalt
