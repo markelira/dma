@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Button } from '@/components/ui/button';
-import { Building2, X as CloseIcon, Mail, Loader2, CheckCircle } from 'lucide-react';
+import { Check, X as CloseIcon, Mail, Loader2, CheckCircle } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 
@@ -25,6 +25,15 @@ export function CompanyEmployeeNoAccessModal({
   const [isNotifying, setIsNotifying] = useState(false);
   const [notifySuccess, setNotifySuccess] = useState(false);
   const [notifyError, setNotifyError] = useState<string | null>(null);
+
+  const benefits = [
+    'Teljes hozzáférés 150+ struktúraépítő tartalomhoz',
+    'Több mint 200 órányi azonnal alkalmazható, működő rendszer',
+    '5 munkatárs díjmentes hozzáadása',
+    'Hetente frissülő tartalmak',
+    'Bármikor lemondható',
+    '7 napos ingyenes kipróbálás'
+  ];
 
   useEffect(() => {
     setPortalContainer(document.body);
@@ -97,7 +106,7 @@ export function CompanyEmployeeNoAccessModal({
               onClick={(e) => e.stopPropagation()}
             >
               {/* Glow effect */}
-              <div className="absolute -inset-4 bg-gradient-to-tr from-amber-500/50 to-amber-400 opacity-20 blur-2xl rounded-3xl" />
+              <div className="absolute -inset-4 bg-gradient-to-tr from-brand-secondary/50 to-brand-secondary opacity-20 blur-2xl rounded-3xl" />
 
               <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden">
                 {/* Close button */}
@@ -108,53 +117,36 @@ export function CompanyEmployeeNoAccessModal({
                   <CloseIcon className="h-5 w-5 text-white" />
                 </button>
 
-                {/* Gradient header - amber/orange for company theme */}
-                <div className="bg-gradient-to-t from-amber-500 to-amber-400 px-6 pt-10 pb-8 text-center">
-                  {/* Building icon */}
-                  <motion.div
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: 'spring', damping: 15, delay: 0.1 }}
-                    className="flex justify-center mb-5"
-                  >
-                    <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                      <Building2 className="w-8 h-8 text-white" />
-                    </div>
-                  </motion.div>
-
+                {/* Gradient header */}
+                <div className="bg-gradient-to-t from-brand-secondary to-brand-secondary/50 px-6 pt-10 pb-8 text-center">
                   {/* Headline */}
                   <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-2xl font-bold text-white tracking-tight mb-2"
+                    transition={{ delay: 0.1 }}
+                    className="text-2xl font-bold text-white tracking-tight"
                   >
-                    Nincs aktív vállalati előfizetés
+                    Fedezd fel 7 napig ingyen
                   </motion.h2>
-
-                  {/* Subheadline */}
-                  <motion.p
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
-                    className="text-white/90 text-base"
-                  >
-                    Vállalati hozzáférés szükséges
-                  </motion.p>
                 </div>
 
                 {/* Content */}
                 <div className="px-6 py-6 space-y-6">
-                  {/* Message */}
+                  {/* Benefits grid */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-center"
+                    transition={{ delay: 0.2 }}
+                    className="grid grid-cols-2 gap-x-4 gap-y-3"
                   >
-                    <p className="text-gray-600 leading-relaxed">
-                      Kérd meg a céged adminisztrátorát, hogy aktiválja az előfizetést a tartalmak eléréséhez.
-                    </p>
+                    {benefits.map((benefit, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                          <Check className="w-3 h-3 text-green-600" />
+                        </div>
+                        <span className="text-sm text-gray-700 leading-tight">{benefit}</span>
+                      </div>
+                    ))}
                   </motion.div>
 
                   {/* Success message */}
@@ -166,7 +158,7 @@ export function CompanyEmployeeNoAccessModal({
                     >
                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                       <p className="text-sm text-green-700">
-                        Értesítés elküldve a cégvezetődnek!
+                        Sikeresen értesítetted a főnököt!
                       </p>
                     </motion.div>
                   )}
@@ -182,19 +174,17 @@ export function CompanyEmployeeNoAccessModal({
                     </motion.div>
                   )}
 
-                  {/* Buttons */}
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.35 }}
-                    className="space-y-3"
-                  >
-                    {/* Notify Boss Button */}
-                    {!notifySuccess && companyId && (
+                  {/* CTA Button */}
+                  {!notifySuccess && companyId && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.25 }}
+                    >
                       <Button
                         onClick={handleNotifyBoss}
                         disabled={isNotifying}
-                        className="w-full h-12 text-base font-semibold bg-gradient-to-t from-amber-600 to-amber-500 hover:from-amber-700 hover:to-amber-600 text-white transition-all shadow-lg shadow-amber-500/20"
+                        className="w-full h-14 text-lg font-bold bg-brand-secondary hover:bg-brand-secondary-hover shadow-lg shadow-brand-secondary/30 hover:shadow-brand-secondary/40 transition-all tracking-tight"
                       >
                         {isNotifying ? (
                           <>
@@ -204,20 +194,23 @@ export function CompanyEmployeeNoAccessModal({
                         ) : (
                           <>
                             <Mail className="w-5 h-5 mr-2" />
-                            Főnök értesítése
+                            FŐNÖK ÉRTESÍTÉSE
                           </>
                         )}
                       </Button>
-                    )}
+                    </motion.div>
+                  )}
 
-                    {/* Close Button */}
-                    <Button
-                      onClick={handleClose}
-                      variant="outline"
-                      className="w-full h-12 text-base font-medium border-gray-200 hover:bg-gray-50 transition-all"
-                    >
-                      Bezárás
-                    </Button>
+                  {/* Pricing preview */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-center pt-4 border-t border-gray-100"
+                  >
+                    <p className="text-sm text-gray-500">
+                      A próba után: <span className="font-semibold text-gray-700">14 990 Ft/hó</span>
+                    </p>
                   </motion.div>
                 </div>
               </div>
