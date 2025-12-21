@@ -12,11 +12,20 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
     }
 
-    // Enrollments: Users can only access their own enrollments
+    // Enrollments: Users can access their own enrollments
+    // Company members can access company-sponsored enrollments
     match /enrollments/{enrollmentId} {
       // Users can read their own enrollments, admins can read all
-      allow read: if request.auth != null &&
-        (resource.data.userId == request.auth.uid || isAdmin());
+      // Company members can read enrollments sponsored by their company
+      allow read: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        isAdmin() ||
+        // Company members can read company-sponsored enrollments
+        (resource.data.enrolledByCompany != null && (
+          isCompanyAdmin(resource.data.enrolledByCompany) ||
+          isEmployee(resource.data.enrolledByCompany)
+        ))
+      );
 
       // Users can only create enrollments for themselves
       allow create: if request.auth != null &&

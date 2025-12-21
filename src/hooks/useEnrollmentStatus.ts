@@ -15,23 +15,32 @@ export const useEnrollmentStatus = (courseId: string) => {
         return { isEnrolled: false, enrollmentId: null };
       }
 
-      const { doc, getDoc } = await import('firebase/firestore');
-      const { db } = await import('@/lib/firebase');
+      try {
+        const { doc, getDoc } = await import('firebase/firestore');
+        const { db } = await import('@/lib/firebase');
 
-      // Check for enrollment document
-      const enrollmentId = `${user.uid}_${courseId}`;
-      const enrollmentRef = doc(db, 'enrollments', enrollmentId);
-      const enrollmentDoc = await getDoc(enrollmentRef);
+        // Check for enrollment document
+        const enrollmentId = `${user.uid}_${courseId}`;
+        const enrollmentRef = doc(db, 'enrollments', enrollmentId);
+        const enrollmentDoc = await getDoc(enrollmentRef);
 
-      if (enrollmentDoc.exists()) {
-        return {
-          isEnrolled: true,
-          enrollmentId: enrollmentDoc.id,
-          ...enrollmentDoc.data()
-        };
+        if (enrollmentDoc.exists()) {
+          return {
+            isEnrolled: true,
+            enrollmentId: enrollmentDoc.id,
+            ...enrollmentDoc.data()
+          };
+        }
+
+        return { isEnrolled: false, enrollmentId: null };
+      } catch (error: any) {
+        // Handle permission errors gracefully - treat as not enrolled
+        if (error?.code === 'permission-denied') {
+          console.warn('[useEnrollmentStatus] Permission denied, treating as not enrolled');
+          return { isEnrolled: false, enrollmentId: null };
+        }
+        throw error;
       }
-
-      return { isEnrolled: false, enrollmentId: null };
     },
     enabled: !!courseId && isAuthenticated,
     staleTime: 5 * 60 * 1000, // 5 minutes
