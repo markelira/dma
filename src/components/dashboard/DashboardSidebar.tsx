@@ -119,6 +119,7 @@ interface NavigationItemProps {
 
 interface DashboardSidebarProps {
   onNavigate?: () => void
+  companyLogoUrl?: string
 }
 
 function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
@@ -155,7 +156,7 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
   )
 }
 
-export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
+export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSidebarProps = {}) {
   const pathname = usePathname()
   const { user, isLoading: loading, logout } = useAuthStore()
   const router = useRouter()
@@ -241,7 +242,16 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
       {/* User Profile Section */}
       <div className="border-t border-gray-200 p-4">
         <div className="flex items-center space-x-3 mb-4">
-          {user?.profilePictureUrl ? (
+          {user?.role === 'COMPANY_EMPLOYEE' && companyLogoUrl ? (
+            <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-brand-secondary flex-shrink-0">
+              <Image
+                src={companyLogoUrl}
+                alt="Cég logó"
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : user?.profilePictureUrl ? (
             <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-brand-secondary flex-shrink-0">
               <Image
                 src={user.profilePictureUrl}
@@ -256,7 +266,11 @@ export function DashboardSidebar({ onNavigate }: DashboardSidebarProps = {}) {
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
             >
-              <User className="w-4 h-4 text-white" />
+              {user?.role === 'COMPANY_EMPLOYEE' ? (
+                <Building2 className="w-4 h-4 text-white" />
+              ) : (
+                <User className="w-4 h-4 text-white" />
+              )}
             </motion.div>
           )}
           <div className="flex-1 min-w-0">

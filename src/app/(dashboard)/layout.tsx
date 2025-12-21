@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
 import { Loader2, Menu, X } from 'lucide-react'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 // REMOVED: Duplicate AuthProvider - already wrapped in root layout
 // import { AuthProvider } from '@/contexts/AuthContext'
 import Footer from '@/components/landing-home/ui/footer'
@@ -19,6 +21,7 @@ export default function DashboardRouteGroupLayout({
   const { user, isLoading, authReady } = useAuthStore()
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | undefined>()
 
   useEffect(() => {
     console.log('🔍 [DIAGNOSTIC] DashboardLayout auth check', {
@@ -72,6 +75,23 @@ export default function DashboardRouteGroupLayout({
     }
   }, [user, isLoading, authReady, router])
 
+  // Fetch company logo for COMPANY_EMPLOYEE users
+  useEffect(() => {
+    const fetchCompanyLogo = async () => {
+      if (user?.role === 'COMPANY_EMPLOYEE' && user.companyId) {
+        try {
+          const companyDoc = await getDoc(doc(db, 'companies', user.companyId))
+          if (companyDoc.exists()) {
+            setCompanyLogoUrl(companyDoc.data()?.logoUrl)
+          }
+        } catch (error) {
+          console.error('Error fetching company logo:', error)
+        }
+      }
+    }
+    fetchCompanyLogo()
+  }, [user?.role, user?.companyId])
+
   if (!authReady || isLoading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -106,7 +126,7 @@ export default function DashboardRouteGroupLayout({
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <DashboardSidebar onNavigate={() => setSidebarOpen(false)} />
+        <DashboardSidebar onNavigate={() => setSidebarOpen(false)} companyLogoUrl={companyLogoUrl} />
       </aside>
 
       {/* Mobile Menu Button - Floating */}

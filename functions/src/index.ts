@@ -2371,3 +2371,10 @@ export {
   seedDefaultTargetAudiences,
   getMigrationStatus,
 } from './migrations/flattenCoursesToLessons';
+
+// ============================================
+// EMAIL TESTING (Admin only)
+// ============================================
+
+// Export test email function - triggers all email templates
+export { testAllEmails } from './testAllEmails';

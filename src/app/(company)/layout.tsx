@@ -24,6 +24,7 @@ export default function CompanyLayout({
   const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [companyName, setCompanyName] = useState<string | undefined>()
+  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | undefined>()
 
   // Trial popup state (for company admins without subscription)
   const { shouldShowForAuthUser, hasUsedTrial, isLoading: subscriptionLoading, dismiss: dismissTrial } = useTrialPopup()
@@ -71,7 +72,9 @@ export default function CompanyLayout({
         try {
           const companyDoc = await getDoc(doc(db, 'companies', user.companyId))
           if (companyDoc.exists()) {
-            setCompanyName(companyDoc.data()?.name)
+            const data = companyDoc.data()
+            setCompanyName(data?.name)
+            setCompanyLogoUrl(data?.logoUrl)
           }
         } catch (error) {
           console.error('Error fetching company name:', error)
@@ -139,6 +142,7 @@ export default function CompanyLayout({
       >
         <CompanyDashboardSidebar
           companyName={companyName}
+          companyLogoUrl={companyLogoUrl}
           onNavigate={() => setSidebarOpen(false)}
         />
       </aside>
