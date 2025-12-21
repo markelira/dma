@@ -176,8 +176,8 @@ function MRRTrendChart({ data }: { data: Array<{ date: string; amount: number }>
         <AreaChart data={formattedData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
+              <stop offset="5%" stopColor="#112a4b" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#112a4b" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" vertical={false} />
@@ -205,7 +205,7 @@ function MRRTrendChart({ data }: { data: Array<{ date: string; amount: number }>
           <Area
             type="monotone"
             dataKey="amount"
-            stroke="#3B82F6"
+            stroke="#112a4b"
             strokeWidth={2}
             fillOpacity={1}
             fill="url(#colorRevenue)"
@@ -219,8 +219,8 @@ function MRRTrendChart({ data }: { data: Array<{ date: string; amount: number }>
 // Revenue by Plan Chart
 function RevenueByPlanChart({ data }: { data: { monthly: number; sixMonth: number; yearly: number } }) {
   const chartData = [
-    { name: 'Havi', value: data.monthly, color: '#3B82F6' },
-    { name: '6 hónapos', value: data.sixMonth, color: '#8B5CF6' },
+    { name: 'Havi', value: data.monthly, color: '#112a4b' },
+    { name: '6 hónapos', value: data.sixMonth, color: '#1a3d6e' },
     { name: 'Éves', value: data.yearly, color: '#10B981' },
   ].filter((item) => item.value > 0)
 
@@ -315,7 +315,7 @@ function UserGrowthChart({ data }: { data: Array<{ date: string; count: number }
             }}
             formatter={(value: number) => [value, 'Új felhasználó']}
           />
-          <Bar dataKey="count" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={20} />
+          <Bar dataKey="count" fill="#112a4b" radius={[4, 4, 0, 0]} maxBarSize={20} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -453,7 +453,7 @@ function CompanyMetrics({ companies }: { companies: AnalyticsData['companies'] }
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all"
+              className="bg-[#112a4b] h-2 rounded-full transition-all"
               style={{ width: `${seatUtilization}%` }}
             />
           </div>
@@ -477,8 +477,8 @@ function UserBreakdown({ users }: { users: AnalyticsData['users'] }) {
         <div>
           <div className="text-xs font-medium text-gray-500 uppercase mb-2">Szerepkör szerint</div>
           <div className="grid grid-cols-3 gap-2">
-            <div className="text-center p-3 bg-blue-50 rounded-lg">
-              <div className="text-xl font-bold text-blue-600">{users.byRole.students}</div>
+            <div className="text-center p-3 bg-[#112a4b]/5 rounded-lg">
+              <div className="text-xl font-bold text-[#112a4b]">{users.byRole.students}</div>
               <div className="text-xs text-gray-600">Hallgató</div>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
@@ -606,7 +606,7 @@ export function AnalyticsDashboard() {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#112a4b] mx-auto mb-4" />
           <p className="text-gray-500">Analytics betöltése...</p>
         </div>
       </div>
@@ -635,16 +635,16 @@ export function AnalyticsDashboard() {
           subtitle={`+${data.users.newThisMonth} ebben a hónapban`}
           icon={Users}
           trend={data.users.growth}
-          iconColor="text-blue-600"
-          iconBg="bg-blue-100"
+          iconColor="text-[#112a4b]"
+          iconBg="bg-[#112a4b]/10"
         />
         <StatCard
           title="Aktív előfizetők"
           value={data.subscriptions.total}
           subtitle={`${data.subscriptions.trial.count} próba időszakban`}
           icon={CreditCard}
-          iconColor="text-green-600"
-          iconBg="bg-green-100"
+          iconColor="text-[#112a4b]"
+          iconBg="bg-[#112a4b]/10"
         />
         <StatCard
           title="MRR"
@@ -652,32 +652,32 @@ export function AnalyticsDashboard() {
           subtitle={`ARR: ${formatCurrency(data.revenue.arr)}`}
           icon={TrendingUp}
           trend={data.revenue.growth}
-          iconColor="text-emerald-600"
-          iconBg="bg-emerald-100"
+          iconColor="text-green-600"
+          iconBg="bg-green-100"
         />
         <StatCard
           title="Vállalatok"
           value={data.companies.total}
           subtitle={`${data.companies.totalEmployees} alkalmazott`}
           icon={Building2}
-          iconColor="text-purple-600"
-          iconBg="bg-purple-100"
+          iconColor="text-[#112a4b]"
+          iconBg="bg-[#112a4b]/10"
         />
         <StatCard
           title="Aktív ma"
           value={data.users.activeToday}
           subtitle="Bejelentkezett"
           icon={Activity}
-          iconColor="text-amber-600"
-          iconBg="bg-amber-100"
+          iconColor="text-[#112a4b]"
+          iconBg="bg-[#112a4b]/10"
         />
         <StatCard
           title="Konverzió"
           value={`${data.conversionRate}%`}
           subtitle="Előfizető / felhasználó"
           icon={Percent}
-          iconColor="text-teal-600"
-          iconBg="bg-teal-100"
+          iconColor="text-[#112a4b]"
+          iconBg="bg-[#112a4b]/10"
         />
       </div>
 

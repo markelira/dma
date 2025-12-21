@@ -362,17 +362,17 @@ export function UnifiedSidebar({ userRole }: UnifiedSidebarProps) {
                   className={cn(
                     'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
                     isActive
-                      ? 'bg-red-50 text-red-600 shadow-sm'
+                      ? 'bg-[#112a4b]/5 text-[#112a4b] shadow-sm'
                       : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   )}
                 >
                   <Icon className={cn(
                     "h-4 w-4",
-                    isActive ? "text-red-600" : "text-gray-500"
+                    isActive ? "text-[#112a4b]" : "text-gray-500"
                   )} />
                   <span className="flex-1">{item.title}</span>
                   {isReportsPage && openTicketsCount > 0 && (
-                    <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                    <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-[#112a4b] rounded-full">
                       {openTicketsCount}
                     </span>
                   )}

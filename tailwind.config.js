@@ -103,6 +103,12 @@ module.exports = {
           'secondary-hover': '#c9232d', // Darker on hover
           'secondary-light': '#ff4d58', // Lighter variant
         },
+        // Admin Dashboard Color (Navy Blue)
+        admin: {
+          DEFAULT: '#112a4b', // Admin primary accent
+          light: '#1a3d6e', // Lighter variant for hover
+          dark: '#0a1a2e', // Darker variant
+        },
         // DMA.hu Brand Colors (legacy from logo)
         dma: {
           red: '#E72B36', // Updated to match brand secondary

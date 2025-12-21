@@ -218,7 +218,7 @@ export default function AdminUsersPage() {
       case 'COMPANY_ADMIN':
         return 'bg-purple-100 text-purple-700 border-purple-200'
       case 'INSTRUCTOR':
-        return 'bg-brand-secondary/10 text-brand-secondary-hover border-brand-secondary/20'
+        return 'bg-blue-100 text-blue-700 border-blue-200'
       case 'STUDENT':
         return 'bg-green-100 text-green-700 border-green-200'
       default:
@@ -242,35 +242,32 @@ export default function AdminUsersPage() {
   }
 
   if (usersLoading || statsLoading) {
-    return <div className="flex justify-center items-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#112a4b]" />
+      </div>
+    )
   }
 
   if (usersError) {
-    return <div className="text-destructive">Hiba a felhasználók betöltése közben: {usersError.message}</div>
+    return <div className="text-red-600">Hiba a felhasználók betöltése közben: {usersError.message}</div>
   }
 
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-brand-secondary/50 to-indigo-600 rounded-xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
-        
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Felhasználók Kezelése</h1>
-              <p className="text-brand-secondary-light text-lg">
-                Platform felhasználók áttekintése és adminisztrációja
-              </p>
-            </div>
-            <div className="hidden lg:block">
-              <Button className="bg-white text-brand-secondary hover:bg-gray-100 flex items-center gap-2">
-                <Plus className="h-4 w-4" />
-                Új Felhasználó
-              </Button>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Felhasználók Kezelése</h1>
+          <p className="text-gray-500">
+            Platform felhasználók áttekintése és adminisztrációja
+          </p>
+        </div>
+        <div className="hidden lg:block">
+          <Button className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Új Felhasználó
+          </Button>
         </div>
       </div>
 
@@ -278,7 +275,7 @@ export default function AdminUsersPage() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900">Felhasználói Statisztikák</h2>
-          <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">
+          <Badge className="bg-[#112a4b]/10 text-[#112a4b]">
             <Sparkles className="w-3 h-3 mr-1" />
             Valós idejű
           </Badge>
@@ -288,8 +285,8 @@ export default function AdminUsersPage() {
           <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-brand-secondary" />
+                <div className="w-12 h-12 rounded-lg bg-[#112a4b]/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-[#112a4b]" />
                 </div>
                 <Badge variant="outline" className="text-xs text-green-600 border-green-600">
                   +{stats?.newUsersThisMonth || 0}
@@ -444,7 +441,7 @@ export default function AdminUsersPage() {
           <div className="flex items-center justify-between">
             <CardTitle>Felhasználók Listája</CardTitle>
             <div className="flex items-center gap-2">
-              <Badge className="bg-indigo-100 text-indigo-700">
+              <Badge className="bg-[#112a4b]/10 text-[#112a4b]">
                 <Users className="w-3 h-3 mr-1" />
                 {filteredUsers.length} felhasználó
               </Badge>
@@ -644,7 +641,7 @@ export default function AdminUsersPage() {
             <select
               value={selectedRole}
               onChange={(e) => setSelectedRole(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-secondary"
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background transition-colors hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#112a4b]"
             >
               <option value="STUDENT">Hallgató</option>
               <option value="INSTRUCTOR">Oktató</option>
@@ -675,7 +672,7 @@ export default function AdminUsersPage() {
             <AlertDialogAction
               onClick={handleUpdateRole}
               disabled={updateRoleMutation.isPending || !selectedRole || selectedRole === selectedUser?.role}
-              className="bg-brand-secondary text-white hover:bg-brand-secondary-hover"
+              className="bg-[#112a4b] text-white hover:bg-[#1a3d6e]"
             >
               {updateRoleMutation.isPending ? 'Mentés...' : 'Szerepkör Módosítása'}
             </AlertDialogAction>

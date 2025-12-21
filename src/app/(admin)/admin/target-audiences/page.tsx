@@ -100,16 +100,16 @@ export default function TargetAudiencesPage() {
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="container py-8 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Célközönségek kezelése</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Célközönségek kezelése</h1>
+          <p className="text-gray-500">
             Célközönségek létrehozása és kezelése tartalmakhoz
           </p>
         </div>
-        <Button onClick={openForCreate} className="flex items-center gap-2">
+        <Button onClick={openForCreate} className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Új célközönség
         </Button>
@@ -118,10 +118,10 @@ export default function TargetAudiencesPage() {
       {/* Target Audiences Table */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#112a4b]" />
         </div>
       ) : !targetAudiences || targetAudiences.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center py-12 rounded-xl bg-white border border-gray-200 shadow-sm">
           <Users className="w-12 h-12 mx-auto text-gray-400 mb-3" />
           <p className="text-gray-600 mb-4">Még nincs célközönség létrehozva</p>
           <Button onClick={openForCreate} variant="outline">
@@ -129,7 +129,7 @@ export default function TargetAudiencesPage() {
           </Button>
         </div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -143,8 +143,8 @@ export default function TargetAudiencesPage() {
                 <TableRow key={targetAudience.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-brand-secondary/10 flex items-center justify-center">
-                        <Users className="w-5 h-5 text-brand-secondary" />
+                      <div className="w-10 h-10 rounded-full bg-[#112a4b]/10 flex items-center justify-center">
+                        <Users className="w-5 h-5 text-[#112a4b]" />
                       </div>
                       {targetAudience.name}
                     </div>

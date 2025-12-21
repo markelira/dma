@@ -188,16 +188,16 @@ export default function InstructorsPage() {
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <div className="container py-8 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">Oktatók kezelése</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Oktatók kezelése</h1>
+          <p className="text-gray-500">
             Oktatók létrehozása és kezelése tartalmakhoz
           </p>
         </div>
-        <Button onClick={openForCreate} className="flex items-center gap-2">
+        <Button onClick={openForCreate} className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
           <Plus className="w-4 h-4" />
           Új oktató
         </Button>
@@ -206,10 +206,10 @@ export default function InstructorsPage() {
       {/* Instructors Table */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#112a4b]" />
         </div>
       ) : !instructors || instructors.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center py-12 rounded-xl bg-white border border-gray-200 shadow-sm">
           <User className="w-12 h-12 mx-auto text-gray-400 mb-3" />
           <p className="text-gray-600 mb-4">Még nincs oktató létrehozva</p>
           <Button onClick={openForCreate} variant="outline">
@@ -217,7 +217,7 @@ export default function InstructorsPage() {
           </Button>
         </div>
       ) : (
-        <div className="border rounded-lg overflow-hidden">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -251,7 +251,7 @@ export default function InstructorsPage() {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                       instructor.role === 'SZEREPLŐ'
                         ? 'bg-purple-100 text-purple-800'
-                        : 'bg-brand-secondary/10 text-brand-secondary-hover'
+                        : 'bg-[#112a4b]/10 text-[#112a4b]'
                     }`}>
                       {INSTRUCTOR_ROLE_LABELS[instructor.role || 'MENTOR']}
                     </span>
@@ -370,7 +370,7 @@ export default function InstructorsPage() {
                 <SelectContent>
                   <SelectItem value="MENTOR">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-brand-secondary/50" />
+                      <span className="w-2 h-2 rounded-full bg-[#112a4b]" />
                       Mentor
                     </div>
                   </SelectItem>
@@ -424,13 +424,13 @@ export default function InstructorsPage() {
                   >
                     {imageUploading ? (
                       <div className="flex flex-col items-center gap-2">
-                        <Loader2 className="w-8 h-8 text-brand-secondary animate-spin" />
+                        <Loader2 className="w-8 h-8 text-[#112a4b] animate-spin" />
                         <span className="text-sm text-gray-600">
                           Feltöltés... {uploadProgress}%
                         </span>
                         <div className="w-full max-w-xs bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-brand-secondary h-2 rounded-full transition-all duration-300"
+                            className="bg-[#112a4b] h-2 rounded-full transition-all duration-300"
                             style={{ width: `${uploadProgress}%` }}
                           />
                         </div>

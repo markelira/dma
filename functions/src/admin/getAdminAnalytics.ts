@@ -80,10 +80,11 @@ export const getAdminAnalytics = onCall({
       return { success: false, error: 'Authentication required' };
     }
 
-    // Check admin role
+    // Check admin role (accept both 'admin' and 'ADMIN')
     const userDoc = await firestore.collection('users').doc(request.auth.uid).get();
     const userData = userDoc.data();
-    if (!userData || userData.role !== 'admin') {
+    const userRole = userData?.role?.toLowerCase();
+    if (!userData || userRole !== 'admin') {
       return { success: false, error: 'Admin access required' };
     }
 

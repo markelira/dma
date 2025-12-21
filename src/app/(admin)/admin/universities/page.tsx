@@ -56,19 +56,27 @@ export default function AdminUniversitiesPage() {
   ) || []
 
   if (isLoading) {
-    return <div className="flex justify-center items-center h-64"><Spinner size="lg" /></div>
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#112a4b]" />
+      </div>
+    )
   }
   if (error) {
-    return <div className="text-destructive">Hiba az egyetemek betöltésekor: {error.message}</div>
+    return <div className="text-red-600">Hiba az egyetemek betöltésekor: {error.message}</div>
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Egyetemek Kezelése</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Egyetemek kezelése</h1>
+          <p className="text-gray-500">Egyetemek és partnerek kezelése</p>
+        </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button className="flex items-center gap-2">
+            <Button className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
               <Plus className="h-4 w-4" />
               Új Egyetem
             </Button>
@@ -82,20 +90,18 @@ export default function AdminUniversitiesPage() {
         </AlertDialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Keresés</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Input placeholder="Keresés név vagy slug alapján..." value={search} onChange={e => setSearch(e.target.value)} />
-        </CardContent>
-      </Card>
+      {/* Search */}
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+        <label className="text-sm font-medium text-gray-900 mb-2 block">Keresés</label>
+        <Input placeholder="Keresés név vagy slug alapján..." value={search} onChange={e => setSearch(e.target.value)} />
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Egyetemek ({filtered.length})</CardTitle>
-        </CardHeader>
-        <CardContent>
+      {/* Universities Table */}
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-bold text-gray-900">Egyetemek ({filtered.length})</h3>
+        </div>
+        <div className="p-6">
           <Table>
             <TableHeader>
               <TableRow>
@@ -120,8 +126,8 @@ export default function AdminUniversitiesPage() {
               ))}
             </TableBody>
           </Table>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 } 

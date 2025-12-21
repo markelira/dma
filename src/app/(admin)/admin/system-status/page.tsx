@@ -104,25 +104,18 @@ export default function AdminSystemStatusPage() {
   return (
     <div className="space-y-8">
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-cyan-500 to-brand-secondary rounded-xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
-        
-        <div className="relative z-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Rendszer Állapot</h1>
-              <p className="text-cyan-100 text-lg">
-                Platform teljesítmény és állapot monitorozás
-              </p>
-            </div>
-            <div className="hidden lg:block">
-              <Badge className="bg-white/20 backdrop-blur-sm border-white/30 text-white text-lg px-6 py-3 flex items-center">
-                <CheckCircle className="h-5 w-5 mr-2" />
-                Minden rendszer működik
-              </Badge>
-            </div>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Rendszer állapot</h1>
+          <p className="text-gray-500">
+            Platform teljesítmény és állapot monitorozás
+          </p>
+        </div>
+        <div className="hidden lg:block">
+          <Badge className="bg-green-100 text-green-700 border-green-200 text-lg px-6 py-3 flex items-center">
+            <CheckCircle className="h-5 w-5 mr-2" />
+            Minden rendszer működik
+          </Badge>
         </div>
       </div>
 
@@ -130,15 +123,15 @@ export default function AdminSystemStatusPage() {
       <div>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-900">Rendszer Áttekintés</h2>
-          <Badge className="bg-cyan-100 text-cyan-700">
+          <Badge className="bg-[#112a4b]/10 text-[#112a4b]">
             <Activity className="w-3 h-3 mr-1" />
             Valós idejű monitoring
           </Badge>
         </div>
         
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-lg bg-green-50 flex items-center justify-center">
                   <Activity className="w-6 h-6 text-green-600" />
@@ -158,14 +151,14 @@ export default function AdminSystemStatusPage() {
                   Elmúlt 30 nap
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="p-6">
               <div className="flex items-center justify-between">
-                <div className="w-12 h-12 rounded-lg bg-brand-secondary/5 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-brand-secondary" />
+                <div className="w-12 h-12 rounded-lg bg-[#112a4b]/10 flex items-center justify-center">
+                  <Users className="w-6 h-6 text-[#112a4b]" />
                 </div>
               </div>
               <div className="mt-4">
@@ -179,11 +172,11 @@ export default function AdminSystemStatusPage() {
                   Jelenleg online
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-lg bg-purple-50 flex items-center justify-center">
                   <Clock className="w-6 h-6 text-purple-600" />
@@ -200,11 +193,11 @@ export default function AdminSystemStatusPage() {
                   API hívások
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="p-6">
               <div className="flex items-center justify-between">
                 <div className="w-12 h-12 rounded-lg bg-emerald-50 flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-emerald-600" />
@@ -221,23 +214,21 @@ export default function AdminSystemStatusPage() {
                   Elmúlt 24 óra
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* System Components */}
-      <Card className="hover:shadow-md transition-shadow">
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Rendszer Komponensek</span>
-            <Badge variant="outline" className="text-xs">
-              <Server className="w-3 h-3 mr-1" />
-              {systemMetrics.length} komponens
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <h3 className="text-lg font-bold text-gray-900">Rendszer Komponensek</h3>
+          <Badge variant="outline" className="text-xs">
+            <Server className="w-3 h-3 mr-1" />
+            {systemMetrics.length} komponens
+          </Badge>
+        </div>
+        <div className="p-6">
           <div className="space-y-4">
             {systemMetrics.map((metric, index) => (
               <div key={index} className="space-y-2">
@@ -257,22 +248,20 @@ export default function AdminSystemStatusPage() {
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Service Status Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Szolgáltatások</span>
-              <Badge className="bg-green-100 text-green-700">
-                <CheckCircle className="w-3 h-3 mr-1" />
-                Mind aktív
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h3 className="text-lg font-bold text-gray-900">Szolgáltatások</h3>
+            <Badge className="bg-green-100 text-green-700">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Mind aktív
+            </Badge>
+          </div>
+          <div className="p-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg">
                 <div className="flex items-center gap-3">
@@ -286,10 +275,10 @@ export default function AdminSystemStatusPage() {
                   Aktív
                 </Badge>
               </div>
-              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-brand-secondary/5 to-indigo-50 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gradient-to-r from-[#112a4b]/5 to-[#112a4b]/10 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-brand-secondary/10 rounded-lg flex items-center justify-center">
-                    <Database className="h-5 w-5 text-brand-secondary" />
+                  <div className="w-10 h-10 bg-[#112a4b]/10 rounded-lg flex items-center justify-center">
+                    <Database className="h-5 w-5 text-[#112a4b]" />
                   </div>
                   <span className="font-medium">Firestore Adatbázis</span>
                 </div>
@@ -323,14 +312,14 @@ export default function AdminSystemStatusPage() {
                 </Badge>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="hover:shadow-md transition-shadow">
-          <CardHeader>
-            <CardTitle>Erőforrás Használat</CardTitle>
-          </CardHeader>
-          <CardContent>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-bold text-gray-900">Erőforrás Használat</h3>
+          </div>
+          <div className="p-6">
             <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -373,8 +362,8 @@ export default function AdminSystemStatusPage() {
                 <Progress value={28} className="h-2" />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )

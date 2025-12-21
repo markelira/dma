@@ -112,7 +112,7 @@ export default function AdminReportsPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'open':
-        return <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">Nyitott</Badge>
+        return <Badge className="bg-[#112a4b]/10 text-[#112a4b]">Nyitott</Badge>
       case 'in-progress':
         return <Badge className="bg-yellow-100 text-yellow-700">Folyamatban</Badge>
       case 'resolved':
@@ -133,7 +133,7 @@ export default function AdminReportsPage() {
       case 'normal':
         return <Badge className="bg-gray-100 text-gray-700">Normál</Badge>
       case 'low':
-        return <Badge className="bg-brand-secondary/10 text-brand-secondary-hover">Alacsony</Badge>
+        return <Badge className="bg-blue-100 text-blue-700">Alacsony</Badge>
       default:
         return <Badge className="bg-gray-100 text-gray-700">Normál</Badge>
     }
@@ -256,7 +256,7 @@ export default function AdminReportsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#112a4b] mx-auto mb-4"></div>
           <p className="text-gray-600">Jegyek betöltése...</p>
         </div>
       </div>
@@ -264,84 +264,83 @@ export default function AdminReportsPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Támogatási Jegyek
-          </h1>
-          <p className="text-gray-600">
-            Felhasználói segítségkérések és jelentések kezelése
-          </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          Támogatási jegyek
+        </h1>
+        <p className="text-gray-500">
+          Felhasználói segítségkérések és jelentések kezelése
+        </p>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Összes</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+              <Activity className="w-8 h-8 text-gray-400" />
+            </div>
+          </div>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Összes</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
-                </div>
-                <Activity className="w-8 h-8 text-gray-400" />
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Nyitott</p>
+                <p className="text-2xl font-bold text-[#112a4b]">{stats.open}</p>
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Nyitott</p>
-                  <p className="text-2xl font-bold text-brand-secondary">{stats.open}</p>
-                </div>
-                <AlertCircle className="w-8 h-8 text-brand-secondary" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Folyamatban</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.inProgress}</p>
-                </div>
-                <Clock className="w-8 h-8 text-yellow-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Megoldva</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
-                </div>
-                <CheckCircle className="w-8 h-8 text-green-400" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Sürgős</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.urgent}</p>
-                </div>
-                <AlertTriangle className="w-8 h-8 text-red-400" />
-              </div>
-            </CardContent>
-          </Card>
+              <AlertCircle className="w-8 h-8 text-[#112a4b]" />
+            </div>
+          </div>
         </div>
 
-        {/* Filters */}
-        <Card className="mb-6">
-          <CardContent className="p-4">
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Folyamatban</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.inProgress}</p>
+              </div>
+              <Clock className="w-8 h-8 text-yellow-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Megoldva</p>
+                <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Sürgős</p>
+                <p className="text-2xl font-bold text-red-600">{stats.urgent}</p>
+              </div>
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm">
+        <div className="p-4">
             <div className="flex flex-wrap gap-4">
               <div className="flex-1 min-w-[200px]">
                 <div className="relative">
@@ -382,31 +381,31 @@ export default function AdminReportsPage() {
                 </SelectContent>
               </Select>
 
-              <Button 
-                variant="outline" 
-                className="gap-2"
-                onClick={() => {
-                  setFilterStatus('all')
-                  setFilterPriority('all')
-                  setSearchQuery('')
-                }}
-              >
-                <Filter className="w-4 h-4" />
-                Szűrők törlése
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                setFilterStatus('all')
+                setFilterPriority('all')
+                setSearchQuery('')
+              }}
+            >
+              <Filter className="w-4 h-4" />
+              Szűrők törlése
+            </Button>
+          </div>
+        </div>
+      </div>
 
-        {/* Tickets List and Detail */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Tickets List */}
-          <div className="lg:col-span-1">
-            <Card className="h-[600px] overflow-hidden">
-              <CardHeader>
-                <CardTitle>Jegyek ({filteredTickets.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 overflow-y-auto h-[520px]">
+      {/* Tickets List and Detail */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Tickets List */}
+        <div className="lg:col-span-1">
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm h-[600px] overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">Jegyek ({filteredTickets.length})</h3>
+            </div>
+            <div className="p-0 overflow-y-auto h-[520px]">
                 {filteredTickets.length === 0 ? (
                   <div className="text-center py-8">
                     <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-2" />
@@ -439,32 +438,32 @@ export default function AdminReportsPage() {
                           </span>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
+        </div>
 
-          {/* Ticket Detail */}
-          <div className="lg:col-span-2">
-            {selectedTicket ? (
-              <Card className="h-[600px] overflow-hidden">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="text-lg">{selectedTicket.subject}</CardTitle>
-                      <CardDescription>
-                        #{selectedTicket.id.slice(-6).toUpperCase()} • {formatDate(selectedTicket.createdAt)}
-                      </CardDescription>
-                    </div>
-                    <div className="flex gap-2">
-                      {getStatusBadge(selectedTicket.status)}
-                      {getPriorityBadge(selectedTicket.priority)}
-                    </div>
+        {/* Ticket Detail */}
+        <div className="lg:col-span-2">
+          {selectedTicket ? (
+            <div className="rounded-xl bg-white border border-gray-200 shadow-sm h-[600px] overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{selectedTicket.subject}</h3>
+                    <p className="text-sm text-gray-500">
+                      #{selectedTicket.id.slice(-6).toUpperCase()} • {formatDate(selectedTicket.createdAt)}
+                    </p>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-4 overflow-y-auto h-[480px]">
+                  <div className="flex gap-2">
+                    {getStatusBadge(selectedTicket.status)}
+                    {getPriorityBadge(selectedTicket.priority)}
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-4 overflow-y-auto h-[480px]">
                   {/* User Info */}
                   <div className="bg-gray-50 rounded-lg p-4">
                     <div className="flex items-center gap-4">
@@ -565,25 +564,24 @@ export default function AdminReportsPage() {
                           <Reply className="w-4 h-4" />
                           Válasz küldése
                         </Button>
-                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card className="h-[600px] flex items-center justify-center">
-                <div className="text-center">
-                  <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">
-                    Válassz egy jegyet
-                  </h3>
-                  <p className="text-gray-600">
-                    Kattints egy jegyre a bal oldali listából a részletek megtekintéséhez
-                  </p>
                 </div>
-              </Card>
-            )}
-          </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-xl bg-white border border-gray-200 shadow-sm h-[600px] flex items-center justify-center">
+              <div className="text-center">
+                <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
+                  Válassz egy jegyet
+                </h3>
+                <p className="text-gray-600">
+                  Kattints egy jegyre a bal oldali listából a részletek megtekintéséhez
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

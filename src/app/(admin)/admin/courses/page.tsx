@@ -97,58 +97,52 @@ export default function CoursesPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-2 text-muted-foreground">Loading courses...</p>
-          </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#112a4b] mx-auto"></div>
+          <p className="mt-2 text-gray-500">Tartalmak betöltése...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Course Management</h1>
-          <p className="text-muted-foreground">
-            Manage all courses in the platform
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Tartalom kezelés</h1>
+          <p className="text-gray-500">
+            Platform tartalmak kezelése
           </p>
         </div>
         <Link href="/admin/courses/new/edit">
-          <Button>
+          <Button className="bg-[#112a4b] text-white hover:bg-[#1a3d6e]">
             <Plus className="mr-2 h-4 w-4" />
             Új tartalom
           </Button>
         </Link>
       </div>
 
-
-
       {/* Search and Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex items-center space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search courses by title, description, or instructor..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+      <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+        <div className="flex items-center space-x-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Keresés cím, leírás vagy oktató alapján..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Courses Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {filteredCourses.map((course) => (
-          <Card key={course.id} className="hover:shadow-lg transition-shadow">
+          <div key={course.id} className="rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -248,21 +242,18 @@ export default function CoursesPage() {
                 </div>
               </div>
             </CardContent>
-          </Card>
+          </div>
         ))}
       </div>
 
       {filteredCourses.length === 0 && (
-        <Card>
-          <CardContent className="pt-6">
-                          <div className="text-center py-12">
-                <div className="text-muted-foreground mb-4">
-                  {searchTerm ? "No courses found matching your search." : "No courses available."}
-                </div>
-
-              </div>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
+          <div className="text-center py-12">
+            <div className="text-gray-500 mb-4">
+              {searchTerm ? "Nincs a keresésnek megfelelő tartalom." : "Nincs elérhető tartalom."}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
