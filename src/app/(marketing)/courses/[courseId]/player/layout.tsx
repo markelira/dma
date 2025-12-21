@@ -50,16 +50,18 @@ export default function PlayerLayout({
         footer { display: none !important; }
         /* Reset body padding from marketing layout */
         .pt-\\[74px\\] { padding-top: 0 !important; }
-        /* Ensure full height and prevent scrolling */
-        html, body {
-          height: 100%;
+        /* Prevent body scroll but allow internal scrolling */
+        html {
           overflow: hidden;
-        }
-        #__next {
           height: 100%;
+        }
+        body {
+          overflow: hidden;
+          height: 100%;
+          margin: 0;
         }
       `}</style>
-      <div className="h-screen overflow-hidden bg-white relative z-50">
+      <div className="h-[100dvh] bg-white relative z-50">
         {children}
       </div>
     </>
