@@ -68,15 +68,48 @@ export function useRecommendedCourses(maxCount: number = 3) {
       console.log('📊 [Recommended Courses] Published courses:', publishedCourses.length)
       console.log('📊 [Recommended Courses] Enrolled course IDs:', enrolledCourseIds)
 
-      // 3. Filter and process courses
+      // 3. Filter courses first (before fetching instructors)
+      const filteredCourses = publishedCourses.filter(
+        courseDoc => !enrolledCourseIds.includes(courseDoc.id)
+      )
+
+      // 4. Batch fetch ALL unique instructors at once (fix N+1 query)
+      const instructorIds = new Set<string>()
+      filteredCourses.forEach(courseDoc => {
+        const instructorId = courseDoc.data().instructorId
+        if (instructorId) instructorIds.add(instructorId)
+      })
+
+      // Fetch all instructors in parallel (single batch instead of N calls)
+      const instructorMap = new Map<string, string>()
+      if (instructorIds.size > 0) {
+        const instructorPromises = Array.from(instructorIds).map(async (id) => {
+          try {
+            const instructorRef = doc(db, 'users', id)
+            const instructorSnap = await getDoc(instructorRef)
+            if (instructorSnap.exists()) {
+              const data = instructorSnap.data()
+              const name = `${data.firstName || ''} ${data.lastName || ''}`.trim() || 'Unknown Instructor'
+              return { id, name }
+            }
+          } catch (error) {
+            console.error('Error fetching instructor:', error)
+          }
+          return { id, name: 'Unknown Instructor' }
+        })
+
+        const instructorResults = await Promise.all(instructorPromises)
+        instructorResults.forEach(result => {
+          if (result) instructorMap.set(result.id, result.name)
+        })
+      }
+
+      console.log(`📊 [Recommended Courses] Batch fetched ${instructorMap.size} instructors`)
+
+      // 5. Build recommendations with instructor data from map
       const recommendations: RecommendedCourse[] = []
 
-      for (const courseDoc of publishedCourses) {
-        // Skip if user is already enrolled
-        if (enrolledCourseIds.includes(courseDoc.id)) {
-          continue
-        }
-
+      for (const courseDoc of filteredCourses) {
         // Stop if we have enough recommendations
         if (recommendations.length >= maxCount) {
           break
@@ -84,20 +117,10 @@ export function useRecommendedCourses(maxCount: number = 3) {
 
         const courseData = courseDoc.data()
 
-        // Fetch instructor name
-        let instructorName = 'Unknown Instructor'
-        if (courseData.instructorId) {
-          try {
-            const instructorRef = doc(db, 'users', courseData.instructorId)
-            const instructorSnap = await getDoc(instructorRef)
-            if (instructorSnap.exists()) {
-              const instructorData = instructorSnap.data()
-              instructorName = `${instructorData.firstName || ''} ${instructorData.lastName || ''}`.trim() || 'Unknown Instructor'
-            }
-          } catch (error) {
-            console.error('Error fetching instructor:', error)
-          }
-        }
+        // Get instructor name from pre-fetched map (O(1) lookup)
+        const instructorName = courseData.instructorId
+          ? instructorMap.get(courseData.instructorId) || 'Unknown Instructor'
+          : 'Unknown Instructor'
 
         // Calculate duration from lesson count or use default
         const lessonCount = courseData.lessonCount || 0

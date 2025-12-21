@@ -13,6 +13,49 @@ const nextConfig = {
     // Use git commit hash as build ID
     return process.env.VERCEL_GIT_COMMIT_SHA || 'development';
   },
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Prevent clickjacking
+          { key: 'X-Frame-Options', value: 'DENY' },
+          // Prevent MIME type sniffing
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // XSS protection for older browsers
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          // HSTS - enforce HTTPS (1 year)
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          // Control referrer information
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Restrict browser features
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+          },
+          // Content Security Policy - balanced for functionality
+          {
+            key: 'Content-Security-Policy',
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://*.firebaseio.com https://*.googleapis.com https://js.stripe.com https://*.mux.com",
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com data:",
+              "img-src 'self' data: blob: https: http://127.0.0.1:*",
+              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://firestore.googleapis.com https://*.cloudfunctions.net https://api.stripe.com https://*.mux.com wss://*.firebaseio.com",
+              "frame-src 'self' https://js.stripe.com https://*.firebaseapp.com",
+              "media-src 'self' https://*.mux.com blob:",
+              "worker-src 'self' blob:",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
+            ].join('; '),
+          },
+        ],
+      },
+    ];
+  },
   images: {
     // Modern formats for better compression (AVIF is 50% smaller than WebP)
     formats: ['image/avif', 'image/webp'],

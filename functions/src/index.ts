@@ -2378,3 +2378,15 @@ export {
 
 // Export test email function - triggers all email templates
 export { testAllEmails } from './testAllEmails';
+
+// ============================================
+// GDPR COMPLIANCE (User Data Rights)
+// ============================================
+
+// Export GDPR functions for user data rights
+export {
+  exportUserData,
+  requestAccountDeletion,
+  cancelAccountDeletion,
+  executeAccountDeletion,
+} from './gdpr';

@@ -4,8 +4,9 @@ import "@/styles/globals.css"
 import { ReactQueryProvider } from "@/components/react-query-provider"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { Toaster } from 'sonner'
-import Script from 'next/script'
 import { AuthProvider } from '@/components/auth-provider'
+import { CookieConsent } from '@/components/CookieConsent'
+import { ConditionalAnalytics } from '@/components/ConditionalAnalytics'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -37,13 +38,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hu" suppressHydrationWarning>
-      <Script src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} strategy="afterInteractive" />
-      <Script id="ga-init" strategy="afterInteractive">
-        {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config','${process.env.NEXT_PUBLIC_GA_ID}', { page_path: window.location.pathname });`}
-      </Script>
+      {/* Analytics loaded conditionally after cookie consent */}
+      <ConditionalAnalytics />
       <body className={`${inter.variable} bg-gray-50 font-sans tracking-tight text-gray-900 antialiased min-h-screen`}>
         <ErrorBoundary>
           <ReactQueryProvider>
@@ -51,6 +47,8 @@ gtag('config','${process.env.NEXT_PUBLIC_GA_ID}', { page_path: window.location.p
               {children}
             </AuthProvider>
             <Toaster position="bottom-right" />
+            {/* GDPR Cookie Consent Banner */}
+            <CookieConsent />
           </ReactQueryProvider>
         </ErrorBoundary>
       </body>

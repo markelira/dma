@@ -11,18 +11,18 @@ export const useCourses = () => {
     queryFn: async () => {
       // Fetch real data from Firebase
       console.log('🔍 Fetching courses from Firebase');
-      
+
       const { collection, getDocs, query, where } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase');
-      
+
       const coursesQuery = query(
         collection(db, 'courses'),
         where('status', '==', 'PUBLISHED')
       );
-      
+
       const snapshot = await getDocs(coursesQuery);
       const courses: Course[] = [];
-      
+
       for (const doc of snapshot.docs) {
         const data = doc.data();
         courses.push({
@@ -32,10 +32,12 @@ export const useCourses = () => {
           updatedAt: data.updatedAt || new Date().toISOString(),
         } as Course);
       }
-      
+
       console.log(`✅ Fetched ${courses.length} courses from Firebase`);
       return courses;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes - don't refetch if data is fresh
+    gcTime: 30 * 60 * 1000,   // 30 minutes - keep in cache
   });
 };
 
@@ -135,6 +137,8 @@ export const useCourse = (identifier: string) => {
       return course;
     },
     enabled: !!identifier,
+    staleTime: 5 * 60 * 1000, // 5 minutes - don't refetch if data is fresh
+    gcTime: 30 * 60 * 1000,   // 30 minutes - keep in cache
   });
 };
 
@@ -475,14 +479,16 @@ export const useCourseList = ({
         total: courses.length
       };
       
-      console.log('✅ Firebase response:', { 
-        total: response.total, 
+      console.log('✅ Firebase response:', {
+        total: response.total,
         coursesReturned: response.courses.length,
         offset,
-        limit 
+        limit
       });
-      
+
       return response;
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes - catalog can update more frequently
+    gcTime: 15 * 60 * 1000,   // 15 minutes - keep in cache
   });
 }; 

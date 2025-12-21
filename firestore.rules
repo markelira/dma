@@ -12,15 +12,37 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
     }
 
-    // Allow all authenticated users to read/write enrollments
-    match /enrollments/{document=**} {
-      allow read, write: if request.auth != null;
+    // Enrollments: Users can only access their own enrollments
+    match /enrollments/{enrollmentId} {
+      // Users can read their own enrollments, admins can read all
+      allow read: if request.auth != null &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+
+      // Users can only create enrollments for themselves
+      allow create: if request.auth != null &&
+        request.resource.data.userId == request.auth.uid;
+
+      // Users can only update their own enrollments (progress, lastAccessedAt, etc.)
+      allow update: if request.auth != null &&
+        resource.data.userId == request.auth.uid;
+
+      // No client-side deletion (use Cloud Functions for cleanup)
+      allow delete: if false;
     }
 
-    // Allow public read for courses
-    match /courses/{document=**} {
+    // Courses: Public read, admin/instructor write
+    match /courses/{courseId} {
+      // Public read access for course catalog
       allow read: if true;
-      allow write: if request.auth != null;
+
+      // Only admins and instructors can create/update/delete courses
+      allow create, update, delete: if isAdmin();
+
+      // Nested modules and lessons inherit course permissions
+      match /{subcollection=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     // Instructors: Public read, admin-only write
@@ -50,9 +72,27 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
     }
 
-    // Allow authenticated users to read/write users
-    match /users/{document=**} {
-      allow read, write: if request.auth != null;
+    // Users: Self-access only with admin exceptions
+    match /users/{userId} {
+      // Users can read their own profile, admins can read all
+      allow read: if request.auth != null &&
+        (request.auth.uid == userId || isAdmin());
+
+      // Users can create their own profile
+      allow create: if request.auth != null &&
+        request.auth.uid == userId;
+
+      // Users can update their own profile (except role and subscription fields)
+      // Admins can update any user
+      allow update: if request.auth != null && (
+        (request.auth.uid == userId &&
+          !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role', 'stripeCustomerId', 'stripeSubscriptionId', 'subscriptionStatus'])) ||
+        isAdmin()
+      );
+
+      // No client-side deletion
+      allow delete: if false;
     }
 
     // COMPANY ADMIN DASHBOARD RULES
@@ -190,9 +230,81 @@ service cloud.firestore {
       allow read: if isAdmin();
     }
 
-    // Allow all other authenticated operations (fallback)
+    // Subscriptions: User can read own, Cloud Functions write
+    match /subscriptions/{subscriptionId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Only Cloud Functions via Stripe webhooks
+    }
+
+    // Teams: Team members can read, owner can update
+    match /teams/{teamId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.ownerId == request.auth.uid ||
+         resource.data.memberIds.hasAny([request.auth.uid]) ||
+         isAdmin());
+      allow create: if isAuthenticated() &&
+        request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAuthenticated() &&
+        resource.data.ownerId == request.auth.uid;
+      allow delete: if false;
+
+      // Team members subcollection
+      match /members/{memberId} {
+        allow read: if isAuthenticated() &&
+          (get(/databases/$(database)/documents/teams/$(teamId)).data.ownerId == request.auth.uid ||
+           get(/databases/$(database)/documents/teams/$(teamId)).data.memberIds.hasAny([request.auth.uid]));
+        allow write: if isAuthenticated() &&
+          get(/databases/$(database)/documents/teams/$(teamId)).data.ownerId == request.auth.uid;
+      }
+    }
+
+    // Invoices: User can read own, Cloud Functions write
+    match /invoices/{invoiceId} {
+      allow read: if isAuthenticated() &&
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow write: if false; // Only Cloud Functions
+    }
+
+    // Promo Codes: Admin only
+    match /promoCodes/{codeId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Promo Code Usages: Read own, write via Cloud Function
+    match /promoCodeUsages/{usageId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow write: if false; // Cloud Functions only
+    }
+
+    // Password Resets: Cloud Functions only
+    match /passwordResets/{resetId} {
+      allow read, write: if false; // Cloud Functions only
+    }
+
+    // Password Reset Attempts: Cloud Functions only (rate limiting)
+    match /passwordResetAttempts/{attemptId} {
+      allow read, write: if false; // Cloud Functions only
+    }
+
+    // Email Verifications: Cloud Functions only
+    match /emailVerifications/{verificationId} {
+      allow read, write: if false; // Cloud Functions only
+    }
+
+    // Admin Notifications: Authenticated users can create, Cloud Functions manage
+    match /adminNotifications/{notificationId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated();
+      allow update, delete: if false;
+    }
+
+    // SECURITY: Deny-by-default fallback
+    // Any collection not explicitly defined above is denied access
+    // Add new collection rules ABOVE this fallback, not below
     match /{document=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if false;
     }
   }
 }
