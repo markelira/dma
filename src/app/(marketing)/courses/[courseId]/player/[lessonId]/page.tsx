@@ -422,7 +422,7 @@ export default function CoursePlayerPage() {
   return (
     <>
       {/* Desktop Layout */}
-      <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] overflow-hidden">
+      <div className="hidden md:flex h-[100dvh] overflow-hidden">
         {/* Sidebar - Masterclass style or traditional module-based */}
         {useMasterclassSidebar ? (
           <MasterclassSidebar

@@ -206,7 +206,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
+        <div className="hidden md:flex h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel */}
           <WebinarSidePanel
             courseTitle={course.title}
@@ -415,7 +415,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
+        <div className="hidden md:flex h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel with Lesson Navigation */}
           <AcademiaSidePanel
             courseTitle={course.title}
@@ -686,7 +686,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
+        <div className="hidden md:flex h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel with Lesson Navigation */}
           <MasterclassSidePanel
             courseTitle={course.title}
@@ -867,7 +867,7 @@ export function NetflixPlayerLayout({
         </div>
 
         {/* ========== DESKTOP LAYOUT ========== */}
-        <div className="hidden md:flex min-h-[100dvh] max-h-[100dvh] bg-black overflow-hidden">
+        <div className="hidden md:flex h-[100dvh] bg-black overflow-hidden">
           {/* Left Side Panel */}
           <PodcastSidePanel
             courseTitle={course.title}
