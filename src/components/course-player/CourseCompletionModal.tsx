@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation'
 import confetti from 'canvas-confetti'
 import { CheckCircle, X as CloseIcon } from 'lucide-react'
 import { CourseType } from '@/types'
+import { useAuthStore } from '@/stores/authStore'
+import { getDashboardPath } from '@/lib/routing'
 
 interface CourseCompletionModalProps {
   /** Whether the modal is visible */
@@ -109,6 +111,7 @@ export function CourseCompletionModal({
   onDismiss,
 }: CourseCompletionModalProps) {
   const router = useRouter()
+  const { user } = useAuthStore()
 
   // Fire confetti when modal opens
   useEffect(() => {
@@ -135,11 +138,11 @@ export function CourseCompletionModal({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [isOpen, onDismiss])
 
-  // Handle going back to homepage
-  const handleGoToHome = useCallback(() => {
+  // Handle going back to dashboard
+  const handleGoToDashboard = useCallback(() => {
     onDismiss()
-    router.push('/')
-  }, [onDismiss, router])
+    router.push(getDashboardPath(user?.role))
+  }, [onDismiss, router, user?.role])
 
   // Handle backdrop click
   const handleBackdropClick = useCallback(
@@ -214,7 +217,7 @@ export function CourseCompletionModal({
 
             {/* CTA Button */}
             <button
-              onClick={handleGoToHome}
+              onClick={handleGoToDashboard}
               className="w-full h-14 text-lg font-bold bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-xl shadow-lg shadow-brand-secondary/30 hover:shadow-brand-secondary/40 transition-all tracking-tight"
             >
               Vissza a kezdőlapra
