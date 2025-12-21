@@ -33,9 +33,15 @@ service cloud.firestore {
       allow create: if request.auth != null &&
         request.resource.data.userId == request.auth.uid;
 
-      // Users can only update their own enrollments (progress, lastAccessedAt, etc.)
-      allow update: if request.auth != null &&
-        resource.data.userId == request.auth.uid;
+      // Users can update their own enrollments (progress, lastAccessedAt, etc.)
+      // Company members can update company-sponsored enrollments
+      allow update: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        (resource.data.enrolledByCompany != null && (
+          isCompanyAdmin(resource.data.enrolledByCompany) ||
+          isEmployee(resource.data.enrolledByCompany)
+        ))
+      );
 
       // No client-side deletion (use Cloud Functions for cleanup)
       allow delete: if false;
@@ -116,15 +122,20 @@ service cloud.firestore {
     }
 
     // Helper function to check if admin has specific permission
+    // Note: Must check existence first to avoid error for non-admins
     function hasPermission(companyId, permission) {
-      let adminDoc = get(/databases/$(database)/documents/companies/$(companyId)/admins/$(request.auth.uid));
-      return adminDoc.data.permissions[permission] == true;
+      let adminPath = /databases/$(database)/documents/companies/$(companyId)/admins/$(request.auth.uid);
+      return exists(adminPath) &&
+        get(adminPath).data.permissions[permission] == true;
     }
 
-    // Helper function to check if user is employee
+    // Helper function to check if user is active employee
+    // Note: Only 'active' status grants access (not 'invited' or 'left')
     function isEmployee(companyId) {
+      let employeePath = /databases/$(database)/documents/companies/$(companyId)/employees/$(request.auth.uid);
       return isAuthenticated() &&
-        exists(/databases/$(database)/documents/companies/$(companyId)/employees/$(request.auth.uid));
+        exists(employeePath) &&
+        get(employeePath).data.status == 'active';
     }
 
     // Prevent permission escalation
@@ -151,7 +162,9 @@ service cloud.firestore {
             request.resource.data.role
           );
 
-        allow update: if isCompanyAdmin(companyId) && adminId == request.auth.uid;
+        // Admins can update own record but cannot change role or permissions
+        allow update: if isCompanyAdmin(companyId) && adminId == request.auth.uid &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'permissions']);
         allow delete: if false; // No deletion in MVP
       }
 
@@ -172,7 +185,8 @@ service cloud.firestore {
 
       // Masterclasses subcollection
       match /masterclasses/{masterclassId} {
-        allow read: if isCompanyAdmin(companyId);
+        // Both admins and employees can view available masterclasses
+        allow read: if isCompanyAdmin(companyId) || isEmployee(companyId);
         allow create, update: if isCompanyAdmin(companyId);
         allow delete: if false;
       }
@@ -232,13 +246,24 @@ service cloud.firestore {
 
     // Lesson Progress: Track user progress through lessons
     match /lessonProgress/{progressId} {
-      // Users can read/write their own progress
-      // Progress ID format: {userId}_{lessonId}
-      allow read, write: if isAuthenticated() &&
+      // Users can read their own progress (supports both GET and QUERY operations)
+      // GET: progressId matches pattern, QUERY: userId field matches
+      allow read: if isAuthenticated() && (
+        progressId.matches('^' + request.auth.uid + '_.*$') ||
+        resource.data.userId == request.auth.uid
+      );
+
+      // Users can write their own progress (requires progressId match for security)
+      allow write: if isAuthenticated() &&
         progressId.matches('^' + request.auth.uid + '_.*$');
 
       // Admins can read any progress
       allow read: if isAdmin();
+
+      // Company admins can read their employees' progress
+      allow read: if isAuthenticated() &&
+        resource.data.companyId != null &&
+        isCompanyAdmin(resource.data.companyId);
     }
 
     // Subscriptions: User can read own, Cloud Functions write
