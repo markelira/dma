@@ -240,11 +240,22 @@ export const useEnrollInCourse = () => {
         };
       }
       
-      // Create new enrollment
+      // Get course details first (needed for enrollment and audit log)
+      const courseRef = doc(db, 'courses', courseId);
+      const courseDoc = await getDoc(courseRef);
+      const courseData = courseDoc.data();
+
+      // Build user name
+      const userName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email?.split('@')[0] || 'Felhasználó';
+
+      // Create new enrollment with user and course info for activity feed
       const now = Timestamp.now();
       await setDoc(enrollmentRef, {
         userId: user.id,
         courseId,
+        userEmail: user.email || '',
+        userName,
+        courseName: courseData?.title || 'Kurzus',
         enrolledAt: now,
         lastAccessedAt: now,
         completedLessons: 0,
@@ -254,17 +265,12 @@ export const useEnrollInCourse = () => {
         updatedAt: now
       });
       
-      // Get course details for audit log
-      const courseRef = doc(db, 'courses', courseId);
-      const courseDoc = await getDoc(courseRef);
-      const courseData = courseDoc.data();
-      
       // Create audit log entry for enrollment
       try {
         await addDoc(collection(db, 'auditLogs'), {
           userId: user.id,
           userEmail: user.email || '',
-          userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Student',
+          userName,
           action: 'ENROLL_COURSE',
           resource: 'Course',
           resourceId: courseId,

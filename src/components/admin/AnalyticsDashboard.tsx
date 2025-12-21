@@ -22,7 +22,6 @@ import {
   TrendingDown,
   Building2,
   Activity,
-  Percent,
   AlertTriangle,
   Loader2,
   ChevronDown,
@@ -238,12 +237,17 @@ function LiveActivitySection() {
       enrollmentActivities = snapshot.docs.map((doc) => {
         const data = doc.data()
         const enrolledAt = data.enrolledAt?.toDate?.() || new Date(data.enrolledAt)
+        const userName = data.userName || data.userEmail?.split('@')[0] || 'Felhasználó'
+        const courseName = data.courseName || data.courseTitle || 'kurzus'
         return {
           id: `enrollment-${doc.id}`,
           type: 'enrollment' as const,
-          description: `Új beiratkozás: ${data.courseName || data.courseTitle || 'Kurzus'}`,
+          description: `${userName} beiratkozott: ${courseName}`,
           timestamp: enrolledAt,
-          metadata: { courseName: data.courseName || data.courseTitle },
+          metadata: {
+            courseName: data.courseName || data.courseTitle,
+            email: data.userEmail,
+          },
         }
       })
       updateMergedActivities()
@@ -548,8 +552,8 @@ export function AnalyticsDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Key Metrics - 6 Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Key Metrics - 4 Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Összes felhasználó"
           value={data.users.total}
@@ -568,15 +572,6 @@ export function AnalyticsDashboard() {
           iconBg="bg-[#112a4b]/10"
         />
         <StatCard
-          title="MRR"
-          value={formatCurrency(data.revenue.mrr)}
-          subtitle={`ARR: ${formatCurrency(data.revenue.arr)}`}
-          icon={TrendingUp}
-          trend={data.revenue.growth}
-          iconColor="text-green-600"
-          iconBg="bg-green-100"
-        />
-        <StatCard
           title="Vállalatok"
           value={data.companies.total}
           subtitle={`${data.companies.totalEmployees} alkalmazott`}
@@ -589,14 +584,6 @@ export function AnalyticsDashboard() {
           value={data.users.activeToday}
           subtitle="Bejelentkezett"
           icon={Activity}
-          iconColor="text-[#112a4b]"
-          iconBg="bg-[#112a4b]/10"
-        />
-        <StatCard
-          title="Konverzió"
-          value={`${data.conversionRate}%`}
-          subtitle="Előfizető / felhasználó"
-          icon={Percent}
           iconColor="text-[#112a4b]"
           iconBg="bg-[#112a4b]/10"
         />
