@@ -130,12 +130,16 @@ service cloud.firestore {
     }
 
     // Helper function to check if user is active employee
-    // Note: Only 'active' status grants access (not 'invited' or 'left')
+    // Checks EITHER: user document has companyId OR employee subcollection has active status
     function isEmployee(companyId) {
+      let userPath = /databases/$(database)/documents/users/$(request.auth.uid);
       let employeePath = /databases/$(database)/documents/companies/$(companyId)/employees/$(request.auth.uid);
-      return isAuthenticated() &&
-        exists(employeePath) &&
-        get(employeePath).data.status == 'active';
+      return isAuthenticated() && (
+        // Check user document has this companyId
+        (exists(userPath) && get(userPath).data.companyId == companyId) ||
+        // Or check employee subcollection has active status
+        (exists(employeePath) && get(employeePath).data.status == 'active')
+      );
     }
 
     // Prevent permission escalation
