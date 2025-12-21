@@ -124,7 +124,7 @@ export const useLessonProgress = () => {
       // Update enrollment progress if courseId is provided
       if (courseId) {
         try {
-          const { collection, query, where, getDocs, getDoc, updateDoc } = await import('firebase/firestore')
+          const { collection, query, where, getDocs, getDoc, updateDoc, limit } = await import('firebase/firestore')
 
           // Get course to count total lessons
           const courseRef = doc(db, 'courses', courseId)
@@ -146,24 +146,33 @@ export const useLessonProgress = () => {
             }
 
             // For ACADEMIA courses, also check modules subcollection
+            // SCALABILITY: Use Promise.allSettled for parallel fetching
             if (totalLessons === 0 && courseType === 'ACADEMIA') {
               const modulesRef = collection(db, 'courses', courseId, 'modules')
               const modulesSnapshot = await getDocs(modulesRef)
 
-              for (const moduleDoc of modulesSnapshot.docs) {
+              // Parallel fetch all module lessons instead of sequential loop
+              const lessonCountPromises = modulesSnapshot.docs.map(async (moduleDoc) => {
                 const moduleLessonsRef = collection(db, 'courses', courseId, 'modules', moduleDoc.id, 'lessons')
                 const moduleLessonsSnapshot = await getDocs(moduleLessonsRef)
-                totalLessons += moduleLessonsSnapshot.size
-              }
-              console.log('📊 Counted lessons from ACADEMIA modules:', totalLessons)
+                return moduleLessonsSnapshot.size
+              })
+
+              const results = await Promise.allSettled(lessonCountPromises)
+              totalLessons = results.reduce((sum, result) =>
+                result.status === 'fulfilled' ? sum + result.value : sum, 0
+              )
+              console.log('📊 Counted lessons from ACADEMIA modules (parallel):', totalLessons)
             }
 
             if (totalLessons > 0) {
-              // Get ALL lesson progress for this user in this course
+              // Get lesson progress for this user in this course
+              // SCALABILITY: Add limit to prevent unbounded queries for heavy users
               const progressQuery = query(
                 collection(db, 'lessonProgress'),
                 where('userId', '==', user.uid),
-                where('courseId', '==', courseId)
+                where('courseId', '==', courseId),
+                limit(200) // Cap at 200 lessons per course (more than any course should have)
               )
               const progressSnapshot = await getDocs(progressQuery)
 

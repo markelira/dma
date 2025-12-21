@@ -312,7 +312,11 @@ async function fetchModulesWithLessons(courseId: string): Promise<any[]> {
     };
   });
 
-  return Promise.all(modulesPromises);
+  // SCALABILITY: Use Promise.allSettled for error resilience - one module failure won't break all
+  const results = await Promise.allSettled(modulesPromises);
+  return results
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+    .map(r => r.value);
 }
 
 /**
@@ -324,27 +328,26 @@ async function fetchInstructors(instructorIds: string[]): Promise<any[]> {
   }
 
   const instructorPromises = instructorIds.map(async (instructorId) => {
-    try {
-      const doc = await firestore.collection('instructors').doc(instructorId).get();
-      if (doc.exists) {
-        const data = doc.data()!;
-        return {
-          id: doc.id,
-          name: data.name || 'Ismeretlen',
-          title: data.title,
-          bio: data.bio,
-          profilePictureUrl: data.profilePictureUrl,
-          role: data.role || 'MENTOR',
-        };
-      }
-    } catch (e) {
-      logger.warn('[fetchInstructors] Error fetching instructor', { instructorId, error: e });
+    const doc = await firestore.collection('instructors').doc(instructorId).get();
+    if (doc.exists) {
+      const data = doc.data()!;
+      return {
+        id: doc.id,
+        name: data.name || 'Ismeretlen',
+        title: data.title,
+        bio: data.bio,
+        profilePictureUrl: data.profilePictureUrl,
+        role: data.role || 'MENTOR',
+      };
     }
     return null;
   });
 
-  const results = await Promise.all(instructorPromises);
-  return results.filter(Boolean);
+  // SCALABILITY: Use Promise.allSettled for error resilience
+  const results = await Promise.allSettled(instructorPromises);
+  return results
+    .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled' && r.value !== null)
+    .map(r => r.value);
 }
 
 /**
@@ -364,24 +367,21 @@ async function fetchSourceCourseNames(lessons: any[]): Promise<Record<string, st
     return {};
   }
 
-  const results = await Promise.all(
-    Array.from(sourceCourseIds).map(async (sourceCourseId) => {
-      try {
-        const doc = await firestore.collection('courses').doc(sourceCourseId).get();
-        if (doc.exists) {
-          return { id: sourceCourseId, title: doc.data()?.title || 'Ismeretlen tartalom' };
-        }
-      } catch (e) {
-        logger.warn('[fetchSourceCourseNames] Error', { sourceCourseId, error: e });
-      }
-      return null;
-    })
-  );
+  const sourcePromises = Array.from(sourceCourseIds).map(async (sourceCourseId) => {
+    const doc = await firestore.collection('courses').doc(sourceCourseId).get();
+    if (doc.exists) {
+      return { id: sourceCourseId, title: doc.data()?.title || 'Ismeretlen tartalom' };
+    }
+    return null;
+  });
+
+  // SCALABILITY: Use Promise.allSettled for error resilience
+  const results = await Promise.allSettled(sourcePromises);
 
   const names: Record<string, string> = {};
   results.forEach((result) => {
-    if (result) {
-      names[result.id] = result.title;
+    if (result.status === 'fulfilled' && result.value) {
+      names[result.value.id] = result.value.title;
     }
   });
 

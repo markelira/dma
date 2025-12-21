@@ -87,21 +87,29 @@ export const useCourse = (identifier: string) => {
         if (!modulesSnapshot.empty) {
           console.log(`Found ${modulesSnapshot.size} modules`);
 
-          // Fetch lessons from each module
-          for (const moduleDoc of modulesSnapshot.docs) {
+          // SCALABILITY: Fetch lessons from all modules in parallel
+          const modulePromises = modulesSnapshot.docs.map(async (moduleDoc) => {
             const moduleLessonsRef = collection(db, 'courses', courseData.id, 'modules', moduleDoc.id, 'lessons');
             const moduleLessonsSnapshot = await getDocs(moduleLessonsRef);
 
             if (!moduleLessonsSnapshot.empty) {
-              const moduleLessons = moduleLessonsSnapshot.docs.map(doc => ({
+              return moduleLessonsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
                 moduleId: moduleDoc.id // Ensure moduleId is set
               }));
-              lessons.push(...moduleLessons);
-              console.log(`Found ${moduleLessons.length} lessons in module ${moduleDoc.id}`);
             }
-          }
+            return [];
+          });
+
+          // Use Promise.allSettled for error resilience
+          const results = await Promise.allSettled(modulePromises);
+          results.forEach((result, index) => {
+            if (result.status === 'fulfilled' && result.value.length > 0) {
+              lessons.push(...result.value);
+              console.log(`Found ${result.value.length} lessons in module ${modulesSnapshot.docs[index].id}`);
+            }
+          });
         }
       } catch (error) {
         console.log('No lessons in modules subcollection:', error);

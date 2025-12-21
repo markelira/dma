@@ -437,8 +437,15 @@ export const useAdvancedProgressSync = ({
 
   // Set up real-time sync listener
   // SCALABILITY: Removed progressData from deps to prevent listener recreation on every update
+  // SCALABILITY: Clean up previous listener BEFORE creating new one to prevent orphans on rapid navigation
   useEffect(() => {
     if (!user || !defaultSyncOptions.enableRealTimeSync) return
+
+    // Clean up any existing listener FIRST to prevent orphan listeners during rapid navigation
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current()
+      unsubscribeRef.current = null
+    }
 
     const db = getFirestore()
     const progressDocRef = doc(db, 'lessonProgress', `${user.id}_${lessonId}`)

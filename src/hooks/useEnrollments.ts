@@ -1,7 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { collection, query, where, getDocs, doc, getDoc, orderBy, limit as firestoreLimit } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
+import { httpsCallable } from 'firebase/functions'
+import { db, functions } from '@/lib/firebase'
 import { useAuthStore } from '@/stores/authStore'
+
+// SCALABILITY: Use Cloud Function for batched enrollment enrichment
+const USE_CLOUD_FUNCTION = true
 
 export interface Enrollment {
   id: string
@@ -79,7 +83,8 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
     queryFn: async (): Promise<EnrollmentWithCourse[]> => {
       console.log('🔍 [useEnrollments] Starting query...', {
         userId: user?.uid,
-        statusFilter: status || 'ALL'
+        statusFilter: status || 'ALL',
+        usingCloudFunction: USE_CLOUD_FUNCTION
       });
 
       if (!user?.uid) {
@@ -87,74 +92,74 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         throw new Error('User not authenticated')
       }
 
-      // Fetch actual enrollments from Firestore
+      // SCALABILITY: Use Cloud Function for batched fetching (reduces 25K reads to 1 call)
+      if (USE_CLOUD_FUNCTION) {
+        try {
+          const enrichEnrollmentsCallable = httpsCallable<
+            { status?: string },
+            { success: boolean; enrollments: any[] }
+          >(functions, 'enrichEnrollments');
+
+          const result = await enrichEnrollmentsCallable({ status });
+
+          if (result.data.success) {
+            console.log('✅ [useEnrollments] Cloud Function result:', result.data.enrollments.length, 'enrollments');
+
+            // Convert ISO strings back to Date objects
+            return result.data.enrollments.map(e => ({
+              ...e,
+              enrolledAt: new Date(e.enrolledAt),
+              lastAccessedAt: e.lastAccessedAt ? new Date(e.lastAccessedAt) : undefined,
+            })) as EnrollmentWithCourse[];
+          }
+        } catch (cloudError) {
+          console.warn('⚠️ [useEnrollments] Cloud Function failed, falling back to direct queries:', cloudError);
+          // Fall through to direct Firestore queries
+        }
+      }
+
+      // FALLBACK: Direct Firestore queries (N+1 pattern - less efficient)
       const enrollmentsRef = collection(db, 'enrollments')
       let q = query(enrollmentsRef, where('userId', '==', user.uid))
 
       if (status) {
-        // Handle status variations: 'in_progress' can be stored as 'ACTIVE' or 'in_progress'
         const statusValues = status === 'in_progress'
           ? ['in_progress', 'ACTIVE', 'active']
           : [status]
         q = query(q, where('status', 'in', statusValues))
-        console.log('🔎 [useEnrollments] Added status filter:', statusValues);
       }
 
       const enrollmentsSnap = await getDocs(q)
-      console.log('📊 [useEnrollments] Raw Firestore result:', enrollmentsSnap.size, 'documents');
+      console.log('📊 [useEnrollments] Fallback - Raw Firestore result:', enrollmentsSnap.size, 'documents');
 
-      // Log each enrollment found
-      enrollmentsSnap.docs.forEach((doc, i) => {
-        const data = doc.data();
-        console.log(`  [${i}] ${doc.id}: status=${data.status}, courseId=${data.courseId}`);
-      });
-
-      // Fetch course details for each enrollment
+      // Fetch course details for each enrollment (N+1 pattern)
       const enrollmentsWithCourses = await Promise.all(
         enrollmentsSnap.docs.map(async (enrollmentDoc) => {
           const enrollmentData = enrollmentDoc.data()
 
-          // Fetch course details
           const courseRef = doc(db, 'courses', enrollmentData.courseId)
           const courseSnap = await getDoc(courseRef)
           const courseData = courseSnap.exists() ? courseSnap.data() : null
 
-          // Fetch instructor name if instructorId exists
           let instructorName = 'Unknown Instructor'
           if (courseData?.instructorId) {
             try {
               const instructorRef = doc(db, 'instructors', courseData.instructorId)
               const instructorSnap = await getDoc(instructorRef)
               if (instructorSnap.exists()) {
-                const instructorData = instructorSnap.data()
-                instructorName = instructorData.name || 'Unknown Instructor'
+                instructorName = instructorSnap.data()?.name || 'Unknown Instructor'
               }
             } catch (error) {
               console.error('Error fetching instructor:', error)
             }
           }
 
-          // Handle both Firestore Timestamp and ISO string formats for enrolledAt
-          let enrolledAtDate: Date;
-          if (enrollmentData.enrolledAt?.toDate) {
-            // Firestore Timestamp
-            enrolledAtDate = enrollmentData.enrolledAt.toDate();
-          } else if (typeof enrollmentData.enrolledAt === 'string') {
-            // ISO string format
-            enrolledAtDate = new Date(enrollmentData.enrolledAt);
-          } else {
-            enrolledAtDate = new Date();
-          }
+          let enrolledAtDate: Date = enrollmentData.enrolledAt?.toDate?.() ||
+            (typeof enrollmentData.enrolledAt === 'string' ? new Date(enrollmentData.enrolledAt) : new Date());
 
-          // Handle both formats for lastAccessedAt
-          let lastAccessedAtDate: Date | undefined;
-          if (enrollmentData.lastAccessedAt?.toDate) {
-            lastAccessedAtDate = enrollmentData.lastAccessedAt.toDate();
-          } else if (typeof enrollmentData.lastAccessedAt === 'string') {
-            lastAccessedAtDate = new Date(enrollmentData.lastAccessedAt);
-          }
+          let lastAccessedAtDate: Date | undefined = enrollmentData.lastAccessedAt?.toDate?.() ||
+            (typeof enrollmentData.lastAccessedAt === 'string' ? new Date(enrollmentData.lastAccessedAt) : undefined);
 
-          // Get first lesson ID from subcollection
           const firstLessonId = await getFirstLessonId(enrollmentData.courseId);
 
           return {
@@ -176,22 +181,11 @@ export function useEnrollments(status?: 'not_started' | 'in_progress' | 'complet
         })
       )
 
-      // Sort by lastAccessedAt (most recent first)
       enrollmentsWithCourses.sort((a, b) => {
         const dateA = a.lastAccessedAt || a.enrolledAt
         const dateB = b.lastAccessedAt || b.enrolledAt
         return dateB.getTime() - dateA.getTime()
       })
-
-      console.log('✅ [useEnrollments] Final result:', {
-        totalEnrollments: enrollmentsWithCourses.length,
-        courses: enrollmentsWithCourses.map(e => ({
-          id: e.id,
-          courseId: e.courseId,
-          courseName: e.courseName,
-          status: e.status
-        }))
-      });
 
       return enrollmentsWithCourses
     },
