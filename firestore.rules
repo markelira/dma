@@ -17,7 +17,9 @@ service cloud.firestore {
     match /enrollments/{enrollmentId} {
       // Users can read their own enrollments, admins can read all
       // Company members can read enrollments sponsored by their company
+      // Note: resource == null allows reading non-existent docs (returns not-found result)
       allow read: if request.auth != null && (
+        resource == null ||
         resource.data.userId == request.auth.uid ||
         isAdmin() ||
         // Company members can read company-sponsored enrollments
