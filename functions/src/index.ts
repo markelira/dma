@@ -2616,3 +2616,10 @@ export {
   cancelAccountDeletion,
   executeAccountDeletion,
 } from './gdpr';
+
+// ============================================
+// ADMIN ANALYTICS
+// ============================================
+
+// Export admin analytics function
+export { getAdminAnalytics } from './admin/getAdminAnalytics';
