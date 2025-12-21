@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { Check } from 'lucide-react'
+import { useTrialCTA } from '@/hooks/useTrialCTA'
 
 const features = [
   'Teljes hozzáférés 150+ struktúraépítő tartalomhoz',
@@ -13,6 +13,7 @@ const features = [
 ]
 
 export function PricingEditorial() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section className="w-full bg-[rgb(249,250,251)] py-20 md:py-28 overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
@@ -77,12 +78,12 @@ export function PricingEditorial() {
                 <div className="h-px bg-white/20 mb-6 sm:mb-8" />
 
                 {/* CTA Button */}
-                <Link
-                  href="/register"
+                <button
+                  onClick={handleTrialClick}
                   className="block w-full py-4 px-6 bg-white text-gray-900 font-semibold text-center rounded-xl hover:bg-gray-100 transition-colors"
                 >
                   Kezdd el ingyen
-                </Link>
+                </button>
               </div>
             </div>
           </div>

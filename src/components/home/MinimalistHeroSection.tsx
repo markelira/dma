@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 /**
  * MinimalistHeroSection - Clean, Corporate, Professional
@@ -13,6 +14,7 @@ import Image from 'next/image';
  */
 export function MinimalistHeroSection() {
   const router = useRouter();
+  const { handleTrialClick } = useTrialCTA();
 
   return (
     <section className="relative bg-white">
@@ -61,7 +63,7 @@ export function MinimalistHeroSection() {
               <Button
                 size="lg"
                 className="bg-primary hover:bg-primary/90 text-white font-bold px-8 py-6 text-base rounded-lg transition-colors"
-                onClick={() => router.push('/register')}
+                onClick={handleTrialClick}
               >
                 Próbáld ki ingyen
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -70,7 +72,7 @@ export function MinimalistHeroSection() {
                 size="lg"
                 variant="outline"
                 className="border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-bold px-8 py-6 text-base rounded-lg"
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/pricing')}
               >
                 Árak megtekintése
               </Button>

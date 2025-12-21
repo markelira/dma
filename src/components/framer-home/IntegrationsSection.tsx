@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTrialCTA } from "@/hooks/useTrialCTA";
 
 const categories = [
   { icon: "📈", label: "Marketing", color: "#E72B36", x: -40, y: -20, delay: 0 },
@@ -13,6 +14,7 @@ const categories = [
 ];
 
 export default function IntegrationsSection() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section
       className="py-24 md:py-32 px-6 lg:px-12 relative overflow-hidden"
@@ -116,7 +118,7 @@ export default function IntegrationsSection() {
               Böngészd a tartalmakat
             </Link>
             <Link
-              href="/register"
+              href="/pricing"
               className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",

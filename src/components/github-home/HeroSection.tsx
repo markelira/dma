@@ -2,11 +2,15 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { AnimatedGlobe } from './shared/AnimatedGlobe';
 import { GradientText } from './shared/GradientText';
 import { Button } from '@/components/ui/button';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 export function HeroSection() {
+  const router = useRouter();
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section className="relative flex items-center justify-center overflow-hidden bg-[#0D1117]">
       {/* Background gradient effects */}
@@ -81,6 +85,7 @@ export function HeroSection() {
               <Button
                 size="lg"
                 className="group bg-white text-black hover:bg-gray-100 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
+                onClick={handleTrialClick}
               >
                 Kezdd el ingyen
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -91,6 +96,7 @@ export function HeroSection() {
                 size="lg"
                 variant="outline"
                 className="border-gray-700 text-white hover:bg-gray-800 hover:border-gray-600 text-base px-6 py-3 lg:px-8 lg:py-4 rounded-lg font-bold"
+                onClick={() => router.push('/pricing')}
               >
                 Árak megtekintése
               </Button>

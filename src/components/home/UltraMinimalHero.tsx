@@ -3,6 +3,7 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 /**
  * UltraMinimalHero - Cluely-inspired minimal hero
@@ -13,6 +14,7 @@ import { Button } from '@/components/ui/button';
  */
 export function UltraMinimalHero() {
   const router = useRouter();
+  const { handleTrialClick } = useTrialCTA();
 
   return (
     <section className="relative bg-white">
@@ -36,7 +38,7 @@ export function UltraMinimalHero() {
             <Button
               size="lg"
               className="bg-primary hover:bg-primary/90 text-white font-bold px-10 py-7 text-lg rounded-lg transition-colors shadow-sm"
-              onClick={() => router.push('/register')}
+              onClick={handleTrialClick}
             >
               Próbáld ki ingyen
             </Button>
@@ -44,7 +46,7 @@ export function UltraMinimalHero() {
               size="lg"
               variant="ghost"
               className="text-gray-700 hover:text-gray-900 font-bold px-10 py-7 text-lg"
-              onClick={() => router.push('/register')}
+              onClick={() => router.push('/pricing')}
             >
               Árak megtekintése
             </Button>

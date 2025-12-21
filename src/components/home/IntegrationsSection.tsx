@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef, MouseEvent as ReactMouseEvent } from 'react';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 // Platform/Tool logos as placeholder icons
 const platforms = [
@@ -122,6 +123,7 @@ const containerVariants = {
 };
 
 export function IntegrationsSection() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section className="relative w-full bg-[rgb(15,15,15)] py-20 sm:py-24 md:py-28 overflow-hidden">
       {/* Subtle radial gradient */}
@@ -186,15 +188,15 @@ export function IntegrationsSection() {
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <a
-            href="/register"
+          <button
+            onClick={handleTrialClick}
             className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[rgb(231,43,54)] text-white font-bold text-base transition-all duration-300 hover:bg-[rgb(200,35,45)] hover:-translate-y-0.5 hover:shadow-[0_0_40px_rgba(231,43,54,0.3)]"
           >
             Csatlakozz most
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </a>
+          </button>
         </motion.div>
       </div>
     </section>

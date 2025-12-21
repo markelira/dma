@@ -3,9 +3,11 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 export function NewFooterSection() {
   const [email, setEmail] = useState('');
+  const { handleTrialClick } = useTrialCTA();
 
   const handleNewsletterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,12 +35,12 @@ export function NewFooterSection() {
               7 napos ingyenes próba, korlátlan csapattagokkal.
               Nincs bankkártya szükséges.
             </p>
-            <Link
-              href="/register"
+            <button
+              onClick={handleTrialClick}
               className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-bold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300"
             >
               Próbáld ki ingyen
-            </Link>
+            </button>
           </motion.div>
         </div>
       </div>

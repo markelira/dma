@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { useTrialCTA } from "@/hooks/useTrialCTA";
 
 const features = [
   {
@@ -38,6 +38,7 @@ const quotes = [
 ];
 
 export default function FeaturesSection() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section
       className="py-8 px-4 md:px-6 lg:px-8"
@@ -79,15 +80,15 @@ export default function FeaturesSection() {
                 A haladó eszközöktől a zökkenőmentes navigációig, mindent úgy terveztünk,
                 hogy a tanulási élményed emlékezetes legyen.
               </p>
-              <Link
-                href="/courses"
+              <button
+                onClick={handleTrialClick}
                 className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-colors w-fit"
               >
                 Kezdd el most
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+              </button>
             </motion.div>
           </div>
 

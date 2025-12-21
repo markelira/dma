@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTrialCTA } from "@/hooks/useTrialCTA";
 
 export default function HeroSection() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section
       className="min-h-screen pt-32 pb-20 px-6 lg:px-12"
@@ -67,7 +69,7 @@ export default function HeroSection() {
               Tartalmak felfedezése
             </Link>
             <Link
-              href="/register"
+              href="/pricing"
               className="px-8 py-4 rounded-full font-bold border-2 transition-all hover:scale-105"
               style={{
                 borderColor: "rgb(18, 17, 17)",
