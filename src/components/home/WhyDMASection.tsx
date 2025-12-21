@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useTrialCTA } from '@/hooks/useTrialCTA'
 
 export function WhyDMASection() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section className="w-full bg-[rgb(249,250,251)] py-20 sm:py-24 md:py-28 overflow-hidden">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20">
@@ -77,8 +79,8 @@ export function WhyDMASection() {
 
         {/* CTA */}
         <div className="flex justify-center">
-          <Link
-            href="/register"
+          <button
+            onClick={handleTrialClick}
             className="group inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 text-sm sm:text-base md:text-lg font-medium sm:font-semibold text-white bg-[#E53935] hover:bg-[#C62828] rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] whitespace-nowrap"
           >
             Fedezd fel 7 napig ingyen
@@ -90,7 +92,7 @@ export function WhyDMASection() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </Link>
+          </button>
         </div>
 
       </div>

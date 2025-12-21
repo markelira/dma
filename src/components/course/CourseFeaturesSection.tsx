@@ -4,6 +4,7 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import { motion } from "motion/react";
 import Link from 'next/link';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 interface CourseData {
   certificateEnabled?: boolean;
@@ -30,6 +31,8 @@ const offerFeatures = [
 ];
 
 export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }: CourseFeaturesSectionProps) {
+  const { handleTrialClick } = useTrialCTA();
+
   // Hide sales section for subscribers
   if (isSubscriber) {
     return null;
@@ -75,12 +78,12 @@ export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }
         ))}
       </ul>
 
-      <Link
-        href="/register"
+      <button
+        onClick={handleTrialClick}
         className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-secondary text-white rounded-lg font-semibold hover:bg-brand-secondary/90 transition-colors"
       >
         Fedezd fel 7 napig ingyen
-      </Link>
+      </button>
     </motion.section>
   );
 }

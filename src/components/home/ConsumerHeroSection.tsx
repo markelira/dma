@@ -6,6 +6,7 @@ import { Check, Play, Users, TrendingUp, Award, ChevronDown } from 'lucide-react
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 /**
  * ConsumerHeroSection - B2C focused hero for DMA.hu MVP
@@ -14,6 +15,7 @@ import Image from 'next/image';
  */
 export function ConsumerHeroSection() {
   const router = useRouter();
+  const { handleTrialClick } = useTrialCTA();
 
   const scrollToNext = () => {
     const element = document.getElementById('features-section');
@@ -143,7 +145,7 @@ export function ConsumerHeroSection() {
               <Button
                 size="lg"
                 className="group bg-primary hover:bg-primary-hover text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-                onClick={() => router.push('/register')}
+                onClick={handleTrialClick}
               >
                 <span>Fedezd fel 7 napig ingyen</span>
                 <span className="inline-block transition-transform group-hover:translate-x-1 ml-2">→</span>
@@ -152,7 +154,7 @@ export function ConsumerHeroSection() {
                 size="lg"
                 variant="outline"
                 className="border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-lg rounded-full"
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/pricing')}
               >
                 Árak megtekintése
               </Button>

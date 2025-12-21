@@ -40,6 +40,7 @@ const v2_1 = require("firebase-functions/v2");
 const https_1 = require("firebase-functions/v2/https");
 const linkEmployeeByEmail_1 = require("./linkEmployeeByEmail");
 const welcome_1 = require("../email/templates/welcome");
+const employeeWelcome_1 = require("../email/templates/employeeWelcome");
 /**
  * Complete unified registration - creates company and user for all new registrations
  * Everyone gets COMPANY_ADMIN role with a Company document
@@ -222,18 +223,22 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         console.log(`   Company: ${finalCompanyName}`);
         console.log(`   Linked to invite: ${linkedToInvite}`);
         // Send welcome email (fire-and-forget, non-blocking)
-        (0, welcome_1.sendWelcomeEmail)({
+        // Use employee welcome email for employees (no trial CTA), regular for company admins
+        const emailData = {
             firstName: firstName.trim(),
             email: email.trim().toLowerCase(),
-        }).then((result) => {
+        };
+        const sendEmailFn = linkedToInvite ? employeeWelcome_1.sendEmployeeWelcomeEmail : welcome_1.sendWelcomeEmail;
+        const emailType = linkedToInvite ? 'employee welcome' : 'welcome';
+        sendEmailFn(emailData).then((result) => {
             if (result.success) {
-                console.log(`📧 [completeUnifiedRegistration] Welcome email sent to ${email}`);
+                console.log(`📧 [completeUnifiedRegistration] ${emailType} email sent to ${email}`);
             }
             else {
-                console.warn(`⚠️ [completeUnifiedRegistration] Failed to send welcome email:`, result.error);
+                console.warn(`⚠️ [completeUnifiedRegistration] Failed to send ${emailType} email:`, result.error);
             }
         }).catch((err) => {
-            console.warn(`⚠️ [completeUnifiedRegistration] Error sending welcome email:`, err.message);
+            console.warn(`⚠️ [completeUnifiedRegistration] Error sending ${emailType} email:`, err.message);
         });
         return {
             success: true,

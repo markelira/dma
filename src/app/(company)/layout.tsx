@@ -35,8 +35,8 @@ export default function CompanyLayout({
     user?.role === 'company_admin' || // Support both cases
     (user?.companyId && (user?.companyRole === 'owner' || user?.companyRole === 'admin'))
 
-  // Check if user is a company employee (should use student dashboard)
-  const isCompanyEmployee = user?.role === 'COMPANY_EMPLOYEE' && user?.companyRole === 'employee'
+  // Check if user is a company employee (has companyId and companyRole 'employee')
+  const isCompanyEmployee = !!(user?.companyId && user?.companyRole === 'employee')
 
   useEffect(() => {
     if (authReady && !isLoading) {
@@ -83,13 +83,14 @@ export default function CompanyLayout({
 
   // Show trial popup for company admins without subscription
   // Only shows once per session (dismissed state stored in sessionStorage)
+  // Never show for employees - they should see CompanyEmployeeNoAccessModal instead
   useEffect(() => {
     if (subscriptionLoading) return
 
-    if (isCompanyAdmin && shouldShowForAuthUser) {
+    if (isCompanyAdmin && !isCompanyEmployee && shouldShowForAuthUser) {
       setShowTrialModal(true)
     }
-  }, [isCompanyAdmin, shouldShowForAuthUser, subscriptionLoading])
+  }, [isCompanyAdmin, isCompanyEmployee, shouldShowForAuthUser, subscriptionLoading])
 
   // Handle trial modal actions
   const handleTrialStart = () => {

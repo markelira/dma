@@ -2,9 +2,14 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { PlatformPreview } from './components/PlatformPreview';
+import { useTrialCTA } from '@/hooks/useTrialCTA';
 
 export function HeroSection() {
+  const router = useRouter();
+  const { handleTrialClick } = useTrialCTA();
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#FFFAF5] pt-20 pb-12 md:pt-24 md:pb-16">
       {/* Background Gradient Mesh */}
@@ -62,14 +67,14 @@ export function HeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.6 }}
             >
-              <Link
-                href="/register"
+              <button
+                onClick={handleTrialClick}
                 className="inline-flex items-center justify-center px-8 py-4 bg-dma-red text-white font-bold rounded-full shadow-lg hover:bg-dma-red-hover hover:shadow-xl hover:scale-105 transition-all duration-300 text-lg"
               >
                 Fedezd fel 7 napig ingyen
-              </Link>
+              </button>
               <Link
-                href="/register"
+                href="/pricing"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-dma-navy font-bold rounded-full border-2 border-dma-navy hover:bg-dma-navy hover:text-white transition-all duration-300 text-lg"
               >
                 Árak megtekintése

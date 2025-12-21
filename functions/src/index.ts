@@ -8,6 +8,14 @@ import * as nodemailer from 'nodemailer';
 import { v4 as uuidv4 } from 'uuid';
 import sgMail from '@sendgrid/mail';
 import { z } from 'zod';
+import {
+  wrapInBaseTemplate,
+  createHeading,
+  createParagraph,
+  createButtonRow,
+  createAlertBox,
+  generatePlainText
+} from './email/templates/base';
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -274,6 +282,11 @@ export const requestPasswordReset = onCall({
       };
     }
 
+    // Get user's first name from Firestore for personalized greeting
+    const userDoc = await firestore.collection('users').doc(userRecord.uid).get();
+    const userData = userDoc.data();
+    const firstName = userData?.firstName || 'Felhasználó';
+
     // Generate reset token
     const resetToken = uuidv4();
     const resetExpiry = new Date();
@@ -292,131 +305,31 @@ export const requestPasswordReset = onCall({
     const baseUrl = process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000';
     const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
 
-    // World-class HTML email template matching DMA brand
-    const htmlContent = `
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Jelszó visszaállítás - DMA Platform</title>
-  <!--[if mso]>
-  <style type="text/css">
-    body, table, td {font-family: Arial, sans-serif !important;}
-  </style>
-  <![endif]-->
-</head>
-<body style="margin: 0; padding: 0; background-color: #F9FAFB; font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
-  <!-- Email wrapper -->
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <!-- Main container -->
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 2px 16px 0 rgba(16, 23, 42, 0.08); max-width: 600px; width: 100%;">
+    // Build email content using base template (unified styling)
+    const emailContent = `
+      ${createHeading(`Szia ${firstName}!`, 2)}
+      ${createParagraph('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
+      ${createButtonRow({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetLink, variant: 'primary' })}
+      ${createAlertBox('⏱️ Fontos: Ez a link 1 óráig érvényes biztonsági okokból.', 'warning')}
+      ${createParagraph('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
+    `;
 
-          <!-- Header with DMA Navy brand color -->
-          <tr>
-            <td style="background-color: #2C3E54; padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                DMA Platform
-              </h1>
-              <p style="margin: 8px 0 0 0; color: #ffffff; opacity: 0.9; font-size: 14px;">
-                Jelszó visszaállítás
-              </p>
-            </td>
-          </tr>
+    const htmlContent = wrapInBaseTemplate(emailContent, {
+      showUnsubscribe: false,
+      preheader: 'Jelszó visszaállítás a DMA Masterclass platformon'
+    });
 
-          <!-- Main content -->
-          <tr>
-            <td style="padding: 40px 32px;">
-
-              <!-- Greeting -->
-              <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px; font-weight: 600; line-height: 1.3;">
-                Kedves Felhasználó!
-              </h2>
-
-              <!-- Message -->
-              <p style="margin: 0 0 16px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                Jelszó visszaállítási kérelmet kaptunk az Ön <strong>DMA Platform</strong> fiókjához.
-              </p>
-
-              <p style="margin: 0 0 32px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                A jelszó visszaállításához kattintson az alábbi gombra:
-              </p>
-
-              <!-- CTA Button with blue gradient -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td align="center" style="padding: 0 0 32px 0;">
-                    <a href="${resetLink}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(to top, #2563eb, #3b82f6); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); letter-spacing: 0.3px;">
-                      Új jelszó beállítása
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Alternative link -->
-              <div style="background-color: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
-                <p style="margin: 0 0 8px 0; color: #1E40AF; font-size: 14px; font-weight: 600;">
-                  Vagy másold be ezt a linket a böngészőbe:
-                </p>
-                <p style="margin: 0; color: #1E40AF; font-size: 13px; word-break: break-all; line-height: 1.5;">
-                  ${resetLink}
-                </p>
-              </div>
-
-              <!-- Security info -->
-              <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px;">
-                <p style="margin: 0; color: #78350F; font-size: 14px; line-height: 1.5;">
-                  <strong>⏱️ Fontos:</strong> Ez a link <strong>1 óráig</strong> érvényes biztonsági okokból.
-                </p>
-              </div>
-
-              <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px; line-height: 1.6;">
-                Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.
-              </p>
-
-              <!-- Signature -->
-              <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                Üdvözlettel,<br>
-                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
-              </p>
-
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #F9FAFB; padding: 32px; text-align: center; border-radius: 0 0 16px 16px; border-top: 1px solid #E5E7EB;">
-              <p style="margin: 0 0 8px 0; color: #6B7280; font-size: 13px; line-height: 1.5;">
-                Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
-              </p>
-              <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                © 2025 DMA Platform. Minden jog fenntartva.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Spacer for email clients -->
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%;">
-          <tr>
-            <td style="padding: 20px 32px; text-align: center;">
-              <p style="margin: 0; color: #9CA3AF; font-size: 12px; line-height: 1.5;">
-                Ha problémád van a gombbal, másold be a fenti linket a böngésződbe.
-              </p>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-      `;
+    const textContent = generatePlainText({
+      greeting: `Szia ${firstName}!`,
+      paragraphs: [
+        'Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát.',
+        'Fontos: Ez a link 1 óráig érvényes biztonsági okokból.',
+        'Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt.',
+      ],
+      ctaText: 'ÚJ JELSZÓ BEÁLLÍTÁSA',
+      ctaUrl: resetLink,
+      signOff: 'Üdvözlettel, A DMA Masterclass csapata',
+    });
 
     // Try SendGrid first if available
     if (initializeSendGrid()) {
@@ -424,8 +337,9 @@ export const requestPasswordReset = onCall({
         const msg = {
           to: email,
           from: FROM_EMAIL,
-          subject: 'Jelszó visszaállítás - DMA Platform',
+          subject: 'Jelszó visszaállítása - DMA Masterclass',
           html: htmlContent,
+          text: textContent,
         };
 
         await sgMail.send(msg);
@@ -464,8 +378,9 @@ export const requestPasswordReset = onCall({
     const mailOptions = {
       from: `"DMA Platform" <${fromEmail}>`,
       to: email,
-      subject: 'Jelszó visszaállítás - DMA Platform',
-      html: htmlContent
+      subject: 'Jelszó visszaállítása - DMA Masterclass',
+      html: htmlContent,
+      text: textContent
     };
 
     const info = await transporter.sendMail(mailOptions);
@@ -755,7 +670,7 @@ export const sendEmailVerification = onCall({
               <!-- Signature -->
               <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
                 Üdvözlettel,<br>
-                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
+                <strong style="color: #2C3E54;">A DMA Masterclass csapata</strong>
               </p>
 
             </td>
@@ -768,7 +683,7 @@ export const sendEmailVerification = onCall({
                 Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
               </p>
               <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                © 2025 DMA Platform. Minden jog fenntartva.
+                © 2025 DMA Masterclass. Minden jog fenntartva.
               </p>
             </td>
           </tr>
@@ -1474,6 +1389,142 @@ export {
   reportLessonIssue,
 } from './support';
 
+// Import notify boss email template
+import { sendNotifyBossEmail } from './email/templates/notifyBossEmail';
+
+/**
+ * Notify Company Admin - Called when employee wants to request subscription
+ * Rate limited: 1 notification per employee per day
+ */
+export const notifyCompanyAdmin = onCall({
+  cors: true,
+  region: 'europe-west1',
+}, async (request) => {
+  try {
+    // Check authentication
+    if (!request.auth) {
+      throw new Error('Hitelesítés szükséges');
+    }
+
+    const { companyId } = request.data as { companyId: string };
+
+    if (!companyId) {
+      throw new Error('Cégazonosító szükséges');
+    }
+
+    const userId = request.auth.uid;
+
+    // Rate limiting: Check if employee already sent notification today
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayStr = today.toISOString().split('T')[0];
+
+    const existingNotification = await firestore
+      .collection('adminNotifications')
+      .where('employeeId', '==', userId)
+      .where('companyId', '==', companyId)
+      .where('date', '==', todayStr)
+      .limit(1)
+      .get();
+
+    if (!existingNotification.empty) {
+      return {
+        success: false,
+        error: 'Ma már küldtél értesítést. Holnap újra próbálhatod.'
+      };
+    }
+
+    // Get company document to verify it exists
+    const companyDoc = await firestore.collection('companies').doc(companyId).get();
+    if (!companyDoc.exists) {
+      throw new Error('Cég nem található');
+    }
+
+    // Get company admin from admins subcollection (look for owner role)
+    let adminsSnapshot = await firestore
+      .collection('companies')
+      .doc(companyId)
+      .collection('admins')
+      .where('role', '==', 'owner')
+      .limit(1)
+      .get();
+
+    // Fallback: try to find any admin if no owner found
+    if (adminsSnapshot.empty) {
+      adminsSnapshot = await firestore
+        .collection('companies')
+        .doc(companyId)
+        .collection('admins')
+        .limit(1)
+        .get();
+    }
+
+    if (adminsSnapshot.empty) {
+      throw new Error('Cég adminisztrátora nem található');
+    }
+
+    const adminDocData = adminsSnapshot.docs[0].data();
+    const adminId = adminDocData?.userId || adminsSnapshot.docs[0].id;
+
+    if (!adminId) {
+      throw new Error('Cég adminisztrátora nem található');
+    }
+
+    // Get admin user data from users collection
+    const adminUserDoc = await firestore.collection('users').doc(adminId).get();
+    if (!adminUserDoc.exists) {
+      throw new Error('Adminisztrátor nem található');
+    }
+
+    const adminData = adminUserDoc.data();
+    const adminEmail = adminData?.email;
+    const adminFirstName = adminData?.firstName || 'Vezető';
+
+    if (!adminEmail) {
+      throw new Error('Adminisztrátor email címe nem található');
+    }
+
+    // Get employee (current user) data
+    const employeeDoc = await firestore.collection('users').doc(userId).get();
+    const employeeData = employeeDoc.data();
+    const employeeFullName = `${employeeData?.lastName || ''} ${employeeData?.firstName || ''}`.trim() || 'Munkatárs';
+
+    // Send the email
+    const emailResult = await sendNotifyBossEmail({
+      adminFirstName,
+      adminEmail,
+      employeeFullName,
+    });
+
+    if (!emailResult.success) {
+      throw new Error(emailResult.error || 'Email küldése sikertelen');
+    }
+
+    // Log the notification (for rate limiting)
+    await firestore.collection('adminNotifications').add({
+      employeeId: userId,
+      companyId,
+      adminId,
+      date: todayStr,
+      sentAt: new Date().toISOString(),
+    });
+
+    logger.info(`[notifyCompanyAdmin] Email sent to ${adminEmail} from employee ${userId}`);
+
+    return {
+      success: true,
+      message: 'Értesítés sikeresen elküldve'
+    };
+
+  } catch (error: any) {
+    logger.error('[notifyCompanyAdmin] Error:', error);
+    return {
+      success: false,
+      error: error.message || 'Értesítés küldése sikertelen'
+    };
+  }
+});
+
 // Export Company Admin Dashboard functions
 export { createCompany } from './company/createCompany';
 export {
@@ -1525,22 +1576,38 @@ export { sendTrialReminders } from './scheduled/trialReminder';
 
 // Export email-related functions
 import { sendWelcomeEmail as sendWelcomeEmailTemplate } from './email/templates/welcome';
+import { sendEmployeeWelcomeEmail as sendEmployeeWelcomeEmailTemplate } from './email/templates/employeeWelcome';
 import { sendNewCourseEmail, sendNewCourseToSubscribers } from './email/templates/newCourse';
 
 /**
  * Send Welcome Email - Called after registration
+ * Sends different email for company employees (without trial CTA)
  */
 export const sendWelcomeEmail = onCall({
   cors: true,
   region: 'europe-west1',
 }, async (request) => {
   try {
-    const { email, firstName } = request.data as { email: string; firstName: string };
+    const { email, firstName, isCompanyEmployee } = request.data as {
+      email: string;
+      firstName: string;
+      isCompanyEmployee?: boolean;
+    };
 
     if (!email) {
       throw new Error('Email cím szükséges');
     }
 
+    // Use employee welcome email for company employees (no trial CTA)
+    if (isCompanyEmployee) {
+      const result = await sendEmployeeWelcomeEmailTemplate({
+        firstName: firstName || 'Felhasználó',
+        email,
+      });
+      return result;
+    }
+
+    // Regular welcome email with trial CTA
     const result = await sendWelcomeEmailTemplate({
       firstName: firstName || 'Felhasználó',
       email,
@@ -2264,6 +2331,7 @@ export {
   generateRecommendationsForUser,
   getPersonalizedRecommendations,
   sendRegistrationReminders,
+  sendInactivityReminders,
 } from './automatedTasks';
 
 // ============================================

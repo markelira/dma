@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import { useTrialCTA } from '@/hooks/useTrialCTA'
 
 export function CtaEditorial() {
+  const { handleTrialClick } = useTrialCTA();
   return (
     <section className="w-full bg-gray-900 py-20 sm:py-24 md:py-28 overflow-hidden relative">
       {/* Background pattern */}
@@ -35,15 +37,15 @@ export function CtaEditorial() {
           </p>
 
           {/* CTA Button */}
-          <Link
-            href="/register"
+          <button
+            onClick={handleTrialClick}
             className="inline-flex items-center gap-3 px-8 py-4 bg-[#E72B36] text-white font-semibold text-lg rounded-xl hover:bg-[#c9242e] transition-all duration-200 shadow-lg shadow-[#E72B36]/30 hover:shadow-[#E72B36]/50 hover:scale-105"
           >
             Kezdd el most – 7 nap ingyen
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </Link>
+          </button>
 
           {/* Trust signal */}
           <p className="text-gray-500 text-sm mt-6">

@@ -7,6 +7,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler';
 import { onCall } from 'firebase-functions/v2/https';
 import { sendRegistrationReminderEmail } from './email/templates/registrationReminder';
 import { sendRegistrationReminder1DayEmail } from './email/templates/registrationReminder1Day';
+import { sendInactivityReminderEmail } from './email/templates/inactivityReminder';
 
 const firestore = admin.firestore();
 
@@ -611,6 +612,122 @@ export const sendRegistrationReminders = onSchedule({
     });
   } catch (error) {
     console.error('Registration reminder error:', error);
+    throw error;
+  }
+});
+
+// ============================================================================
+// INACTIVITY REMINDER EMAILS
+// ============================================================================
+
+/**
+ * Send "We miss you" emails to users who haven't logged in for over 30 days
+ * Runs daily at 10 AM Budapest time
+ */
+export const sendInactivityReminders = onSchedule({
+  schedule: '0 10 * * *', // 10 AM daily
+  timeZone: 'Europe/Budapest',
+  region: 'europe-west1',
+}, async (event) => {
+  console.log('Starting inactivity reminder emails...');
+
+  try {
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    // Find all users
+    const usersSnapshot = await firestore.collection('users').get();
+
+    console.log(`Checking ${usersSnapshot.size} users for inactivity...`);
+
+    let sentCount = 0;
+    let skippedCount = 0;
+
+    for (const userDoc of usersSnapshot.docs) {
+      const userData = userDoc.data();
+      const userId = userDoc.id;
+
+      // Skip if no email
+      if (!userData.email) {
+        skippedCount++;
+        continue;
+      }
+
+      // Skip company employees - they can't pay, only company admin can subscribe
+      if (userData.companyId && userData.companyRole === 'employee') {
+        skippedCount++;
+        continue;
+      }
+
+      // Check last login/activity time
+      // Use lastLoginAt, lastActivityAt, or updatedAt as fallback
+      const lastActivity = userData.lastLoginAt || userData.lastActivityAt || userData.updatedAt;
+
+      if (!lastActivity) {
+        // If no activity record, use createdAt and check if older than 30 days
+        const createdAt = userData.createdAt ? new Date(userData.createdAt) : null;
+        if (!createdAt || createdAt > thirtyDaysAgo) {
+          skippedCount++;
+          continue;
+        }
+      } else {
+        const lastActivityDate = new Date(lastActivity);
+        if (lastActivityDate > thirtyDaysAgo) {
+          // User was active in the last 30 days
+          skippedCount++;
+          continue;
+        }
+      }
+
+      // Check if we already sent an inactivity reminder in the last 30 days
+      const existingReminder = await firestore.collection('inactivityReminders')
+        .where('userId', '==', userId)
+        .where('sentAt', '>=', thirtyDaysAgo.toISOString())
+        .limit(1)
+        .get();
+
+      if (!existingReminder.empty) {
+        // Already sent a reminder recently
+        skippedCount++;
+        continue;
+      }
+
+      // Send the inactivity reminder email
+      const firstName = userData.firstName || 'Felhasználó';
+
+      try {
+        const result = await sendInactivityReminderEmail({
+          firstName,
+          email: userData.email,
+        });
+
+        if (result.success) {
+          // Record that we sent the reminder
+          await firestore.collection('inactivityReminders').add({
+            userId,
+            email: userData.email,
+            sentAt: now.toISOString(),
+            lastActivityAt: lastActivity || userData.createdAt || null,
+          });
+
+          sentCount++;
+          console.log(`Sent inactivity reminder to ${userData.email}`);
+        } else {
+          console.warn(`Failed to send inactivity reminder to ${userData.email}:`, result.error);
+        }
+      } catch (emailError: any) {
+        console.error(`Error sending inactivity reminder to ${userData.email}:`, emailError.message);
+      }
+    }
+
+    console.log('Inactivity reminders completed:', {
+      sent: sentCount,
+      skipped: skippedCount,
+      total: usersSnapshot.size,
+    });
+  } catch (error) {
+    console.error('Inactivity reminder error:', error);
     throw error;
   }
 });

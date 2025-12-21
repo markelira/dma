@@ -36,9 +36,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteAllCourses = exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.getCompanyEnrolledCourses = exports.enrollCompanyInCourse = exports.removeEmployee = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeUnifiedRegistration = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.checkEmailAvailability = exports.healthCheck = void 0;
-exports.deleteInstructor = exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.notifyNewContent = exports.sendWelcomeEmail = exports.sendTrialReminders = exports.getSignedUploadUrl = exports.restoreSoftDeletedCourses = void 0;
-exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getPlayerData = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.sendRegistrationReminders = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = void 0;
+exports.deleteCourse = exports.publishCourse = exports.updateCourse = exports.createCourse = exports.muxWebhook = exports.migrateVideoToMux = exports.testVideoUpload = exports.getMuxAssetStatus = exports.getMuxUploadUrl = exports.getCompanyEnrolledCourses = exports.enrollCompanyInCourse = exports.removeEmployee = exports.sendEmployeeReminder = exports.generateCSVReport = exports.getEmployeeProgressDetail = exports.getCompanyDashboard = exports.getCompanyPurchases = exports.purchaseCompanyMasterclass = exports.getCompanyMasterclasses = exports.unassignEmployeeFromMasterclass = exports.assignEmployeeToMasterclass = exports.completeUnifiedRegistration = exports.completeCompanyOnboarding = exports.createCompanyMasterclass = exports.enrollEmployeesInMasterclass = exports.acceptEmployeeInvite = exports.verifyEmployeeInvite = exports.addEmployee = exports.createCompany = exports.notifyCompanyAdmin = exports.reportLessonIssue = exports.respondToSupportTicket = exports.createSupportTicket = exports.getAuditLogStats = exports.getAuditLogs = exports.verifyEmail = exports.enrollInCourse = exports.getCoursesCallable = exports.getCourse = exports.updateUserRole = exports.getStats = exports.getUsers = exports.sendEmailVerification = exports.validateResetToken = exports.resetPassword = exports.requestPasswordReset = exports.firebaseLogin = exports.echo = exports.checkEmailAvailability = exports.healthCheck = void 0;
+exports.updateInstructor = exports.createInstructor = exports.getInstructors = exports.getResourceDownloadUrls = exports.markLessonComplete = exports.syncProgressOnDeviceSwitch = exports.getSyncedLessonProgress = exports.getDashboardStats = exports.createUserProfile = exports.resendVerificationCode = exports.verifyEmailCode = exports.sendEmailVerificationCode = exports.getSzamlazzInvoicePdf = exports.getStripeInvoices = exports.stripeWebhook = exports.createCustomer = exports.getPaymentHistory = exports.createCheckoutSession = exports.validatePromoCode = exports.deletePromoCode = exports.getPromoCodes = exports.createPromoCode = exports.createBillingPortalSession = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = exports.getTeamEnrolledCourses = exports.enrollTeamInCourse = exports.getTeamMembers = exports.checkSubscriptionAccess = exports.getTeamDashboard = exports.resendTeamInvite = exports.removeTeamMember = exports.leaveTeam = exports.declineTeamInvite = exports.acceptTeamInvite = exports.inviteTeamMember = exports.deleteCategory = exports.updateCategory = exports.createCategory = exports.seedCategories = exports.getCategories = exports.notifyNewContent = exports.sendWelcomeEmail = exports.sendTrialReminders = exports.getSignedUploadUrl = exports.restoreSoftDeletedCourses = exports.deleteAllCourses = void 0;
+exports.getMigrationStatus = exports.seedDefaultTargetAudiences = exports.addDefaultInstructorRoles = exports.migrateCoursesToFlatLessons = exports.getPlayerData = exports.getCoursesWithFilters = exports.getPlatformAnalytics = exports.sendInactivityReminders = exports.sendRegistrationReminders = exports.getPersonalizedRecommendations = exports.generateRecommendationsForUser = exports.generateDailyRecommendations = exports.calculateDailyAnalytics = exports.trackLearningProgress = exports.endLearningSession = exports.startLearningSession = exports.markAchievementCelebrated = exports.checkAchievements = exports.getAllAchievements = exports.getUserAchievements = exports.getDashboardAnalytics = exports.updateLearningStreak = exports.getLearningStreak = exports.deleteLearningGoal = exports.updateGoalProgress = exports.getLearningGoals = exports.createLearningGoal = exports.getUserPreferences = exports.saveUserPreferences = exports.deleteTargetAudience = exports.updateTargetAudience = exports.createTargetAudience = exports.getTargetAudiences = exports.deleteInstructor = void 0;
 /**
  * Minimal Firebase Functions for Development
  */
@@ -49,6 +49,7 @@ const nodemailer = __importStar(require("nodemailer"));
 const uuid_1 = require("uuid");
 const mail_1 = __importDefault(require("@sendgrid/mail"));
 const zod_1 = require("zod");
+const base_1 = require("./email/templates/base");
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -284,6 +285,10 @@ exports.requestPasswordReset = (0, https_1.onCall)({
                 message: 'Ha a megadott email cím regisztrálva van, küldtünk egy jelszó-visszaállítási linket.'
             };
         }
+        // Get user's first name from Firestore for personalized greeting
+        const userDoc = await firestore.collection('users').doc(userRecord.uid).get();
+        const userData = userDoc.data();
+        const firstName = userData?.firstName || 'Felhasználó';
         // Generate reset token
         const resetToken = (0, uuid_1.v4)();
         const resetExpiry = new Date();
@@ -299,139 +304,38 @@ exports.requestPasswordReset = (0, https_1.onCall)({
         // Prepare reset link
         const baseUrl = process.env.FRONTEND_URL || process.env.APP_URL || 'http://localhost:3000';
         const resetLink = `${baseUrl}/reset-password?token=${resetToken}`;
-        // World-class HTML email template matching DMA brand
-        const htmlContent = `
-<!DOCTYPE html>
-<html lang="hu">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Jelszó visszaállítás - DMA Platform</title>
-  <!--[if mso]>
-  <style type="text/css">
-    body, table, td {font-family: Arial, sans-serif !important;}
-  </style>
-  <![endif]-->
-</head>
-<body style="margin: 0; padding: 0; background-color: #F9FAFB; font-family: 'Titillium Web', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;">
-  <!-- Email wrapper -->
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #F9FAFB;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-        <!-- Main container -->
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border-radius: 16px; box-shadow: 0 2px 16px 0 rgba(16, 23, 42, 0.08); max-width: 600px; width: 100%;">
-
-          <!-- Header with DMA Navy brand color -->
-          <tr>
-            <td style="background-color: #2C3E54; padding: 40px 32px; text-align: center; border-radius: 16px 16px 0 0;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                DMA Platform
-              </h1>
-              <p style="margin: 8px 0 0 0; color: #ffffff; opacity: 0.9; font-size: 14px;">
-                Jelszó visszaállítás
-              </p>
-            </td>
-          </tr>
-
-          <!-- Main content -->
-          <tr>
-            <td style="padding: 40px 32px;">
-
-              <!-- Greeting -->
-              <h2 style="margin: 0 0 24px 0; color: #111827; font-size: 24px; font-weight: 600; line-height: 1.3;">
-                Kedves Felhasználó!
-              </h2>
-
-              <!-- Message -->
-              <p style="margin: 0 0 16px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                Jelszó visszaállítási kérelmet kaptunk az Ön <strong>DMA Platform</strong> fiókjához.
-              </p>
-
-              <p style="margin: 0 0 32px 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                A jelszó visszaállításához kattintson az alábbi gombra:
-              </p>
-
-              <!-- CTA Button with blue gradient -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td align="center" style="padding: 0 0 32px 0;">
-                    <a href="${resetLink}" style="display: inline-block; padding: 16px 48px; background: linear-gradient(to top, #2563eb, #3b82f6); color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); letter-spacing: 0.3px;">
-                      Új jelszó beállítása
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Alternative link -->
-              <div style="background-color: #EFF6FF; border: 1px solid #DBEAFE; border-radius: 8px; padding: 20px; margin: 0 0 24px 0;">
-                <p style="margin: 0 0 8px 0; color: #1E40AF; font-size: 14px; font-weight: 600;">
-                  Vagy másold be ezt a linket a böngészőbe:
-                </p>
-                <p style="margin: 0; color: #1E40AF; font-size: 13px; word-break: break-all; line-height: 1.5;">
-                  ${resetLink}
-                </p>
-              </div>
-
-              <!-- Security info -->
-              <div style="background-color: #FEF3C7; border-left: 4px solid #F59E0B; padding: 16px 20px; margin: 0 0 24px 0; border-radius: 4px;">
-                <p style="margin: 0; color: #78350F; font-size: 14px; line-height: 1.5;">
-                  <strong>⏱️ Fontos:</strong> Ez a link <strong>1 óráig</strong> érvényes biztonsági okokból.
-                </p>
-              </div>
-
-              <p style="margin: 0 0 16px 0; color: #6B7280; font-size: 14px; line-height: 1.6;">
-                Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.
-              </p>
-
-              <!-- Signature -->
-              <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
-                Üdvözlettel,<br>
-                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
-              </p>
-
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #F9FAFB; padding: 32px; text-align: center; border-radius: 0 0 16px 16px; border-top: 1px solid #E5E7EB;">
-              <p style="margin: 0 0 8px 0; color: #6B7280; font-size: 13px; line-height: 1.5;">
-                Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
-              </p>
-              <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                © 2025 DMA Platform. Minden jog fenntartva.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Spacer for email clients -->
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; width: 100%;">
-          <tr>
-            <td style="padding: 20px 32px; text-align: center;">
-              <p style="margin: 0; color: #9CA3AF; font-size: 12px; line-height: 1.5;">
-                Ha problémád van a gombbal, másold be a fenti linket a böngésződbe.
-              </p>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-      `;
+        // Build email content using base template (unified styling)
+        const emailContent = `
+      ${(0, base_1.createHeading)(`Szia ${firstName}!`, 2)}
+      ${(0, base_1.createParagraph)('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
+      ${(0, base_1.createButtonRow)({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetLink, variant: 'primary' })}
+      ${(0, base_1.createAlertBox)('⏱️ Fontos: Ez a link 1 óráig érvényes biztonsági okokból.', 'warning')}
+      ${(0, base_1.createParagraph)('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
+    `;
+        const htmlContent = (0, base_1.wrapInBaseTemplate)(emailContent, {
+            showUnsubscribe: false,
+            preheader: 'Jelszó visszaállítás a DMA Masterclass platformon'
+        });
+        const textContent = (0, base_1.generatePlainText)({
+            greeting: `Szia ${firstName}!`,
+            paragraphs: [
+                'Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát.',
+                'Fontos: Ez a link 1 óráig érvényes biztonsági okokból.',
+                'Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt.',
+            ],
+            ctaText: 'ÚJ JELSZÓ BEÁLLÍTÁSA',
+            ctaUrl: resetLink,
+            signOff: 'Üdvözlettel, A DMA Masterclass csapata',
+        });
         // Try SendGrid first if available
         if (initializeSendGrid()) {
             try {
                 const msg = {
                     to: email,
                     from: FROM_EMAIL,
-                    subject: 'Jelszó visszaállítás - DMA Platform',
+                    subject: 'Jelszó visszaállítása - DMA Masterclass',
                     html: htmlContent,
+                    text: textContent,
                 };
                 await mail_1.default.send(msg);
                 v2_1.logger.info('Email sent via SendGrid to:', email);
@@ -467,8 +371,9 @@ exports.requestPasswordReset = (0, https_1.onCall)({
         const mailOptions = {
             from: `"DMA Platform" <${fromEmail}>`,
             to: email,
-            subject: 'Jelszó visszaállítás - DMA Platform',
-            html: htmlContent
+            subject: 'Jelszó visszaállítása - DMA Masterclass',
+            html: htmlContent,
+            text: textContent
         };
         const info = await transporter.sendMail(mailOptions);
         // For development, log the preview URL
@@ -727,7 +632,7 @@ exports.sendEmailVerification = (0, https_1.onCall)({
               <!-- Signature -->
               <p style="margin: 24px 0 0 0; color: #374151; font-size: 16px; line-height: 1.6;">
                 Üdvözlettel,<br>
-                <strong style="color: #2C3E54;">A DMA Platform csapata</strong>
+                <strong style="color: #2C3E54;">A DMA Masterclass csapata</strong>
               </p>
 
             </td>
@@ -740,7 +645,7 @@ exports.sendEmailVerification = (0, https_1.onCall)({
                 Ez egy automatikus üzenet, kérjük ne válaszoljon rá.
               </p>
               <p style="margin: 0; color: #9CA3AF; font-size: 12px;">
-                © 2025 DMA Platform. Minden jog fenntartva.
+                © 2025 DMA Masterclass. Minden jog fenntartva.
               </p>
             </td>
           </tr>
@@ -1353,6 +1258,119 @@ var support_1 = require("./support");
 Object.defineProperty(exports, "createSupportTicket", { enumerable: true, get: function () { return support_1.createSupportTicket; } });
 Object.defineProperty(exports, "respondToSupportTicket", { enumerable: true, get: function () { return support_1.respondToSupportTicket; } });
 Object.defineProperty(exports, "reportLessonIssue", { enumerable: true, get: function () { return support_1.reportLessonIssue; } });
+// Import notify boss email template
+const notifyBossEmail_1 = require("./email/templates/notifyBossEmail");
+/**
+ * Notify Company Admin - Called when employee wants to request subscription
+ * Rate limited: 1 notification per employee per day
+ */
+exports.notifyCompanyAdmin = (0, https_1.onCall)({
+    cors: true,
+    region: 'europe-west1',
+}, async (request) => {
+    try {
+        // Check authentication
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        const { companyId } = request.data;
+        if (!companyId) {
+            throw new Error('Cégazonosító szükséges');
+        }
+        const userId = request.auth.uid;
+        // Rate limiting: Check if employee already sent notification today
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayStr = today.toISOString().split('T')[0];
+        const existingNotification = await firestore
+            .collection('adminNotifications')
+            .where('employeeId', '==', userId)
+            .where('companyId', '==', companyId)
+            .where('date', '==', todayStr)
+            .limit(1)
+            .get();
+        if (!existingNotification.empty) {
+            return {
+                success: false,
+                error: 'Ma már küldtél értesítést. Holnap újra próbálhatod.'
+            };
+        }
+        // Get company document to verify it exists
+        const companyDoc = await firestore.collection('companies').doc(companyId).get();
+        if (!companyDoc.exists) {
+            throw new Error('Cég nem található');
+        }
+        // Get company admin from admins subcollection (look for owner role)
+        let adminsSnapshot = await firestore
+            .collection('companies')
+            .doc(companyId)
+            .collection('admins')
+            .where('role', '==', 'owner')
+            .limit(1)
+            .get();
+        // Fallback: try to find any admin if no owner found
+        if (adminsSnapshot.empty) {
+            adminsSnapshot = await firestore
+                .collection('companies')
+                .doc(companyId)
+                .collection('admins')
+                .limit(1)
+                .get();
+        }
+        if (adminsSnapshot.empty) {
+            throw new Error('Cég adminisztrátora nem található');
+        }
+        const adminDocData = adminsSnapshot.docs[0].data();
+        const adminId = adminDocData?.userId || adminsSnapshot.docs[0].id;
+        if (!adminId) {
+            throw new Error('Cég adminisztrátora nem található');
+        }
+        // Get admin user data from users collection
+        const adminUserDoc = await firestore.collection('users').doc(adminId).get();
+        if (!adminUserDoc.exists) {
+            throw new Error('Adminisztrátor nem található');
+        }
+        const adminData = adminUserDoc.data();
+        const adminEmail = adminData?.email;
+        const adminFirstName = adminData?.firstName || 'Vezető';
+        if (!adminEmail) {
+            throw new Error('Adminisztrátor email címe nem található');
+        }
+        // Get employee (current user) data
+        const employeeDoc = await firestore.collection('users').doc(userId).get();
+        const employeeData = employeeDoc.data();
+        const employeeFullName = `${employeeData?.lastName || ''} ${employeeData?.firstName || ''}`.trim() || 'Munkatárs';
+        // Send the email
+        const emailResult = await (0, notifyBossEmail_1.sendNotifyBossEmail)({
+            adminFirstName,
+            adminEmail,
+            employeeFullName,
+        });
+        if (!emailResult.success) {
+            throw new Error(emailResult.error || 'Email küldése sikertelen');
+        }
+        // Log the notification (for rate limiting)
+        await firestore.collection('adminNotifications').add({
+            employeeId: userId,
+            companyId,
+            adminId,
+            date: todayStr,
+            sentAt: new Date().toISOString(),
+        });
+        v2_1.logger.info(`[notifyCompanyAdmin] Email sent to ${adminEmail} from employee ${userId}`);
+        return {
+            success: true,
+            message: 'Értesítés sikeresen elküldve'
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[notifyCompanyAdmin] Error:', error);
+        return {
+            success: false,
+            error: error.message || 'Értesítés küldése sikertelen'
+        };
+    }
+});
 // Export Company Admin Dashboard functions
 var createCompany_1 = require("./company/createCompany");
 Object.defineProperty(exports, "createCompany", { enumerable: true, get: function () { return createCompany_1.createCompany; } });
@@ -1414,19 +1432,30 @@ var trialReminder_1 = require("./scheduled/trialReminder");
 Object.defineProperty(exports, "sendTrialReminders", { enumerable: true, get: function () { return trialReminder_1.sendTrialReminders; } });
 // Export email-related functions
 const welcome_1 = require("./email/templates/welcome");
+const employeeWelcome_1 = require("./email/templates/employeeWelcome");
 const newCourse_1 = require("./email/templates/newCourse");
 /**
  * Send Welcome Email - Called after registration
+ * Sends different email for company employees (without trial CTA)
  */
 exports.sendWelcomeEmail = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
 }, async (request) => {
     try {
-        const { email, firstName } = request.data;
+        const { email, firstName, isCompanyEmployee } = request.data;
         if (!email) {
             throw new Error('Email cím szükséges');
         }
+        // Use employee welcome email for company employees (no trial CTA)
+        if (isCompanyEmployee) {
+            const result = await (0, employeeWelcome_1.sendEmployeeWelcomeEmail)({
+                firstName: firstName || 'Felhasználó',
+                email,
+            });
+            return result;
+        }
+        // Regular welcome email with trial CTA
         const result = await (0, welcome_1.sendWelcomeEmail)({
             firstName: firstName || 'Felhasználó',
             email,
@@ -2021,6 +2050,7 @@ Object.defineProperty(exports, "generateDailyRecommendations", { enumerable: tru
 Object.defineProperty(exports, "generateRecommendationsForUser", { enumerable: true, get: function () { return automatedTasks_1.generateRecommendationsForUser; } });
 Object.defineProperty(exports, "getPersonalizedRecommendations", { enumerable: true, get: function () { return automatedTasks_1.getPersonalizedRecommendations; } });
 Object.defineProperty(exports, "sendRegistrationReminders", { enumerable: true, get: function () { return automatedTasks_1.sendRegistrationReminders; } });
+Object.defineProperty(exports, "sendInactivityReminders", { enumerable: true, get: function () { return automatedTasks_1.sendInactivityReminders; } });
 // ============================================
 // PLATFORM ANALYTICS
 // ============================================

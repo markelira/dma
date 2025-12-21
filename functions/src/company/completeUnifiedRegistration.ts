@@ -5,6 +5,7 @@ import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { Company, CompanyAdmin } from '../types/company';
 import { linkEmployeeByEmail } from './linkEmployeeByEmail';
 import { sendWelcomeEmail } from '../email/templates/welcome';
+import { sendEmployeeWelcomeEmail } from '../email/templates/employeeWelcome';
 
 interface UnifiedRegistrationInput {
   // Required fields
@@ -239,17 +240,23 @@ export const completeUnifiedRegistration = https.onCall(
       console.log(`   Linked to invite: ${linkedToInvite}`);
 
       // Send welcome email (fire-and-forget, non-blocking)
-      sendWelcomeEmail({
+      // Use employee welcome email for employees (no trial CTA), regular for company admins
+      const emailData = {
         firstName: firstName.trim(),
         email: email.trim().toLowerCase(),
-      }).then((result) => {
+      };
+
+      const sendEmailFn = linkedToInvite ? sendEmployeeWelcomeEmail : sendWelcomeEmail;
+      const emailType = linkedToInvite ? 'employee welcome' : 'welcome';
+
+      sendEmailFn(emailData).then((result) => {
         if (result.success) {
-          console.log(`📧 [completeUnifiedRegistration] Welcome email sent to ${email}`);
+          console.log(`📧 [completeUnifiedRegistration] ${emailType} email sent to ${email}`);
         } else {
-          console.warn(`⚠️ [completeUnifiedRegistration] Failed to send welcome email:`, result.error);
+          console.warn(`⚠️ [completeUnifiedRegistration] Failed to send ${emailType} email:`, result.error);
         }
       }).catch((err) => {
-        console.warn(`⚠️ [completeUnifiedRegistration] Error sending welcome email:`, err.message);
+        console.warn(`⚠️ [completeUnifiedRegistration] Error sending ${emailType} email:`, err.message);
       });
 
       return {

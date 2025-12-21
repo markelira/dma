@@ -19,6 +19,7 @@ import { sendCompanySubscriptionCanceledEmail } from '../src/email/templates/com
 import { sendNewContentAvailableEmail } from '../src/email/templates/newContentAvailable';
 import { sendRegistrationReminderEmail } from '../src/email/templates/registrationReminder';
 import { sendRegistrationReminder1DayEmail } from '../src/email/templates/registrationReminder1Day';
+import { sendInactivityReminderEmail } from '../src/email/templates/inactivityReminder';
 
 const TEST_EMAIL = process.argv[2] || 'test@example.com';
 
@@ -157,6 +158,20 @@ async function testAllEmails() {
     console.log(result.success ? '   ✅ Sent!' : `   ❌ Failed: ${result.error}`);
   } catch (e: any) {
     results.push({ name: 'Registration Reminder 1-day', success: false, error: e.message });
+    console.log(`   ❌ Error: ${e.message}`);
+  }
+
+  // 10. Inactivity Reminder Email
+  console.log('\n🔟 Testing Inactivity Reminder Email...');
+  try {
+    const result = await sendInactivityReminderEmail({
+      firstName: 'Teszt',
+      email: TEST_EMAIL,
+    });
+    results.push({ name: 'Inactivity Reminder', success: result.success, error: result.error });
+    console.log(result.success ? '   ✅ Sent!' : `   ❌ Failed: ${result.error}`);
+  } catch (e: any) {
+    results.push({ name: 'Inactivity Reminder', success: false, error: e.message });
     console.log(`   ❌ Error: ${e.message}`);
   }
 
