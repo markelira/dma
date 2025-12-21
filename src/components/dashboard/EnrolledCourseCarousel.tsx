@@ -160,7 +160,7 @@ export function EnrolledCourseCarousel({
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+          className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pl-4"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {enrollments.map((enrollment, index) => {

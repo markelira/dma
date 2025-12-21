@@ -220,7 +220,7 @@ export function CarouselSection({
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4 pl-6"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {courses.map((course, index) => (

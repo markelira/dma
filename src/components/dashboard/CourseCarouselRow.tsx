@@ -144,7 +144,7 @@ export function CourseCarouselRow({
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-6"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {courses.map((course, index) => {

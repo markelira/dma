@@ -202,7 +202,7 @@ export function InteractiveCourseSection({ courses, universityName }: Interactiv
               {selectedCategory ? `Kiemelt ${selectedCategory} kurzusok` : 'Kiemelt kurzusok'}
             </h2>
             {isLoading ? (
-              <div className="flex gap-4 overflow-x-auto pb-4">
+              <div className="flex gap-4 overflow-x-auto pb-4 pl-4">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="min-w-[280px]">
                     <CourseSkeletonCard />
@@ -210,7 +210,7 @@ export function InteractiveCourseSection({ courses, universityName }: Interactiv
                 ))}
               </div>
             ) : (
-              <div className="flex gap-4 overflow-x-auto pb-4">
+              <div className="flex gap-4 overflow-x-auto pb-4 pl-4">
                 {featuredCourses.map((course) => (
                   <div key={course.id} className="min-w-[280px]">
                     <CourseCardSmall course={course} />

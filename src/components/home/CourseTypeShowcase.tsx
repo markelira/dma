@@ -196,7 +196,7 @@ export function CourseTypeShowcase({
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+            className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-2 pl-5"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {courses.map((course, index) => (
