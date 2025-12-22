@@ -193,7 +193,7 @@ export function EnrolledCourseCarousel({
         {/* Scrollable Container with Virtualization */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-12"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-4 -my-4"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {enrollments.map((enrollment, index) => {

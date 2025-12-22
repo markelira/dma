@@ -152,6 +152,14 @@ export function CourseCarouselRow({
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
+        {viewAllLink && (
+          <a
+            href={viewAllLink}
+            className="text-sm text-brand-secondary hover:text-brand-secondary/80 font-medium transition-colors"
+          >
+            Összes megtekintése →
+          </a>
+        )}
       </div>
 
       {/* Carousel */}
@@ -181,7 +189,7 @@ export function CourseCarouselRow({
         {/* Scrollable Container with Virtualization */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-12"
+          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-4 -my-4"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {courses.map((course, index) => {
