@@ -7,6 +7,7 @@ import { Toaster } from 'sonner'
 import { AuthProvider } from '@/components/auth-provider'
 import { CookieConsent } from '@/components/CookieConsent'
 import { ConditionalAnalytics } from '@/components/ConditionalAnalytics'
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -51,6 +52,8 @@ export default function RootLayout({
             <CookieConsent />
           </ReactQueryProvider>
         </ErrorBoundary>
+        {/* Vercel Analytics for page views */}
+        <Analytics />
       </body>
     </html>
   )
