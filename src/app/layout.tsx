@@ -16,20 +16,67 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "DMA Masterclass – Struktúraépítő streaming platform",
+  metadataBase: new URL('https://masterclass.dma.hu'),
+  title: {
+    default: "DMA Masterclass – Struktúraépítő streaming platform",
+    template: "%s | DMA Masterclass"
+  },
   description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek.",
   keywords: [
     "online képzés",
-    "magyar egyetemek",
-    "elismert bizonyítvány",
-    "karrier fejlesztés"
+    "vállalkozás fejlesztés",
+    "cégépítés",
+    "üzleti stratégia",
+    "magyar vállalkozók",
+    "masterclass",
+    "streaming platform"
   ],
+  authors: [{ name: "DMA Masterclass" }],
+  creator: "DMA Masterclass",
+  publisher: "DMA Masterclass",
+  formatDetection: {
+    email: false,
+    telephone: false,
+  },
   alternates: {
     canonical: "/",
     languages: {
       hu: "/"
     }
-  }
+  },
+  openGraph: {
+    type: "website",
+    locale: "hu_HU",
+    siteName: "DMA Masterclass",
+    title: "DMA Masterclass – Struktúraépítő streaming platform",
+    description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
+    url: "https://masterclass.dma.hu",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DMA Masterclass",
+      }
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DMA Masterclass – Struktúraépítő streaming platform",
+    description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
 }
 
 export default function RootLayout({
@@ -37,8 +84,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "DMA Masterclass",
+    "url": "https://masterclass.dma.hu",
+    "logo": "https://masterclass.dma.hu/logo.png",
+    "description": "Struktúraépítő streaming platform vállalkozóknak",
+    "sameAs": [
+      "https://www.facebook.com/dmaakademia",
+      "https://www.linkedin.com/company/dma-akademia"
+    ]
+  }
+
   return (
     <html lang="hu" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+      </head>
       {/* Analytics loaded conditionally after cookie consent */}
       <ConditionalAnalytics />
       <body className={`${inter.variable} bg-gray-50 font-sans tracking-tight text-gray-900 antialiased min-h-screen`}>
