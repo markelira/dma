@@ -1,8 +1,13 @@
 'use client';
 
-import { useRef, useState, useEffect, ReactNode } from 'react';
+import { useRef, useState, useEffect, useCallback, ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { PremiumCourseCard } from '@/components/courses/PremiumCourseCard';
+
+// Card width constants for virtualization calculations
+const CARD_WIDTH_DESKTOP = 320;
+const CARD_GAP = 24; // gap-6
+const BUFFER_CARDS = 2; // Render 2 extra cards on each side for smooth scrolling
 
 interface Course {
   id: string;
@@ -36,10 +41,11 @@ interface EnrolledCourseCarouselProps {
     firstLessonId?: string;
     userId?: string;
   }>;
-  courses?: Course[]; // NEW: Full course objects for PremiumCourseCard
+  courses?: Course[]; // Full course objects for PremiumCourseCard
   categories?: Array<{ id: string; name: string }>;
   instructors?: Array<{ id: string; name: string; title?: string; bio?: string; profilePictureUrl?: string }>;
-  userId?: string; // NEW: User ID for enrollment detection
+  userId?: string; // User ID for enrollment detection
+  isSubscribed?: boolean; // Subscription status passed from parent
 }
 
 export function EnrolledCourseCarousel({
@@ -50,12 +56,15 @@ export function EnrolledCourseCarousel({
   categories = [],
   instructors = [],
   userId,
+  isSubscribed = false,
 }: EnrolledCourseCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const visibilityRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  // Virtualization: track which cards are visible
+  const [visibleRange, setVisibleRange] = useState({ start: 0, end: 4 });
 
   // Lazy loading: only render cards when carousel is near viewport
   useEffect(() => {
@@ -75,13 +84,37 @@ export function EnrolledCourseCarousel({
     return () => observer.disconnect();
   }, []);
 
-  const checkScroll = () => {
+  // Calculate visible card range based on scroll position
+  const calculateVisibleRange = useCallback(() => {
+    if (!scrollContainerRef.current) return;
+
+    const container = scrollContainerRef.current;
+    const { scrollLeft, clientWidth } = container;
+
+    // Use desktop card width for calculations
+    const cardWidthWithGap = CARD_WIDTH_DESKTOP + CARD_GAP;
+
+    // Calculate first and last visible card indices
+    const firstVisible = Math.floor(scrollLeft / cardWidthWithGap);
+    const visibleCount = Math.ceil(clientWidth / cardWidthWithGap) + 1;
+    const lastVisible = firstVisible + visibleCount;
+
+    // Add buffer cards on each side for smooth scrolling
+    const start = Math.max(0, firstVisible - BUFFER_CARDS);
+    const end = Math.min(enrollments.length - 1, lastVisible + BUFFER_CARDS);
+
+    setVisibleRange({ start, end });
+  }, [enrollments.length]);
+
+  const checkScroll = useCallback(() => {
     if (scrollContainerRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
       setCanScrollLeft(scrollLeft > 0);
       setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
+      // Also update visible range for virtualization
+      calculateVisibleRange();
     }
-  };
+  }, [calculateVisibleRange]);
 
   useEffect(() => {
     if (!isVisible) return; // Don't set up scroll listeners until visible
@@ -95,7 +128,7 @@ export function EnrolledCourseCarousel({
         window.removeEventListener('resize', checkScroll);
       };
     }
-  }, [enrollments, isVisible]);
+  }, [enrollments, isVisible, checkScroll]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -157,20 +190,41 @@ export function EnrolledCourseCarousel({
           </button>
         )}
 
-        {/* Scrollable Container */}
+        {/* Scrollable Container with Virtualization */}
         <div
           ref={scrollContainerRef}
           className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-12"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {enrollments.map((enrollment, index) => {
+            // Virtualization: only render cards that are in the visible range
+            const isInVisibleRange = index >= visibleRange.start && index <= visibleRange.end;
+
+            // For off-screen cards, render lightweight placeholder to maintain scroll size
+            if (!isInVisibleRange) {
+              return (
+                <div
+                  key={enrollment.id}
+                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[280px]"
+                  style={{ scrollSnapAlign: 'start' }}
+                  aria-hidden="true"
+                />
+              );
+            }
+
             // Find the full course object for this enrollment
             const fullCourse = courses.find(c => c.id === enrollment.courseId);
 
-            // If no course found, skip this enrollment
+            // If no course found, render placeholder
             if (!fullCourse) {
-              console.warn(`[EnrolledCourseCarousel] Course not found for enrollment: ${enrollment.courseId}`);
-              return null;
+              return (
+                <div
+                  key={enrollment.id}
+                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[280px]"
+                  style={{ scrollSnapAlign: 'start' }}
+                  aria-hidden="true"
+                />
+              );
             }
 
             return (
@@ -187,6 +241,8 @@ export function EnrolledCourseCarousel({
                   instructors={instructors}
                   userId={userId || enrollment.userId}
                   index={index}
+                  isSubscribed={isSubscribed}
+                  priority={index < 3}
                 />
               </div>
             );

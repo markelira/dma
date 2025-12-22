@@ -1,17 +1,39 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion } from "motion/react";
-import { BookOpen, Bookmark, BookmarkCheck, Play, Clock, CheckCircle } from "lucide-react";
+import React, { useState, useMemo, useCallback } from 'react';
+import { BookOpen, Bookmark, BookmarkCheck, Play, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { cardStyles, buttonStyles } from "@/lib/design-tokens";
-import { useEnrollmentStatus } from "@/hooks/useEnrollmentStatus";
 import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
-import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 import { toast } from "sonner";
 import { calculateCourseDuration, formatDurationHungarian } from "@/lib/carouselUtils";
+
+// Move utility functions OUTSIDE component to prevent recreation on every render
+const getCourseTypeLabel = (courseType?: string): string | null => {
+  switch (courseType) {
+    case 'ACADEMIA': return 'Akadémia';
+    case 'WEBINAR': return 'Webinár';
+    case 'MASTERCLASS': return 'Masterclass';
+    case 'PODCAST': return 'Podcast';
+    default: return null;
+  }
+};
+
+const getCourseTypeColor = (courseType?: string) => {
+  switch (courseType) {
+    case 'ACADEMIA':
+      return { bg: 'rgba(59, 130, 246, 0.1)', border: 'rgba(59, 130, 246, 0.3)', text: '#3B82F6' };
+    case 'WEBINAR':
+      return { bg: 'rgba(168, 85, 247, 0.1)', border: 'rgba(168, 85, 247, 0.3)', text: '#A855F7' };
+    case 'MASTERCLASS':
+      return { bg: 'rgba(20, 184, 166, 0.1)', border: 'rgba(20, 184, 166, 0.3)', text: '#14B8A6' };
+    case 'PODCAST':
+      return { bg: 'rgba(34, 197, 94, 0.1)', border: 'rgba(34, 197, 94, 0.3)', text: '#22C55E' };
+    default:
+      return { bg: 'rgba(107, 114, 128, 0.1)', border: 'rgba(107, 114, 128, 0.3)', text: '#6B7280' };
+  }
+};
 
 interface Course {
   id: string;
@@ -63,14 +85,16 @@ interface PremiumCourseCardProps {
   index: number;
   categories?: Array<{ id: string; name: string }>;
   instructors?: Instructor[]; // Optional instructors array
-  enrollments?: Enrollment[]; // NEW: Array of enrollments for checking enrollment status
-  enrollment?: Enrollment; // NEW: Explicit enrollment data for this course
-  showProgress?: boolean; // NEW: Force show progress bar
-  userId?: string; // NEW: User ID for enrollment detection
+  enrollments?: Enrollment[]; // Array of enrollments for checking enrollment status
+  enrollment?: Enrollment; // Explicit enrollment data for this course
+  showProgress?: boolean; // Force show progress bar
+  userId?: string; // User ID for enrollment detection
   priority?: boolean; // LCP optimization - prioritize loading for above-fold images
+  isSubscribed?: boolean; // Subscription status passed from parent (performance optimization)
 }
 
-export function PremiumCourseCard({
+// Wrap in React.memo with custom comparison for performance
+export const PremiumCourseCard = React.memo(function PremiumCourseCard({
   course,
   index,
   categories,
@@ -79,12 +103,11 @@ export function PremiumCourseCard({
   enrollment,
   showProgress,
   userId,
-  priority = false
+  priority = false,
+  isSubscribed = false
 }: PremiumCourseCardProps) {
   const router = useRouter();
   const { user } = useAuthStore();
-  const { data: enrollmentStatus } = useEnrollmentStatus(course.id);
-  const { data: subscription } = useSubscriptionStatus();
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
 
@@ -174,23 +197,11 @@ export function PremiumCourseCard({
 
   const durationBadgeText = totalDuration > 0 ? formatDurationBadge(totalDuration) : null;
 
-  // Log when categories are undefined or empty (for debugging)
-  useEffect(() => {
-    if (!categories || categories.length === 0) {
-      console.warn(`[PremiumCourseCard] No categories for course: ${course.title}`, {
-        hasCategories: !!categories,
-        categoriesLength: categories?.length,
-        courseId: course.id,
-        courseCategoryId: course.categoryId,
-        courseCategoryIds: course.categoryIds
-      });
-    }
-  }, [categories, course.title, course.id, course.categoryId, course.categoryIds]);
-
-  const isEnrolled = enrollmentStatus?.isEnrolled ?? false;
+  // Use enrollment data from props instead of per-card API calls
+  const isEnrolled = isEnrolledUniversal || enrollments?.some(e => e.courseId === course.id) || false;
   const isEnrolling = enrollMutation.isPending;
-  const isSubscriber = subscription?.isActive ?? false;
-  const currentLessonId = (enrollmentStatus as any)?.currentLessonId;
+  const isSubscriber = isSubscribed; // Use prop from parent instead of per-card hook
+  const currentLessonId = userEnrollment?.currentLessonId || enrollment?.currentLessonId;
   const hasStarted = currentLessonId || (course.progress && course.progress > 0);
 
   // Handle card click - subscribers with started courses go to player
@@ -220,33 +231,22 @@ export function PremiumCourseCard({
     }
   };
 
-  // Get category display names (supports multiple categories)
-  // Courses store categoryId/categoryIds in Firestore, so we need to map to category names
-  const getCategoryNames = () => {
-    const names: string[] = [];
-
-    // Early return if no categories array provided
-    if (!categories || categories.length === 0) {
-      return [];
-    }
+  // Memoize category names to prevent recalculation on every render
+  const categoryNames = useMemo(() => {
+    if (!categories || categories.length === 0) return [];
 
     // Check for multiple categories first (new system)
     if (course.categoryIds && course.categoryIds.length > 0) {
-      course.categoryIds.forEach(catId => {
-        const cat = categories.find(c => c.id === catId);
-        if (cat && cat.name) {
-          names.push(cat.name);
-        }
-      });
+      const names = course.categoryIds
+        .map(catId => categories.find(c => c.id === catId)?.name)
+        .filter((name): name is string => !!name);
       if (names.length > 0) return names;
     }
 
     // Fallback to single category ID
     if (course.categoryId) {
       const category = categories.find(cat => cat.id === course.categoryId);
-      if (category && category.name) {
-        return [category.name];
-      }
+      if (category?.name) return [category.name];
     }
 
     // Fallback to category string (legacy)
@@ -255,71 +255,14 @@ export function PremiumCourseCard({
     }
 
     return [];
-  };
+  }, [categories, course.categoryIds, course.categoryId, course.category]);
 
-  const getCourseTypeLabel = (courseType?: string) => {
-    switch (courseType) {
-      case 'ACADEMIA':
-        return 'Akadémia';
-      case 'WEBINAR':
-        return 'Webinár';
-      case 'MASTERCLASS':
-        return 'Masterclass';
-      case 'PODCAST':
-        return 'Podcast';
-      default:
-        return null;
-    }
-  };
-
-  const getCourseTypeColor = (courseType?: string) => {
-    switch (courseType) {
-      case 'ACADEMIA':
-        return {
-          bg: 'rgba(59, 130, 246, 0.1)', // blue-500
-          border: 'rgba(59, 130, 246, 0.3)',
-          text: '#3B82F6'
-        };
-      case 'WEBINAR':
-        return {
-          bg: 'rgba(168, 85, 247, 0.1)', // purple-500
-          border: 'rgba(168, 85, 247, 0.3)',
-          text: '#A855F7'
-        };
-      case 'MASTERCLASS':
-        return {
-          bg: 'rgba(20, 184, 166, 0.1)', // teal-500
-          border: 'rgba(20, 184, 166, 0.3)',
-          text: '#14B8A6'
-        };
-      case 'PODCAST':
-        return {
-          bg: 'rgba(34, 197, 94, 0.1)', // green-500
-          border: 'rgba(34, 197, 94, 0.3)',
-          text: '#22C55E'
-        };
-      default:
-        return {
-          bg: 'rgba(107, 114, 128, 0.1)',
-          border: 'rgba(107, 114, 128, 0.3)',
-          text: '#6B7280'
-        };
-    }
-  };
-
+  // Use module-level utility functions (no recreation per render)
   const courseTypeColors = getCourseTypeColor(course.courseType);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{
-        duration: 0.5,
-        delay: index * 0.05, // Stagger effect
-        ease: [0.16, 1, 0.3, 1]
-      }}
-      className="origin-center overflow-visible"
-    >
+    // Removed Framer Motion animation for performance - using CSS transitions only
+    <div className="origin-center overflow-visible">
       <div className="overflow-visible">
         <div
           className="bg-white border border-gray-200 hover:border-gray-300 rounded-xl shadow-lg hover:shadow-xl hover:scale-105 h-full flex flex-col group cursor-pointer transition-all duration-300 overflow-hidden"
@@ -435,7 +378,7 @@ export function PremiumCourseCard({
 
           {/* Category Badges - Left Aligned */}
           <div className="flex items-center gap-2 flex-wrap">
-            {getCategoryNames().map((catName, idx) => (
+            {categoryNames.map((catName, idx) => (
               <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary">
                 {catName}
               </div>
@@ -444,6 +387,16 @@ export function PremiumCourseCard({
         </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  // Only re-render if essential props changed
+  return (
+    prevProps.course.id === nextProps.course.id &&
+    prevProps.course.progress === nextProps.course.progress &&
+    prevProps.enrollment?.progress === nextProps.enrollment?.progress &&
+    prevProps.isSubscribed === nextProps.isSubscribed &&
+    prevProps.priority === nextProps.priority
+  );
+});

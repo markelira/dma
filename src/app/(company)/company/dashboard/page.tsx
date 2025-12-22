@@ -15,9 +15,13 @@ import { useCourses } from '@/hooks/useCourseQueries';
 import { useCategories } from '@/hooks/useCategoryQueries';
 import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
+import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import type { Course } from '@/types';
 import { shuffleArray } from '@/lib/utils';
 import { sortByContentCreatedAt } from '@/lib/carouselUtils';
+
+// Performance: Max cards per carousel (reduced from 10)
+const MAX_CAROUSEL_CARDS = 6;
 
 /**
  * Company Dashboard - Netflix-Style Content Browser
@@ -38,6 +42,9 @@ export default function CompanyDashboardPage() {
   const { data: categories, isLoading: categoriesLoading } = useCategories();
   const { data: targetAudiences, isLoading: audiencesLoading } = useTargetAudiences();
   const { data: instructors, isLoading: instructorsLoading } = useInstructors();
+  // Performance: Lift subscription check to page level (was per-card before)
+  const { data: subscriptionData } = useSubscriptionStatus();
+  const isSubscribed = subscriptionData?.isActive ?? false;
 
   // Filter state
   const [filters, setFilters] = useState<DashboardFilters>({
@@ -220,13 +227,13 @@ export default function CompanyDashboardPage() {
   // Always prepare a "Felkapott" section with courses (fully shuffled for variety)
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return shuffleArray([...filteredCourses]).slice(0, 10);
+    return shuffleArray([...filteredCourses]).slice(0, MAX_CAROUSEL_CARDS);
   }, [filteredCourses]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
-    return sortByContentCreatedAt(filteredCourses).slice(0, 10);
+    return sortByContentCreatedAt(filteredCourses).slice(0, MAX_CAROUSEL_CARDS);
   }, [filteredCourses]);
 
   // Check if we need to show a fallback "Felfedezés" section
@@ -318,6 +325,7 @@ export default function CompanyDashboardPage() {
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
           viewAllLink="/company/dashboard/courses"
         />
       )}
@@ -330,6 +338,7 @@ export default function CompanyDashboardPage() {
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
         />
       )}
 
@@ -341,6 +350,7 @@ export default function CompanyDashboardPage() {
           courses={courses || []}
           categories={categories || []}
           instructors={instructors || []}
+          isSubscribed={isSubscribed}
         />
       )}
 
@@ -349,10 +359,11 @@ export default function CompanyDashboardPage() {
         <CourseCarouselRow
           key={category.id}
           title={category.name}
-          courses={categoryCourses}
+          courses={categoryCourses.slice(0, MAX_CAROUSEL_CARDS)}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
           viewAllLink={`/company/dashboard/courses?category=${category.id}`}
         />
       ))}
@@ -361,10 +372,11 @@ export default function CompanyDashboardPage() {
       {showFallbackSection && filteredCourses.length > 0 && (
         <CourseCarouselRow
           title="Felfedezés"
-          courses={filteredCourses}
+          courses={filteredCourses.slice(0, MAX_CAROUSEL_CARDS)}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
           viewAllLink="/company/dashboard/courses"
         />
       )}
@@ -374,10 +386,11 @@ export default function CompanyDashboardPage() {
         <CourseCarouselRow
           key={audience.id}
           title={audience.name}
-          courses={audienceCourses}
+          courses={audienceCourses.slice(0, MAX_CAROUSEL_CARDS)}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
           viewAllLink={`/company/dashboard/courses?audience=${audience.id}`}
         />
       ))}
@@ -387,10 +400,11 @@ export default function CompanyDashboardPage() {
         <CourseCarouselRow
           key={type}
           title={label}
-          courses={typeCourses}
+          courses={typeCourses.slice(0, MAX_CAROUSEL_CARDS)}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}
+          isSubscribed={isSubscribed}
           viewAllLink={`/company/dashboard/${type.toLowerCase()}`}
         />
       ))}
