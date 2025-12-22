@@ -237,7 +237,7 @@ export default function PodcastPage() {
           {/* Popular podcasts */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Felkapott podcast tartalmak"
+              title="Felkapott Podcastok"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}
@@ -248,7 +248,7 @@ export default function PodcastPage() {
           {/* Newest podcasts */}
           {newestCourses.length > 0 && (
             <CourseCarouselRow
-              title="Legújabb podcast tartalmak"
+              title="Legújabb Podcastok"
               courses={newestCourses}
               categories={categories || []}
               instructors={instructors || []}

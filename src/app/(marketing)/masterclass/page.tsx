@@ -237,7 +237,7 @@ export default function MasterclassPage() {
           {/* Popular masterclasses */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Felkapott masterclass tartalmak"
+              title="Felkapott Masterclassok"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}
@@ -248,7 +248,7 @@ export default function MasterclassPage() {
           {/* Newest masterclasses */}
           {newestCourses.length > 0 && (
             <CourseCarouselRow
-              title="Legújabb masterclass tartalmak"
+              title="Legújabb Masterclassok"
               courses={newestCourses}
               categories={categories || []}
               instructors={instructors || []}

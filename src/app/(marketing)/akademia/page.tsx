@@ -237,7 +237,7 @@ export default function AkademiaPage() {
           {/* Popular academias */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Felkapott akadémia tartalmak"
+              title="Felkapott Akadémiák"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}
@@ -248,7 +248,7 @@ export default function AkademiaPage() {
           {/* Newest academias */}
           {newestCourses.length > 0 && (
             <CourseCarouselRow
-              title="Legújabb akadémia tartalmak"
+              title="Legújabb Akadémiák"
               courses={newestCourses}
               categories={categories || []}
               instructors={instructors || []}

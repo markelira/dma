@@ -237,7 +237,7 @@ export default function WebinarPage() {
           {/* Popular webinars */}
           {popularCourses.length > 0 && (
             <CourseCarouselRow
-              title="Felkapott webinár tartalmak"
+              title="Felkapott Webinárok"
               courses={popularCourses}
               categories={categories || []}
               instructors={instructors || []}
@@ -248,7 +248,7 @@ export default function WebinarPage() {
           {/* Newest webinars */}
           {newestCourses.length > 0 && (
             <CourseCarouselRow
-              title="Legújabb webinár tartalmak"
+              title="Legújabb Webinárok"
               courses={newestCourses}
               categories={categories || []}
               instructors={instructors || []}
