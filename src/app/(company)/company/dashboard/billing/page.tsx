@@ -385,7 +385,7 @@ export default function CompanyBillingPage() {
               </h3>
             </div>
             <p className="text-gray-600 mb-6">
-              Indítson el egy vállalati előfizetést az összes tartalomhoz való hozzáféréshez
+              Kezdj bele a kalandba és indítsd el Masterclass előfizetésed
             </p>
 
             {/* Benefits list - what they will get */}

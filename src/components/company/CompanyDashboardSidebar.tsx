@@ -51,7 +51,7 @@ const navigationSections = [
     title: 'EGYÉB',
     items: [
       { title: 'Munkatársaim', href: '/company/dashboard/employees', icon: Users },
-      { title: 'Számlázás', href: '/company/dashboard/billing', icon: CreditCard },
+      { title: 'Számláim', href: '/company/dashboard/billing', icon: CreditCard },
       { title: 'Beállítások', href: '/company/dashboard/settings', icon: Settings },
     ]
   }
