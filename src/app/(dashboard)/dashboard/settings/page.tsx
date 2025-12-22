@@ -77,7 +77,6 @@ export default function SettingsPage() {
       await updateDoc(doc(db, 'users', user.uid), {
         firstName,
         lastName,
-        phone,
         updatedAt: new Date().toISOString()
       })
 
@@ -190,10 +189,10 @@ export default function SettingsPage() {
                   id="phone"
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+36 30 123 4567"
-                  className="h-10 bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-brand-secondary focus:ring-brand-secondary"
+                  disabled
+                  className="h-10 bg-gray-100 border-gray-200 cursor-not-allowed text-gray-500"
                 />
+                <p className="text-xs text-gray-500 mt-1.5">A telefonszám nem módosítható</p>
               </div>
             </div>
 
