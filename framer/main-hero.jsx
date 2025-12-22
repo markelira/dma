@@ -1059,7 +1059,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 												}}
 											>
 												{
-													"Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek."
+													"Fedezz fel több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek."
 												}
 											</motion.p>
 										</React.Fragment>

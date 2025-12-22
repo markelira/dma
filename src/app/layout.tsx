@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     default: "DMA Masterclass – Struktúraépítő streaming platform",
     template: "%s | DMA Masterclass"
   },
-  description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek.",
+  description: "Fedezz fel több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen. Zéró bullshit, csak azonnal alkalmazható és működő rendszerek.",
   keywords: [
     "online képzés",
     "vállalkozás fejlesztés",
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     locale: "hu_HU",
     siteName: "DMA Masterclass",
     title: "DMA Masterclass – Struktúraépítő streaming platform",
-    description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
+    description: "Fedezz fel több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
     url: "https://masterclass.dma.hu",
     images: [
       {
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "DMA Masterclass – Struktúraépítő streaming platform",
-    description: "Fedezz fel a több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
+    description: "Fedezz fel több mint 150 cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.",
     images: ["/og-image.png"],
   },
   robots: {
