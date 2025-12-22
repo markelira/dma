@@ -242,7 +242,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                     // Construct name from firstName + lastName if displayName is not set
                     const firstName = userData?.firstName || '';
                     const lastName = userData?.lastName || '';
-                    const fullName = `${firstName} ${lastName}`.trim();
+                    const fullName = `${lastName} ${firstName}`.trim();
                     usersData.set(userDoc.id, {
                         displayName: userData?.displayName || fullName || userData?.email || 'Unknown User',
                         email: userData?.email || '',
@@ -261,7 +261,7 @@ exports.getCompanyDashboard = v2_1.https.onCall({
                 employeesDataMap.set(data.userId, {
                     jobTitle: data.jobTitle,
                     employeeId: doc.id,
-                    fullName: data.fullName || `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+                    fullName: data.fullName || `${data.lastName || ''} ${data.firstName || ''}`.trim(),
                 });
             }
         });

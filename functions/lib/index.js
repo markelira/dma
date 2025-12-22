@@ -340,7 +340,6 @@ exports.requestPasswordReset = (0, https_1.onCall)({
       ${(0, base_1.createHeading)(`Szia ${firstName}!`, 2)}
       ${(0, base_1.createParagraph)('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
       ${(0, base_1.createButtonRow)({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetLink, variant: 'primary' })}
-      ${(0, base_1.createAlertBox)('⏱️ Fontos: Ez a link 1 óráig érvényes biztonsági okokból.', 'warning')}
       ${(0, base_1.createParagraph)('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
     `;
         const htmlContent = (0, base_1.wrapInBaseTemplate)(emailContent, {
@@ -351,7 +350,6 @@ exports.requestPasswordReset = (0, https_1.onCall)({
             greeting: `Szia ${firstName}!`,
             paragraphs: [
                 'Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát.',
-                'Fontos: Ez a link 1 óráig érvényes biztonsági okokból.',
                 'Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt.',
             ],
             ctaText: 'ÚJ JELSZÓ BEÁLLÍTÁSA',

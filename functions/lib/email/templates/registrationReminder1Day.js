@@ -13,7 +13,7 @@ const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
  */
 async function sendRegistrationReminder1DayEmail(data) {
     const { email } = data;
-    const subject = 'RE: Üdv a Struktúraépítők között - DMA Masterclass';
+    const subject = 'Tegnap regisztráltál - ideje belevágni! - DMA Masterclass';
     const content = `
     ${(0, base_1.createHeading)('Hé Struktúraépítő!', 2)}
     ${(0, base_1.createParagraph)('Regisztrációdkor azt gondoltuk, hogy tényleg belevágsz életed kalandjába. Most viszont szomorúan látjuk, hogy még nem kezdtél bele.')}

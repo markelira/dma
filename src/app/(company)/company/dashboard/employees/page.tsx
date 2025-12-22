@@ -107,7 +107,7 @@ export default function EmployeesPage() {
 
         const employeesList: CompanyEmployee[] = employeesSnapshot.docs.map(doc => ({
           id: doc.id,
-          fullName: `${doc.data().firstName} ${doc.data().lastName}`,
+          fullName: `${doc.data().lastName} ${doc.data().firstName}`,
           ...doc.data() as Omit<CompanyEmployee, 'id' | 'fullName'>
         }));
 
@@ -179,7 +179,7 @@ export default function EmployeesPage() {
 
       const moreEmployees: CompanyEmployee[] = employeesSnapshot.docs.map(doc => ({
         id: doc.id,
-        fullName: `${doc.data().firstName} ${doc.data().lastName}`,
+        fullName: `${doc.data().lastName} ${doc.data().firstName}`,
         ...doc.data() as Omit<CompanyEmployee, 'id' | 'fullName'>
       }));
 
@@ -244,7 +244,7 @@ export default function EmployeesPage() {
 
         const employeesList: CompanyEmployee[] = employeesSnapshot.docs.map(doc => ({
           id: doc.id,
-          fullName: `${doc.data().firstName} ${doc.data().lastName}`,
+          fullName: `${doc.data().lastName} ${doc.data().firstName}`,
           ...doc.data() as Omit<CompanyEmployee, 'id' | 'fullName'>
         }));
 
@@ -308,17 +308,23 @@ export default function EmployeesPage() {
     return Array.from(seen.values());
   }, [progressEmployees]);
 
+  // Filter progress by selected employee first
+  const employeeFilteredProgress = useMemo(() => {
+    if (selectedEmployee === 'all') return progressEmployees;
+    return progressEmployees.filter(e => e.employeeId === selectedEmployee);
+  }, [progressEmployees, selectedEmployee]);
+
   // "Folyamatban" - exclude 0% progress (those go to "Saját listán")
-  const inProgressCount = progressEmployees.filter(e =>
+  const inProgressCount = employeeFilteredProgress.filter(e =>
     (e.status === 'active' || e.status === 'at-risk' || e.status === 'in-progress') && e.progressPercent > 0
   ).length;
 
   // "Saját listán" - enrolled with 0% progress (not started yet)
-  const notStartedCount = progressEmployees.filter(e =>
+  const notStartedCount = employeeFilteredProgress.filter(e =>
     e.progressPercent === 0 && e.status !== 'completed' && e.status !== 'watchlist'
   ).length;
 
-  const completedCount = progressEmployees.filter(e => e.status === 'completed').length;
+  const completedCount = employeeFilteredProgress.filter(e => e.status === 'completed').length;
 
   // Filtered progress data
   const filteredProgressData = useMemo(() => {
