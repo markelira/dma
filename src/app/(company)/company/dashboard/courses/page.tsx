@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import { db, functions as fbFunctions } from '@/lib/firebase';
 import { collection, query, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
@@ -63,6 +63,7 @@ interface Course {
 
 export default function CompanyCoursesPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isLoading: authLoading, authReady } = useAuthStore();
   const [company, setCompany] = useState<Company | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -70,8 +71,23 @@ export default function CompanyCoursesPage() {
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
   const [searchInput, setSearchInput] = useState('');
   const [selectedType, setSelectedType] = useState<string>('ALL');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [selectedAudienceId, setSelectedAudienceId] = useState<string | null>(null);
   const { data: instructors = [] } = useInstructors();
   const { data: enrollments = [] } = useEnrollments();
+
+  // Read URL params on mount
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    const audienceParam = searchParams.get('audience');
+    const typeParam = searchParams.get('type');
+
+    if (categoryParam) setSelectedCategoryId(categoryParam);
+    if (audienceParam) setSelectedAudienceId(audienceParam);
+    if (typeParam && Object.keys(COURSE_TYPE_LABELS).includes(typeParam.toUpperCase())) {
+      setSelectedType(typeParam.toUpperCase());
+    }
+  }, [searchParams]);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -143,13 +159,28 @@ export default function CompanyCoursesPage() {
     return () => unsubscribe();
   }, []);
 
-  // Filter courses by type and search
+  // Filter courses by type, category, and search
   const filteredCourses = useMemo(() => {
     let filtered = courses;
 
     // Filter by type
     if (selectedType !== 'ALL') {
       filtered = filtered.filter(c => c.courseType === selectedType);
+    }
+
+    // Filter by category (from URL param)
+    if (selectedCategoryId) {
+      filtered = filtered.filter(c =>
+        c.categoryId === selectedCategoryId ||
+        (c as any).categoryIds?.includes(selectedCategoryId)
+      );
+    }
+
+    // Filter by audience (from URL param)
+    if (selectedAudienceId) {
+      filtered = filtered.filter(c =>
+        (c as any).targetAudienceIds?.includes(selectedAudienceId)
+      );
     }
 
     // Filter by search
@@ -162,7 +193,7 @@ export default function CompanyCoursesPage() {
     }
 
     return filtered;
-  }, [courses, selectedType, searchInput]);
+  }, [courses, selectedType, selectedCategoryId, selectedAudienceId, searchInput]);
 
   // Stats
   const stats = useMemo(() => {
@@ -247,10 +278,27 @@ export default function CompanyCoursesPage() {
       </div>
 
       {/* Results Count */}
-      <div className="text-sm text-gray-500">
-        {filteredCourses.length} tartalom található
-        {searchInput && ` "${searchInput}" kifejezésre`}
-        {selectedType !== 'ALL' && ` - ${COURSE_TYPE_LABELS[selectedType]}`}
+      <div className="flex items-center justify-between text-sm text-gray-500">
+        <div>
+          {filteredCourses.length} tartalom található
+          {searchInput && ` "${searchInput}" kifejezésre`}
+          {selectedType !== 'ALL' && ` - ${COURSE_TYPE_LABELS[selectedType]}`}
+          {selectedCategoryId && categories.length > 0 && (
+            <span> - {categories.find(c => c.id === selectedCategoryId)?.name || 'Kategória'}</span>
+          )}
+        </div>
+        {(selectedCategoryId || selectedAudienceId) && (
+          <button
+            onClick={() => {
+              setSelectedCategoryId(null);
+              setSelectedAudienceId(null);
+              router.push('/company/dashboard/courses');
+            }}
+            className="text-brand-secondary hover:text-brand-secondary/80 font-medium"
+          >
+            Szűrő törlése
+          </button>
+        )}
       </div>
 
       {/* Courses Grid */}
