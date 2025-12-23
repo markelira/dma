@@ -347,7 +347,6 @@ export const requestPasswordReset = onCall({
       ${createHeading(`Szia ${firstName}!`, 2)}
       ${createParagraph('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
       ${createButtonRow({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetLink, variant: 'primary' })}
-      ${createAlertBox('⏱️ Fontos: Ez a link 1 óráig érvényes biztonsági okokból.', 'warning')}
       ${createParagraph('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
     `;
 
@@ -360,7 +359,6 @@ export const requestPasswordReset = onCall({
       greeting: `Szia ${firstName}!`,
       paragraphs: [
         'Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát.',
-        'Fontos: Ez a link 1 óráig érvényes biztonsági okokból.',
         'Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt.',
       ],
       ctaText: 'ÚJ JELSZÓ BEÁLLÍTÁSA',
@@ -1609,6 +1607,11 @@ export { enrollEmployeesInMasterclass } from './company/enrollEmployees';
 export { createCompanyMasterclass } from './company/createMasterclass';
 export { completeCompanyOnboarding } from './company/completeOnboarding';
 export { completeUnifiedRegistration } from './company/completeUnifiedRegistration';
+
+// ============================================
+// PENDING REGISTRATION (Recovery/Persistence)
+// ============================================
+export { savePendingRegistration, getPendingRegistration, cleanupPendingRegistrations } from './registration';
 export {
   assignEmployeeToMasterclass,
   unassignEmployeeFromMasterclass,
@@ -2259,6 +2262,10 @@ export {
 export {
   createCustomer,
 } from './payment/createCustomer';
+
+export {
+  verifyStripePayment,
+} from './payment/verifyStripePayment';
 
 // ============================================
 // STRIPE WEBHOOK

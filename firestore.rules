@@ -347,6 +347,17 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Pending Registrations: For registration state persistence and recovery
+    // Cloud Functions handle all writes (Admin SDK bypasses rules)
+    // Users can read their own pending registration for client-side recovery checks
+    match /pendingRegistrations/{userId} {
+      // Users can only read their own pending registration
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      // All writes go through Cloud Functions (savePendingRegistration, cleanup)
+      // Block client-side writes for security
+      allow write: if false;
+    }
+
     // SECURITY: Deny-by-default fallback
     // Any collection not explicitly defined above is denied access
     // Add new collection rules ABOVE this fallback, not below

@@ -56,6 +56,103 @@ const subscriptionCanceled_1 = require("../email/templates/subscriptionCanceled"
 const paymentSuccess_1 = require("../email/templates/paymentSuccess");
 const paymentFailed_1 = require("../email/templates/paymentFailed");
 const firestore = admin.firestore();
+// Import internal registration helper for fallback completion
+const completeRegistrationInternal_1 = require("../company/completeRegistrationInternal");
+// Import employee invitation email sender
+const employeeInvite_1 = require("../company/employeeInvite");
+/**
+ * Check for pending registration and complete if needed (fallback)
+ * This handles the case where frontend failed to call completeUnifiedRegistration
+ */
+async function checkAndCompletePendingRegistration(userId) {
+    try {
+        // Check if user already has a company (registration already complete)
+        const userDoc = await firestore.collection('users').doc(userId).get();
+        if (userDoc.exists && userDoc.data()?.companyId) {
+            v2_1.logger.info('[checkAndCompletePendingRegistration] User already has company, skipping');
+            return;
+        }
+        // Check for pending registration
+        const pendingDoc = await firestore.collection('pendingRegistrations').doc(userId).get();
+        if (!pendingDoc.exists) {
+            v2_1.logger.info('[checkAndCompletePendingRegistration] No pending registration found');
+            return;
+        }
+        const pendingData = pendingDoc.data();
+        v2_1.logger.info('[checkAndCompletePendingRegistration] Found pending registration, completing...', {
+            userId,
+            step: pendingData.currentStep
+        });
+        // Complete the registration using internal helper
+        const result = await (0, completeRegistrationInternal_1.completeRegistrationInternal)({
+            userId,
+            firstName: pendingData.firstName,
+            lastName: pendingData.lastName,
+            email: pendingData.email,
+            phone: pendingData.phone,
+            companyName: pendingData.companyName
+        });
+        if (result.success && !result.alreadyRegistered) {
+            v2_1.logger.info('[checkAndCompletePendingRegistration] Registration completed via webhook fallback', {
+                userId,
+                companyId: result.companyId
+            });
+            // Send employee invites if any
+            if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
+                v2_1.logger.info('[checkAndCompletePendingRegistration] Sending employee invites:', pendingData.pendingEmployees.length);
+                // Get company name for invite emails
+                const companyDoc = await firestore.collection('companies').doc(result.companyId).get();
+                const companyName = companyDoc.data()?.name || 'DMA';
+                const baseUrl = process.env.APP_URL || 'https://masterclass.dma.hu';
+                for (const employee of pendingData.pendingEmployees) {
+                    try {
+                        // Use direct Firestore operations for employee invite (since addEmployee is a Cloud Function)
+                        const employeeRef = firestore.collection('companies').doc(result.companyId).collection('employees').doc();
+                        const inviteToken = `inv_${employeeRef.id}_${Date.now()}`;
+                        await employeeRef.set({
+                            companyId: result.companyId,
+                            email: employee.email.toLowerCase(),
+                            firstName: employee.firstName,
+                            lastName: employee.lastName,
+                            fullName: `${employee.firstName} ${employee.lastName}`,
+                            status: 'invited',
+                            invitedBy: userId,
+                            invitedAt: admin.firestore.FieldValue.serverTimestamp(),
+                            inviteToken,
+                            inviteExpiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + 7 * 24 * 60 * 60 * 1000),
+                            enrolledMasterclasses: [],
+                        });
+                        v2_1.logger.info(`[checkAndCompletePendingRegistration] Employee invite created: ${employee.email}`);
+                        // Send invitation email
+                        const inviteUrl = `${baseUrl}/register?invite=${inviteToken}&email=${encodeURIComponent(employee.email.toLowerCase())}`;
+                        try {
+                            await (0, employeeInvite_1.sendInvitationEmail)(employee.email.toLowerCase(), {
+                                firstName: employee.firstName,
+                                companyName,
+                                inviteUrl,
+                            });
+                            v2_1.logger.info(`[checkAndCompletePendingRegistration] Invitation email sent to: ${employee.email}`);
+                        }
+                        catch (emailError) {
+                            v2_1.logger.error(`[checkAndCompletePendingRegistration] Failed to send email to ${employee.email}:`, emailError.message);
+                            // Don't throw - invite was created successfully
+                        }
+                    }
+                    catch (inviteError) {
+                        v2_1.logger.error(`[checkAndCompletePendingRegistration] Failed to invite ${employee.email}:`, inviteError.message);
+                    }
+                }
+            }
+            // Clean up pending registration
+            await pendingDoc.ref.delete();
+            v2_1.logger.info('[checkAndCompletePendingRegistration] Cleaned up pending registration');
+        }
+    }
+    catch (error) {
+        v2_1.logger.error('[checkAndCompletePendingRegistration] Error:', error.message);
+        // Don't throw - this is a fallback, don't fail the webhook
+    }
+}
 // Lazy Stripe initialization - will be initialized on first request
 let stripe = null;
 let stripeWebhookSecret = null;
@@ -321,6 +418,9 @@ async function handleSubscriptionCheckout(session, stripe) {
                 subscriptionId,
             });
         }
+        // FALLBACK: Check if user has pending registration and complete if needed
+        // This handles edge cases where frontend failed to call completeUnifiedRegistration
+        await checkAndCompletePendingRegistration(userId);
     }
     catch (error) {
         v2_1.logger.error('[handleSubscriptionCheckout] Error:', error);
@@ -334,6 +434,19 @@ async function handleSubscriptionCheckout(session, stripe) {
 async function handleIndividualSubscription(params) {
     const { userId, customerId, subscriptionId, subscriptionStatus, priceId, subscriptionPlan, startDate, endDate, trialEndDate, } = params;
     try {
+        // IDEMPOTENCY CHECK: Skip if subscription already exists
+        const existingSubscription = await firestore
+            .collection('subscriptions')
+            .where('stripeSubscriptionId', '==', subscriptionId)
+            .limit(1)
+            .get();
+        if (!existingSubscription.empty) {
+            v2_1.logger.info('[handleIndividualSubscription] Subscription already exists, skipping (idempotent)', {
+                subscriptionId,
+                userId
+            });
+            return;
+        }
         // Create subscription document
         await firestore.collection('subscriptions').add({
             userId,
@@ -400,6 +513,20 @@ async function handleIndividualSubscription(params) {
 async function handleCompanySubscription(params) {
     const { userId, companyId, customerId, subscriptionId, subscriptionStatus, priceId, subscriptionPlan, startDate, endDate, trialEndDate, } = params;
     try {
+        // IDEMPOTENCY CHECK: Skip if subscription already exists
+        const existingSubscription = await firestore
+            .collection('subscriptions')
+            .where('stripeSubscriptionId', '==', subscriptionId)
+            .limit(1)
+            .get();
+        if (!existingSubscription.empty) {
+            v2_1.logger.info('[handleCompanySubscription] Subscription already exists, skipping (idempotent)', {
+                subscriptionId,
+                companyId,
+                userId
+            });
+            return;
+        }
         // Verify company exists
         const companyDoc = await firestore.collection('companies').doc(companyId).get();
         if (!companyDoc.exists) {

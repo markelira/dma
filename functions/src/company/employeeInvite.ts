@@ -321,17 +321,6 @@ export const acceptEmployeeInvite = https.onCall(
     const userId = request.auth.uid;
     const userEmail = request.auth.token.email;
 
-    // SECURITY: Require email verification before accepting company invite
-    const userDoc = await db.collection('users').doc(userId).get();
-    const userData = userDoc.data();
-    if (userData?.emailVerified !== true) {
-      console.log('❌ [acceptEmployeeInvite] Email not verified - rejecting');
-      throw new HttpsError(
-        'failed-precondition',
-        'Az email címed nincs még megerősítve. Kérjük, erősítsd meg az email címedet a meghívó elfogadása előtt.'
-      );
-    }
-
     if (!token) {
       console.log('❌ [acceptEmployeeInvite] No token provided');
       throw new HttpsError(

@@ -36,9 +36,11 @@ function getStripeInstance(): Stripe {
 const CreateCheckoutSessionSchema = z.object({
   priceId: z.string().min(1), // Stripe price ID for subscriptions
   courseId: z.string().optional(), // For course purchases
-  successUrl: z.string().url(),
-  cancelUrl: z.string().url(),
+  successUrl: z.string().url().optional(), // Required for hosted mode
+  cancelUrl: z.string().url().optional(), // Required for hosted mode
+  returnUrl: z.string().url().optional(), // Required for embedded mode
   mode: z.enum(['payment', 'subscription']).default('subscription'),
+  uiMode: z.enum(['hosted', 'embedded']).default('hosted'), // Embedded checkout support
   metadata: z.record(z.string()).optional()
 });
 
@@ -80,12 +82,6 @@ export const createCheckoutSession = onCall({
       throw new Error('Felhasználói adatok nem találhatók');
     }
 
-    // SECURITY: Require email verification before subscription
-    if (userData.emailVerified !== true) {
-      logger.warn(`User ${userId} attempted checkout without email verification`);
-      throw new Error('Az email címed nincs még megerősítve. Kérjük, erősítsd meg az email címedet a fizetés előtt.');
-    }
-
     // Get or create Stripe customer
     let stripeCustomerId = userData.stripeCustomerId;
 
@@ -121,14 +117,28 @@ export const createCheckoutSession = onCall({
       isTeamOwner: userData.isTeamOwner,
     });
 
+    // Validate URL requirements based on uiMode
+    const isEmbeddedMode = validatedData.uiMode === 'embedded';
+    if (isEmbeddedMode && !validatedData.returnUrl) {
+      throw new Error('returnUrl is required for embedded checkout mode');
+    }
+    if (!isEmbeddedMode && (!validatedData.successUrl || !validatedData.cancelUrl)) {
+      throw new Error('successUrl and cancelUrl are required for hosted checkout mode');
+    }
+
     // Prepare session parameters
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer: stripeCustomerId,
       payment_method_types: ['card'],
       mode: validatedData.mode,
-      success_url: validatedData.successUrl,
-      cancel_url: validatedData.cancelUrl,
       locale: 'hu',
+      // UI mode: 'hosted' (redirect) or 'embedded' (iframe)
+      ui_mode: isEmbeddedMode ? 'embedded' : 'hosted',
+      // URL configuration based on mode
+      ...(isEmbeddedMode
+        ? { return_url: validatedData.returnUrl }
+        : { success_url: validatedData.successUrl, cancel_url: validatedData.cancelUrl }
+      ),
 
       // Collect billing addresses (required)
       billing_address_collection: 'required',
@@ -244,13 +254,15 @@ export const createCheckoutSession = onCall({
       createdAt: new Date().toISOString()
     });
 
-    logger.info(`Checkout session created: ${session.id}`);
+    logger.info(`Checkout session created: ${session.id}, ui_mode: ${validatedData.uiMode}`);
 
     const response = {
       success: true,
       data: {
         sessionId: session.id,
-        url: session.url
+        url: session.url, // For hosted mode redirect
+        clientSecret: session.client_secret, // For embedded mode
+        uiMode: validatedData.uiMode
       }
     };
 
@@ -259,9 +271,9 @@ export const createCheckoutSession = onCall({
       hasSuccess: 'success' in response,
       successValue: response.success,
       hasData: 'data' in response,
-      dataValue: response.data,
+      uiMode: response.data?.uiMode,
       hasUrl: response.data && 'url' in response.data,
-      urlValue: response.data?.url
+      hasClientSecret: response.data && 'clientSecret' in response.data
     });
 
     return response;

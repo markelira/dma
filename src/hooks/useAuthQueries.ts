@@ -132,13 +132,6 @@ export function useLogin() {
           allFields: Object.keys(userData)
         })
         
-        // Check if email is verified
-        if (userData.emailVerified === false) {
-          // Sign out the user if email is not verified
-          await auth.signOut()
-          throw new Error('Kérjük, először erősítse meg email címét a bejelentkezéshez.')
-        }
-        
         const userObject = {
           id: userCredential.user.uid,
           uid: userCredential.user.uid,

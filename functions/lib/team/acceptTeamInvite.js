@@ -61,13 +61,6 @@ exports.acceptTeamInvite = (0, https_1.onCall)({
         const { inviteToken } = request.data;
         const userId = request.auth.uid;
         v2_1.logger.info('[acceptTeamInvite] Accepting invite', { userId, inviteToken });
-        // 1b. SECURITY: Require email verification before accepting team invite
-        const verificationDoc = await firestore.collection('users').doc(userId).get();
-        const verificationData = verificationDoc.data();
-        if (verificationData?.emailVerified !== true) {
-            v2_1.logger.warn(`User ${userId} attempted to accept team invite without email verification`);
-            throw new https_1.HttpsError('failed-precondition', 'Az email címed nincs még megerősítve. Kérjük, erősítsd meg az email címedet a meghívó elfogadása előtt.');
-        }
         // 2. Validate input
         if (!inviteToken) {
             throw new https_1.HttpsError('invalid-argument', 'Meghívó token szükséges');

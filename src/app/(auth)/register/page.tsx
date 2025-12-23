@@ -1,49 +1,23 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth, AuthProvider } from '@/contexts/AuthContext';
-import { UnifiedRegisterForm } from '@/components/auth/UnifiedRegisterForm';
-import { EmailVerificationModal } from '@/components/auth/EmailVerificationModal';
+import { UnifiedRegisterForm, ValuePropositionSection } from '@/components/auth/UnifiedRegisterForm';
 import { httpsCallable } from 'firebase/functions';
 import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
-import { Building2 } from 'lucide-react';
-import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
-import { getDashboardPath } from '@/lib/routing';
-import { updateAuthStoreFromFirebase } from '@/lib/updateAuthStore';
+import Footer from '@/components/landing-home/ui/footer';
+import { Loader2 } from 'lucide-react';
 
-interface UnifiedRegistrationInput {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  companyName: string;
-  billingEmail: string;
-  industry?: string;
-  companySize?: string;
-}
-
-interface UnifiedRegistrationResponse {
-  success: boolean;
-  companyId: string;
-  userId: string;
-  linkedToInvite?: boolean;
-  message?: string;
-}
-
-interface AddEmployeeInput {
-  companyId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}
-
-interface AddEmployeeResponse {
-  success: boolean;
-  inviteId?: string;
-  message?: string;
-}
+// Hide the auth layout header on this page (we have logo in left panel)
+const HideAuthHeader = () => (
+  <style jsx global>{`
+    header.absolute.z-30 {
+      display: none !important;
+    }
+  `}</style>
+);
 
 interface InviteData {
   valid: boolean;
@@ -53,28 +27,69 @@ interface InviteData {
   expired?: boolean;
 }
 
+// Interfaces for Cloud Functions
+interface GetPendingRegistrationResponse {
+  found: boolean;
+  alreadyCompleted?: boolean;
+  data?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    companyName?: string;
+    currentStep: 1 | 2 | 3;
+    pendingEmployees: Array<{ email: string; firstName: string; lastName: string }>;
+    stripeSessionId?: string;
+  };
+}
+
+interface VerifyPaymentResponse {
+  paymentComplete: boolean;
+  subscriptionId?: string;
+  customerId?: string;
+}
+
+interface UnifiedRegistrationInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  companyName?: string;
+  billingEmail?: string;
+}
+
+interface UnifiedRegistrationResponse {
+  success: boolean;
+  companyId: string;
+  userId: string;
+}
+
+interface AddEmployeeInput {
+  companyId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading, register: registerUser, logout } = useAuth();
-
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [registeredUserId, setRegisteredUserId] = useState<string | null>(null);
-  const [registeredEmail, setRegisteredEmail] = useState('');
+  const { user, loading: authLoading } = useAuth();
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteError, setInviteError] = useState('');
 
-  // Get params from URL (redirectTo is kept for potential future use but not currently used)
-  const redirectToParam = searchParams?.get('redirect_to');
+  // Payment recovery state
+  const [isProcessingPaymentReturn, setIsProcessingPaymentReturn] = useState(false);
+  const [checkingPending, setCheckingPending] = useState(false);
+
+  // Get params from URL
   const inviteToken = searchParams?.get('invite');
-  const inviteEmail = searchParams?.get('email');
+  const paymentComplete = searchParams?.get('payment_complete');
 
-
-  // Verify invite token and prefill email when present
+  // Verify invite token when present
   useEffect(() => {
     const verifyInvite = async () => {
       if (!inviteToken) return;
@@ -103,7 +118,6 @@ function RegisterPageContent() {
           setInviteError('Ez a meghívó nem található vagy már fel lett használva');
         } else {
           // If verification fails, still allow registration but don't show company info
-          // User can register normally and linkEmployeeByEmail will try to match by email
           console.log('[Register] Invite verification failed, allowing normal registration');
         }
       } finally {
@@ -112,185 +126,188 @@ function RegisterPageContent() {
     };
 
     verifyInvite();
-  }, [inviteToken, inviteEmail]);
+  }, [inviteToken]);
 
-  // Check for pending email verification on mount (survives page refresh)
-  useEffect(() => {
-    const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
-    if (pendingVerification && !showVerificationModal && !isVerifying) {
-      try {
-        const data = JSON.parse(pendingVerification);
-        console.log('[Register Page] Found pending verification in sessionStorage:', data);
-        setRegisteredUserId(data.userId);
-        setRegisteredEmail(data.email);
-        setIsVerifying(true);
-        setShowVerificationModal(true);
-      } catch (err) {
-        console.error('[Register Page] Error parsing pending verification:', err);
-        sessionStorage.removeItem('pendingEmailVerification');
+  // Complete registration helper
+  const completeRegistrationFromPending = useCallback(async (pendingData: GetPendingRegistrationResponse['data']) => {
+    if (!pendingData || !user) return false;
+
+    try {
+      console.log('[Register] Completing registration from pending data...');
+
+      // Call completeUnifiedRegistration Cloud Function
+      const completeRegistrationFn = httpsCallable<UnifiedRegistrationInput, UnifiedRegistrationResponse>(
+        functions,
+        'completeUnifiedRegistration'
+      );
+
+      const result = await completeRegistrationFn({
+        firstName: pendingData.firstName,
+        lastName: pendingData.lastName,
+        email: pendingData.email,
+        phone: pendingData.phone,
+        companyName: pendingData.companyName,
+        billingEmail: pendingData.email
+      });
+
+      console.log('[Register] Registration completed:', result.data);
+
+      if (result.data.success) {
+        // Send employee invites if any
+        if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
+          console.log('[Register] Sending employee invites:', pendingData.pendingEmployees.length);
+          const addEmployee = httpsCallable<AddEmployeeInput, { success: boolean }>(functions, 'addEmployee');
+
+          for (const employee of pendingData.pendingEmployees) {
+            try {
+              await addEmployee({
+                companyId: result.data.companyId,
+                email: employee.email,
+                firstName: employee.firstName,
+                lastName: employee.lastName
+              });
+              console.log(`[Register] Invite sent to ${employee.email}`);
+            } catch (inviteError: any) {
+              console.error(`[Register] Failed to invite ${employee.email}:`, inviteError);
+            }
+          }
+        }
+
+        // Force token refresh
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.getIdToken(true);
+          await currentUser.reload();
+        }
+
+        // Set welcome popup flag
+        sessionStorage.setItem('showWelcomePopup', 'true');
+
+        return true;
       }
+      return false;
+    } catch (err) {
+      console.error('[Register] Error completing registration:', err);
+      return false;
     }
-  }, []); // Run once on mount
+  }, [user]);
 
+  // Handle payment complete return from Stripe
   useEffect(() => {
-    // If user is already authenticated, redirect to appropriate dashboard
-    // Don't redirect if we're verifying email
-    const pendingVerification = sessionStorage.getItem('pendingEmailVerification');
+    const handlePaymentReturn = async () => {
+      if (paymentComplete !== 'true' || !user || authLoading || isProcessingPaymentReturn) return;
 
-    if (user && !authLoading && !isVerifying && !pendingVerification) {
-      const dashboardPath = getDashboardPath((user as any)?.role);
-      console.log('[Register Page] User authenticated, redirecting to', dashboardPath);
-      router.push(dashboardPath);
-    }
-  }, [user, authLoading, router, isVerifying]);
+      setIsProcessingPaymentReturn(true);
+      console.log('[Register] Payment complete detected, verifying...');
 
+      try {
+        // Get pending registration
+        const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
+          functions,
+          'getPendingRegistration'
+        );
+        const pendingResult = await getPendingFn();
 
-  if (authLoading || inviteLoading) {
+        if (pendingResult.data.alreadyCompleted) {
+          console.log('[Register] Registration already completed, redirecting...');
+          router.push('/company/dashboard');
+          return;
+        }
+
+        if (!pendingResult.data.found || !pendingResult.data.data) {
+          console.log('[Register] No pending registration found');
+          setIsProcessingPaymentReturn(false);
+          return;
+        }
+
+        const pendingData = pendingResult.data.data;
+
+        // If there's a stripe session ID, verify the payment
+        if (pendingData.stripeSessionId) {
+          const verifyPaymentFn = httpsCallable<{ sessionId: string }, VerifyPaymentResponse>(
+            functions,
+            'verifyStripePayment'
+          );
+          const paymentResult = await verifyPaymentFn({ sessionId: pendingData.stripeSessionId });
+
+          if (paymentResult.data.paymentComplete) {
+            console.log('[Register] Payment verified, completing registration...');
+            const success = await completeRegistrationFromPending(pendingData);
+            if (success) {
+              router.push('/company/dashboard');
+              return;
+            }
+          } else {
+            console.log('[Register] Payment not complete yet');
+          }
+        }
+      } catch (err) {
+        console.error('[Register] Error handling payment return:', err);
+      }
+
+      setIsProcessingPaymentReturn(false);
+    };
+
+    handlePaymentReturn();
+  }, [paymentComplete, user, authLoading, router, isProcessingPaymentReturn, completeRegistrationFromPending]);
+
+  // Check for pending registration on mount (for redirect decision)
+  useEffect(() => {
+    const checkPendingRegistration = async () => {
+      if (!user || authLoading || inviteToken || checkingPending) return;
+
+      setCheckingPending(true);
+      try {
+        const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
+          functions,
+          'getPendingRegistration'
+        );
+        const result = await getPendingFn();
+
+        if (result.data.alreadyCompleted) {
+          // User has completed registration - redirect to dashboard
+          console.log('[Register] User already completed registration, redirecting...');
+          router.push('/company/dashboard');
+          return;
+        }
+
+        if (result.data.found) {
+          // Has pending registration - stay on page
+          console.log('[Register] User has pending registration');
+        } else {
+          // No pending registration - user is fully registered, redirect
+          // But only if they have a role/companyId (check happens in getPendingRegistration)
+          console.log('[Register] No pending registration found');
+        }
+      } catch (err) {
+        console.error('[Register] Error checking pending registration:', err);
+      }
+      setCheckingPending(false);
+    };
+
+    checkPendingRegistration();
+  }, [user, authLoading, inviteToken, router, checkingPending]);
+
+  if (authLoading || inviteLoading || isProcessingPaymentReturn) {
     return (
-      <div className="flex items-center justify-center min-h-[300px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-gray-900 mx-auto mb-4"></div>
-          <p className="text-sm text-gray-600">
-            {inviteLoading ? 'Meghívó ellenőrzése...' : 'Betöltés...'}
-          </p>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-[300px]">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
+        <p className="text-sm text-gray-600">
+          {inviteLoading ? 'Meghívó ellenőrzése...' :
+           isProcessingPaymentReturn ? 'Fizetés ellenőrzése...' :
+           'Betöltés...'}
+        </p>
       </div>
     );
   }
 
-  // If user is authenticated, show nothing (will redirect)
-  // EXCEPT when we're showing the verification modal
-  if (user && !showVerificationModal) {
-    return null;
-  }
-
-  // If showing verification modal, only render the modal
-  if (showVerificationModal && registeredUserId) {
-    console.log('[Register Page] Rendering EmailVerificationModal component');
-    console.log('[Register Page] Modal state - showVerificationModal:', showVerificationModal);
-    console.log('[Register Page] Modal state - registeredUserId:', registeredUserId);
-    console.log('[Register Page] Modal state - email:', registeredEmail);
-
+  // If user is authenticated and checking for pending registration, show loading
+  if (user && checkingPending) {
     return (
-      <EmailVerificationModal
-        email={registeredEmail}
-        userId={registeredUserId}
-        onCancel={async () => {
-          console.log('[Register Page] User cancelled verification');
-
-          // Clear pending verification from sessionStorage
-          sessionStorage.removeItem('pendingEmailVerification');
-
-          // Reset state
-          setIsVerifying(false);
-          setShowVerificationModal(false);
-          setRegisteredUserId(null);
-          setRegisteredEmail('');
-
-          // Log out the user
-          try {
-            await logout();
-            console.log('[Register Page] User logged out after cancellation');
-          } catch (err) {
-            console.error('[Register Page] Error logging out:', err);
-          }
-
-          // Redirect to login
-          router.push('/login');
-        }}
-        onVerified={async () => {
-          console.log('[Register Page] Email verified successfully');
-
-          const currentUser = auth.currentUser;
-          if (!currentUser) {
-            console.error('[Register Page] No current user after verification');
-            router.push('/login');
-            return;
-          }
-
-          // Get pending registration data from sessionStorage
-          const pendingDataStr = sessionStorage.getItem('pendingRegistrationData');
-
-          if (pendingDataStr) {
-            try {
-              const pendingData = JSON.parse(pendingDataStr);
-              console.log('[Register Page] Found pending registration data, completing registration...');
-
-              // NOW call completeUnifiedRegistration to create Firestore documents
-              const completeRegistration = httpsCallable<UnifiedRegistrationInput, UnifiedRegistrationResponse>(
-                functions,
-                'completeUnifiedRegistration'
-              );
-
-              const result = await completeRegistration({
-                firstName: pendingData.firstName,
-                lastName: pendingData.lastName,
-                email: pendingData.email,
-                phone: pendingData.phone,
-                companyName: pendingData.companyName,
-                billingEmail: pendingData.billingEmail,
-                industry: pendingData.industry,
-                companySize: pendingData.companySize
-              });
-
-              console.log('[Register Page] ✅ Registration completed:', result.data);
-
-              if (result.data.success) {
-                // Send employee invites if any were added
-                if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
-                  console.log('[Register Page] Sending employee invites:', pendingData.pendingEmployees.length);
-                  const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
-
-                  for (const employee of pendingData.pendingEmployees) {
-                    addEmployee({
-                      companyId: result.data.companyId,
-                      email: employee.email,
-                      firstName: employee.firstName,
-                      lastName: employee.lastName
-                    }).then(() => {
-                      console.log(`[Register Page] ✅ Invite sent to ${employee.email}`);
-                    }).catch((inviteError: any) => {
-                      console.error(`[Register Page] ⚠️ Failed to invite ${employee.email}:`, inviteError);
-                    });
-                  }
-                }
-
-                // Force token refresh to pick up new custom claims
-                await currentUser.getIdToken(true);
-                await currentUser.reload();
-                console.log('[Register Page] ✅ Token refreshed');
-
-                // Update Zustand store with fresh custom claims
-                await updateAuthStoreFromFirebase(currentUser);
-                console.log('[Register Page] ✅ Store updated');
-              }
-
-              // Clear pending data
-              sessionStorage.removeItem('pendingRegistrationData');
-            } catch (err) {
-              console.error('[Register Page] Error completing registration:', err);
-              // Still continue to clear state and redirect
-            }
-          }
-
-          // Clear pending verification from sessionStorage
-          sessionStorage.removeItem('pendingEmailVerification');
-          console.log('[Register Page] Cleared pending verification from sessionStorage');
-
-          setIsVerifying(false);
-          setShowVerificationModal(false);
-
-          // Check if this is an invited employee (they don't need to pay)
-          if (inviteData) {
-            console.log('[Register Page] Invited employee - redirecting to dashboard (no payment required)');
-            router.push('/dashboard');
-          } else {
-            // Regular registration - redirect to company dashboard (popup will show there)
-            console.log('[Register Page] Redirecting new user to company dashboard');
-            router.push('/company/dashboard');
-          }
-        }}
-      />
+      <div className="flex flex-col items-center justify-center min-h-[300px]">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
+        <p className="text-sm text-gray-600">Adatok betöltése...</p>
+      </div>
     );
   }
 
@@ -320,32 +337,68 @@ function RegisterPageContent() {
   }
 
   // Show unified registration form
+  const isInvitedEmployee = !!inviteData;
+
+  // For invited employees: simple single-column layout
+  if (isInvitedEmployee) {
+    return (
+      <div>
+        <UnifiedRegisterForm inviteData={inviteData} />
+
+        {/* Bottom links */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            A regisztrációval elfogadod az{' '}
+            <Link
+              className="whitespace-nowrap font-medium text-gray-700 underline hover:no-underline"
+              href="/terms"
+            >
+              Általános Szerződési Feltételeket
+            </Link>{' '}
+            és az{' '}
+            <Link
+              className="whitespace-nowrap font-medium text-gray-700 underline hover:no-underline"
+              href="/privacy"
+            >
+              Adatvédelmi Nyilatkozatot
+            </Link>
+            .
+          </p>
+        </div>
+
+        {/* Login link */}
+        <div className="mt-6 text-center text-sm text-gray-600">
+          Már van fiókod?{' '}
+          <Link
+            className="font-medium text-gray-900 underline hover:no-underline"
+            href="/login"
+          >
+            Bejelentkezés
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // For normal registration: form stays centered, subtle left panel as background
   return (
-    <>
-      <UnifiedRegisterForm
-        inviteData={inviteData}
-        onRegistrationComplete={(userId: string, email: string) => {
-          console.log('[Register Page] Registration complete, showing verification modal');
-          console.log('[Register Page] User ID:', userId);
-          console.log('[Register Page] Email:', email);
+    <div className="relative">
+      <HideAuthHeader />
 
-          // Store the userId and email for modal
-          setRegisteredUserId(userId);
-          setRegisteredEmail(email);
+      {/* LEFT: Subtle background panel - fixed full-height (tablet and desktop) */}
+      <div className="hidden md:block fixed left-0 top-0 bottom-0 w-[380px] bg-gradient-to-br from-gray-50 to-white border-r border-gray-100">
+        <div className="pt-8 px-4">
+          <ValuePropositionSection />
+        </div>
+      </div>
 
-          // Save to sessionStorage (survives page refresh)
-          sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
-            userId,
-            email
-          }));
+      {/* Mobile only: Subtle value prop above form */}
+      <div className="md:hidden mb-6 -mx-4 px-3 sm:px-4 py-5 sm:py-6 bg-gray-50/80 border-b border-gray-100">
+        <ValuePropositionSection />
+      </div>
 
-          // Set verifying flag to prevent redirect
-          setIsVerifying(true);
-
-          // Show verification modal
-          setShowVerificationModal(true);
-        }}
-      />
+      {/* CENTER: Form - stays in original centered position */}
+      <UnifiedRegisterForm inviteData={inviteData} />
 
       {/* Bottom links */}
       <div className="mt-6 text-center">
@@ -378,7 +431,22 @@ function RegisterPageContent() {
           Bejelentkezés
         </Link>
       </div>
-    </>
+
+      {/* Footer - breaks out to full width, then offset for left panel on tablet/desktop */}
+      <div
+        className="mt-12 sm:mt-16 w-screen relative"
+        style={{ marginLeft: 'calc(-50vw + 50%)' }}
+      >
+        {/* On tablet/desktop: footer in remaining space after left panel */}
+        <div className="hidden md:block absolute left-[380px] right-0">
+          <Footer border={true} />
+        </div>
+        {/* On mobile: full width footer */}
+        <div className="md:hidden">
+          <Footer border={true} />
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -26,7 +26,7 @@ export async function sendRegistrationReminder1DayEmail(
 ): Promise<{ success: boolean; error?: string }> {
   const { email } = data;
 
-  const subject = 'RE: Üdv a Struktúraépítők között - DMA Masterclass';
+  const subject = 'Tegnap regisztráltál - ideje belevágni! - DMA Masterclass';
 
   const content = `
     ${createHeading('Hé Struktúraépítő!', 2)}

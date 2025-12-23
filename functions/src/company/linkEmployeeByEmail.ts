@@ -143,14 +143,14 @@ export async function linkEmployeeByEmail(
       type: 'employee_joined',
       employeeId,
       userId,
-      employeeName: employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`,
+      employeeName: employeeData.fullName || `${employeeData.lastName} ${employeeData.firstName}`,
       joinedVia: 'registration',
       timestamp: FieldValue.serverTimestamp(),
     }).catch(() => { /* Non-critical */ });
 
     // 7. Send employee welcome email (fire-and-forget, non-blocking)
     const employeeFirstName = employeeData.firstName || employeeData.fullName?.split(' ')[0] || 'Kollega';
-    const employeeFullName = employeeData.fullName || `${employeeData.firstName} ${employeeData.lastName}`;
+    const employeeFullName = employeeData.fullName || `${employeeData.lastName} ${employeeData.firstName}`;
     sendEmployeeWelcomeEmail({
       firstName: employeeFirstName,
       email: email.toLowerCase(),

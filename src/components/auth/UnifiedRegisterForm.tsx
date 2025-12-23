@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Mail,
   Lock,
@@ -15,15 +15,49 @@ import {
   ArrowRight,
   ArrowLeft,
   UserPlus,
-  X
+  X,
+  CreditCard,
+  CheckCircle,
+  Star
 } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
 import { httpsCallable } from 'firebase/functions';
 import { getAuthErrorMessage } from '@/hooks/useAuthQueries';
-import { updateAuthStoreFromFirebase } from '@/lib/updateAuthStore';
-import { useAuthStore } from '@/stores/authStore';
 import { markAsRecentlyRegistered } from '@/hooks/useSubscriptionStatus';
+import { useAuth } from '@/contexts/AuthContext';
+
+// Cloud Function interfaces for pending registration
+interface SavePendingRegistrationInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  companyName?: string;
+  currentStep: 1 | 2 | 3;
+  pendingEmployees: Array<{ email: string; firstName: string; lastName: string }>;
+  stripeSessionId?: string;
+  stripeCustomerId?: string;
+}
+
+interface GetPendingRegistrationResponse {
+  found: boolean;
+  alreadyCompleted?: boolean;
+  data?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    companyName?: string;
+    currentStep: 1 | 2 | 3;
+    pendingEmployees: Array<{ email: string; firstName: string; lastName: string }>;
+    stripeSessionId?: string;
+  };
+}
+import { RegistrationProgressBar } from './RegistrationProgressBar';
+import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface UnifiedRegistrationData {
   // Step 1: Personal info (all required)
@@ -33,12 +67,8 @@ interface UnifiedRegistrationData {
   phone: string;
   password: string;
   confirmPassword: string;
-
-  // Step 2: Optional company details
+  // Optional company details
   companyName: string;
-  billingEmail: string;
-  industry: string;
-  companySize: string;
 }
 
 interface UnifiedRegisterFormProps {
@@ -58,8 +88,6 @@ interface UnifiedRegistrationInput {
   phone: string;
   companyName?: string;
   billingEmail?: string;
-  industry?: string;
-  companySize?: string;
 }
 
 interface UnifiedRegistrationResponse {
@@ -83,19 +111,188 @@ interface AddEmployeeResponse {
   inviteToken: string;
 }
 
+// Testimonials data from homepage
+const testimonials = [
+  { name: 'Göndör János', review: 'Együttműködésünk során új szintre emeltük cégünk működését. Olyan vállalati struktúrát sikerült kialakítani amivel alapot képeztünk a további fejlődésnek. Köszönet mindenért!' },
+  { name: 'Joe Buránszki', review: 'A legjobban azt szeretem, hogy könnyen használható életszerű információt kaptam a cég működésében. És ehhez kaptam egy jó alap rendszert, amiben tudok nap mint nap gondolkodni és jobban tudok tervezni.' },
+  { name: 'Máté Kiss', review: 'Kiváló, felkészült csapat. Arra törekszenek, hogy gyakorlatban is hasznosítható tudást adjanak át, segítve a vállalkozásokat belső folyamataik, rendszereik kiépítésében, fejlesztésében.' },
+  { name: 'Dóra Hodosi-Bodnár', review: 'A DMA-s képzések miatt határozottan fejlődnek a személyes képességeim. Könnyebben tudom kezelni a konfliktusokat, és az esetlegesen felmerülő problémákat.' },
+  { name: 'Balázs Végső', review: 'Amióta a DMA-nál tanulok, konzultálok, jobban tudom kezelni az embereket, helyreállt a kommunikáció a cégben az alvállalkozóimmal és az alkalmazottakkal.' },
+  { name: 'Viktória Vass', review: 'A DMA olyan tudást adott át nekem amivel a lehető legegyszerűbben stressz mentesen oldom meg a problémákat, konfliktus helyzeteket. Megmutatta a dolgok pozitív oldalát.' },
+  { name: 'Imre Ling', review: 'A képzésen elhangzott ismereteket hasznosan lehet azonnal alkalmazni a gyakorlatban. Ezáltal hatékonyabban működik a cég, stressz mentessé válik.' },
+  { name: 'Miklos Molnar', review: 'Hatékony képzések ami nem csak a vállalkozásomat segíti elő, hanem a személyiség fejlődésben is sokat segít. Igazi vezetőkkel tanulhatok.' },
+  { name: 'István Oláh', review: 'DMA segíti a vállalkozásokat a céljaik elérésében. Segít a munkatársaknak és tulajdonosoknak a hatékonyabb munkavégzésben. A személyes fejlődés és jó hangulat garantált!' },
+  { name: 'Attila Bíró', review: 'Már egy éve dolgozunk együtt. Csak jó tapasztalataim vannak. Nagyon profi csapat, mindenkinek csak ajánlani tudom.' },
+  { name: 'Ottó Kerekes', review: 'A DMA nagyon sokat segített a vállalkozásunkba, hogy az precizen és biztonságosan működhessen. Ezen kívül a kommunikációdat is fejlesztheted.' },
+  { name: 'Benjamin Szabó', review: 'Hatalmas segítséget nyújtanak a munkám elvégzéséhez. Nem csak elméleti hanem gyakorlati tanácsokkal és útmutatásokkal segítenek.' },
+];
+
+// Value Proposition Section - exported for use in page layout
+// Subtle styling to blend with page background
+export function ValuePropositionSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Auto-advance carousel every 5 seconds (pause when expanded)
+  useEffect(() => {
+    if (isExpanded) return;
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [isExpanded]);
+
+  // Reset expanded state when testimonial changes
+  useEffect(() => {
+    setIsExpanded(false);
+  }, [currentIndex]);
+
+  const currentTestimonial = testimonials[currentIndex];
+  const initials = currentTestimonial.name.split(' ').map(n => n[0]).join('').slice(0, 2);
+  const isLongReview = currentTestimonial.review.length > 120;
+
+  return (
+    <div className="text-gray-600 p-6 lg:p-8">
+      {/* DMA Logo - sticky at top */}
+      <div className="mb-8">
+        <Link href="/" className="inline-flex" aria-label="DMA">
+          <Image
+            src="/images/dma-logo.png"
+            alt="DMA Logo"
+            width={100}
+            height={36}
+            className="h-8 w-auto"
+          />
+        </Link>
+      </div>
+
+      {/* Headline */}
+      <h2 className="text-xl lg:text-2xl font-bold mb-2 text-gray-800">
+        Fedezd fel 7 napig teljesen ingyen
+      </h2>
+      <p className="text-gray-500 text-sm lg:text-base mb-6">
+        
+      </p>
+
+      {/* Benefits - subtle brand color checkmarks */}
+      <ul className="space-y-2.5 sm:space-y-3 mb-6">
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">7 napos ingyenes kipróbálás</span>
+        </li>
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">Teljes hozzáférés 150+ struktúraépítő tartalomhoz</span>
+        </li>
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">Több mint 200 órányi azonnal alkalmazható, működő rendszer</span>
+        </li>
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">5 munkatárs díjmentes hozzáadása</span>
+        </li>
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">Hetente frissülő tartalmak</span>
+        </li>
+        <li className="flex items-start gap-2.5 sm:gap-3">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">Bármikor lemondható</span>
+        </li>
+      </ul>
+
+      {/* Pricing - subtle */}
+      <div className="text-xs sm:text-sm text-gray-400 mb-5 sm:mb-6 pb-5 sm:pb-6 border-b border-gray-200">
+        Utána: <span className="text-gray-700 font-medium">14.990 Ft/hó</span>
+      </div>
+
+      {/* Testimonial Carousel */}
+      <div>
+        {/* Stars and Google Review badge */}
+        <div className="flex items-center gap-0.5 sm:gap-1 mb-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Star key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" />
+          ))}
+          <span className="text-[10px] sm:text-xs text-gray-400 ml-1.5 sm:ml-2">Google Review</span>
+        </div>
+
+        {/* Animated testimonial */}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className={`text-gray-500 text-xs sm:text-sm italic mb-2 leading-relaxed ${!isExpanded && isLongReview ? 'line-clamp-3' : ''}`}>
+                "{currentTestimonial.review}"
+              </p>
+              {isLongReview && (
+                <button
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="text-brand-secondary text-[10px] sm:text-xs font-medium hover:underline mb-3 py-1"
+                >
+                  {isExpanded ? 'Kevesebb' : 'Tovább olvasom...'}
+                </button>
+              )}
+              <div className="flex items-center gap-2.5 sm:gap-3 mt-3">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-brand-secondary/20 flex items-center justify-center text-xs sm:text-sm font-bold text-brand-secondary">
+                  {initials}
+                </div>
+                <div>
+                  <p className="font-medium text-xs sm:text-sm text-gray-700">{currentTestimonial.name}</p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Dot indicators - larger tap targets for mobile */}
+        <div className="flex gap-0.5 mt-4 justify-center">
+          {testimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentIndex(i)}
+              className="p-2 touch-manipulation"
+              aria-label={`Go to testimonial ${i + 1}`}
+            >
+              <span
+                className={`block w-2 h-2 rounded-full transition-colors ${
+                  i === currentIndex ? 'bg-brand-secondary' : 'bg-gray-300'
+                }`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   inviteData,
-  onRegistrationComplete
+  // onRegistrationComplete is reserved for future use (e.g., analytics callbacks)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onRegistrationComplete: _onRegistrationComplete
 }) => {
   const router = useRouter();
   const step2Ref = useRef<HTMLDivElement>(null);
-  const isProcessingRef = useRef(false); // Prevent double-click race condition
-  const [currentStep, setCurrentStep] = useState(1);
+  const step3Ref = useRef<HTMLDivElement>(null);
+  const isProcessingRef = useRef(false);
+
+  // Step state: 1 = Personal Info, 2 = Colleagues, 3 = Payment
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [checkingEmail, setCheckingEmail] = useState(false);
+
+  // Firebase user state (created after Step 1)
+  const [firebaseUserId, setFirebaseUserId] = useState<string | null>(null);
 
   // Employee invite state (max 5)
   const [pendingEmployees, setPendingEmployees] = useState<{
@@ -110,6 +307,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [checkingEmployeeEmail, setCheckingEmployeeEmail] = useState(false);
   const [employeeSuccess, setEmployeeSuccess] = useState(false);
 
+  // Recovery state
+  const [isRecovering, setIsRecovering] = useState(false);
+  const [recoveryChecked, setRecoveryChecked] = useState(false);
+
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: inviteData?.employeeName.split(' ')[0] || '',
     lastName: inviteData?.employeeName.split(' ').slice(1).join(' ') || '',
@@ -117,18 +318,79 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
     phone: '',
     password: '',
     confirmPassword: '',
-    companyName: '',
-    billingEmail: '',
-    industry: '',
-    companySize: ''
+    companyName: ''
   });
+
+  // Get auth context for checking logged-in user
+  const { user, loading: authLoading } = useAuth();
+
+  // Check for pending registration on mount (recovery flow)
+  useEffect(() => {
+    const checkPendingRegistration = async () => {
+      // Skip if already checked, still loading auth, or it's an invite flow
+      if (recoveryChecked || authLoading || inviteData) return;
+
+      // If user is logged in, check for pending registration
+      if (user) {
+        try {
+          console.log('[Registration] Checking for pending registration...');
+          const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
+            functions,
+            'getPendingRegistration'
+          );
+          const result = await getPendingFn();
+
+          if (result.data.alreadyCompleted) {
+            // User already completed registration - redirect
+            console.log('[Registration] User already completed registration, redirecting...');
+            router.push('/company/dashboard');
+            return;
+          }
+
+          if (result.data.found && result.data.data) {
+            const pendingData = result.data.data;
+            console.log('[Registration] Found pending registration at step:', pendingData.currentStep);
+
+            // Restore form data
+            setFormData(prev => ({
+              ...prev,
+              firstName: pendingData.firstName || prev.firstName,
+              lastName: pendingData.lastName || prev.lastName,
+              email: pendingData.email || prev.email,
+              phone: pendingData.phone || prev.phone,
+              companyName: pendingData.companyName || prev.companyName
+            }));
+
+            // Restore employees
+            if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
+              setPendingEmployees(pendingData.pendingEmployees);
+            }
+
+            // Set Firebase user ID
+            setFirebaseUserId(user.uid);
+
+            // Resume at correct step
+            setCurrentStep(pendingData.currentStep);
+            setIsRecovering(true);
+          }
+        } catch (err) {
+          console.error('[Registration] Error checking pending registration:', err);
+        }
+      }
+
+      setRecoveryChecked(true);
+    };
+
+    checkPendingRegistration();
+  }, [user, authLoading, recoveryChecked, inviteData, router]);
 
   const updateField = (field: keyof UnifiedRegistrationData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     setError('');
   };
 
-  // Employee invite helpers
+  // ============ EMPLOYEE HELPERS ============
+
   const handleAddEmployee = async () => {
     setEmployeeError('');
 
@@ -148,19 +410,16 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       return;
     }
 
-    // Check for duplicate email in pending list
     if (pendingEmployees.some(emp => emp.email.toLowerCase() === newEmployeeEmail.toLowerCase())) {
       setEmployeeError('Ez az email cím már hozzá lett adva');
       return;
     }
 
-    // Check if same as main registration email
     if (newEmployeeEmail.trim().toLowerCase() === formData.email.trim().toLowerCase()) {
       setEmployeeError('Nem adhatod hozzá a saját email címedet');
       return;
     }
 
-    // Check if email is already in use (like main email field)
     setCheckingEmployeeEmail(true);
     try {
       const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
@@ -187,19 +446,18 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       lastName: newEmployeeLastName.trim()
     }]);
 
-    // Clear inputs
     setNewEmployeeEmail('');
     setNewEmployeeFirstName('');
     setNewEmployeeLastName('');
-
-    // Show success message
     setEmployeeSuccess(true);
-    setTimeout(() => setEmployeeSuccess(false), 3000); // Hide after 3 seconds
+    setTimeout(() => setEmployeeSuccess(false), 3000);
   };
 
   const handleRemoveEmployee = (email: string) => {
     setPendingEmployees(prev => prev.filter(emp => emp.email !== email));
   };
+
+  // ============ VALIDATION ============
 
   const validateStep1 = async (): Promise<boolean> => {
     if (!formData.firstName.trim() || formData.firstName.length < 2) {
@@ -250,266 +508,260 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
     return true;
   };
 
-  const validateStep2 = () => {
-    // Step 2 is optional - only validate if fields are provided
-    if (formData.billingEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.billingEmail)) {
-      setError('Érvénytelen számlázási email cím');
-      return false;
-    }
-    return true;
-  };
+  // ============ STEP HANDLERS ============
 
-  const handleNext = async () => {
-    // GUARD: Prevent concurrent executions (for invited employee flow)
-    if (isProcessingRef.current) {
-      console.log('[Registration] Already processing, ignoring duplicate click');
-      return;
-    }
-
+  // Step 1 → Step 2: Create Firebase Auth user, then move to colleagues
+  const handleStep1Next = async () => {
+    if (isProcessingRef.current) return;
     setError('');
 
     const isValid = await validateStep1();
     if (!isValid) return;
 
-    // Move to Step 2
-    setCurrentStep(2);
-
-    // Smooth scroll to Step 2
-    setTimeout(() => {
-      step2Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-  };
-
-  const handleBack = () => {
-    setError('');
-    setCurrentStep(1);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleComplete = async () => {
-    // GUARD: Prevent concurrent executions (race condition fix)
-    if (isProcessingRef.current) {
-      console.log('[Registration] Already processing, ignoring duplicate click');
-      return;
-    }
-
-    isProcessingRef.current = true; // Set immediately (synchronous)
-    setError('');
-
-    // Validate Step 2 (optional fields)
-    if (!validateStep2()) {
-      isProcessingRef.current = false; // Reset on validation failure
-      return;
-    }
-
-    // Check if there are unsaved employee details in input fields
-    // If user filled in employee data but didn't click "Munkatárs hozzáadása", auto-save it
-    const hasUnsavedEmployeeData = newEmployeeEmail.trim() || newEmployeeFirstName.trim() || newEmployeeLastName.trim();
-
-    if (hasUnsavedEmployeeData) {
-      // Check if all required fields are filled
-      const allFieldsFilled = newEmployeeEmail.trim() && newEmployeeFirstName.trim() && newEmployeeLastName.trim();
-
-      if (!allFieldsFilled) {
-        // Partial data - ask user to complete or clear
-        setError('Töltsd ki az összes munkatárs mezőt, vagy töröld a részben kitöltött adatokat a folytatáshoz.');
-        isProcessingRef.current = false;
-        return;
-      }
-
-      // Validate employee email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(newEmployeeEmail.trim())) {
-        setEmployeeError('Érvénytelen munkatárs email cím');
-        isProcessingRef.current = false;
-        return;
-      }
-
-      // Check if max employees reached
-      if (pendingEmployees.length >= 5) {
-        setEmployeeError('Maximum 5 munkatársat adhatsz hozzá. Töröld az egyik meglévőt vagy hagyd üresen a mezőket.');
-        isProcessingRef.current = false;
-        return;
-      }
-
-      // Check for duplicate in pending list
-      if (pendingEmployees.some(emp => emp.email.toLowerCase() === newEmployeeEmail.trim().toLowerCase())) {
-        setEmployeeError('Ez az email cím már hozzá lett adva');
-        isProcessingRef.current = false;
-        return;
-      }
-
-      // Check if same as main registration email
-      if (newEmployeeEmail.trim().toLowerCase() === formData.email.trim().toLowerCase()) {
-        setEmployeeError('Nem adhatod hozzá a saját email címedet');
-        isProcessingRef.current = false;
-        return;
-      }
-
-      // Check employee email availability
-      setLoading(true);
-      try {
-        console.log('[Registration] Checking unsaved employee email availability...');
-        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
-          functions,
-          'checkEmailAvailability'
-        );
-        const result = await checkEmail({ email: newEmployeeEmail.trim().toLowerCase() });
-
-        if (!result.data.available) {
-          setEmployeeError('Ez az email cím már használatban van');
-          setLoading(false);
-          isProcessingRef.current = false;
-          return;
-        }
-      } catch (err) {
-        console.error('[Registration] Employee email check error:', err);
-        // Continue - backend will catch duplicates
-      }
-
-      // All validations passed - add to pending employees
-      console.log('[Registration] Auto-saving unsaved employee data...');
-      setPendingEmployees(prev => [...prev, {
-        email: newEmployeeEmail.trim().toLowerCase(),
-        firstName: newEmployeeFirstName.trim(),
-        lastName: newEmployeeLastName.trim()
-      }]);
-
-      // Clear the input fields
-      setNewEmployeeEmail('');
-      setNewEmployeeFirstName('');
-      setNewEmployeeLastName('');
-      setEmployeeSuccess(true);
-      setTimeout(() => setEmployeeSuccess(false), 3000);
-    }
-
+    isProcessingRef.current = true;
     setLoading(true);
 
-    // Re-check email availability before registration (prevents race condition)
-    // Email was checked in Step 1, but someone might have registered it since then
-    if (!inviteData) {
-      try {
-        console.log('[Unified Registration] Re-checking email availability...');
-        const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
-          functions,
-          'checkEmailAvailability'
-        );
-        const emailCheckResult = await checkEmail({ email: formData.email.trim().toLowerCase() });
-
-        if (!emailCheckResult.data.available) {
-          console.log('[Unified Registration] Email is taken, blocking registration');
-          setError('Ez az email cím már használatban van. Próbálj bejelentkezni vagy használj másik email címet.');
-          setLoading(false);
-          isProcessingRef.current = false;
-          return;
-        }
-        console.log('[Unified Registration] Email is available, proceeding...');
-      } catch (emailErr) {
-        console.error('[Unified Registration] Email check error:', emailErr);
-        // Continue anyway - Firebase Auth will catch duplicates as fallback
-      }
-    }
-
-    console.log('[Unified Registration] Starting registration process...');
-    console.log('[Unified Registration] Form data:', {
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-      phone: formData.phone,
-      companyName: formData.companyName || '(will use user name)',
-      billingEmail: formData.billingEmail || '(will use registration email)',
-      industry: formData.industry || '(not provided)',
-      companySize: formData.companySize || '(not provided)'
-    });
-
     try {
-      // Step 1: Create Firebase Auth user
-      console.log('[Unified Registration] Step 1: Creating Firebase Auth user...');
+      // Create Firebase Auth user
+      console.log('[Registration] Creating Firebase Auth user...');
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         formData.email.trim().toLowerCase(),
         formData.password
       );
 
-      console.log('[Unified Registration] ✅ User created successfully:', userCredential.user.uid);
-
-      // CRITICAL: Set pending verification in sessionStorage IMMEDIATELY
-      // This prevents the register page from redirecting before registration completes
-      sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
-        userId: userCredential.user.uid,
-        email: formData.email.trim().toLowerCase()
-      }));
-      console.log('[Unified Registration] ✅ Set pending verification flag in sessionStorage');
+      console.log('[Registration] User created:', userCredential.user.uid);
+      setFirebaseUserId(userCredential.user.uid);
 
       // Update display name (Hungarian convention: family name first)
-      console.log('[Unified Registration] Step 2: Updating display name...');
       await updateProfile(userCredential.user, {
         displayName: `${formData.lastName.trim()} ${formData.firstName.trim()}`
       });
 
-      console.log('[Unified Registration] ✅ Display name updated');
-
-      // Step 3: Store registration data for AFTER email verification
-      // We DON'T create Firestore documents yet - only after email is verified
-      console.log('[Unified Registration] Step 3: Storing registration data for after verification...');
-
-      const pendingRegistrationData = {
+      // Save pending registration to Firestore (replaces sessionStorage)
+      const savePendingFn = httpsCallable<SavePendingRegistrationInput, { success: boolean }>(
+        functions,
+        'savePendingRegistration'
+      );
+      await savePendingFn({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim().toLowerCase(),
         phone: formData.phone.trim(),
         companyName: formData.companyName.trim(),
-        billingEmail: formData.billingEmail.trim(),
-        industry: formData.industry,
-        companySize: formData.companySize,
-        pendingEmployees: pendingEmployees.map(emp => ({
-          firstName: emp.firstName,
-          lastName: emp.lastName,
-          email: emp.email
-        }))
-      };
+        currentStep: 2,
+        pendingEmployees: []
+      });
+      console.log('[Registration] Saved pending registration to Firestore');
 
-      // Store in sessionStorage - will be used after email verification
-      sessionStorage.setItem('pendingRegistrationData', JSON.stringify(pendingRegistrationData));
-      console.log('[Unified Registration] ✅ Registration data stored in sessionStorage');
-
-      // Mark as recently registered to skip expensive subscription status check
+      // Mark as recently registered to skip expensive subscription check
       markAsRecentlyRegistered();
 
-      // Show verification modal IMMEDIATELY
-      if (onRegistrationComplete) {
-        console.log('[Unified Registration] Showing verification modal immediately...');
-        onRegistrationComplete(userCredential.user.uid, formData.email.trim());
+      // For invited employees, complete immediately (no payment needed)
+      if (inviteData) {
+        console.log('[Registration] Invited employee - completing registration immediately');
+        await completeRegistration(userCredential.user.uid);
+        return;
       }
 
-      // Send verification email in background (fire-and-forget)
-      const sendEmailVerificationCode = httpsCallable(functions, 'sendEmailVerificationCode');
-      sendEmailVerificationCode({})
-        .then((result: any) => {
-          console.log('[Unified Registration] ✅ Verification email sent:', result.data);
-          if (result.data.code) {
-            console.log('🔐 VERIFICATION CODE (emulator):', result.data.code);
-          }
-        })
-        .catch((emailError: any) => {
-          console.error('[Unified Registration] ⚠️ Email send failed:', emailError);
-          // User can use Resend button in modal
-        });
+      // Move to Step 2 (Colleagues)
+      setCurrentStep(2);
+      setLoading(false);
+      isProcessingRef.current = false;
+
+      setTimeout(() => {
+        step2Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
 
     } catch (err: any) {
-      console.error('[Unified Registration] Error:', err);
+      console.error('[Registration] Error:', err);
       setError(getAuthErrorMessage(err));
       setLoading(false);
-      isProcessingRef.current = false; // Reset on error to allow retry
+      isProcessingRef.current = false;
     }
-    // Note: Don't set loading to false if successful - parent will handle the flow
-    // Note: Don't reset isProcessingRef on success - user will be redirected
   };
 
+  // Step 2 → Step 3: Move to payment
+  const handleStep2Next = async () => {
+    // Check if there are unsaved employee details
+    const hasUnsavedData = newEmployeeEmail.trim() || newEmployeeFirstName.trim() || newEmployeeLastName.trim();
+    if (hasUnsavedData) {
+      const allFieldsFilled = newEmployeeEmail.trim() && newEmployeeFirstName.trim() && newEmployeeLastName.trim();
+      if (!allFieldsFilled) {
+        setEmployeeError('Töltsd ki az összes munkatárs mezőt, vagy töröld a részben kitöltött adatokat.');
+        return;
+      }
+      // Auto-save the unsaved employee
+      await handleAddEmployee();
+    }
+
+    // Save pending registration to Firestore with employees
+    try {
+      const savePendingFn = httpsCallable<SavePendingRegistrationInput, { success: boolean }>(
+        functions,
+        'savePendingRegistration'
+      );
+      await savePendingFn({
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        companyName: formData.companyName.trim(),
+        currentStep: 3,
+        pendingEmployees: pendingEmployees
+      });
+      console.log('[Registration] Updated pending registration with employees');
+    } catch (err) {
+      console.error('[Registration] Error saving pending registration:', err);
+      // Continue anyway - webhook can still complete registration
+    }
+
+    // Move to Step 3 (Payment)
+    setCurrentStep(3);
+    setTimeout(() => {
+      step3Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
+
+  // Step 3 Complete: Payment done, finalize registration
+  const handlePaymentComplete = async () => {
+    console.log('[Registration] Payment completed, finalizing registration...');
+    if (firebaseUserId) {
+      await completeRegistration(firebaseUserId);
+    }
+  };
+
+  const handlePaymentError = (errorMessage: string) => {
+    console.error('[Registration] Payment error:', errorMessage);
+    setError(errorMessage);
+  };
+
+  // ============ COMPLETE REGISTRATION ============
+
+  const completeRegistration = async (_userId: string) => {
+    setLoading(true);
+    try {
+      // Use state data instead of sessionStorage (formData and pendingEmployees are in state)
+      const registrationData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        companyName: formData.companyName.trim()
+      };
+
+      // Call completeUnifiedRegistration Cloud Function
+      const completeRegistrationFn = httpsCallable<UnifiedRegistrationInput, UnifiedRegistrationResponse>(
+        functions,
+        'completeUnifiedRegistration'
+      );
+
+      const result = await completeRegistrationFn({
+        firstName: registrationData.firstName,
+        lastName: registrationData.lastName,
+        email: registrationData.email,
+        phone: registrationData.phone,
+        companyName: registrationData.companyName,
+        billingEmail: registrationData.email
+      });
+
+      console.log('[Registration] Registration completed:', result.data);
+
+      if (result.data.success) {
+        // Send employee invites if any (from state, not sessionStorage)
+        if (pendingEmployees && pendingEmployees.length > 0) {
+          console.log('[Registration] Sending employee invites:', pendingEmployees.length);
+          const addEmployee = httpsCallable<AddEmployeeInput, AddEmployeeResponse>(functions, 'addEmployee');
+
+          for (const employee of pendingEmployees) {
+            try {
+              await addEmployee({
+                companyId: result.data.companyId,
+                email: employee.email,
+                firstName: employee.firstName,
+                lastName: employee.lastName
+              });
+              console.log(`[Registration] Invite sent to ${employee.email}`);
+            } catch (inviteError: any) {
+              console.error(`[Registration] Failed to invite ${employee.email}:`, inviteError);
+            }
+          }
+        }
+
+        // Force token refresh
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          await currentUser.getIdToken(true);
+          await currentUser.reload();
+        }
+
+        // Note: pendingRegistration cleanup happens in webhook/Cloud Function
+        // No sessionStorage to clear - we use Firestore now
+
+        // Set welcome popup flag
+        sessionStorage.setItem('showWelcomePopup', 'true');
+
+        // Redirect to dashboard
+        if (inviteData) {
+          router.push('/dashboard');
+        } else {
+          router.push('/company/dashboard');
+        }
+      }
+    } catch (err: any) {
+      console.error('[Registration] Complete registration error:', err);
+      setError(err.message || 'Hiba történt a regisztráció befejezésekor');
+      setLoading(false);
+    }
+  };
+
+  // ============ RENDER ============
+
+  // Invited employee: only Step 1
+  const isInvitedEmployee = !!inviteData;
+  const totalSteps = isInvitedEmployee ? 1 : 3;
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Progress Bar - only show for normal registration */}
+      {!isInvitedEmployee && (
+        <RegistrationProgressBar
+          currentStep={currentStep}
+          totalSteps={totalSteps as 1 | 3}
+        />
+      )}
+
+      {/* Loading state while checking for pending registration */}
+      {!recoveryChecked && user && !inviteData && (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-brand-secondary" />
+          <span className="ml-2 text-sm text-gray-600">Adatok betöltése...</span>
+        </div>
+      )}
+
+      {/* Recovery Banner - show when resuming a pending registration */}
+      {isRecovering && recoveryChecked && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-full">
+              <CheckCircle className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-800">
+                Folytathatod a regisztrációt
+              </p>
+              <p className="text-xs text-blue-600">
+                A korábban megadott adataid elmentettük. Folytasd onnan, ahol abbahagytad!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Company Invite Banner */}
       {inviteData && (
-        <div className="mb-6 p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg">
+        <div className="p-4 bg-brand-secondary/5 border border-brand-secondary/20 rounded-lg">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-brand-secondary/10 rounded-full">
               <Building2 className="w-5 h-5 text-brand-secondary" />
@@ -526,260 +778,255 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         </div>
       )}
 
-      {/* Step 1: Personal Information */}
-      <div>
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {inviteData ? 'Regisztráció és csatlakozás' : 'Kezdjünk bele a kalandba'}
-          </h1>
-          <p className="mt-2 text-sm text-gray-600">
-            {inviteData ? 'Töltsd ki az adataidat' : '5 munkatársad is hozzáférhet a tartalmakhoz'}
-          </p>
+
+      {/* Error Display */}
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 sm:p-4 text-xs sm:text-sm text-red-800">
+          {error}
         </div>
+      )}
 
-        {error && (
-          <div className="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-800">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-5">
-          {/* Last Name - Hungarian convention: family name first */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="lastName">
-              Vezetéknév
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="lastName"
-                type="text"
-                className="form-input w-full py-2.5 pl-10"
-                placeholder="Kovács"
-                value={formData.lastName}
-                onChange={(e) => updateField('lastName', e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          {/* First Name */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="firstName">
-              Keresztnév
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="firstName"
-                type="text"
-                className="form-input w-full py-2.5 pl-10"
-                placeholder="János"
-                value={formData.firstName}
-                onChange={(e) => updateField('firstName', e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-          </div>
-
-          {/* Company Name (Optional) - Hidden for invited employees */}
-          {!inviteData && (
-            <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companyName">
-                Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Building2 className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="companyName"
-                  type="text"
-                  className="form-input w-full py-2.5 pl-10"
-                  placeholder="Ha üresen hagyod, a neved lesz használva"
-                  value={formData.companyName}
-                  onChange={(e) => updateField('companyName', e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Email */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
-              Email cím {inviteData && <span className="text-gray-500 text-xs font-normal">(meghívóból)</span>}
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="email"
-                type="email"
-                className={`form-input w-full py-2.5 pl-10 ${inviteData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                placeholder="pelda@email.com"
-                value={formData.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                required
-                disabled={loading || !!inviteData}
-                readOnly={!!inviteData}
-              />
-            </div>
-            {inviteData && (
-              <p className="mt-1 text-xs text-gray-500">
-                A meghívóhoz tartozó email cím nem módosítható
+      {/* ============ STEP 1: Personal Information ============ */}
+      <AnimatePresence mode="wait">
+        {currentStep === 1 && (
+          <motion.div
+            key="step1"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+              <div className="mb-6">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                {inviteData ? 'Regisztráció és csatlakozás' : 'Kezdjünk bele a kalandba'}
+              </h1>
+              <p className="mt-2 text-sm text-gray-600">
+                {inviteData ? 'Töltsd ki az adataidat' : ''}
               </p>
-            )}
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="phone">
-              Telefonszám
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Phone className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                inputMode="tel"
-                autoComplete="off"
-                className="form-input w-full py-2.5 pl-10"
-                placeholder="+36 30 123 4567"
-                value={formData.phone}
-                onChange={(e) => updateField('phone', e.target.value)}
-                required
-                disabled={loading}
-              />
             </div>
-          </div>
 
-          {/* Password */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="password">
-              Jelszó
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                className="form-input w-full py-2.5 pl-10 pr-10"
-                placeholder="••••••••"
-                value={formData.password}
-                onChange={(e) => updateField('password', e.target.value)}
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                tabIndex={-1}
-              >
-                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="confirmPassword">
-              Jelszó megerősítése
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                className="form-input w-full py-2.5 pl-10 pr-10"
-                placeholder="••••••••"
-                value={formData.confirmPassword}
-                onChange={(e) => updateField('confirmPassword', e.target.value)}
-                required
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                tabIndex={-1}
-              >
-                {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Next Button */}
-          {currentStep === 1 && (
-            <motion.button
-              type="button"
-              onClick={() => {
-                if (inviteData) {
-                  // For invited employees, skip Step 2 and complete registration
-                  handleComplete();
-                } else {
-                  // For regular users, go to Step 2
-                  handleNext();
-                }
-              }}
-              disabled={loading || checkingEmail}
-              className="w-full py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-              whileTap={{ scale: 0.98 }}
-            >
-              {checkingEmail ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Ellenőrzés...
-                </>
-              ) : inviteData ? (
-                'Regisztráció befejezése'
-              ) : (
-                <>
-                  Tovább
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </motion.button>
-          )}
-        </div>
-      </div>
-
-      {/* Step 2: Employee Invites - Hidden for invited employees */}
-      {!inviteData && currentStep === 2 && (
-        <motion.div
-          ref={step2Ref}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="space-y-6 pt-8 border-t border-gray-200"
-        >
-          {/* Employee Invites Section */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Munkatársak meghívása
-            </h2>
-            <p className="text-sm text-gray-600 mb-6">
-              opcionális, max. 5 fő
-            </p>
-
-            {/* Add Employee Form - Vertical layout like Step 1 */}
             <div className="space-y-5">
               {/* Last Name */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="lastName">
+                  Vezetéknév
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="lastName"
+                    type="text"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    placeholder="Kovács"
+                    value={formData.lastName}
+                    onChange={(e) => updateField('lastName', e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* First Name */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="firstName">
+                  Keresztnév
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <User className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="firstName"
+                    type="text"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    placeholder="János"
+                    value={formData.firstName}
+                    onChange={(e) => updateField('firstName', e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Company Name - Hidden for invited employees */}
+              {!inviteData && (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companyName">
+                    Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Building2 className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <input
+                      id="companyName"
+                      type="text"
+                      className="form-input w-full py-3 sm:py-2.5 pl-10"
+                      placeholder="Ha üresen hagyod, a neved lesz használva"
+                      value={formData.companyName}
+                      onChange={(e) => updateField('companyName', e.target.value)}
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Email */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
+                  Email cím {inviteData && <span className="text-gray-500 text-xs">(meghívóból)</span>}
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${inviteData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    placeholder="pelda@email.com"
+                    value={formData.email}
+                    onChange={(e) => updateField('email', e.target.value)}
+                    disabled={loading || !!inviteData}
+                    readOnly={!!inviteData}
+                  />
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="phone">
+                  Telefonszám
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Phone className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="phone"
+                    type="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    placeholder="+36 30 123 4567"
+                    value={formData.phone}
+                    onChange={(e) => updateField('phone', e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="password">
+                  Jelszó
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10 pr-12"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={(e) => updateField('password', e.target.value)}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 touch-manipulation"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm Password */}
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="confirmPassword">
+                  Jelszó megerősítése
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10 pr-12"
+                    placeholder="••••••••"
+                    value={formData.confirmPassword}
+                    onChange={(e) => updateField('confirmPassword', e.target.value)}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600 touch-manipulation"
+                    tabIndex={-1}
+                    aria-label={showConfirmPassword ? 'Jelszó elrejtése' : 'Jelszó megjelenítése'}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Next Button */}
+              <motion.button
+                type="button"
+                onClick={handleStep1Next}
+                disabled={loading || checkingEmail}
+                className="w-full py-3.5 sm:py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 touch-manipulation"
+                whileTap={{ scale: 0.98 }}
+              >
+                {loading || checkingEmail ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    {checkingEmail ? 'Ellenőrzés...' : 'Feldolgozás...'}
+                  </>
+                ) : inviteData ? (
+                  'Regisztráció befejezése'
+                ) : (
+                  <>
+                    Tovább
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ============ STEP 2: Colleagues ============ */}
+        {currentStep === 2 && (
+          <motion.div
+            key="step2"
+            ref={step2Ref}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Munkatársak meghívása
+              </h2>
+              <p className="mt-2 text-sm text-gray-600">
+                Opcionális - maximum 5 munkatársat adhatsz hozzá
+              </p>
+            </div>
+
+            <div className="space-y-5">
+              {/* Employee Input Fields */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                   Vezetéknév
@@ -790,7 +1037,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   </div>
                   <input
                     type="text"
-                    className="form-input w-full py-2.5 pl-10"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
                     placeholder="Kovács"
                     value={newEmployeeLastName}
                     onChange={(e) => {
@@ -803,7 +1050,6 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 </div>
               </div>
 
-              {/* First Name */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                   Keresztnév
@@ -814,7 +1060,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   </div>
                   <input
                     type="text"
-                    className="form-input w-full py-2.5 pl-10"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
                     placeholder="János"
                     value={newEmployeeFirstName}
                     onChange={(e) => {
@@ -827,7 +1073,6 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 </div>
               </div>
 
-              {/* Email */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700">
                   Email cím
@@ -838,7 +1083,9 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   </div>
                   <input
                     type="email"
-                    className="form-input w-full py-2.5 pl-10"
+                    inputMode="email"
+                    autoComplete="email"
+                    className="form-input w-full py-3 sm:py-2.5 pl-10"
                     placeholder="pelda@email.com"
                     value={newEmployeeEmail}
                     onChange={(e) => {
@@ -857,12 +1104,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 </div>
               </div>
 
-              {/* Error message */}
+              {/* Error/Success Messages */}
               {employeeError && (
                 <p className="text-sm text-red-600">{employeeError}</p>
               )}
-
-              {/* Success message */}
               {employeeSuccess && (
                 <p className="text-sm text-green-600 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -887,80 +1132,120 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 ) : (
                   <>
                     <UserPlus className="w-5 h-5" />
-                    Új munkatárs hozzáadása
+                    Munkatárs hozzáadása
                   </>
                 )}
               </button>
+
+              {/* Pending Employees List */}
+              {pendingEmployees.length > 0 && (
+                <div className="mt-4 space-y-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    Hozzáadott munkatársak ({pendingEmployees.length}/5):
+                  </p>
+                  {pendingEmployees.map((employee) => (
+                    <div
+                      key={employee.email}
+                      className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center">
+                          <span className="text-xs font-medium text-brand-secondary">
+                            {employee.firstName[0]}{employee.lastName[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {employee.lastName} {employee.firstName}
+                          </p>
+                          <p className="text-xs text-gray-500">{employee.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEmployee(employee.email)}
+                        disabled={loading}
+                        className="p-2.5 -m-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors touch-manipulation"
+                        aria-label={`${employee.lastName} ${employee.firstName} eltávolítása`}
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Navigation Buttons */}
+              <div className="flex gap-3 sm:gap-4 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    // Note: Can't truly go back since Firebase user exists
+                    // This just clears errors and shows a message
+                    setError('A fiók már létrejött. Kérjük, folytasd a regisztrációt.');
+                  }}
+                  disabled={loading}
+                  className="flex-1 py-3.5 sm:py-3 px-4 sm:px-6 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2 touch-manipulation"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline">Vissza</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleStep2Next}
+                  disabled={loading}
+                  className="flex-[2] sm:flex-1 py-3.5 sm:py-3 px-4 sm:px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 touch-manipulation"
+                >
+                  <span className="text-sm sm:text-base">Tovább a fizetéshez</span>
+                  <CreditCard className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Skip info */}
+              <p className="text-center text-xs text-gray-500">
+                Később is hozzáadhatsz munkatársakat a beállításokban
+              </p>
+            </div>
+          </motion.div>
+        )}
+
+        {/* ============ STEP 3: Payment ============ */}
+        {currentStep === 3 && firebaseUserId && (
+          <motion.div
+            key="step3"
+            ref={step3Ref}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                Fizetés
+              </h2>
+              <p className="mt-2 text-sm text-gray-600">
+                7 napos ingyenes próbaidőszak, utána 14.990 Ft/hó
+              </p>
             </div>
 
-            {/* Pending Employees List */}
-            {pendingEmployees.length > 0 && (
-              <div className="mt-6 space-y-2">
-                <p className="text-sm font-medium text-gray-700">
-                  Hozzáadott munkatársak ({pendingEmployees.length}/5):
-                </p>
-                {pendingEmployees.map((employee) => (
-                  <div
-                    key={employee.email}
-                    className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-brand-secondary/10 flex items-center justify-center">
-                        <span className="text-xs font-medium text-brand-secondary">
-                          {employee.firstName[0]}{employee.lastName[0]}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">
-                          {employee.lastName} {employee.firstName}
-                        </p>
-                        <p className="text-xs text-gray-500">{employee.email}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveEmployee(employee.email)}
-                      disabled={loading}
-                      className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-4 pt-4">
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={loading}
-              className="flex-1 py-3 px-6 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              Vissza
-            </button>
-
-            <button
-              type="button"
-              onClick={handleComplete}
-              disabled={loading}
-              className="flex-1 py-3 px-6 bg-gradient-to-t from-brand-secondary to-brand-secondary/50 text-white rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Regisztráció...
-                </>
-              ) : (
-                'Regisztráció befejezése'
-              )}
-            </button>
-          </div>
-        </motion.div>
-      )}
+            <StripeEmbeddedCheckout
+              userId={firebaseUserId}
+              email={formData.email}
+              registrationData={{
+                firstName: formData.firstName.trim(),
+                lastName: formData.lastName.trim(),
+                email: formData.email.trim().toLowerCase(),
+                phone: formData.phone.trim(),
+                companyName: formData.companyName.trim() || undefined,
+                pendingEmployees: pendingEmployees
+              }}
+              onComplete={handlePaymentComplete}
+              onError={handlePaymentError}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
