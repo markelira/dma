@@ -216,7 +216,16 @@ function RegisterPageContent() {
         const pendingResult = await getPendingFn();
 
         if (pendingResult.data.alreadyCompleted) {
-          console.log('[Register] Registration already completed, redirecting...');
+          console.log('[Register] Registration already completed, refreshing auth and redirecting...');
+          // Webhook completed registration - need to refresh auth state before redirect
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            await currentUser.getIdToken(true); // Force token refresh to get new claims
+            await refreshUser(); // Update React + Zustand state
+          }
+          // Set popup flags
+          sessionStorage.setItem('showWelcomePopup', 'true');
+          sessionStorage.setItem('trialPopupDismissed', 'true');
           router.push('/company/dashboard');
           return;
         }

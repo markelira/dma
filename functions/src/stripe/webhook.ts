@@ -336,7 +336,11 @@ async function handleSubscriptionCheckout(session: Stripe.Checkout.Session, stri
     // Get subscription plan from price ID
     const subscriptionPlan = stripePriceIdToPlan(priceId);
 
-    // Get user details
+    // CRITICAL: Complete pending registration FIRST (creates company)
+    // This must happen BEFORE fetching user data so we have the companyId
+    await checkAndCompletePendingRegistration(userId);
+
+    // Get user details (may have been created by checkAndCompletePendingRegistration)
     const userDoc = await firestore.collection('users').doc(userId).get();
     const userData = userDoc.data();
 
@@ -448,9 +452,8 @@ async function handleSubscriptionCheckout(session: Stripe.Checkout.Session, stri
       });
     }
 
-    // FALLBACK: Check if user has pending registration and complete if needed
-    // This handles edge cases where frontend failed to call completeUnifiedRegistration
-    await checkAndCompletePendingRegistration(userId);
+    // NOTE: checkAndCompletePendingRegistration is now called at the START of this function
+    // This ensures company exists BEFORE subscription is created
 
   } catch (error: any) {
     logger.error('[handleSubscriptionCheckout] Error:', error);
