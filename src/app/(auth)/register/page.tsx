@@ -380,9 +380,9 @@ function RegisterPageContent() {
         </div>
       </div>
 
-      {/* Mobile only: Subtle value prop above form */}
+      {/* Mobile only: Collapsible value prop above form */}
       <div className="md:hidden mb-6 -mx-4 px-3 sm:px-4 py-5 sm:py-6 bg-gray-50/80 border-b border-gray-100">
-        <ValuePropositionSection />
+        <ValuePropositionSection collapsible />
       </div>
 
       {/* CENTER: Form - stays in original centered position */}

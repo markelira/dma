@@ -18,7 +18,8 @@ import {
   X,
   CreditCard,
   CheckCircle,
-  Star
+  Star,
+  ChevronDown
 } from 'lucide-react';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth, functions } from '@/lib/firebase';
@@ -129,9 +130,14 @@ const testimonials = [
 
 // Value Proposition Section - exported for use in page layout
 // Subtle styling to blend with page background
-export function ValuePropositionSection() {
+interface ValuePropositionSectionProps {
+  collapsible?: boolean;
+}
+
+export function ValuePropositionSection({ collapsible = false }: ValuePropositionSectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isDetailsExpanded, setIsDetailsExpanded] = useState(false);
 
   // Auto-advance carousel every 5 seconds (pause when expanded)
   useEffect(() => {
@@ -170,8 +176,23 @@ export function ValuePropositionSection() {
       <h2 className="text-xl lg:text-2xl font-bold mb-2 text-gray-800">
         Fedezd fel 7 napig teljesen ingyen
       </h2>
+
+      {/* Collapsible toggle button (mobile only) */}
+      {collapsible && (
+        <button
+          onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+          className="flex items-center gap-2 text-sm text-brand-secondary font-medium mt-3 mb-2 py-1"
+        >
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isDetailsExpanded ? 'rotate-180' : ''}`} />
+          {isDetailsExpanded ? 'Csomag részletei bezárása' : 'Masterclass csomag részletei'}
+        </button>
+      )}
+
+      {/* Collapsible content - shown always on desktop, toggle on mobile */}
+      {(!collapsible || isDetailsExpanded) && (
+        <>
       <p className="text-gray-500 text-sm lg:text-base mb-6">
-        
+
       </p>
 
       {/* Benefits - subtle brand color checkmarks */}
@@ -268,6 +289,8 @@ export function ValuePropositionSection() {
           ))}
         </div>
       </div>
+        </>
+      )}
     </div>
   );
 }
