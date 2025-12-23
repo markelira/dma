@@ -9,6 +9,8 @@ import { functions, auth } from '@/lib/firebase';
 import Link from 'next/link';
 import Footer from '@/components/landing-home/ui/footer';
 import { Loader2 } from 'lucide-react';
+import { clearRecentRegistrationFlag } from '@/hooks/useSubscriptionStatus';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Hide the auth layout header on this page (we have logo in left panel)
 const HideAuthHeader = () => (
@@ -75,6 +77,7 @@ function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading, refreshUser } = useAuth();
+  const queryClient = useQueryClient();
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
@@ -185,6 +188,12 @@ function RegisterPageContent() {
         // Small delay to ensure state propagates
         await new Promise(resolve => setTimeout(resolve, 300));
 
+        // CRITICAL: Clear the "recently registered" flag so subscription check actually runs
+        // Without this, useSubscriptionStatus returns fake "no subscription" for 60 seconds
+        clearRecentRegistrationFlag();
+        // Invalidate the React Query cache to force fresh subscription check
+        queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+
         // Set welcome popup flag
         sessionStorage.setItem('showWelcomePopup', 'true');
         // Dismiss trial popup since user just completed payment
@@ -197,7 +206,7 @@ function RegisterPageContent() {
       console.error('[Register] Error completing registration:', err);
       return false;
     }
-  }, [user, refreshUser]);
+  }, [user, refreshUser, queryClient]);
 
   // Handle payment complete return from Stripe
   useEffect(() => {
@@ -223,6 +232,10 @@ function RegisterPageContent() {
             await currentUser.getIdToken(true); // Force token refresh to get new claims
             await refreshUser(); // Update React + Zustand state
           }
+          // CRITICAL: Clear the "recently registered" flag so subscription check actually runs
+          clearRecentRegistrationFlag();
+          // Invalidate the React Query cache to force fresh subscription check
+          queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
           // Set popup flags
           sessionStorage.setItem('showWelcomePopup', 'true');
           sessionStorage.setItem('trialPopupDismissed', 'true');
