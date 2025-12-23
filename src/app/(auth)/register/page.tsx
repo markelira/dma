@@ -187,6 +187,8 @@ function RegisterPageContent() {
 
         // Set welcome popup flag
         sessionStorage.setItem('showWelcomePopup', 'true');
+        // Dismiss trial popup since user just completed payment
+        sessionStorage.setItem('trialPopupDismissed', 'true');
 
         return true;
       }
@@ -262,7 +264,8 @@ function RegisterPageContent() {
 
   // Only show loading on initial mount for invite loading or payment processing
   // Don't show loading for authLoading after initial mount - this prevents form remounting
-  if (inviteLoading || isProcessingPaymentReturn) {
+  // Also show loading immediately when URL has payment_complete=true (before effect runs)
+  if (inviteLoading || isProcessingPaymentReturn || paymentComplete === 'true') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
         <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
