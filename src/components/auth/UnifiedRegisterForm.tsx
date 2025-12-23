@@ -282,6 +282,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
   const isProcessingRef = useRef(false);
+  const recoveryCheckInitiatedRef = useRef(false); // Prevents multiple recovery checks
 
   // Step state: 1 = Personal Info, 2 = Colleagues, 3 = Payment
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
@@ -324,65 +325,86 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   // Get auth context for checking logged-in user
   const { user, loading: authLoading } = useAuth();
 
+  // Track if we're currently checking to prevent duplicate calls
+  const [isCheckingPending, setIsCheckingPending] = useState(false);
+
   // Check for pending registration on mount (recovery flow)
   useEffect(() => {
     const checkPendingRegistration = async () => {
-      // Skip if already checked, still loading auth, or it's an invite flow
-      if (recoveryChecked || authLoading || inviteData) return;
+      // Skip if already checked, still loading auth, currently checking, or it's an invite flow
+      if (recoveryChecked || authLoading || isCheckingPending || inviteData) return;
 
-      // If user is logged in, check for pending registration
-      if (user) {
-        try {
-          console.log('[Registration] Checking for pending registration...');
-          const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
-            functions,
-            'getPendingRegistration'
-          );
-          const result = await getPendingFn();
-
-          if (result.data.alreadyCompleted) {
-            // User already completed registration - redirect
-            console.log('[Registration] User already completed registration, redirecting...');
-            router.push('/company/dashboard');
-            return;
-          }
-
-          if (result.data.found && result.data.data) {
-            const pendingData = result.data.data;
-            console.log('[Registration] Found pending registration at step:', pendingData.currentStep);
-
-            // Restore form data
-            setFormData(prev => ({
-              ...prev,
-              firstName: pendingData.firstName || prev.firstName,
-              lastName: pendingData.lastName || prev.lastName,
-              email: pendingData.email || prev.email,
-              phone: pendingData.phone || prev.phone,
-              companyName: pendingData.companyName || prev.companyName
-            }));
-
-            // Restore employees
-            if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
-              setPendingEmployees(pendingData.pendingEmployees);
-            }
-
-            // Set Firebase user ID
-            setFirebaseUserId(user.uid);
-
-            // Resume at correct step
-            setCurrentStep(pendingData.currentStep);
-            setIsRecovering(true);
-          }
-        } catch (err) {
-          console.error('[Registration] Error checking pending registration:', err);
-        }
+      // Additional safeguard using ref - survives re-renders and state issues
+      if (recoveryCheckInitiatedRef.current) {
+        console.log('[Registration] Recovery check already initiated (ref), skipping');
+        setRecoveryChecked(true);
+        return;
       }
 
-      setRecoveryChecked(true);
+      // Only check if user is logged in
+      if (!user) {
+        // Not logged in yet - mark as checked (new users don't need recovery)
+        setRecoveryChecked(true);
+        recoveryCheckInitiatedRef.current = true;
+        return;
+      }
+
+      // CRITICAL: Set ref FIRST to prevent any race conditions, then set state
+      recoveryCheckInitiatedRef.current = true;
+      setIsCheckingPending(true);
+
+      try {
+        console.log('[Registration] Checking for pending registration...');
+        const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
+          functions,
+          'getPendingRegistration'
+        );
+        const result = await getPendingFn();
+
+        if (result.data.alreadyCompleted) {
+          // User already completed registration - redirect
+          console.log('[Registration] User already completed registration, redirecting...');
+          router.push('/company/dashboard');
+          return;
+        }
+
+        if (result.data.found && result.data.data) {
+          const pendingData = result.data.data;
+          console.log('[Registration] Found pending registration at step:', pendingData.currentStep);
+
+          // Restore form data
+          setFormData(prev => ({
+            ...prev,
+            firstName: pendingData.firstName || prev.firstName,
+            lastName: pendingData.lastName || prev.lastName,
+            email: pendingData.email || prev.email,
+            phone: pendingData.phone || prev.phone,
+            companyName: pendingData.companyName || prev.companyName
+          }));
+
+          // Restore employees
+          if (pendingData.pendingEmployees && pendingData.pendingEmployees.length > 0) {
+            setPendingEmployees(pendingData.pendingEmployees);
+          }
+
+          // Set Firebase user ID
+          setFirebaseUserId(user.uid);
+
+          // Resume at correct step
+          setCurrentStep(pendingData.currentStep);
+          setIsRecovering(true);
+        }
+      } catch (err) {
+        console.error('[Registration] Error checking pending registration:', err);
+      } finally {
+        // Always mark as checked after completion (success or error)
+        setRecoveryChecked(true);
+        setIsCheckingPending(false);
+      }
     };
 
     checkPendingRegistration();
-  }, [user, authLoading, recoveryChecked, inviteData, router]);
+  }, [user, authLoading, recoveryChecked, isCheckingPending, inviteData, router]);
 
   const updateField = (field: keyof UnifiedRegistrationData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

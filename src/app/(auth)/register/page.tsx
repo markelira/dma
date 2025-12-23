@@ -83,7 +83,6 @@ function RegisterPageContent() {
 
   // Payment recovery state
   const [isProcessingPaymentReturn, setIsProcessingPaymentReturn] = useState(false);
-  const [checkingPending, setCheckingPending] = useState(false);
 
   // Get params from URL
   const inviteToken = searchParams?.get('invite');
@@ -251,62 +250,20 @@ function RegisterPageContent() {
     handlePaymentReturn();
   }, [paymentComplete, user, authLoading, router, isProcessingPaymentReturn, completeRegistrationFromPending]);
 
-  // Check for pending registration on mount (for redirect decision)
-  useEffect(() => {
-    const checkPendingRegistration = async () => {
-      if (!user || authLoading || inviteToken || checkingPending) return;
+  // NOTE: Registration state checking and redirect logic is handled by UnifiedRegisterForm
+  // The form calls getPendingRegistration and handles recovery/redirect appropriately
+  // We removed the duplicate check here to prevent race conditions and double API calls
 
-      setCheckingPending(true);
-      try {
-        const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
-          functions,
-          'getPendingRegistration'
-        );
-        const result = await getPendingFn();
-
-        if (result.data.alreadyCompleted) {
-          // User has completed registration - redirect to dashboard
-          console.log('[Register] User already completed registration, redirecting...');
-          router.push('/company/dashboard');
-          return;
-        }
-
-        if (result.data.found) {
-          // Has pending registration - stay on page
-          console.log('[Register] User has pending registration');
-        } else {
-          // No pending registration - user is fully registered, redirect
-          // But only if they have a role/companyId (check happens in getPendingRegistration)
-          console.log('[Register] No pending registration found');
-        }
-      } catch (err) {
-        console.error('[Register] Error checking pending registration:', err);
-      }
-      setCheckingPending(false);
-    };
-
-    checkPendingRegistration();
-  }, [user, authLoading, inviteToken, router, checkingPending]);
-
-  if (authLoading || inviteLoading || isProcessingPaymentReturn) {
+  // Only show loading on initial mount for invite loading or payment processing
+  // Don't show loading for authLoading after initial mount - this prevents form remounting
+  if (inviteLoading || isProcessingPaymentReturn) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
         <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
         <p className="text-sm text-gray-600">
           {inviteLoading ? 'Meghívó ellenőrzése...' :
-           isProcessingPaymentReturn ? 'Fizetés ellenőrzése...' :
-           'Betöltés...'}
+           'Fizetés ellenőrzése...'}
         </p>
-      </div>
-    );
-  }
-
-  // If user is authenticated and checking for pending registration, show loading
-  if (user && checkingPending) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[300px]">
-        <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
-        <p className="text-sm text-gray-600">Adatok betöltése...</p>
       </div>
     );
   }
