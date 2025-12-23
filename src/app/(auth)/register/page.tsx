@@ -74,7 +74,7 @@ interface AddEmployeeInput {
 function RegisterPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
 
   // Employee invite handling
   const [inviteData, setInviteData] = useState<InviteData | null>(null);
@@ -179,6 +179,12 @@ function RegisterPageContent() {
           await currentUser.reload();
         }
 
+        // Update React auth state with new claims
+        await refreshUser();
+
+        // Small delay to ensure state propagates
+        await new Promise(resolve => setTimeout(resolve, 300));
+
         // Set welcome popup flag
         sessionStorage.setItem('showWelcomePopup', 'true');
 
@@ -189,7 +195,7 @@ function RegisterPageContent() {
       console.error('[Register] Error completing registration:', err);
       return false;
     }
-  }, [user]);
+  }, [user, refreshUser]);
 
   // Handle payment complete return from Stripe
   useEffect(() => {
