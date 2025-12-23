@@ -844,14 +844,28 @@ export const getUsers = onCall({
 
     usersSnapshot.forEach((doc) => {
       const userData = doc.data()
+
+      // Handle createdAt which may be a Firestore Timestamp or ISO string
+      let createdAtStr: string
+      if (userData.createdAt?.toDate) {
+        // Firestore Timestamp object
+        createdAtStr = userData.createdAt.toDate().toISOString()
+      } else if (userData.createdAt?._seconds) {
+        // Serialized Timestamp object
+        createdAtStr = new Date(userData.createdAt._seconds * 1000).toISOString()
+      } else if (typeof userData.createdAt === 'string') {
+        createdAtStr = userData.createdAt
+      } else {
+        createdAtStr = new Date().toISOString()
+      }
+
       users.push({
         id: doc.id,
         email: userData.email || '',
         firstName: userData.firstName || '',
         lastName: userData.lastName || '',
         role: userData.role || 'STUDENT',
-        createdAt: userData.createdAt || new Date().toISOString(),
-        lastLoginAt: userData.lastLoginAt || null,
+        createdAt: createdAtStr,
         isActive: userData.isActive !== false, // Default to true
         profilePictureUrl: userData.profilePictureUrl || null,
         emailVerified: userData.emailVerified || false,

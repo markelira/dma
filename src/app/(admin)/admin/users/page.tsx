@@ -61,7 +61,6 @@ interface User {
   lastName: string
   role: 'STUDENT' | 'INSTRUCTOR' | 'ADMIN' | 'COMPANY_ADMIN'
   createdAt: string
-  lastLoginAt?: string
   isActive: boolean
   profilePictureUrl?: string
   emailVerified?: boolean
@@ -456,7 +455,6 @@ export default function AdminUsersPage() {
                 <TableHead className="font-bold">Email</TableHead>
                 <TableHead className="font-bold">Szerepkör</TableHead>
                 <TableHead className="font-bold">Regisztráció</TableHead>
-                <TableHead className="font-bold">Utolsó Bejelentkezés</TableHead>
                 <TableHead className="font-bold">Állapot</TableHead>
                 <TableHead className="text-right font-bold">Műveletek</TableHead>
               </TableRow>
@@ -464,7 +462,7 @@ export default function AdminUsersPage() {
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8">
+                  <TableCell colSpan={6} className="text-center py-8">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <Users className="w-12 h-12 text-gray-300" />
                       <p className="text-muted-foreground">Nincs találat a megadott szűrőkkel</p>
@@ -526,16 +524,6 @@ export default function AdminUsersPage() {
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       {new Date(user.createdAt).toLocaleDateString('hu-HU')}
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    {user.lastLoginAt ? (
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        {new Date(user.lastLoginAt).toLocaleDateString('hu-HU')}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground">Még nem jelentkezett be</span>
-                    )}
                   </TableCell>
                   <TableCell>
                     <Badge 
