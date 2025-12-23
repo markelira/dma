@@ -359,6 +359,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (currentUser) {
       const enrichedUser = await fetchUserData(currentUser, true); // Force token refresh
       setUser(enrichedUser);
+
+      // ALSO update Zustand store so all components (including CompanyLayout) see new data
+      useAuthStore.getState().setUser(enrichedUser);
     }
   };
 
