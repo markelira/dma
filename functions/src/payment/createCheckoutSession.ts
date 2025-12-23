@@ -71,15 +71,31 @@ export const createCheckoutSession = onCall({
 
     logger.info(`Creating checkout session for user: ${userId}`);
 
-    // Get user document
+    // Get user document OR pending registration for new signups
+    let userData: any = null;
+    let isPendingRegistration = false;
     const userDoc = await firestore.collection('users').doc(userId).get();
-    if (!userDoc.exists) {
-      throw new Error('Felhasználó nem található');
+
+    if (userDoc.exists) {
+      userData = userDoc.data();
+    } else {
+      // Fallback: Check pendingRegistrations for new signups
+      const pendingDoc = await firestore.collection('pendingRegistrations').doc(userId).get();
+      if (pendingDoc.exists) {
+        const pending = pendingDoc.data();
+        userData = {
+          email: pending?.email,
+          firstName: pending?.firstName,
+          lastName: pending?.lastName,
+          companyName: pending?.companyName, // For subscription type detection
+        };
+        isPendingRegistration = true;
+        logger.info('[createCheckoutSession] Using pending registration data for new user:', userId);
+      }
     }
 
-    const userData = userDoc.data();
     if (!userData) {
-      throw new Error('Felhasználói adatok nem találhatók');
+      throw new Error('Felhasználó nem található');
     }
 
     // Get or create Stripe customer
@@ -98,23 +114,33 @@ export const createCheckoutSession = onCall({
 
       stripeCustomerId = customer.id;
 
-      // Save customer ID to user document
-      await firestore.collection('users').doc(userId).update({
-        stripeCustomerId: customer.id,
-        updatedAt: new Date().toISOString()
-      });
+      // Save customer ID (to users doc or pendingRegistrations)
+      if (isPendingRegistration) {
+        await firestore.collection('pendingRegistrations').doc(userId).update({
+          stripeCustomerId: customer.id,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } else {
+        await firestore.collection('users').doc(userId).update({
+          stripeCustomerId: customer.id,
+          updatedAt: new Date().toISOString()
+        });
+      }
     }
 
     // Determine subscription type based on user's account
-    // Individual: user has NO teamId AND NO companyId
-    // Company: user has companyId (B2B) or teamId/isTeamOwner (legacy)
-    const isCompanyUser = !!(userData.companyId || userData.teamId || userData.isTeamOwner);
+    // For pending registrations: has companyName = company subscription
+    // For existing users: has companyId/teamId = company subscription
+    const isCompanyUser = isPendingRegistration
+      ? !!userData.companyName  // New registration with company name
+      : !!(userData.companyId || userData.teamId || userData.isTeamOwner);
+
     const subscriptionType = isCompanyUser ? 'company' : 'individual';
     const companyId = userData.companyId || userData.teamId || null;
     logger.info(`Subscription type determined: ${subscriptionType}`, {
+      isPendingRegistration,
+      companyName: userData.companyName,
       companyId,
-      teamId: userData.teamId,
-      isTeamOwner: userData.isTeamOwner,
     });
 
     // Validate URL requirements based on uiMode
