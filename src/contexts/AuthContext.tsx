@@ -249,7 +249,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             router.push('/register');
             return;
           } else {
-            console.log('🔄 [AuthContext] User needs to complete registration, already on /register - no redirect needed');
+            console.log('🔄 [AuthContext] User needs to complete registration, already on /register - setting user for recovery');
+            // Remove the _needsRegistrationCompletion flag and set the user
+            // so UnifiedRegisterForm can detect logged-in user and trigger recovery
+            const cleanUser = { ...enrichedUser };
+            delete (cleanUser as any)._needsRegistrationCompletion;
+            setUser(cleanUser);
             setLoading(false);
             return;
           }
