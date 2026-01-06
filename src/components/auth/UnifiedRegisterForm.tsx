@@ -349,7 +349,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   });
 
   // Get auth context for checking logged-in user
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
 
   // Track if we're currently checking to prevent duplicate calls
   const [isCheckingPending, setIsCheckingPending] = useState(false);
@@ -754,11 +754,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           }
         }
 
-        // Force token refresh
+        // Force token refresh and update auth context
         const currentUser = auth.currentUser;
         if (currentUser) {
           await currentUser.getIdToken(true);
           await currentUser.reload();
+          await refreshUser(); // Update auth context/store with new claims
         }
 
         // Note: pendingRegistration cleanup happens in webhook/Cloud Function
