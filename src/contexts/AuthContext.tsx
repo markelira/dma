@@ -214,6 +214,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // DIAGNOSTIC LOG 6: onAuthStateChanged fired
+      console.log('🔍 [AuthContext] onAuthStateChanged fired', {
+        hasFirebaseUser: !!firebaseUser,
+        uid: firebaseUser?.uid,
+        email: firebaseUser?.email,
+        timestamp: Date.now()
+      });
+
       if (firebaseUser) {
         // Skip fetch if Zustand store was updated within last 5 seconds
         // This prevents duplicate fetches after registration/login
@@ -247,8 +255,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
 
+        // DIAGNOSTIC LOG 7: Setting user state
+        console.log('🔍 [AuthContext] User state SET', {
+          hasUser: !!enrichedUser,
+          role: enrichedUser?.role,
+          uid: enrichedUser?.uid,
+          timestamp: Date.now()
+        });
         setUser(enrichedUser);
       } else {
+        console.log('🔍 [AuthContext] No firebaseUser - clearing user state', {
+          timestamp: Date.now()
+        });
         setUser(null);
       }
       setLoading(false);

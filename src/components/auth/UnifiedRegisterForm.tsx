@@ -357,8 +357,30 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   // Check for pending registration on mount (recovery flow)
   useEffect(() => {
     const checkPendingRegistration = async () => {
+      // DIAGNOSTIC LOG 1: Entry point
+      console.log('🔍 [UnifiedRegisterForm] Recovery useEffect triggered', {
+        recoveryChecked,
+        authLoading,
+        isCheckingPending,
+        hasInviteData: !!inviteData,
+        hasUser: !!user,
+        userId: user?.uid,
+        userEmail: user?.email,
+        recoveryCheckInitiatedRef: recoveryCheckInitiatedRef.current,
+        timestamp: Date.now()
+      });
+
       // Skip if already checked, still loading auth, currently checking, or it's an invite flow
-      if (recoveryChecked || authLoading || isCheckingPending || inviteData) return;
+      if (recoveryChecked || authLoading || isCheckingPending || inviteData) {
+        // DIAGNOSTIC LOG 2: Guard triggered
+        console.log('🔍 [UnifiedRegisterForm] Recovery check SKIPPED - guard triggered', {
+          reason: recoveryChecked ? 'recoveryChecked' :
+                  authLoading ? 'authLoading' :
+                  isCheckingPending ? 'isCheckingPending' : 'inviteData',
+          timestamp: Date.now()
+        });
+        return;
+      }
 
       // Additional safeguard using ref - survives re-renders and state issues
       if (recoveryCheckInitiatedRef.current) {
@@ -369,6 +391,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
       // Only check if user is logged in
       if (!user) {
+        // DIAGNOSTIC LOG 3: No user - THIS MAY BE THE BUG
+        console.log('🔍 [UnifiedRegisterForm] No user - marking recoveryChecked=true (THIS MAY BE THE BUG)', {
+          timestamp: Date.now()
+        });
         // Not logged in yet - mark as checked (new users don't need recovery)
         setRecoveryChecked(true);
         recoveryCheckInitiatedRef.current = true;
@@ -380,12 +406,26 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       setIsCheckingPending(true);
 
       try {
-        console.log('[Registration] Checking for pending registration...');
+        // DIAGNOSTIC LOG 4: Calling getPendingRegistration
+        console.log('🔍 [UnifiedRegisterForm] Calling getPendingRegistration for user', {
+          userId: user.uid,
+          userEmail: user.email,
+          timestamp: Date.now()
+        });
         const getPendingFn = httpsCallable<void, GetPendingRegistrationResponse>(
           functions,
           'getPendingRegistration'
         );
         const result = await getPendingFn();
+
+        // DIAGNOSTIC LOG 5: Response received
+        console.log('🔍 [UnifiedRegisterForm] getPendingRegistration response', {
+          found: result.data.found,
+          alreadyCompleted: result.data.alreadyCompleted,
+          currentStep: result.data.data?.currentStep,
+          hasData: !!result.data.data,
+          timestamp: Date.now()
+        });
 
         if (result.data.alreadyCompleted) {
           // User already completed registration - redirect
