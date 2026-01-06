@@ -158,7 +158,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         return result;
       } else {
-        // If no Firestore document, fall back to custom claims
+        // If no Firestore document, check for pending registration
+        // This handles the "limbo" state where user exited during payment
+        try {
+          console.log('🔍 [AuthContext] No user doc found, checking for pending registration...');
+          const getPendingRegistration = httpsCallable<void, { found: boolean; data?: any }>(
+            functions,
+            'getPendingRegistration'
+          );
+          const pendingResult = await getPendingRegistration();
+
+          if (pendingResult.data.found && pendingResult.data.data) {
+            console.log('🔍 [AuthContext] User has pending registration, marking for redirect');
+            // Return a marker that indicates this user needs to complete registration
+            return {
+              ...firebaseUser,
+              role: undefined,
+              companyId: undefined,
+              companyRole: undefined,
+              teamId: undefined,
+              isTeamOwner: false,
+              _needsRegistrationCompletion: true
+            } as any;
+          }
+        } catch (pendingError) {
+          console.error('🔍 [AuthContext] Error checking pending registration:', pendingError);
+        }
+
+        // Fall back to custom claims (no pending registration found)
         const result = {
           ...firebaseUser,
           role: customClaims.role as UserRole | undefined,
@@ -201,6 +228,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         const enrichedUser = await fetchUserData(firebaseUser);
+
+        // Check if user needs to complete registration (pending payment)
+        if ((enrichedUser as any)._needsRegistrationCompletion) {
+          console.log('🔄 [AuthContext] User needs to complete registration, redirecting to /register...');
+          setLoading(false);
+          // Don't set user in state - redirect to register instead
+          router.push('/register');
+          return;
+        }
+
         setUser(enrichedUser);
       } else {
         setUser(null);
@@ -209,7 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return unsubscribe;
-  }, []);
+  }, [router]);
 
   const login = async (email: string, password: string) => {
     try {

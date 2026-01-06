@@ -4,6 +4,22 @@ import { functions, auth } from '@/lib/firebase'
 import { useAuthStore, User, AuthResponse } from '@/stores/authStore'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 
+// Interface for pending registration Cloud Function response
+interface GetPendingRegistrationResponse {
+  found: boolean;
+  alreadyCompleted?: boolean;
+  data?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    companyName?: string;
+    currentStep: 1 | 2 | 3;
+    pendingEmployees: Array<{ email: string; firstName: string; lastName: string }>;
+    stripeSessionId?: string;
+  };
+}
+
 /**
  * Translate Firebase Auth error codes to Hungarian user-friendly messages
  */
@@ -93,7 +109,42 @@ export function useLogin() {
         })
 
         if (!userDoc.exists()) {
-          // Check if this is a user who hasn't completed email verification
+          // NEW: Check for pending registration in Firestore (3-step registration flow)
+          try {
+            console.log('[useLogin] User doc not found, checking for pending registration...');
+            const getPendingRegistration = httpsCallable<void, GetPendingRegistrationResponse>(
+              functions,
+              'getPendingRegistration'
+            );
+            const pendingResult = await getPendingRegistration();
+
+            if (pendingResult.data.found && pendingResult.data.data) {
+              console.log('[useLogin] Found pending registration at step:', pendingResult.data.data.currentStep);
+              // Store flag to indicate recovery redirect (for UI feedback on register page)
+              sessionStorage.setItem('pendingRegistrationRecovery', 'true');
+              // Redirect to register page to complete payment
+              window.location.href = '/register';
+              // Return a response to prevent further processing
+              return { success: false, needsRegistrationCompletion: true } as any;
+            }
+
+            if (pendingResult.data.alreadyCompleted) {
+              // Edge case: webhook completed registration but we didn't see the user doc
+              // This could be a race condition - sign out and ask user to try again
+              console.log('[useLogin] Registration marked as complete but user doc missing - logging out');
+              await auth.signOut();
+              throw new Error('A regisztráció befejezve. Kérjük, próbálj újra bejelentkezni.');
+            }
+          } catch (pendingError: any) {
+            // If getPendingRegistration fails (not a HttpsError), fall through to old behavior
+            if (!pendingError.message?.includes('regisztráció')) {
+              console.error('[useLogin] Error checking pending registration:', pendingError);
+            } else {
+              throw pendingError; // Re-throw our custom error
+            }
+          }
+
+          // FALLBACK: Check old sessionStorage method (backwards compatibility)
           const pendingRegistrationData = typeof window !== 'undefined'
             ? sessionStorage.getItem('pendingRegistrationData')
             : null;
@@ -103,7 +154,7 @@ export function useLogin() {
               const pendingData = JSON.parse(pendingRegistrationData);
               if (pendingData.email && pendingData.email.toLowerCase() === email.toLowerCase()) {
                 // User registered but didn't verify - set up verification modal
-                console.log('[useLogin] User has pending verification, redirecting to complete it');
+                console.log('[useLogin] User has pending verification (old flow), redirecting to complete it');
                 sessionStorage.setItem('pendingEmailVerification', JSON.stringify({
                   userId: userCredential.user.uid,
                   email: email
@@ -120,7 +171,7 @@ export function useLogin() {
           }
 
           console.error('❌ [DIAGNOSTIC] User document NOT FOUND in Firestore for uid:', userCredential.user.uid)
-          throw new Error('Felhasználói adatok nem találhatók')
+          throw new Error('Felhasználói adatok nem találhatók. Kérlek, fejezd be a regisztrációt.')
         }
 
         const userData = userDoc.data()
