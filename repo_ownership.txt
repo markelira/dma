@@ -1,0 +1,2 @@
+origin	https://github.com/markelira/dma.git (fetch)
+origin	https://github.com/markelira/dma.git (push)

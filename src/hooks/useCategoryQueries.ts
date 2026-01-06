@@ -49,8 +49,11 @@ export const useCategories = () => {
       }
     },
     // FIXED: Removed enabled: authReady - this is public data, fetch immediately
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
+    // COST OPTIMIZATION: Categories rarely change, cache for 30 minutes
+    // This reduces function calls from ~880/day to ~150/day
+    staleTime: 30 * 60 * 1000, // 30 minutes (was 5 minutes)
+    gcTime: 60 * 60 * 1000, // 60 minutes (was 10 minutes)
     retry: 1,
+    refetchOnWindowFocus: false, // Don't refetch on tab focus for static data
   })
 } 

@@ -231,11 +231,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Check if user needs to complete registration (pending payment)
         if ((enrichedUser as any)._needsRegistrationCompletion) {
-          console.log('🔄 [AuthContext] User needs to complete registration, redirecting to /register...');
-          setLoading(false);
-          // Don't set user in state - redirect to register instead
-          router.push('/register');
-          return;
+          // Only redirect if not already on /register to avoid infinite loop
+          const isOnRegisterPage = typeof window !== 'undefined' && window.location.pathname === '/register';
+
+          if (!isOnRegisterPage) {
+            console.log('🔄 [AuthContext] User needs to complete registration, redirecting to /register...');
+            setLoading(false);
+            // Don't set user in state - redirect to register instead
+            router.push('/register');
+            return;
+          } else {
+            console.log('🔄 [AuthContext] User needs to complete registration, already on /register - no redirect needed');
+            setLoading(false);
+            return;
+          }
         }
 
         setUser(enrichedUser);

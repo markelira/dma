@@ -94,21 +94,28 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
                 const pendingResult = await getPendingRegistration()
 
                 if (pendingResult.data.found && pendingResult.data.data) {
-                  console.log('🔄 [AuthProvider] User has pending registration, redirecting to /register...')
-                  // Set minimal auth for redirect
-                  const userData: User = {
-                    id: fbUser.uid,
-                    uid: fbUser.uid,
-                    email: fbUser.email || '',
-                    firstName: fbUser.displayName?.split(' ')[0] || '',
-                    lastName: fbUser.displayName?.split(' ')[1] || '',
-                    role: 'STUDENT',
+                  // Only redirect if not already on /register to avoid infinite loop
+                  const isOnRegisterPage = typeof window !== 'undefined' && window.location.pathname === '/register'
+
+                  if (!isOnRegisterPage) {
+                    console.log('🔄 [AuthProvider] User has pending registration, redirecting to /register...')
+                    // Set minimal auth for redirect
+                    const userData: User = {
+                      id: fbUser.uid,
+                      uid: fbUser.uid,
+                      email: fbUser.email || '',
+                      firstName: fbUser.displayName?.split(' ')[0] || '',
+                      lastName: fbUser.displayName?.split(' ')[1] || '',
+                      role: 'STUDENT',
+                    }
+                    setAuth(userData, idToken)
+                    setAuthReady(true)
+                    // Redirect to register to complete registration
+                    window.location.href = '/register'
+                    return
+                  } else {
+                    console.log('🔄 [AuthProvider] User has pending registration, already on /register - no redirect needed')
                   }
-                  setAuth(userData, idToken)
-                  setAuthReady(true)
-                  // Redirect to register to complete registration
-                  window.location.href = '/register'
-                  return
                 }
               } catch (pendingError) {
                 console.error('🔍 [AuthProvider] Error checking pending registration:', pendingError)

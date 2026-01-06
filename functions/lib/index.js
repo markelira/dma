@@ -157,7 +157,7 @@ exports.checkEmailAvailability = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
     memory: '256MiB',
-    minInstances: 1,
+    // minInstances removed to reduce baseline costs
     maxInstances: 50,
     timeoutSeconds: 10,
 }, async (request) => {
@@ -950,9 +950,9 @@ exports.updateUserRole = (0, https_1.onCall)({
 exports.getCourse = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
-    memory: '512MiB',
-    minInstances: 2,
-    maxInstances: 100,
+    memory: '256MiB',
+    // minInstances removed to reduce baseline costs (~$0.22/day savings)
+    maxInstances: 50,
     timeoutSeconds: 30,
 }, async (request) => {
     try {
@@ -1078,9 +1078,9 @@ exports.getCourse = (0, https_1.onCall)({
 exports.getCoursesCallable = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
-    memory: '512MiB',
-    minInstances: 2,
-    maxInstances: 100,
+    memory: '256MiB',
+    // minInstances removed to reduce baseline costs (~$0.22/day savings)
+    maxInstances: 50,
     timeoutSeconds: 60,
 }, async (request) => {
     try {
@@ -1606,7 +1606,7 @@ exports.notifyNewContent = (0, https_1.onCall)({
 exports.getCategories = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
-    minInstances: 1,
+    // minInstances removed - this function is called 880+ times/day, caching should be added client-side
 }, async (request) => {
     try {
         v2_1.logger.info('[getCategories] Called');
@@ -2161,8 +2161,8 @@ Object.defineProperty(exports, "getPlayerData", { enumerable: true, get: functio
 exports.enrichEnrollments = (0, https_1.onCall)({
     cors: true,
     region: 'europe-west1',
-    memory: '512MiB',
-    minInstances: 1,
+    memory: '256MiB',
+    // minInstances removed to reduce baseline costs
     maxInstances: 50,
     timeoutSeconds: 30,
 }, async (request) => {

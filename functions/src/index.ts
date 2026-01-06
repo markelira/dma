@@ -140,7 +140,7 @@ export const checkEmailAvailability = onCall({
   cors: true,
   region: 'europe-west1',
   memory: '256MiB',
-  minInstances: 1,
+  // minInstances removed to reduce baseline costs
   maxInstances: 50,
   timeoutSeconds: 10,
 }, async (request) => {
@@ -1030,9 +1030,9 @@ export const updateUserRole = onCall({
 export const getCourse = onCall({
   cors: true,
   region: 'europe-west1',
-  memory: '512MiB',
-  minInstances: 2,
-  maxInstances: 100,
+  memory: '256MiB',
+  // minInstances removed to reduce baseline costs (~$0.22/day savings)
+  maxInstances: 50,
   timeoutSeconds: 30,
 }, async (request) => {
   try {
@@ -1173,9 +1173,9 @@ export const getCourse = onCall({
 export const getCoursesCallable = onCall({
   cors: true,
   region: 'europe-west1',
-  memory: '512MiB',
-  minInstances: 2,
-  maxInstances: 100,
+  memory: '256MiB',
+  // minInstances removed to reduce baseline costs (~$0.22/day savings)
+  maxInstances: 50,
   timeoutSeconds: 60,
 }, async (request) => {
   try {
@@ -1784,7 +1784,7 @@ export const notifyNewContent = onCall({
 export const getCategories = onCall({
   cors: true,
   region: 'europe-west1',
-  minInstances: 1,
+  // minInstances removed - this function is called 880+ times/day, caching should be added client-side
 }, async (request) => {
   try {
     logger.info('[getCategories] Called');
@@ -2464,8 +2464,8 @@ export { getPlayerData } from './playerData';
 export const enrichEnrollments = onCall({
   cors: true,
   region: 'europe-west1',
-  memory: '512MiB',
-  minInstances: 1,
+  memory: '256MiB',
+  // minInstances removed to reduce baseline costs
   maxInstances: 50,
   timeoutSeconds: 30,
 }, async (request) => {

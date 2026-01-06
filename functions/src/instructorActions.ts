@@ -43,7 +43,7 @@ const deleteInstructorSchema = z.object({
 export const getInstructors = onCall({
   cors: true,
   region: 'europe-west1',
-  minInstances: 1,
+  // minInstances removed - this function is called 340+ times/day, caching should be added client-side
 }, async (request) => {
   try {
     logger.info('[getInstructors] Called');

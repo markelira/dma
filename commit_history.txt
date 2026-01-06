@@ -1,0 +1,419 @@
+895c3b4 - mark, 2025-12-23 : fix: Fix Invalid Date in admin users list and remove Last Login column
+93a80e2 - mark, 2025-12-23 : feat: Make registration value proposition collapsible on mobile
+9d69c64 - mark, 2025-12-23 : fix: Clear subscription cache flag after payment completion
+7f07c7a - mark, 2025-12-23 : fix: Refresh auth state when webhook completes registration first
+34d9b39 - mark, 2025-12-23 : fix: Remove trial popup after registration and fix form flash on payment return
+f87d217 - mark, 2025-12-23 : fix: Sync Zustand store in refreshUser() to fix post-registration redirect
+96f47bd - mark, 2025-12-23 : fix: Refresh auth state after registration completion
+617df01 - mark, 2025-12-23 : fix: Widen auth layout for Stripe checkout (max-w-sm → max-w-lg)
+a078cf2 - mark, 2025-12-23 : fix: Prevent registration form remount and infinite loop on step 2
+bc0b566 - mark, 2025-12-23 : feat: Bulletproof registration flow with Firestore persistence
+bf87f48 - mark, 2025-12-22 : fix: Make phone number field read-only in settings pages
+66513ee - mark, 2025-12-22 : fix: Update carousel titles to 'Felkapott/Legújabb X' format
+fcf5914 - mark, 2025-12-22 : fix: Update billing page texts (Számláim menu, new empty state copy)
+eef3c1f - mark, 2025-12-22 : fix: Dynamic employee counts and Hungarian name order (lastName firstName)
+1d71666 - mark, 2025-12-22 : fix: Remove article 'a' from hero text
+16f49e2 - mark, 2025-12-22 : fix: Apply category/audience filters from URL in company courses page
+5e360c4 - mark, 2025-12-22 : fix: Increase carousel padding for hover shadow visibility
+2c8c253 - mark, 2025-12-22 : fix: Add 'Összes megtekintése' link and fix carousel alignment
+48007c7 - mark, 2025-12-22 : perf: Optimize dashboard course cards for reduced memory and lag
+20ca269 - mark, 2025-12-22 : feat: Add Open Graph image for social sharing
+9670c5e - mark, 2025-12-22 : feat: Comprehensive SEO implementation for Google indexing
+2d40c09 - mark, 2025-12-22 : feat: Add Vercel Analytics for page views tracking
+d0aeadd - mark, 2025-12-21 : feat: Improve admin dashboard and activity feed
+0ff05ed - mark, 2025-12-21 : fix: Update isEmployee() to check user document companyId
+7dc44b1 - mark, 2025-12-21 : fix: Add auditLogs collection to Firestore rules
+4c0e7d5 - mark, 2025-12-21 : fix: Add Mux analytics and Chromecast to CSP
+8926bd7 - mark, 2025-12-21 : fix: Company permission fixes for employees and admins
+d3d92ed - mark, 2025-12-21 : fix: Allow reading non-existent enrollment documents
+a8065cd - mark, 2025-12-21 : fix: Handle enrollment permission errors gracefully
+bf0cd18 - mark, 2025-12-21 : feat: Redesign admin dashboard with live activity section
+2008e1c - mark, 2025-12-21 : feat: Redesign admin dashboard to match user/company dashboard
+0ab0185 - mark, 2025-12-21 : feat: Add comprehensive analytics dashboard for admin
+0fadd21 - mark, 2025-12-21 : perf: Phase 2 stability fixes for 1000 concurrent users
+8d009a5 - mark, 2025-12-21 : feat: Scalability improvements for 1000 concurrent users
+610759d - mark, 2025-12-21 : feat: Pre-launch security and performance improvements
+d98e78c - mark, 2025-12-21 : fix: Add PrivacySettings to company dashboard and fix export error handling
+359fd06 - mark, 2025-12-21 : feat: Pre-launch security, performance, and GDPR fixes
+21187bd - mark, 2025-12-21 : feat: Display company logo in sidebar for admins and employees
+d27ca4e - mark, 2025-12-21 : fix: Mobile UI improvements across multiple components
+afc9e29 - mark, 2025-12-21 : feat: Transform employee popup to match boss trial popup design
+9d160e1 - mark, 2025-12-21 : fix: Increase carousel left padding to pl-12 (48px) for hover effects
+4b88756 - mark, 2025-12-21 : fix: Remove overflow-hidden clipping from carousel containers
+8d657ab - mark, 2025-12-21 : fix: Add left padding to course carousels to prevent first card cut-off
+29f3351 - mark, 2025-12-21 : fix: Sidebar extends full height in all course player types
+0e7982c - mark, 2025-12-21 : fix: Sidebar panels extend full height
+b7f17c0 - mark, 2025-12-21 : fix: Adjust player layout to not cut off sidebar
+256bef6 - mark, 2025-12-21 : fix: Course player scrolling and completion modal CTA
+1939315 - mark, 2025-12-21 : fix: Update all CTA buttons to use useTrialCTA hook
+dde13fb - mark, 2025-12-21 : fix: Wait for subscription status before deciding checkout vs dashboard redirect
+f8a8bea - mark, 2025-12-21 : fix: CTA buttons now initiate Stripe checkout for logged-in users
+7468e3b - mark, 2025-12-20 : fix: Wait for authReady on marketing course page modal
+22db5c6 - mark, 2025-12-20 : fix: Wait for authReady before showing company employee modal
+f234b9c - mark, 2025-12-20 : feat: Add notify boss button to company employee no access modal
+9b530bf - mark, 2025-12-20 : fix: Use proper random shuffle for hero carousels (shuffle before slice)
+5051548 - mark, 2025-12-20 : fix: Use per-refresh shuffle for hero carousels instead of daily rotation
+93fe8b8 - mark, 2025-12-20 : fix: Ensure popups reliably appear when triggered
+6cc446f - mark, 2025-12-20 : feat: Course player responsiveness + email template fixes
+ae68ad2 - mark, 2025-12-19 : feat: Update subscription canceled email with new copy
+bdfdb03 - mark, 2025-12-19 : feat: Update subscription started email with new copy
+2142ff8 - mark, 2025-12-19 : feat: Update welcome email with new copy
+2beabe8 - mark, 2025-12-19 : feat: Mark course completed at 99% progress
+0291ba7 - mark, 2025-12-19 : feat: Update lesson completion threshold to 99.5%
+d0af113 - mark, 2025-12-19 : fix: Handle pending verification in useLogin with real userId
+62485d4 - mark, 2025-12-19 : fix: Only redirect to verification if email matches pending registration
+a936dba - mark, 2025-12-19 : fix: Registration flow improvements
+23372aa - mark, 2025-12-19 : fix: Memoize course type carousels to prevent re-render glitching
+bfb033b - mark, 2025-12-19 : fix: Fix company dashboard carousel and rename filter labels
+f4a853f - mark, 2025-12-18 : feat: Improve company employees progress tracking
+a64b5ae - mark, 2025-12-18 : perf: Add lazy loading to remaining carousel components
+eb71ce9 - mark, 2025-12-18 : perf: Add lazy loading to course carousels
+aa99219 - mark, 2025-12-18 : fix: Add shuffle to all carousels on /dashboard page
+1cfb375 - mark, 2025-12-18 : fix: Add shuffle to all carousels and use contentCreatedAt for newest
+de2f1b5 - mark, 2025-12-18 : fix: Simplify payment success page and redirect to company dashboard
+8581838 - mark, 2025-12-18 : feat: Show welcome popup after successful checkout
+b0557a4 - mark, 2025-12-18 : fix: Center align checkmarks with text in FreeTrialModal
+460960f - mark, 2025-12-18 : feat: Simplify subscription success popup
+76de85f - mark, 2025-12-18 : fix: Correct import path for updateAuthStoreFromFirebase
+38f1e5f - mark, 2025-12-18 : fix: Handle missing user doc during email verification
+96822cc - mark, 2025-12-18 : fix: Delay Firestore document creation until email verification
+ebbf51d - mark, 2025-12-18 : fix: Employee subscription recognized immediately after registration
+be24169 - mark, 2025-12-18 : fix: Update company plan field for past_due status
+4ce4086 - mark, 2025-12-18 : fix: Update all subscription locations on payment failure/success
+1453ca3 - mark, 2025-12-18 : fix: Remove useAuth dependency from settings pages
+0350d2f - mark, 2025-12-18 : fix: Migrate sidebars from useAuth to useAuthStore
+401463d - mark, 2025-12-18 : fix: Critical loading issues - remove blocking patterns and auth race conditions
+6f4cdd3 - mark, 2025-12-18 : chore: Trigger Vercel redeploy
+1528dcc - mark, 2025-12-18 : feat: Add watchlist support to company progress tracking
+896bcfa - mark, 2025-12-18 : fix: Show firstName + lastName instead of email in progress tracking
+3e27f7e - mark, 2025-12-18 : refactor: Redesign Nyomonkövetés (progress tracking) section
+ffd2b13 - mark, 2025-12-18 : refactor: Simplify company employees page UI
+a3be110 - mark, 2025-12-18 : perf: Registration flow optimizations + instant verification modal
+9f9e4c0 - mark, 2025-12-17 : perf: Use count() aggregation in platformAnalytics
+663b192 - mark, 2025-12-17 : perf: Parallelize fetches in usePlayerData hook
+3010847 - mark, 2025-12-17 : perf: Fix N+1 queries in courseCatalog and progressTracking
+6409e45 - mark, 2025-12-17 : fix: Move getDashboardStats to europe-west1 region
+210d479 - mark, 2025-12-17 : perf: Phase 2 - Move all functions to europe-west1 region
+ddffdef - mark, 2025-12-17 : perf: Phase 1 quick wins for performance optimization
+500aacb - mark, 2025-12-17 : fix: Registration flow improvements
+eaf6aae - mark, 2025-12-17 : fix: Homepage carousel hover states - only highlight hovered card
+885857a - mark, 2025-12-17 : feat: Update registration flow and subscription popup
+36aa5b0 - mark, 2025-12-17 : fix: Prevent subscription modal race condition for company employees
+9c96668 - mark, 2025-12-17 : fix: Rename profile picture to company logo on settings
+1b2a9c0 - mark, 2025-12-17 : fix: Update employee invite text on register page
+fc94b9f - mark, 2025-12-17 : feat: Replace profile picture with read-only company logo
+f435a9b - mark, 2025-12-17 : fix: Update empty state for courses pages
+a5212ed - mark, 2025-12-17 : feat: Update employees page UI and add admin protection
+86825ce - mark, 2025-12-16 : fix: Company admin role demotion bug on player navigation
+4ea858f - mark, 2025-12-16 : fix: Company admin role case sensitivity issue
+0436c83 - mark, 2025-12-16 : fix: Add profile picture upload to individual settings page
+b9fb96b - mark, 2025-12-16 : feat: Simplify settings pages - merge tabs, remove unused fields
+32a33d6 - mark, 2025-12-16 : fix: Auto-apply search query filter to prevent random errors
+4b42f2a - mark, 2025-12-16 : feat: Improve search/filter bar UX across dashboard
+6f0b621 - mark, 2025-12-16 : fix: Course card badges now use course-level stats fields
+8f7d35d - mark, 2025-12-16 : feat: Course card improvements with duration/part badges
+2ecfd68 - mark, 2025-12-16 : feat: Update course type pages with proper carousel names
+e5eacfe - mark, 2025-12-16 : fix: Set isEnrolled to true on my-courses hero carousels
+1af06d8 - mark, 2025-12-16 : feat: Redesign my-courses pages with Netflix-style hero carousel
+490d4fe - mark, 2025-12-16 : feat: Improve Netflix hero carousel - remove clutter and filter by enrollment
+6cbd7eb - mark, 2025-12-16 : feat: Add cancel button to email verification modal
+0246d66 - mark, 2025-12-16 : fix: Increase carousel vertical padding to py-12 for card visibility
+2473579 - mark, 2025-12-16 : fix: Revert card width and increase carousel vertical padding
+1a84f67 - mark, 2025-12-16 : feat: Sort course carousels by contentCreatedAt and increase carousel size
+06a4782 - mark, 2025-12-16 : fix: Use Stripe invoices API instead of Firestore collection
+b357b5d - mark, 2025-12-16 : fix: Add Firestore index for invoices query (userId + createdAt)
+04d7c8a - mark, 2025-12-16 : fix: Use correct 14,990 HUF price ID for subscription checkout
+6cb4839 - mark, 2025-12-16 : fix: Update no-subscription view and fix Stripe checkout
+cbc51e8 - mark, 2025-12-16 : feat: Color-code subscription status with green/red scheme
+f6f9dea - mark, 2025-12-16 : fix: Update admin billing view with Masterclass branding
+a0cc16c - mark, 2025-12-16 : feat: Update billing page with Masterclass branding and dynamic status
+d679ded - mark, 2025-12-16 : fix: Auto-validate and save unsaved employee data on registration complete
+7be9e6b - mark, 2025-12-16 : fix: Re-check email availability before registration completion
+1adb68e - mark, 2025-12-16 : fix: Prevent double-click registration race condition (critical bug)
+88a60f8 - mark, 2025-12-16 : feat: Add success feedback when employee is added
+7429092 - mark, 2025-12-16 : feat: Transform registration form to adventure-themed flow
+0ac5c1b - mark, 2025-12-14 : feat: Different modal for company employees without subscription
+f249220 - mark, 2025-12-14 : fix: Email check during invite + remove subscription guard
+9a2a62f - mark, 2025-12-14 : feat: Add employee invites to registration form (Step 2)
+361adbe - mark, 2025-12-14 : fix: Use brand color for popup button
+7d3e33b - mark, 2025-12-14 : fix: Simplify popup subtitle to 'Munkatárs meghívás'
+269692e - mark, 2025-12-14 : feat: Require subscription to invite employees
+fa811b7 - mark, 2025-12-14 : fix: Skip Stripe checkout for invited employees
+0a3b3e8 - mark, 2025-12-14 : fix: Company admin routing - block /dashboard access, fix navbar links
+74a2c5e - mark, 2025-12-14 : fix: Employees (COMPANY_EMPLOYEE) should go to /dashboard, not /company/dashboard
+d8c279c - mark, 2025-12-14 : fix: Redirect company_admin users to /company/dashboard instead of /dashboard
+598cea1 - mark, 2025-12-14 : fix: Fix 'Miért fogod imádni' section visibility on 21:9 monitors
+6e4c087 - mark, 2025-12-14 : fix: Remove Framer Motion animation causing section disappearance on 21:9
+23eeac8 - mark, 2025-12-14 : fix: Resolve "Miért fogod imádni" section cutoff on 21:9 monitors
+b74ee9b - mark, 2025-12-14 : feat: Transform /courses page to match course type architecture
+e9e83bc - mark, 2025-12-14 : fix: Add Firestore index for passwordResetAttempts
+379a92e - mark, 2025-12-14 : fix: Fix password reset 500 error (FirebaseError: INTERNAL)
+ebf1f3c - mark, 2025-12-14 : feat: Update welcome popup text after subscription
+e2b58f5 - mark, 2025-12-14 : feat: Change course completion threshold from 90% to 99.5%
+f2e0e51 - mark, 2025-12-14 : feat: Fix course detail page display issues
+3ea7eae - mark, 2025-12-14 : fix: Remove duration displays from all SidePanel components
+f5bfa53 - mark, 2025-12-14 : feat: Remove duration displays from all course player sidebars
+c18b37b - mark, 2025-12-14 : fix: Remove '0' duration display from MasterclassSidebar
+c10fe46 - mark, 2025-12-14 : fix: Remove lesson number badges showing '0' from MasterclassSidebar
+4f572b6 - mark, 2025-12-14 : fix: Remove '0' from NetflixPlayerLayout lesson duration display
+8523a04 - mark, 2025-12-14 : fix: Remove mysterious '0' under lesson titles with strengthened duration guards
+03a4c38 - mark, 2025-12-14 : fix: Remove 'lecke' from NetflixPlayerLayout navigation buttons
+50d4a3c - mark, 2025-12-14 : fix: Remove 'lecke' terminology, use 'rész' for all course types
+02d43c3 - mark, 2025-12-14 : fix: Use 'rész' terminology for Academia navigation buttons
+cea0e42 - mark, 2025-12-14 : fix: Remove instructor counter from all sidebar panels
+34c0890 - mark, 2025-12-14 : feat: Implement instructor carousel/selection pattern across all course types
+c3c9159 - mark, 2025-12-13 : feat: Complete course player UI fixes from screenshot feedback
+640759a - mark, 2025-12-13 : feat: Complete course player UI improvements
+bf1281a - mark, 2025-12-13 : fix: Correct JSX nesting in company billing page
+3bde020 - mark, 2025-12-13 : refactor: Remove header from company billing page
+b3f1661 - mark, 2025-12-13 : refactor: Remove admin badge from company billing page
+1eeecf1 - mark, 2025-12-13 : feat: Simplify subscription cancellation with confirmation dialog
+73566a4 - mark, 2025-12-13 : fix: Kurzus kártya hover animáció hibák javítása
+d685407 - mark, 2025-12-13 : feat: Univerzális PremiumCourseCard beiratkozási státusszal és Mux időtartammal
+29cf62d - mark, 2025-12-13 : feat: Remove partner heading from homepage hero
+9bdb000 - mark, 2025-12-13 : feat: Remove hyphen from Masterclass plural form
+9bc186c - mark, 2025-12-13 : feat: Update navbar labels
+b5512e2 - mark, 2025-12-13 : feat: Rename "Népszerű" to "Felkapott" across all course carousels
+99954cd - mark, 2025-12-13 : fix: Simplify trial status check in webhook to resolve TypeScript error
+6bc0943 - mark, 2025-12-13 : feat: Dashboard improvements and navigation updates
+22d56a6 - mark, 2025-12-12 : feat: Add back 'Gyakran ismételt kérdések' title to FAQ section
+134afdd - mark, 2025-12-12 : feat: Add URL query parameter support for category filtering
+4cdb3b1 - mark, 2025-12-12 : feat: Update FAQ section with new content
+34f7ed8 - mark, 2025-12-12 : feat: Change Masterclass icon from Trophy to Monitor
+a7351d1 - mark, 2025-12-12 : feat: Remove social proof stats section from homepage
+782745c - mark, 2025-12-12 : feat: Remove numbered labels from WhyDMA section
+34e82d5 - mark, 2025-12-12 : feat: Update pricing section text for clarity
+0424d6a - mark, 2025-12-12 : docs: Add comprehensive mobile-first testing checklist
+bb520c7 - mark, 2025-12-12 : feat: Transform hero and banner components to mobile-first
+58a2ad5 - mark, 2025-12-12 : feat: Transform Akademia page to mobile-first design
+b23d16f - mark, 2025-12-12 : feat: Phase 3 mobile-first - Transform 15 homepage components
+101589f - mark, 2025-12-12 : feat: Phase 2 mobile-first - Navigation, course detail, and filters
+01eed66 - mark, 2025-12-12 : feat: Implement mobile-first responsive design across marketing pages
+cc88417 - mark, 2025-12-12 : fix: Improve category badge display logic in PremiumCourseCard
+b0f01a8 - mark, 2025-12-11 : debug: Add logging to check category data
+3de1295 - mark, 2025-12-11 : fix: Remove scale effect on card hover
+2b83725 - mark, 2025-12-11 : refactor: Match course card design to enrolled course card reference
+a7ac540 - mark, 2025-12-11 : fix: Prevent all cards from highlighting when hovering on carousel
+1902f1c - mark, 2025-12-11 : refactor: Reorganize course card layout - title first, badges centered
+538f714 - mark, 2025-12-11 : fix: Remove marketing copy and fix hero title sizing on course type pages
+84f9290 - mark, 2025-12-11 : feat: Transform /courses page to dashboard-style design
+50aa66d - mark, 2025-12-11 : refactor: Remove course type descriptions from courses page
+a02a2c9 - mark, 2025-12-11 : refactor: Remove company account banner from company dashboard
+8f71261 - mark, 2025-12-11 : fix: Complete employee invitation flow overhaul
+a0dde44 - mark, 2025-12-11 : refactor: Update registration form - Hungarian name order & remove optional fields
+b43181e - mark, 2025-12-11 : fix: Prevent premature redirect during registration
+80fa53c - mark, 2025-12-11 : fix: Resolve registration race condition by manually updating Zustand store
+66f45c4 - mark, 2025-12-11 : debug: Add validation logs to track registration race condition
+a87eb84 - mark, 2025-12-11 : fix: Change role from COMPANY_ADMIN to company_admin (lowercase) to match UserRole enum
+1e2730c - mark, 2025-12-11 : fix: Send email verification code after registration
+2cc4800 - mark, 2025-12-11 : fix: Remove setFormData references from register page
+2c211af - mark, 2025-12-11 : feat: Implement unified registration system
+bfa37c0 - mark, 2025-12-11 : fix: Mobile navigation and instructor image display
+17006b3 - mark, 2025-12-11 : fix: Add mobile 'Összes megtekintése' button to homepage
+05e6b92 - mark, 2025-12-11 : fix: Use formatAmount() for billing price display
+157bf77 - mark, 2025-12-11 : fix: Comprehensive mobile UI improvements for homepage and category pages
+4793315 - mark, 2025-12-11 : fix: Add mobile responsive layout to Netflix-style course player
+0594780 - mark, 2025-12-11 : fix: Add paragraph spacing for text lesson content
+32f5493 - mark, 2025-12-11 : fix: Improve text lesson readability in course player
+f3e6dbd - mark, 2025-12-11 : feat: Footer and UI improvements
+4dfd64d - mark, 2025-12-11 : fix: Individual card hover (not whole row)
+b36b7d7 - mark, 2025-12-11 : fix: Hover shadow overflow and auto-apply filters
+4248a50 - mark, 2025-12-11 : fix: Round 2 UI fixes - cards, hover, search removal, settings
+30a6fc7 - mark, 2025-12-11 : feat: Complete dashboard & cards UI overhaul
+f4fc60f - mark, 2025-12-10 : fix: Hide CourseFeaturesSection sales content for subscribers
+24e1c35 - mark, 2025-12-10 : fix: Remove Netflix popup, hide sales sections for subscribers
+14fa1bb - mark, 2025-12-10 : feat: Course detail page improvements for subscribers
+0e388dc - mark, 2025-12-10 : feat: Remove /pricing from user flow, redirect to /register
+ec1c6ac - mark, 2025-12-10 : feat: Randomize course carousel order across all pages
+ac35f8b - mark, 2025-12-10 : feat: Add Hungarian privacy policy and terms of service pages
+d215849 - mark, 2025-12-10 : feat: Add email availability check cloud function and improve auth error handling
+ceeaed6 - mark, 2025-12-10 : feat: Redesign auth pages - remove terminal illustration, add early email check
+be14ed6 - mark, 2025-12-10 : feat: Redesign pricing page with simple dashboard style
+f592a7e - mark, 2025-12-10 : fix: Remove instructor name from navbar dropdown, rename button to Kezdőlap
+9c15bd9 - mark, 2025-12-10 : feat: Dashboard improvements - multi-instructor, carousels, UI cleanup
+755e437 - mark, 2025-12-10 : feat: Redesign dashboard sidebar and add Összes tartalom page
+d74d120 - mark, 2025-12-10 : fix: Billing page improvements
+60430d7 - mark, 2025-12-10 : fix: Restore FolderOpen import for instructor sidebar
+0ce5165 - mark, 2025-12-10 : feat: Add Stripe Customer Portal billing management
+62408a7 - mark, 2025-12-10 : fix: Remove "Profil beállítások" from sidebar quick actions
+735b22b - mark, 2025-12-10 : fix: Sync profile picture with sidebar after upload
+27c48d6 - mark, 2025-12-10 : fix: Update storage rules to allow user profile picture uploads
+89db8e8 - mark, 2025-12-10 : feat: Complete settings pages with profile picture upload
+a020c76 - mark, 2025-12-09 : fix: Remove image zoom effect and mentor info from course cards
+6cba938 - mark, 2025-12-09 : fix: Remove /dashboard/vezerlopult page and sidebar link
+44c3597 - mark, 2025-12-09 : fix: Remove "Összes" link from course carousels in dashboard
+2e6296a - mark, 2025-12-09 : feat: Remove wishlist feature, use bookmark icon for enrollment
+51a0fa8 - mark, 2025-12-09 : fix: Show full lesson titles in course player sidebar
+f2e2221 - mark, 2025-12-09 : feat: Multi-select filters with renamed labels
+64552a8 - mark, 2025-12-09 : fix: Add fallback for broken thumbnail images in course cards
+85f5ae4 - mark, 2025-12-09 : fix: Show full course titles in EnrolledCourseCard
+d9b7dd7 - mark, 2025-12-09 : fix: Show full course titles without truncation in dashboard cards
+26346f5 - mark, 2025-12-09 : fix: Change "alkalmazott" to "munkatárs" in company registration
+4b736f1 - mark, 2025-12-09 : fix: Add flex-shrink-0 to register page checkmark icons
+edc84e9 - mark, 2025-12-09 : fix: Update footer - Tartalmak, masterclass.dma.hu links, larger logo
+4b5ddb1 - mark, 2025-12-09 : fix: Adjust hero content position - reduce padding-top
+2fe9d4a - mark, 2025-12-09 : fix: Hero description expand UX - content pushes down instead of up
+67988b9 - mark, 2025-12-09 : fix: Use | divider between bio and position
+11f01bf - mark, 2025-12-09 : fix: Use instructor bio for company display + update pricing features
+428e389 - mark, 2025-12-09 : feat: Improve course detail page design
+f7b4753 - mark, 2025-12-09 : feat: Progress bars + enrollment-based carousel sorting
+965d7b7 - mark, 2025-12-06 : fix: Make video player controls background transparent
+6aa0939 - mark, 2025-12-06 : feat: Video resume position - save and restore playback progress
+85dd8a9 - mark, 2025-12-06 : feat: Unify CTA messaging to "Fedezd fel 7 napig ingyen"
+a411a8f - mark, 2025-12-06 : fix: Watchlist "No document to update" error
+a0a9f9b - mark, 2025-12-06 : feat: Course detail page UX improvements
+e74089f - mark, 2025-12-06 : feat: Rename "Szereplő" to "Vendég" for podcasts
+818745e - mark, 2025-12-06 : fix: Show all instructors/mentors in hero sections
+91794e4 - mark, 2025-12-06 : feat: Dashboard improvements and profile settings updates
+9027bd7 - mark, 2025-12-06 : feat: Add filter functionality to course type pages
+6b15e45 - mark, 2025-12-06 : feat: Add course type and instructor filters to DashboardSearch
+0e59b49 - mark, 2025-12-06 : feat: Add course type, target audience, and instructor filters to /courses page
+7503498 - mark, 2025-12-06 : fix: Rename 'Saját tartalmaim' to 'Saját listám' in sidebar
+d49173c - mark, 2025-12-06 : feat: Replace wishlist with enrollment button on course cards
+2797ba6 - mark, 2025-12-06 : fix: Disable wishlist feature - Cloud Functions not deployed
+8902a2a - mark, 2025-12-06 : feat: Dashboard UX improvements & category filtering
+62174fc - mark, 2025-12-02 : feat: Mobile-first responsive improvements for homepage (Phase 1-2)
+9e9acc6 - mark, 2025-12-01 : feat: Complete homepage redesign with editorial style sections
+cdc4be8 - mark, 2025-11-30 : feat: Add szamlazz.hu Hungarian invoice integration
+456c5d9 - mark, 2025-11-30 : fix: Remove virtual enrollments - only show explicit enrollments
+a1ba373 - mark, 2025-11-30 : fix: Make Netflix player title smaller (text-sm)
+b79a5dc - mark, 2025-11-30 : fix: All course player back buttons now go to /dashboard
+f260f73 - mark, 2025-11-30 : feat: Dashboard filters work in-place instead of redirecting
+a251014 - mark, 2025-11-30 : fix: Course player back button goes to dashboard, smaller title
+bf3b984 - mark, 2025-11-30 : fix: Make navbar course type links clickable to navigate to sales pages
+0787f02 - mark, 2025-11-30 : fix: Navbar logo links to dashboard when authenticated, course links use ID
+4b2c0bd - mark, 2025-11-30 : fix: Make email white and readable in verification modal
+db8ff94 - mark, 2025-11-30 : fix: Show welcome modal first, then payment modal, add loading state
+0e9af55 - mark, 2025-11-30 : feat: Improve registration and authentication UX
+fa5d1df - mark, 2025-11-29 : fix: Company progress dashboard now shows all company user enrollments
+2683710 - mark, 2025-11-29 : fix: Company subscription not activating after Stripe checkout
+c22d212 - mark, 2025-11-29 : fix: Company employee subscription access - invalidate cache after invite
+c5412ad - mark, 2025-11-29 : fix: Add profile settings page to company dashboard
+ba25847 - mark, 2025-11-29 : fix: Enable sidebar scrolling in all course player layouts
+7a201e6 - mark, 2025-11-29 : feat: Add company invoices page with szamlazz.hu integration
+5ed3dde - mark, 2025-11-29 : fix: Enable sidebar scrolling + collapsible description with Több button
+b9ed72e - mark, 2025-11-29 : fix: Use correct MuxPlayer CSS variables for YouTube-style controls
+caab5de - mark, 2025-11-29 : style: YouTube-style video controls (transparent bg, red progress)
+c208434 - mark, 2025-11-29 : style: Make video player controls white
+fe1dbc8 - mark, 2025-11-29 : fix: Replace HTML5 video with MuxPlayer for HLS support
+448eadf - mark, 2025-11-29 : chore: Add diagnostic logging for video player debugging
+a23b4ff - mark, 2025-11-27 : refactor: Redesign FreeTrialModal with DMA brand identity
+5bf49a4 - mark, 2025-11-27 : feat: Add 7-day free trial subscription popup system
+3ccc084 - mark, 2025-11-27 : fix: Registration bug - instant modal + sessionStorage persistence
+0392c19 - mark, 2025-11-27 : fix: Rename logo files to use hyphens instead of spaces
+ff0b60c - mark, 2025-11-27 : feat: Replace hero carousel logos with new images
+318682a - mark, 2025-11-26 : feat: Auto-enroll and redirect to player on course start
+3a4b8af - mark, 2025-11-26 : fix: Fetch firstLessonId from Firestore subcollection
+734569d - mark, 2025-11-26 : fix: Use flat lessons array for getFirstLessonId helper
+1e71ef7 - mark, 2025-11-26 : fix: Dashboard course cards and hero buttons navigate to player
+c180666 - mark, 2025-11-26 : feat: Dashboard course cards link directly to player for enrolled users
+9ab5029 - mark, 2025-11-26 : revert: Use PremiumCourseCard in carousel like course type pages
+3c54c1f - mark, 2025-11-26 : feat: Redesign course carousel with authentic Netflix UI
+241bcc4 - mark, 2025-11-26 : feat: Add Netflix-style course carousel to homepage
+5acd8a2 - mark, 2025-11-25 : feat: Apply enhanced gradient overlay to course type pages
+a2a7c46 - mark, 2025-11-25 : feat: Increase Netflix hero gradient darkness
+27ad575 - mark, 2025-11-25 : feat: Refine Netflix hero gradient with smooth transition
+a4cc002 - mark, 2025-11-25 : feat: Enhance Netflix hero gradient for better text readability
+1c9fa71 - mark, 2025-11-25 : feat: Add navbar course type dropdowns with hover fix
+9d1e382 - mark, 2025-11-25 : feat: Add dashboard improvements and course type pages
+23fdb78 - mark, 2025-11-25 : feat: Add contentCreatedAt date field to course creation
+86fec40 - mark, 2025-11-25 : fix: Add missing component files for build
+0ac8fab - mark, 2025-11-25 : chore: Migrate domain to masterclass.dma.hu and rebrand to DMA Masterclass
+94efaa3 - mark, 2025-11-25 : feat: Add direct subscription flow from homepage CTA
+575af83 - mark, 2025-11-24 : refactor: Replace 'kurzus' with 'tartalom' throughout UI
+80a8d1f - mark, 2025-11-24 : feat: Add Beiratkozásaim page to company dashboard
+3ccb26c - mark, 2025-11-24 : feat: Redesign company dashboard to match /dashboard design
+2ca87ab - mark, 2025-11-24 : feat: Add course browser to company dashboard
+3e82437 - mark, 2025-11-24 : refactor: Migrate company progress tracking from modules to lessons
+6bf9d53 - mark, 2025-11-24 : fix: Handle null/undefined timestamps in company dashboard
+b06d4b9 - mark, 2025-11-24 : fix: Progress tracking for ACADEMIA courses and watch time aggregation
+94ab8aa - mark, 2025-11-24 : fix: Count lessons from subcollection for flat lesson courses
+1f207ca - mark, 2025-11-24 : feat: Add course completion celebration with confetti
+a23c147 - mark, 2025-11-24 : fix: Handle both timestamp formats in useEnrollments hook
+4c886c9 - mark, 2025-11-24 : chore: Add diagnostic logs to useEnrollments hook
+9ffd73c - mark, 2025-11-24 : fix: Add employees collection group index for email+status query
+d23bc2f - mark, 2025-11-24 : chore: Rebuild functions with employee linking changes
+650a9df - mark, 2025-11-24 : feat: Redesign employee onboarding flow for auto-linking
+39de292 - mark, 2025-11-24 : fix: Auto-accept employee invite when user is logged in
+f87d13d - mark, 2025-11-24 : fix: Add diagnostic logs and fix invite redirect flow
+79429ff - mark, 2025-11-24 : refactor: Remove internal trial logic, use Stripe-managed subscriptions
+8cb076f - mark, 2025-11-24 : feat: Add employee removal feature for company dashboard
+b5b9130 - mark, 2025-11-24 : fix: Update Stripe price ID for company subscription
+9d02844 - mark, 2025-11-24 : fix: Add debug logging and payments Firestore index
+f84881e - mark, 2025-11-24 : fix: Handle nested response in createCheckoutSession
+98ce7b5 - mark, 2025-11-24 : feat: Add getPaymentHistory Cloud Function
+2d13464 - mark, 2025-11-24 : fix: Company dashboard fixes - role check, subscription flow, employee banner
+00ea6ca - mark, 2025-11-24 : feat: Add complete company hooks and update analysis
+f69b98a - mark, 2025-11-24 : refactor: Remove Team dashboard - use Company model for subscription sharing
+6277c9a - mark, 2025-11-24 : feat: Add company course enrollment feature
+6e66821 - mark, 2025-11-24 : feat: Add team course enrollment feature
+2729b37 - mark, 2025-11-24 : fix: Allow re-inviting removed team members
+21ef2ac - mark, 2025-11-24 : feat: Add team subscription sharing feature
+1438dcd - mark, 2025-11-22 : refactor: Simplify dashboard with minimal dark theme
+baaf5fc - mark, 2025-11-22 : fix: Hard delete course with all related data
+fad596d - mark, 2025-11-22 : fix: Save lessons to Firestore on course publish
+462bc0f - mark, 2025-11-22 : fix: Support flat lessons in Mux webhook and actions
+5781b8b - mark, 2025-11-22 : fix: Handle undefined lesson type in video rendering
+a20dea8 - mark, 2025-11-22 : feat: Add PODCAST and MASTERCLASS course player layouts
+ca75a8e - mark, 2025-11-22 : fix: Make learningObjectives optional in createCourse function
+08d9eb5 - mark, 2025-11-22 : fix: Add missing Upload icon import in CourseLessonsStep
+2954c2c - mark, 2025-11-22 : fix: ACADEMIA terminology and UI polish
+01e93e9 - mark, 2025-11-22 : fix: UX improvements for ACADEMIA player
+47fc274 - mark, 2025-11-22 : feat: Add Netflix-style layout for ACADEMIA courses
+a3c44d3 - mark, 2025-11-22 : fix: UI polish for WEBINAR player
+889fc59 - mark, 2025-11-22 : feat: Add WEBINAR split layout with mentor side panel
+8d52cea - mark, 2025-11-22 : fix: Read courseType instead of type field from Firestore
+c9e4170 - mark, 2025-11-22 : debug: Add diagnostic logging for course player type detection
+02af712 - mark, 2025-11-22 : feat: Add Célközönségek to admin sidebar navigation
+70b073c - mark, 2025-11-22 : fix: Check nested lessons subcollection in modules
+f7fc2d5 - mark, 2025-11-22 : fix: Check modules subcollection for lessons in getCoursesCallable
+ca86eeb - mark, 2025-11-22 : Add diagnostic logging to getCoursesCallable and LessonImportModal
+742cf9e - mark, 2025-11-22 : fix: Complete MASTERCLASS lesson import feature
+92f0df3 - mark, 2025-11-22 : feat: Restore video file upload in course creation wizard
+5792f19 - mark, 2025-11-22 : feat: Implement course type differentiation (Phases 5-8)
+44ff700 - mark, 2025-11-22 : feat: Add PODCAST course type
+d08b087 - mark, 2025-11-21 : fix: Force recompilation of player page.tsx
+c8a6f73 - mark, 2025-11-21 : refactor: Force rebuild of course player components with fresh timestamps
+ee3f043 - mark, 2025-11-21 : fix: Correct file permissions to 644 (non-executable)
+641949b - mark, 2025-11-21 : fix: Fix directory and file permissions for icons and course-player components
+b194ee9 - mark, 2025-11-21 : fix: Remove problematic global-error.tsx causing build issues
+36589fa - mark, 2025-11-21 : docs: Add comprehensive Course Player Architecture to CLAUDE.md
+240b7f1 - mark, 2025-11-21 : fix: Add global-error page and fix build issue with NODE_ENV
+0267d2e - mark, 2025-11-21 : feat: Complete course player redesign with pixel-perfect UI
+1cb6077 - elira, 2025-11-16 : feat: Add comprehensive courses catalog page
+2df2fb7 - elira, 2025-11-16 : feat: Complete instructor system refactoring
+aab1a4f - elira, 2025-11-16 : fix: Resolve React error #310 - hooks order violation
+10799fa - elira, 2025-11-16 : fix: Add Firebase Storage rules for instructor profile pictures
+a25f139 - elira, 2025-11-16 : feat: Add file upload for instructor profile pictures
+073a52e - elira, 2025-11-16 : fix: Remove deprecated React Query callbacks from instructor hooks
+9cc2976 - elira, 2025-11-16 : feat: Implement instructor management system
+901959f - elira, 2025-11-16 : fix: Use consistent navbar on course detail pages
+981f7a4 - elira, 2025-11-16 : feat: Implement separate course type pages with navigation
+3026348 - elira, 2025-11-16 : fix: Course cards now display thumbnails correctly
+61853b9 - elira, 2025-11-16 : fix: Add missing Firebase Storage domains to Next.js Image config
+a77b234 - elira, 2025-11-16 : feat: Implement comprehensive course type system with ACADEMIA, WEBINAR, and MASTERCLASS
+2962295 - elira, 2025-11-12 : feat: Add visual chapter markers to video player
+a0d62a8 - elira, 2025-11-12 : feat: Integrate enhanced VideoPlayer from dma-landing with chapters, bookmarks, and analytics
+923b07e - elira, 2025-11-12 : feat: Transform course player design to match platform design system
+c539ec0 - elira, 2025-11-11 : fix: Make sidebar always visible on desktop (Udemy-style layout)
+32ed733 - elira, 2025-11-11 : feat: Build comprehensive course player MVP with tab-based layout
+cdf5be1 - elira, 2025-11-11 : feat: Integrate official Mux Player and clean up course player UI
+1c562be - elira, 2025-11-02 : fix: Disable broken middleware causing redirect loop in production
+b1a6f8d - elira, 2025-11-02 : fix: Resolve authentication redirect loop after email verification
+3dea387 - elira, 2025-11-02 : fix: Update Firebase Auth emailVerified flag when verifying email via OTP
+02e1f06 - elira, 2025-11-02 : fix: Replace login page to use useLogin hook and AuthStore instead of AuthContext
+a8cde33 - elira, 2025-11-02 : fix: Redirect to login after email verification to properly initialize AuthStore
+468e207 - elira, 2025-11-02 : fix: Resolve slow registration and redirect issues after email verification
+9466df6 - elira, 2025-11-02 : fix: Resolve email verification permission errors for new registrations
+d822511 - elira, 2025-11-02 : fix: Configure explicit CORS origins for Firebase Functions
+9bb572f - elira, 2025-11-02 : fix: Remove React Rules of Hooks violation causing modal to not render in production
+4de574e - elira, 2025-11-02 : fix: Resolve production SSR/hydration issues with email verification modal
+ab3272e - elira, 2025-11-02 : fix: Configure Vercel to use npm instead of pnpm
+b5828cd - elira, 2025-11-02 : fix: Email verification modal not rendering due to early return
+9368288 - elira, 2025-11-02 : feat: Add custom hero section and fix email verification modal visibility
+f28d284 - elira, 2025-11-02 : fix: Replace old Header with FramerNavbarWrapper on all marketing pages
+252143e - elira, 2025-11-02 : feat: Add Framer-style scroll-based navbar to marketing pages
+2e603eb - elira, 2025-11-02 : fix: Resolve typography inconsistency between dev and production
+dd310dd - elira, 2025-10-31 : fix: Resolve email verification modal not appearing for new registrations
+c5ea34c - elira, 2025-10-31 : feat: Add email verification system with OTP and upgrade to Node.js 20
+46aa5fe - elira, 2025-10-28 : Initial commit: DMA B2C E-Learning Platform

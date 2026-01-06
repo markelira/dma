@@ -37,9 +37,9 @@ function getStripeInstance(): Stripe {
 export const getSubscriptionStatus = onCall({
   cors: true,
   region: 'europe-west1',
-  memory: '512MiB',
-  minInstances: 2,
-  maxInstances: 100,
+  memory: '256MiB',
+  // minInstances removed to reduce baseline costs (~$0.22/day savings)
+  maxInstances: 50,
   timeoutSeconds: 30,
 }, async (request) => {
   try {

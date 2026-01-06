@@ -207,6 +207,14 @@
         { "fieldPath": "email", "order": "ASCENDING" },
         { "fieldPath": "attemptedAt", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "inactivityReminders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "sentAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
