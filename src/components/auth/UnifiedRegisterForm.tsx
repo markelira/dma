@@ -335,6 +335,9 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [isRecovering, setIsRecovering] = useState(false);
   const [recoveryChecked, setRecoveryChecked] = useState(false);
 
+  // Skip payment state
+  const [isSkippingPayment, setIsSkippingPayment] = useState(false);
+
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: inviteData?.employeeName.split(' ')[0] || '',
     lastName: inviteData?.employeeName.split(' ').slice(1).join(' ') || '',
@@ -680,6 +683,23 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const handlePaymentError = (errorMessage: string) => {
     console.error('[Registration] Payment error:', errorMessage);
     setError(errorMessage);
+  };
+
+  // Skip payment and complete registration without subscription
+  const handleSkipPayment = async () => {
+    if (!firebaseUserId) return;
+
+    setIsSkippingPayment(true);
+    setError('');
+
+    try {
+      console.log('[Registration] Skipping payment, completing registration without subscription...');
+      await completeRegistration(firebaseUserId);
+    } catch (err: any) {
+      console.error('[Registration] Error skipping payment:', err);
+      setError(err.message || 'Hiba történt. Kérjük, próbáld újra.');
+      setIsSkippingPayment(false);
+    }
   };
 
   // ============ COMPLETE REGISTRATION ============
@@ -1288,6 +1308,25 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               onComplete={handlePaymentComplete}
               onError={handlePaymentError}
             />
+
+            {/* Skip payment option */}
+            <div className="mt-6 text-center">
+              <button
+                type="button"
+                onClick={handleSkipPayment}
+                disabled={isSkippingPayment || loading}
+                className="text-sm text-gray-500 hover:text-gray-700 underline hover:no-underline transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSkippingPayment ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    Feldolgozás...
+                  </span>
+                ) : (
+                  'Később'
+                )}
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
