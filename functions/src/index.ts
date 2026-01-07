@@ -859,6 +859,16 @@ export const getUsers = onCall({
         createdAtStr = new Date().toISOString()
       }
 
+      // Handle lastLoginAt timestamp
+      let lastLoginAtStr: string | null = null
+      if (userData.lastLoginAt?.toDate) {
+        lastLoginAtStr = userData.lastLoginAt.toDate().toISOString()
+      } else if (userData.lastLoginAt?._seconds) {
+        lastLoginAtStr = new Date(userData.lastLoginAt._seconds * 1000).toISOString()
+      } else if (typeof userData.lastLoginAt === 'string') {
+        lastLoginAtStr = userData.lastLoginAt
+      }
+
       users.push({
         id: doc.id,
         email: userData.email || '',
@@ -871,6 +881,12 @@ export const getUsers = onCall({
         emailVerified: userData.emailVerified || false,
         institution: userData.institution || null,
         bio: userData.bio || null,
+        // NEW: Additional fields for admin
+        phone: userData.phone || null,
+        subscriptionStatus: userData.subscriptionStatus || null,
+        companyId: userData.companyId || null,
+        companyRole: userData.companyRole || null,
+        lastLoginAt: lastLoginAtStr,
       })
     })
 

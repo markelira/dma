@@ -31,14 +31,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
-import { 
-  Users, 
-  Search, 
-  Filter, 
-  MoreHorizontal, 
-  Edit, 
-  Trash2, 
-  UserCheck, 
+import {
+  Users,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  UserCheck,
   UserX,
   Plus,
   Eye,
@@ -48,7 +48,11 @@ import {
   Shield,
   GraduationCap,
   Activity,
-  Sparkles
+  Sparkles,
+  Phone,
+  Building2,
+  CreditCard,
+  Clock
 } from 'lucide-react'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
@@ -64,6 +68,12 @@ interface User {
   isActive: boolean
   profilePictureUrl?: string
   emailVerified?: boolean
+  // NEW: Additional fields
+  phone?: string | null
+  subscriptionStatus?: 'active' | 'trialing' | 'past_due' | 'canceled' | 'none' | null
+  companyId?: string | null
+  companyRole?: string | null
+  lastLoginAt?: string | null
 }
 
 interface UserStats {
@@ -237,6 +247,40 @@ export default function AdminUsersPage() {
         return 'Hallgató'
       default:
         return role
+    }
+  }
+
+  const getSubscriptionBadgeColor = (status: string | null | undefined) => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-700 border-green-200'
+      case 'trialing':
+        return 'bg-blue-100 text-blue-700 border-blue-200'
+      case 'past_due':
+        return 'bg-red-100 text-red-700 border-red-200'
+      case 'canceled':
+        return 'bg-gray-100 text-gray-700 border-gray-200'
+      case 'none':
+        return 'bg-yellow-100 text-yellow-700 border-yellow-200'
+      default:
+        return 'bg-gray-50 text-gray-500 border-gray-200'
+    }
+  }
+
+  const getSubscriptionLabel = (status: string | null | undefined) => {
+    switch (status) {
+      case 'active':
+        return 'Aktív'
+      case 'trialing':
+        return 'Próba'
+      case 'past_due':
+        return 'Lejárt'
+      case 'canceled':
+        return 'Lemondva'
+      case 'none':
+        return 'Nincs'
+      default:
+        return '-'
     }
   }
 
@@ -452,8 +496,10 @@ export default function AdminUsersPage() {
             <TableHeader>
               <TableRow>
                 <TableHead className="font-bold">Felhasználó</TableHead>
-                <TableHead className="font-bold">Email</TableHead>
+                <TableHead className="font-bold">Elérhetőség</TableHead>
                 <TableHead className="font-bold">Szerepkör</TableHead>
+                <TableHead className="font-bold">Előfizetés</TableHead>
+                <TableHead className="font-bold">Cég</TableHead>
                 <TableHead className="font-bold">Regisztráció</TableHead>
                 <TableHead className="font-bold">Állapot</TableHead>
                 <TableHead className="text-right font-bold">Műveletek</TableHead>
@@ -462,7 +508,7 @@ export default function AdminUsersPage() {
             <TableBody>
               {filteredUsers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8">
+                  <TableCell colSpan={8} className="text-center py-8">
                     <div className="flex flex-col items-center justify-center space-y-2">
                       <Users className="w-12 h-12 text-gray-300" />
                       <p className="text-muted-foreground">Nincs találat a megadott szűrőkkel</p>
@@ -495,19 +541,15 @@ export default function AdminUsersPage() {
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-muted-foreground" />
-                        {user.email}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Mail className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                        <span className="truncate max-w-[180px]">{user.email}</span>
                       </div>
-                      {user.emailVerified !== undefined && (
-                        <Badge 
-                          variant="outline" 
-                          className={user.emailVerified 
-                            ? "text-xs bg-green-50 text-green-700 border-green-200" 
-                            : "text-xs bg-yellow-50 text-yellow-700 border-yellow-200"}
-                        >
-                          {user.emailVerified ? '✓ Megerősített' : '⚠ Nincs megerősítve'}
-                        </Badge>
+                      {user.phone && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Phone className="h-3.5 w-3.5 flex-shrink-0" />
+                          {user.phone}
+                        </div>
                       )}
                     </div>
                   </TableCell>
@@ -520,8 +562,31 @@ export default function AdminUsersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <Badge variant="outline" className={getSubscriptionBadgeColor(user.subscriptionStatus)}>
+                      <CreditCard className="w-3 h-3 mr-1" />
+                      {getSubscriptionLabel(user.subscriptionStatus)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {user.companyId ? (
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="truncate max-w-[100px]">{user.companyId.slice(0, 8)}...</span>
+                        </div>
+                        {user.companyRole && (
+                          <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                            {user.companyRole === 'owner' ? 'Tulajdonos' : user.companyRole === 'admin' ? 'Admin' : 'Alkalmazott'}
+                          </Badge>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                       {new Date(user.createdAt).toLocaleDateString('hu-HU')}
                     </div>
                   </TableCell>
