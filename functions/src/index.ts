@@ -2255,6 +2255,8 @@ export {
   reactivateSubscription,
   getSubscriptionInvoices,
   applyPromoCode,
+  syncSubscriptionFromStripe,
+  dailySubscriptionReconciliation,
 } from './subscription';
 
 // ============================================

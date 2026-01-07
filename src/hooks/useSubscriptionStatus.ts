@@ -116,7 +116,7 @@ export const useSubscriptionStatus = () => {
       }
     },
     enabled: isAuthenticated, // Only fetch if logged in
-    staleTime: isNewUser ? 30 * 1000 : 2 * 60 * 1000, // 30s for new users, 2 min otherwise
+    staleTime: 30 * 1000, // 30 seconds - reduced from 2 min to keep subscription status fresh
     retry: 1, // Retry once on failure
   })
 
