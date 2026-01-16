@@ -1,13 +1,15 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AlertTriangle, Download, Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase';
+import { signOut } from 'firebase/auth';
+import { functions, auth } from '@/lib/firebase';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import {
@@ -30,6 +32,7 @@ import {
  * - Request account deletion (Article 17)
  */
 export function PrivacySettings() {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -73,7 +76,7 @@ export function PrivacySettings() {
     }
   };
 
-  const handleRequestDeletion = async () => {
+  const handleDeleteAccount = async () => {
     if (!user) {
       toast.error('Bejelentkezés szükséges');
       return;
@@ -86,20 +89,23 @@ export function PrivacySettings() {
 
     setIsDeleting(true);
     try {
-      const requestDeletionFn = httpsCallable(functions, 'requestAccountDeletion');
-      const result = await requestDeletionFn({ confirmEmail });
-      const data = result.data as { success: boolean; message: string; scheduledDeletionDate: string };
+      const executeDeleteFn = httpsCallable(functions, 'executeAccountDeletion');
+      const result = await executeDeleteFn({ confirmEmail });
+      const data = result.data as { success: boolean; message: string; deletedDocuments: number };
 
       if (data.success) {
-        const deletionDate = new Date(data.scheduledDeletionDate).toLocaleDateString('hu-HU');
-        toast.success(`${data.message} Törlés időpontja: ${deletionDate}`);
+        toast.success('A fiókod és minden adatod véglegesen törölve.');
         setShowDeleteConfirm(false);
         setConfirmEmail('');
+
+        // Sign out and redirect to home
+        await signOut(auth);
+        router.push('/');
       }
     } catch (error: unknown) {
-      console.error('Deletion request error:', error);
+      console.error('Account deletion error:', error);
       const message = error instanceof Error ? error.message : 'Ismeretlen hiba';
-      toast.error(`Hiba: ${message}`);
+      toast.error(`Hiba a törlés során: ${message}`);
     } finally {
       setIsDeleting(false);
     }
@@ -149,8 +155,8 @@ export function PrivacySettings() {
           </CardTitle>
           <CardDescription>
             A fiók törlése visszafordíthatatlan. Minden adatod, beleértve a
-            beiratkozásaidat, tanulási előrehaladásodat és profilodat véglegesen
-            töröljük. A törlési kérés után 30 napig visszavonhatod a döntésedet.
+            beiratkozásaidat, tanulási előrehaladásodat és profilodat azonnal és
+            véglegesen töröljük.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -169,9 +175,8 @@ export function PrivacySettings() {
                 </AlertDialogTitle>
                 <AlertDialogDescription className="space-y-4">
                   <p>
-                    Ez a művelet <strong>30 nap múlva</strong> véglegesen törli a fiókodat
-                    és az összes kapcsolódó adatot. A törlési kérést 30 napon belül
-                    visszavonhatod.
+                    Ez a művelet <strong>azonnal és véglegesen</strong> törli a fiókodat
+                    és az összes kapcsolódó adatot. Ez a művelet nem vonható vissza!
                   </p>
                   <p className="text-red-600 font-medium">
                     A törlés után elveszíted:
@@ -202,19 +207,19 @@ export function PrivacySettings() {
                   Mégsem
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={handleRequestDeletion}
+                  onClick={handleDeleteAccount}
                   disabled={isDeleting || confirmEmail !== user?.email}
                   className="bg-red-600 hover:bg-red-700"
                 >
                   {isDeleting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Feldolgozás...
+                      Törlés folyamatban...
                     </>
                   ) : (
                     <>
                       <Trash2 className="mr-2 h-4 w-4" />
-                      Törlés indítása
+                      Fiók végleges törlése
                     </>
                   )}
                 </AlertDialogAction>
