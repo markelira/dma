@@ -78,7 +78,7 @@ export const savePendingRegistration = https.onCall(
       const expiresAt = Timestamp.fromMillis(now.toMillis() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
       const pendingData: any = {
-        odingUserId: userId,
+        userId: userId,
         email: email.trim().toLowerCase(),
         firstName: firstName?.trim() || '',
         lastName: lastName?.trim() || '',

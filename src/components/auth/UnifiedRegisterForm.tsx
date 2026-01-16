@@ -106,6 +106,49 @@ interface AddEmployeeInput {
   lastName: string;
 }
 
+/**
+ * Retry a function with exponential backoff
+ * Critical for Cloud Function calls that may fail due to cold starts or network issues
+ */
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  maxRetries: number = 3,
+  baseDelayMs: number = 1000
+): Promise<T> {
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`[Retry] Attempt ${attempt + 1}/${maxRetries} failed:`, error.message);
+
+      // Don't retry on auth errors - these won't resolve with retries
+      if (error.code === 'unauthenticated' || error.code === 'permission-denied') {
+        throw error;
+      }
+
+      // Wait before retrying (exponential backoff: 1s, 2s, 4s)
+      if (attempt < maxRetries - 1) {
+        const delay = baseDelayMs * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  throw lastError || new Error('Retry failed');
+}
+
+/**
+ * Check if browser is Internet Explorer or legacy Edge
+ */
+function isLegacyBrowser(): boolean {
+  if (typeof window === 'undefined') return false;
+  const ua = window.navigator.userAgent;
+  return ua.indexOf('MSIE ') > -1 || ua.indexOf('Trident/') > -1 || ua.indexOf('Edge/') > -1;
+}
+
 interface AddEmployeeResponse {
   success: boolean;
   employeeId: string;
@@ -627,20 +670,40 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       });
 
       // Save pending registration to Firestore (replaces sessionStorage)
+      // CRITICAL: Use retry logic to handle cold starts and network issues
       const savePendingFn = httpsCallable<SavePendingRegistrationInput, { success: boolean }>(
         functions,
         'savePendingRegistration'
       );
-      await savePendingFn({
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim().toLowerCase(),
-        phone: formData.phone.trim(),
-        companyName: formData.companyName.trim(),
-        currentStep: 2,
-        pendingEmployees: []
-      });
-      console.log('[Registration] Saved pending registration to Firestore');
+
+      try {
+        await retryWithBackoff(async () => {
+          const result = await savePendingFn({
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim(),
+            email: formData.email.trim().toLowerCase(),
+            phone: formData.phone.trim(),
+            companyName: formData.companyName.trim(),
+            currentStep: 2,
+            pendingEmployees: []
+          });
+          if (!result.data.success) {
+            throw new Error('Pending registration save returned unsuccessful');
+          }
+          return result;
+        }, 3, 1000);
+        console.log('[Registration] Saved pending registration to Firestore');
+      } catch (saveError: any) {
+        console.error('[Registration] Failed to save pending registration after retries:', saveError);
+        // Delete the Firebase Auth user since we can't continue without pending registration
+        try {
+          await userCredential.user.delete();
+          console.log('[Registration] Rolled back Firebase Auth user due to save failure');
+        } catch (deleteError) {
+          console.error('[Registration] Failed to rollback auth user:', deleteError);
+        }
+        throw new Error('Nem sikerült menteni a regisztrációs adatokat. Kérjük, próbáld újra később.');
+      }
 
       // Mark as recently registered to skip expensive subscription check
       markAsRecentlyRegistered();
@@ -859,6 +922,28 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               </p>
               <p className="text-xs text-blue-600">
                 A korábban megadott adataid elmentettük. Folytasd onnan, ahol abbahagytad!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Legacy Browser Warning */}
+      {isLegacyBrowser() && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-100 rounded-full">
+              <svg className="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-amber-800">
+                Régebbi böngészőt használsz
+              </p>
+              <p className="text-xs text-amber-600">
+                Az Internet Explorer és a régi Edge böngészők nem támogatottak.
+                Kérjük, használj modern böngészőt (Chrome, Firefox, új Edge) a regisztrációhoz.
               </p>
             </div>
           </div>
