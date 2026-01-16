@@ -453,15 +453,20 @@ export const executeAccountDeletion = onCall({
       });
     });
 
-    // 8. Remove from company employees
-    const employeeSnapshot = await firestore
-      .collectionGroup('employees')
-      .where('userId', '==', userId)
-      .get();
-    employeeSnapshot.docs.forEach(doc => {
-      batch.delete(doc.ref);
-      deletedCount++;
-    });
+    // 8. Remove from company employees (skip if index not ready)
+    try {
+      const employeeSnapshot = await firestore
+        .collectionGroup('employees')
+        .where('userId', '==', userId)
+        .get();
+      employeeSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+        deletedCount++;
+      });
+    } catch (employeeError) {
+      logger.warn(`[GDPR] Could not query employees (index may not be ready): ${userId}`, employeeError);
+      // Continue with deletion - employees will be orphaned but user data is still removed
+    }
 
     // 9. Delete the user document
     const userDocRef = firestore.collection('users').doc(userId);
