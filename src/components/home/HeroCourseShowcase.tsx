@@ -204,7 +204,7 @@ export function HeroCourseShowcase({ maxCourses = 8 }: HeroCourseShowcaseProps) 
           {/* Scrollable Container */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-5 overflow-x-auto overflow-y-visible py-6 scrollbar-hide scroll-smooth"
+            className="flex gap-5 overflow-x-auto overflow-y-visible py-6 pl-4 scrollbar-hide scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {courses.map((course, index) => (

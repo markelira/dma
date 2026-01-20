@@ -197,7 +197,7 @@ export function NetflixCourseCarousel() {
           {/* Scrollable Track */}
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto overflow-y-visible py-6 scrollbar-hide scroll-smooth"
+            className="flex gap-6 overflow-x-auto overflow-y-visible py-6 pl-4 scrollbar-hide scroll-smooth"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {loading ? (
