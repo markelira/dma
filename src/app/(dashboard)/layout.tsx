@@ -128,19 +128,25 @@ export default function DashboardRouteGroupLayout({
         <DashboardSidebar onNavigate={() => setSidebarOpen(false)} companyLogoUrl={companyLogoUrl} />
       </aside>
 
-      {/* Mobile Menu Button - Floating, moves right when sidebar open */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className={`fixed z-[60] rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden transition-all duration-300
-          ${sidebarOpen ? 'top-4 left-[220px]' : 'top-4 left-4'}
-        `}
-      >
-        {sidebarOpen ? (
-          <X className="h-6 w-6 text-gray-700" />
-        ) : (
+      {/* Mobile Menu Button - Floating */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-4 left-4 z-[60] rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
+        >
           <Menu className="h-6 w-6 text-gray-700" />
-        )}
-      </button>
+        </button>
+      )}
+
+      {/* Close button inside sidebar header when open */}
+      {sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(false)}
+          className="fixed top-4 left-[200px] z-[60] rounded-lg bg-gray-100 border border-gray-200 p-2 hover:bg-gray-200 lg:hidden"
+        >
+          <X className="h-6 w-6 text-gray-700" />
+        </button>
+      )}
 
       {/* Main Content Area - offset by sidebar width on desktop */}
       <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-h-screen overflow-y-auto">
