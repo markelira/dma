@@ -4,10 +4,10 @@ import { useRouter } from 'next/navigation';
 import { useCourse } from '@/hooks/useCourseQueries';
 import { useEnrollInCourse } from '@/hooks/useCourseQueries';
 import { useSearchParams } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, limit, getDocs, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import React, { useState, useMemo, useRef } from 'react';
 import { AuthProvider } from '@/contexts/AuthContext';
@@ -27,9 +27,6 @@ import { CompanyEmployeeNoAccessModal } from '@/components/subscription/CompanyE
 import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight } from 'lucide-react';
-import { useInstructors } from '@/hooks/useInstructorQueries';
-import { useCategories } from '@/hooks/useCategoryQueries';
-import { useCourses } from '@/hooks/useCourseQueries';
 import { getCourseTypeTerminology, getDefaultInstructorRole } from '@/lib/terminology';
 import { CourseType } from '@/types';
 
@@ -50,119 +47,206 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const queryClient = useQueryClient();
   const detailsRef = useRef<HTMLDivElement>(null);
 
-  // Fetch instructors to get full instructor data
-  const { data: instructors = [] } = useInstructors();
+  // Fetch only the instructors for this course (targeted query)
+  const { data: courseInstructors = [] } = useQuery({
+    queryKey: ['course-instructors', course?.instructorIds, course?.instructorId],
+    queryFn: async () => {
+      if (!course) return [];
 
-  // Fetch categories to map categoryIds to names
-  const { data: categories = [] } = useCategories();
+      // Get instructor IDs from course
+      const instructorIds = course.instructorIds?.length
+        ? course.instructorIds
+        : course.instructorId
+          ? [course.instructorId]
+          : [];
 
-  // Fetch all courses for related courses section
-  const { data: allCourses = [] } = useCourses();
+      if (instructorIds.length === 0) {
+        // Fallback to legacy instructor data if available
+        const legacyInstructor = course.instructor || {};
+        if (legacyInstructor.firstName || legacyInstructor.lastName) {
+          return [{
+            id: course.instructorId || 'legacy',
+            name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
+            title: legacyInstructor.title,
+            bio: legacyInstructor.bio,
+            profilePictureUrl: legacyInstructor.profilePictureUrl,
+          }];
+        }
+        // Default fallback
+        return [{
+          id: 'default',
+          name: course.instructorName || 'DMA Oktató',
+          title: course.instructorTitle,
+          bio: course.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
+          profilePictureUrl: course.instructorImageUrl,
+        }];
+      }
 
-  // Get category names from categoryIds - SUPPORTS MULTIPLE CATEGORIES
-  const courseCategoryNames = useMemo(() => {
-    if (!course) return [];
+      // Fetch only the instructors we need
+      const instructorDocs = await Promise.all(
+        instructorIds.map(instId => getDoc(doc(db, 'users', instId)))
+      );
 
-    const c = course;
-    const categoryNames: string[] = [];
+      const fetchedInstructors = instructorDocs
+        .filter(d => d.exists())
+        .map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            name: data?.name || `${data?.firstName || ''} ${data?.lastName || ''}`.trim() || 'Ismeretlen',
+            title: data?.title,
+            bio: data?.bio,
+            profilePictureUrl: data?.profilePictureUrl,
+            role: data?.role,
+          };
+        });
 
-    // NEW: Support multiple categories via categoryIds array
-    if (c.categoryIds && c.categoryIds.length > 0 && categories.length > 0) {
-      c.categoryIds.forEach(catId => {
-        const found = categories.find(cat => cat.id === catId);
-        if (found) categoryNames.push(found.name);
-      });
-
-      if (categoryNames.length > 0) return categoryNames;
-    }
-
-    // Fallback to single category
-    if (c.category && typeof c.category === 'object' && 'name' in c.category) {
-      return [c.category.name];
-    }
-
-    if (c.category && typeof c.category === 'string') {
-      return [c.category];
-    }
-
-    if (c.categoryId && categories.length > 0) {
-      const found = categories.find(cat => cat.id === c.categoryId);
-      if (found) return [found.name];
-    }
-
-    return ['Általános'];
-  }, [course, categories]);
-
-  // Fetch instructor data from instructors collection - SUPPORTS MULTIPLE INSTRUCTORS
-  const courseInstructors = useMemo(() => {
-    if (!course) return [];
-
-    const c = course;
-    const foundInstructors: any[] = [];
-
-    // NEW: Support multiple instructors via instructorIds array
-    if (c.instructorIds && c.instructorIds.length > 0 && instructors.length > 0) {
-      c.instructorIds.forEach(instId => {
-        const found = instructors.find(inst => inst.id === instId);
-        if (found) foundInstructors.push(found);
-      });
-
-      if (foundInstructors.length > 0) return foundInstructors;
-    }
-
-    // Fallback to single instructorId
-    if (c.instructorId && instructors.length > 0) {
-      const found = instructors.find(inst => inst.id === c.instructorId);
-      if (found) return [found];
-    }
-
-    // Fallback to legacy instructor data if available
-    const legacyInstructor = c.instructor || {};
-    if (legacyInstructor.firstName || legacyInstructor.lastName) {
-      return [{
-        id: c.instructorId || 'legacy',
-        name: `${legacyInstructor.firstName || ''} ${legacyInstructor.lastName || ''}`.trim(),
-        title: legacyInstructor.title,
-        bio: legacyInstructor.bio,
-        profilePictureUrl: legacyInstructor.profilePictureUrl,
-        createdAt: '',
-        updatedAt: ''
+      return fetchedInstructors.length > 0 ? fetchedInstructors : [{
+        id: 'default',
+        name: course.instructorName || 'DMA Oktató',
+        title: course.instructorTitle,
+        bio: course.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
+        profilePictureUrl: course.instructorImageUrl,
       }];
+    },
+    enabled: !!course,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Fetch only the categories for this course (targeted query)
+  const { data: courseCategories = [] } = useQuery({
+    queryKey: ['course-categories', course?.categoryIds, course?.categoryId],
+    queryFn: async () => {
+      if (!course) return [];
+
+      // Get category IDs from course
+      const categoryIds = course.categoryIds?.length
+        ? course.categoryIds
+        : course.categoryId
+          ? [course.categoryId]
+          : [];
+
+      if (categoryIds.length === 0) {
+        // Fallback to legacy category data
+        if (course.category && typeof course.category === 'object' && 'name' in course.category) {
+          return [{ id: 'legacy', name: (course.category as any).name }];
+        }
+        if (course.category && typeof course.category === 'string') {
+          return [{ id: 'legacy', name: course.category }];
+        }
+        return [];
+      }
+
+      // Fetch only the categories we need
+      const categoryDocs = await Promise.all(
+        categoryIds.map(catId => getDoc(doc(db, 'categories', catId)))
+      );
+
+      return categoryDocs
+        .filter(d => d.exists())
+        .map(d => ({
+          id: d.id,
+          name: d.data()?.name || 'Kategória',
+        }));
+    },
+    enabled: !!course,
+    staleTime: 30 * 60 * 1000, // 30 minutes
+  });
+
+  // Get category names from fetched categories
+  const courseCategoryNames = useMemo(() => {
+    if (courseCategories.length > 0) {
+      return courseCategories.map(cat => cat.name);
     }
+    // Fallback to legacy category string if no categories fetched
+    if (course?.category && typeof course.category === 'string') {
+      return [course.category];
+    }
+    return ['Általános'];
+  }, [courseCategories, course?.category]);
 
-    // Default fallback
-    return [{
-      id: 'default',
-      name: c.instructorName || 'DMA Oktató',
-      title: c.instructorTitle,
-      bio: c.instructorBio || 'Tapasztalt oktató az ELIRA platformon.',
-      profilePictureUrl: c.instructorImageUrl,
-      createdAt: '',
-      updatedAt: ''
-    }];
-  }, [course, instructors]);
+  // Fetch related courses (targeted query - only 7 courses max)
+  const { data: relatedCourses = [] } = useQuery({
+    queryKey: ['related-courses', course?.id, course?.categoryIds, course?.categoryId],
+    queryFn: async () => {
+      if (!course) return [];
 
-  // Get related courses (same category or same instructor, excluding current course)
-  const relatedCourses = useMemo(() => {
-    if (!course || !allCourses || allCourses.length === 0) return [];
+      // Get the primary category for finding related courses
+      const primaryCategoryId = course.categoryIds?.[0] || course.categoryId;
 
-    return allCourses
-      .filter(c => c.id !== course.id) // Exclude current course
-      .filter(c => {
-        // Match by category
-        const hasSameCategory =
-          (course.categoryIds && c.categoryIds && course.categoryIds.some(catId => c.categoryIds?.includes(catId))) ||
-          (course.categoryId && c.categoryId === course.categoryId);
+      if (!primaryCategoryId) return [];
 
-        // Match by instructor
-        const hasSameInstructor =
-          (course.instructorIds && c.instructorIds && course.instructorIds.some(instId => c.instructorIds?.includes(instId))) ||
-          (course.instructorId && c.instructorId === course.instructorId);
+      try {
+        // Query for courses in the same category
+        const relatedQuery = query(
+          collection(db, 'courses'),
+          where('status', '==', 'PUBLISHED'),
+          where('categoryIds', 'array-contains', primaryCategoryId),
+          limit(7) // Fetch 7 to have room after excluding current
+        );
 
-        return hasSameCategory || hasSameInstructor;
-      })
-      .slice(0, 6); // Limit to 6 courses
-  }, [course, allCourses]);
+        const snap = await getDocs(relatedQuery);
+        const courses = snap.docs
+          .map(d => ({ id: d.id, ...d.data() } as any))
+          .filter(c => c.id !== course.id) // Exclude current course
+          .slice(0, 6);
+
+        // If we don't have enough, try a fallback query with categoryId field
+        if (courses.length < 3) {
+          const fallbackQuery = query(
+            collection(db, 'courses'),
+            where('status', '==', 'PUBLISHED'),
+            where('categoryId', '==', primaryCategoryId),
+            limit(7)
+          );
+          const fallbackSnap = await getDocs(fallbackQuery);
+          const fallbackCourses = fallbackSnap.docs
+            .map(d => ({ id: d.id, ...d.data() } as any))
+            .filter(c => c.id !== course.id && !courses.some(existing => existing.id === c.id));
+
+          courses.push(...fallbackCourses.slice(0, 6 - courses.length));
+        }
+
+        return courses.slice(0, 6);
+      } catch (error) {
+        console.error('Error fetching related courses:', error);
+        return [];
+      }
+    },
+    enabled: !!course && !!(course.categoryIds?.[0] || course.categoryId),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  // Get unique category IDs from related courses for displaying category badges
+  const relatedCoursesCategoryIds = useMemo(() => {
+    const categoryIds = new Set<string>();
+    relatedCourses.forEach(c => {
+      if (c.categoryIds) c.categoryIds.forEach((id: string) => categoryIds.add(id));
+      if (c.categoryId) categoryIds.add(c.categoryId);
+    });
+    return Array.from(categoryIds);
+  }, [relatedCourses]);
+
+  // Fetch categories needed for related courses display
+  const { data: relatedCoursesCategories = [] } = useQuery({
+    queryKey: ['related-courses-categories', relatedCoursesCategoryIds],
+    queryFn: async () => {
+      if (relatedCoursesCategoryIds.length === 0) return [];
+
+      const categoryDocs = await Promise.all(
+        relatedCoursesCategoryIds.map(catId => getDoc(doc(db, 'categories', catId)))
+      );
+
+      return categoryDocs
+        .filter(d => d.exists())
+        .map(d => ({
+          id: d.id,
+          name: d.data()?.name || 'Kategória',
+        }));
+    },
+    enabled: relatedCoursesCategoryIds.length > 0,
+    staleTime: 30 * 60 * 1000,
+  });
 
   // Handle payment success/cancel
   React.useEffect(() => {
@@ -575,8 +659,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           <div className="w-full mx-auto max-w-[1440px] 2xl:max-w-[1800px] 3xl:max-w-[2400px] px-4 sm:px-5 md:px-6 lg:px-12 xl:px-20 2xl:px-24 pb-8 sm:pb-10 lg:pb-12">
             <RelatedCoursesSection
               courses={relatedCourses}
-              categories={categories}
-              instructors={instructors}
+              categories={relatedCoursesCategories}
               title="Kapcsolódó tartalmak"
               darkMode={true}
             />

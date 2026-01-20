@@ -2,47 +2,56 @@
 // This enables any course ID to work, not just pre-built ones
 
 import { Metadata } from 'next'
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
-import { getFirestore } from 'firebase-admin/firestore'
+import { initializeApp, getApps } from 'firebase/app'
+import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore'
 import ClientCourseDetailPage from './ClientCourseDetailPage'
 
-// Initialize Firebase Admin for server-side metadata generation
-function getAdminFirestore() {
-  if (getApps().length === 0) {
-    if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-      initializeApp({
-        credential: cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
-      })
-    } else {
-      initializeApp({
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'dmaapp-477d4',
-      })
-    }
-  }
-  return getFirestore()
+// Firebase config for server-side metadata fetching
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "demo-api-key",
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "dmaapp-477d4.firebaseapp.com",
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "dmaapp-477d4",
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "dmaapp-477d4.firebasestorage.app",
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "demo-app-id",
 }
 
-// Fetch course data for metadata
+// Get or initialize Firebase app for metadata generation
+function getMetadataFirestore() {
+  let app
+  if (getApps().length === 0) {
+    app = initializeApp(firebaseConfig, 'metadata-app')
+  } else {
+    // Check if metadata-app exists, otherwise use first app
+    app = getApps().find(a => a.name === 'metadata-app') || getApps()[0]
+  }
+  return getFirestore(app)
+}
+
+// Fetch course data for metadata using client SDK
 async function getCourseData(courseId: string) {
   try {
-    const db = getAdminFirestore()
+    const db = getMetadataFirestore()
 
     // Try direct lookup first
-    const courseDoc = await db.collection('courses').doc(courseId).get()
-    if (courseDoc.exists) {
-      return { id: courseDoc.id, ...courseDoc.data() }
+    const courseRef = doc(db, 'courses', courseId)
+    const courseSnap = await getDoc(courseRef)
+
+    if (courseSnap.exists()) {
+      return { id: courseSnap.id, ...courseSnap.data() }
     }
 
     // Try by slug
-    const slugQuery = await db
-      .collection('courses')
-      .where('slug', '==', courseId)
-      .limit(1)
-      .get()
+    const slugQuery = query(
+      collection(db, 'courses'),
+      where('slug', '==', courseId),
+      limit(1)
+    )
+    const slugSnap = await getDocs(slugQuery)
 
-    if (!slugQuery.empty) {
-      const doc = slugQuery.docs[0]
-      return { id: doc.id, ...doc.data() }
+    if (!slugSnap.empty) {
+      const docSnap = slugSnap.docs[0]
+      return { id: docSnap.id, ...docSnap.data() }
     }
 
     return null
