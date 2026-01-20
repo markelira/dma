@@ -363,7 +363,7 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
         </div>
 
         {/* Content */}
-        <div className="flex-1 flex flex-col p-4">
+        <div className="flex-1 flex flex-col p-4 min-h-[100px]">
           {/* Title (NEW: Smaller text size) */}
           <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-2 min-h-[2.5rem] group-hover:text-brand-secondary transition-colors">
             {course.title}
@@ -376,13 +376,18 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
             </div>
           )}
 
-          {/* Category Badges - Left Aligned */}
-          <div className="flex items-center gap-2 flex-wrap">
-            {categoryNames.map((catName, idx) => (
-              <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary">
+          {/* Category Badges - Left Aligned, max 2 with overflow indicator */}
+          <div className="flex items-center gap-2 mt-auto">
+            {categoryNames.slice(0, 2).map((catName, idx) => (
+              <div key={idx} className="px-2.5 py-1 rounded-md text-xs font-normal bg-brand-secondary/10 border border-brand-secondary/20 text-brand-secondary truncate max-w-[120px]">
                 {catName}
               </div>
             ))}
+            {categoryNames.length > 2 && (
+              <div className="px-2 py-1 rounded-md text-xs font-normal bg-gray-100 text-gray-500">
+                +{categoryNames.length - 2}
+              </div>
+            )}
           </div>
         </div>
         </div>

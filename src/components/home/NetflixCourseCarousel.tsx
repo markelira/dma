@@ -154,7 +154,7 @@ export function NetflixCourseCarousel() {
               Tartalmaink
             </h2>
           </div>
-          <div className="h-[320px] flex items-center justify-center bg-gray-100 rounded-xl">
+          <div className="h-[300px] flex items-center justify-center bg-gray-100 rounded-xl">
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         </div>
@@ -203,7 +203,7 @@ export function NetflixCourseCarousel() {
             {loading ? (
               // Loading skeletons
               [...Array(4)].map((_, i) => (
-                <div key={i} className="flex-shrink-0 w-[280px] md:w-[320px]" style={{ scrollSnapAlign: 'start' }}>
+                <div key={i} className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]" style={{ scrollSnapAlign: 'start' }}>
                   <div className="aspect-video bg-gray-800 rounded-xl animate-pulse" />
                   <div className="h-5 bg-gray-800 rounded mt-4 w-3/4 animate-pulse" />
                   <div className="h-4 bg-gray-800 rounded mt-2 w-1/2 animate-pulse" />
@@ -211,7 +211,7 @@ export function NetflixCourseCarousel() {
               ))
             ) : (
               courses.map((course, index) => (
-                <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px]" style={{ scrollSnapAlign: 'start' }}>
+                <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]" style={{ scrollSnapAlign: 'start' }}>
                   <PremiumCourseCard
                     course={course}
                     index={index}

@@ -167,7 +167,7 @@ export default function FeaturedCoursesCarousel() {
               Kezdd el a tanulást a legkedveltebb és leghatékonyabb kurzusainkkal
             </p>
           </div>
-          <div className="h-[320px] flex items-center justify-center bg-white/50 rounded-xl">
+          <div className="h-[300px] flex items-center justify-center bg-white/50 rounded-xl">
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         </div>
@@ -241,7 +241,7 @@ export default function FeaturedCoursesCarousel() {
             {courses.map((course, index) => (
               <div
                 key={course.id}
-                className="flex-shrink-0"
+                className="flex-shrink-0 h-[300px]"
                 style={{
                   width: "340px",
                   scrollSnapAlign: "start",

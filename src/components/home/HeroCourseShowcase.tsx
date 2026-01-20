@@ -208,7 +208,7 @@ export function HeroCourseShowcase({ maxCourses = 8 }: HeroCourseShowcaseProps) 
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {courses.map((course, index) => (
-              <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px]">
+              <div key={course.id} className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]">
                 <PremiumCourseCard
                   course={course}
                   index={index}

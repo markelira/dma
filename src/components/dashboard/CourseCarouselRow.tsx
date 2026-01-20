@@ -140,7 +140,7 @@ export function CourseCarouselRow({
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
         </div>
-        <div className="h-[280px] flex items-center justify-center bg-gray-50 rounded-xl">
+        <div className="h-[300px] flex items-center justify-center bg-gray-50 rounded-xl">
           <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
         </div>
       </section>
@@ -201,7 +201,7 @@ export function CourseCarouselRow({
               return (
                 <div
                   key={course.id}
-                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[280px]"
+                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]"
                   style={{ scrollSnapAlign: 'start' }}
                   aria-hidden="true"
                 />
@@ -215,7 +215,7 @@ export function CourseCarouselRow({
             return (
               <div
                 key={course.id}
-                className="flex-shrink-0 w-[280px] md:w-[320px]"
+                className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]"
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <PremiumCourseCard
