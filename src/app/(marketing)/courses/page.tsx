@@ -294,7 +294,7 @@ export default function CoursesPage() {
         });
         return {
           category,
-          courses: categoryCourses,
+          courses: shuffleArray(categoryCourses),
         };
       })
       .filter(row => row.courses.length > 0);
@@ -423,7 +423,7 @@ export default function CoursesPage() {
 
               {/* Course Type Carousels */}
               {courses && ['WEBINAR', 'ACADEMIA', 'MASTERCLASS', 'PODCAST'].map(type => {
-                const typeCourses = courses.filter(c => c.courseType === type);
+                const typeCourses = shuffleArray(courses.filter(c => c.courseType === type));
                 if (typeCourses.length === 0) return null;
 
                 const typeLabels: Record<string, string> = {
