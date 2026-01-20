@@ -72,7 +72,7 @@ exports.savePendingRegistration = v2_1.https.onCall({
         const now = firestore_1.Timestamp.now();
         const expiresAt = firestore_1.Timestamp.fromMillis(now.toMillis() + 7 * 24 * 60 * 60 * 1000); // 7 days
         const pendingData = {
-            odingUserId: userId,
+            userId: userId,
             email: email.trim().toLowerCase(),
             firstName: firstName?.trim() || '',
             lastName: lastName?.trim() || '',

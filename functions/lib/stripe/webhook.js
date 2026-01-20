@@ -688,8 +688,9 @@ async function handleSubscriptionUpdated(subscription) {
                     subscriptionStatus: status,
                     updatedAt: new Date().toISOString(),
                 };
-                // If subscription was/is trialing, mark that user has used trial
-                if (subscriptionData.status === 'trialing') {
+                // Mark hasUsedTrial if user WAS trialing (old status) OR IS trialing (new status)
+                // This covers both: starting a trial AND transitioning from trial to paid
+                if (subscriptionData.status === 'trialing' || status === 'trialing') {
                     updateUserData.hasUsedTrial = true;
                 }
                 await firestore.collection('users').doc(subscriptionData.userId).update(updateUserData);
@@ -781,6 +782,8 @@ async function handleSubscriptionDeleted(subscription) {
             if (subscriptionData.userId) {
                 await firestore.collection('users').doc(subscriptionData.userId).update({
                     subscriptionStatus: 'canceled',
+                    // IMPORTANT: Mark hasUsedTrial even on cancellation - prevents trial abuse
+                    hasUsedTrial: true,
                     updatedAt: new Date().toISOString(),
                 });
             }

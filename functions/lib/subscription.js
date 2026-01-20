@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = void 0;
+exports.dailySubscriptionReconciliation = exports.syncSubscriptionFromStripe = exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSubscription = exports.cancelSubscription = exports.getSubscriptionStatus = void 0;
 /**
  * Subscription Management Cloud Functions
  *
@@ -44,6 +44,7 @@ exports.applyPromoCode = exports.getSubscriptionInvoices = exports.reactivateSub
  */
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
+const scheduler_1 = require("firebase-functions/v2/scheduler");
 const v2_1 = require("firebase-functions/v2");
 const stripe_1 = __importDefault(require("stripe"));
 const companySubscriptionCanceled_1 = require("./email/templates/companySubscriptionCanceled");
@@ -64,6 +65,68 @@ function getStripeInstance() {
         });
     }
     return stripe;
+}
+/**
+ * Map Stripe subscription status to our internal status
+ */
+function mapStripeStatusToInternal(stripeStatus) {
+    switch (stripeStatus) {
+        case 'active':
+            return 'active';
+        case 'trialing':
+            return 'trialing';
+        case 'past_due':
+            return 'past_due';
+        case 'canceled':
+        case 'unpaid':
+        case 'incomplete_expired':
+            return 'canceled';
+        case 'incomplete':
+        case 'paused':
+        default:
+            return 'none';
+    }
+}
+/**
+ * Verify subscription status against Stripe and sync if different
+ * Returns the verified status from Stripe
+ */
+async function verifyAndSyncStripeStatus(stripeSubscriptionId, firestoreStatus, updateTarget) {
+    try {
+        const stripeInstance = getStripeInstance();
+        const stripeSub = await stripeInstance.subscriptions.retrieve(stripeSubscriptionId);
+        const liveStatus = mapStripeStatusToInternal(stripeSub.status);
+        v2_1.logger.info('🔍 [verifyStripeStatus] Stripe verification:', {
+            stripeSubscriptionId,
+            stripeStatus: stripeSub.status,
+            mappedStatus: liveStatus,
+            firestoreStatus: firestoreStatus || 'undefined',
+            needsSync: liveStatus !== firestoreStatus,
+        });
+        // Sync if different
+        if (liveStatus !== firestoreStatus) {
+            v2_1.logger.info('🔄 [verifyStripeStatus] Syncing status mismatch:', {
+                from: firestoreStatus,
+                to: liveStatus,
+                target: `${updateTarget.collection}/${updateTarget.docId}`,
+            });
+            await firestore.collection(updateTarget.collection).doc(updateTarget.docId).update({
+                subscriptionStatus: liveStatus,
+                lastStripeSync: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+            });
+        }
+        return { status: liveStatus, verified: true, subscription: stripeSub };
+    }
+    catch (error) {
+        v2_1.logger.warn('⚠️ [verifyStripeStatus] Could not verify with Stripe:', {
+            stripeSubscriptionId,
+            error: error.message,
+        });
+        // If Stripe lookup fails, return Firestore status with verified: false
+        const fallbackStatus = mapStripeStatusToInternal(firestoreStatus || 'none');
+        return { status: fallbackStatus, verified: false };
+    }
 }
 /**
  * Get user's subscription status
@@ -90,55 +153,77 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
         const userData = userDoc.data();
         // PRIORITY 1: Check user's subscriptionStatus field (set by webhook when team is created)
         if (userData?.subscriptionStatus === 'active' || userData?.subscriptionStatus === 'trialing') {
-            const status = userData.subscriptionStatus;
-            const isTrialing = status === 'trialing';
-            // If user has teamId, get team subscription details
-            if (userData.teamId) {
-                const teamDoc = await firestore.collection('teams').doc(userData.teamId).get();
-                if (teamDoc.exists) {
-                    const teamData = teamDoc.data();
-                    return {
-                        success: true,
-                        hasSubscription: true,
-                        isActive: true,
-                        hasActiveSubscription: true,
-                        viaTeam: true,
-                        hasUsedTrial: userData?.hasUsedTrial || false,
-                        subscription: {
-                            id: userData.stripeSubscriptionId || teamData?.stripeSubscriptionId || userData.teamId,
-                            subscriptionId: teamData?.stripeSubscriptionId || userData.stripeSubscriptionId,
-                            status: status,
-                            planName: teamData?.subscriptionPlan || 'DMA Előfizetés',
-                            currentPeriodStart: teamData?.subscriptionStartDate?.toDate?.() || null,
-                            currentPeriodEnd: teamData?.subscriptionEndDate?.toDate?.() || null,
-                            cancelAtPeriodEnd: false,
-                            createdAt: teamData?.createdAt?.toDate?.() || null,
-                            trialEnd: teamData?.trialEndDate?.toDate?.() || null,
-                            isTrialing: isTrialing,
-                        }
-                    };
+            let status = userData.subscriptionStatus;
+            let stripeVerified = false;
+            // If user has a Stripe subscription ID, verify against Stripe (source of truth)
+            const userStripeSubId = userData.stripeSubscriptionId;
+            if (userStripeSubId) {
+                const verification = await verifyAndSyncStripeStatus(userStripeSubId, userData.subscriptionStatus, { collection: 'users', docId: userId });
+                status = verification.status;
+                stripeVerified = verification.verified;
+                // If Stripe says not active/trialing, skip this priority
+                if (status !== 'active' && status !== 'trialing') {
+                    v2_1.logger.info('🔍 [getSubscriptionStatus] PRIORITY 1 skipped - Stripe verified status is not active/trialing:', {
+                        userId,
+                        firestoreStatus: userData.subscriptionStatus,
+                        stripeStatus: status,
+                    });
+                    // Continue to next priority instead of returning
                 }
             }
-            // User has subscriptionStatus but no team (shouldn't happen, but handle it)
-            return {
-                success: true,
-                hasSubscription: true,
-                isActive: true,
-                hasActiveSubscription: true,
-                hasUsedTrial: userData?.hasUsedTrial || false,
-                subscription: {
-                    id: userData.stripeSubscriptionId || 'direct',
-                    subscriptionId: userData.stripeSubscriptionId,
-                    status: status,
-                    planName: 'DMA Előfizetés',
-                    currentPeriodStart: null,
-                    currentPeriodEnd: null,
-                    cancelAtPeriodEnd: false,
-                    createdAt: null,
-                    trialEnd: null,
-                    isTrialing: isTrialing,
+            // Only return if status is still active/trialing after verification
+            if (status === 'active' || status === 'trialing') {
+                const isTrialing = status === 'trialing';
+                // If user has teamId, get team subscription details
+                if (userData.teamId) {
+                    const teamDoc = await firestore.collection('teams').doc(userData.teamId).get();
+                    if (teamDoc.exists) {
+                        const teamData = teamDoc.data();
+                        return {
+                            success: true,
+                            hasSubscription: true,
+                            isActive: true,
+                            hasActiveSubscription: true,
+                            viaTeam: true,
+                            stripeVerified,
+                            hasUsedTrial: userData?.hasUsedTrial || false,
+                            subscription: {
+                                id: userData.stripeSubscriptionId || teamData?.stripeSubscriptionId || userData.teamId,
+                                subscriptionId: teamData?.stripeSubscriptionId || userData.stripeSubscriptionId,
+                                status: status,
+                                planName: teamData?.subscriptionPlan || 'DMA Előfizetés',
+                                currentPeriodStart: teamData?.subscriptionStartDate?.toDate?.() || null,
+                                currentPeriodEnd: teamData?.subscriptionEndDate?.toDate?.() || null,
+                                cancelAtPeriodEnd: false,
+                                createdAt: teamData?.createdAt?.toDate?.() || null,
+                                trialEnd: teamData?.trialEndDate?.toDate?.() || null,
+                                isTrialing: isTrialing,
+                            }
+                        };
+                    }
                 }
-            };
+                // User has subscriptionStatus but no team (shouldn't happen, but handle it)
+                return {
+                    success: true,
+                    hasSubscription: true,
+                    isActive: true,
+                    hasActiveSubscription: true,
+                    stripeVerified,
+                    hasUsedTrial: userData?.hasUsedTrial || false,
+                    subscription: {
+                        id: userData.stripeSubscriptionId || 'direct',
+                        subscriptionId: userData.stripeSubscriptionId,
+                        status: status,
+                        planName: 'DMA Előfizetés',
+                        currentPeriodStart: null,
+                        currentPeriodEnd: null,
+                        cancelAtPeriodEnd: false,
+                        createdAt: null,
+                        trialEnd: null,
+                        isTrialing: isTrialing,
+                    }
+                };
+            }
         }
         // PRIORITY 2: Check for direct subscription in subscriptions collection (fallback)
         const subscriptionsSnapshot = await firestore
@@ -150,25 +235,48 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
         if (!subscriptionsSnapshot.empty) {
             const subscriptionDoc = subscriptionsSnapshot.docs[0];
             const subscriptionData = subscriptionDoc.data();
-            return {
-                success: true,
-                hasSubscription: true,
-                isActive: true,
-                hasActiveSubscription: true,
-                hasUsedTrial: userData?.hasUsedTrial || false,
-                subscription: {
-                    id: subscriptionDoc.id,
-                    subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
-                    status: subscriptionData.status,
-                    planName: subscriptionData.planName || 'DMA Előfizetés',
-                    currentPeriodStart: subscriptionData.currentPeriodStart,
-                    currentPeriodEnd: subscriptionData.currentPeriodEnd,
-                    cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd || false,
-                    createdAt: subscriptionData.createdAt,
-                    trialEnd: subscriptionData.trialEnd || null,
-                    isTrialing: subscriptionData.status === 'trialing',
+            let status = subscriptionData.status;
+            let stripeVerified = false;
+            // Verify against Stripe if we have a subscription ID
+            const subStripeId = subscriptionData.stripeSubscriptionId;
+            if (subStripeId) {
+                const verification = await verifyAndSyncStripeStatus(subStripeId, subscriptionData.status, { collection: 'subscriptions', docId: subscriptionDoc.id });
+                status = verification.status;
+                stripeVerified = verification.verified;
+                // If Stripe says not active/trialing, skip this priority
+                if (status !== 'active' && status !== 'trialing') {
+                    v2_1.logger.info('🔍 [getSubscriptionStatus] PRIORITY 2 skipped - Stripe verified status is not active/trialing:', {
+                        userId,
+                        subscriptionId: subscriptionDoc.id,
+                        firestoreStatus: subscriptionData.status,
+                        stripeStatus: status,
+                    });
+                    // Continue to next priority instead of returning
                 }
-            };
+            }
+            // Only return if status is still active/trialing after verification
+            if (status === 'active' || status === 'trialing') {
+                return {
+                    success: true,
+                    hasSubscription: true,
+                    isActive: true,
+                    hasActiveSubscription: true,
+                    stripeVerified,
+                    hasUsedTrial: userData?.hasUsedTrial || false,
+                    subscription: {
+                        id: subscriptionDoc.id,
+                        subscriptionId: subscriptionData.stripeSubscriptionId || subscriptionDoc.id,
+                        status: status,
+                        planName: subscriptionData.planName || 'DMA Előfizetés',
+                        currentPeriodStart: subscriptionData.currentPeriodStart,
+                        currentPeriodEnd: subscriptionData.currentPeriodEnd,
+                        cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd || false,
+                        createdAt: subscriptionData.createdAt,
+                        trialEnd: subscriptionData.trialEnd || null,
+                        isTrialing: status === 'trialing',
+                    }
+                };
+            }
         }
         // PRIORITY 3: Check team subscription status directly (not through subscriptions collection)
         const teamId = userData?.teamId;
@@ -178,26 +286,49 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                 const teamData = teamDoc.data();
                 // Check team's subscription status directly
                 if (teamData?.subscriptionStatus === 'active' || teamData?.subscriptionStatus === 'trialing') {
-                    return {
-                        success: true,
-                        hasSubscription: true,
-                        isActive: true,
-                        hasActiveSubscription: true,
-                        inheritedFromTeam: true,
-                        hasUsedTrial: userData?.hasUsedTrial || false,
-                        subscription: {
-                            id: teamData.stripeSubscriptionId || teamId,
-                            subscriptionId: teamData.stripeSubscriptionId,
-                            status: teamData.subscriptionStatus,
-                            planName: teamData.subscriptionPlan || 'DMA Csapat Előfizetés',
-                            currentPeriodStart: teamData.subscriptionStartDate?.toDate?.() || null,
-                            currentPeriodEnd: teamData.subscriptionEndDate?.toDate?.() || null,
-                            cancelAtPeriodEnd: false,
-                            createdAt: teamData.createdAt?.toDate?.() || null,
-                            trialEnd: teamData.trialEndDate?.toDate?.() || null,
-                            isTrialing: teamData.subscriptionStatus === 'trialing',
+                    let status = teamData.subscriptionStatus;
+                    let stripeVerified = false;
+                    // Verify against Stripe if we have a subscription ID
+                    const teamStripeId = teamData.stripeSubscriptionId;
+                    if (teamStripeId) {
+                        const verification = await verifyAndSyncStripeStatus(teamStripeId, teamData.subscriptionStatus, { collection: 'teams', docId: teamId });
+                        status = verification.status;
+                        stripeVerified = verification.verified;
+                        // If Stripe says not active/trialing, skip this priority
+                        if (status !== 'active' && status !== 'trialing') {
+                            v2_1.logger.info('🔍 [getSubscriptionStatus] PRIORITY 3 skipped - Stripe verified status is not active/trialing:', {
+                                userId,
+                                teamId,
+                                firestoreStatus: teamData.subscriptionStatus,
+                                stripeStatus: status,
+                            });
+                            // Continue to next priority instead of returning
                         }
-                    };
+                    }
+                    // Only return if status is still active/trialing after verification
+                    if (status === 'active' || status === 'trialing') {
+                        return {
+                            success: true,
+                            hasSubscription: true,
+                            isActive: true,
+                            hasActiveSubscription: true,
+                            inheritedFromTeam: true,
+                            stripeVerified,
+                            hasUsedTrial: userData?.hasUsedTrial || false,
+                            subscription: {
+                                id: teamData.stripeSubscriptionId || teamId,
+                                subscriptionId: teamData.stripeSubscriptionId,
+                                status: status,
+                                planName: teamData.subscriptionPlan || 'DMA Csapat Előfizetés',
+                                currentPeriodStart: teamData.subscriptionStartDate?.toDate?.() || null,
+                                currentPeriodEnd: teamData.subscriptionEndDate?.toDate?.() || null,
+                                cancelAtPeriodEnd: false,
+                                createdAt: teamData.createdAt?.toDate?.() || null,
+                                trialEnd: teamData.trialEndDate?.toDate?.() || null,
+                                isTrialing: status === 'trialing',
+                            }
+                        };
+                    }
                 }
             }
         }
@@ -224,26 +355,49 @@ exports.getSubscriptionStatus = (0, https_1.onCall)({
                 });
                 // Check company's subscription status (Stripe handles trial via 7-day trial period)
                 if (companyData?.subscriptionStatus === 'active' || companyData?.subscriptionStatus === 'trialing') {
-                    return {
-                        success: true,
-                        hasSubscription: true,
-                        isActive: true,
-                        hasActiveSubscription: true,
-                        viaCompany: true,
-                        hasUsedTrial: userData?.hasUsedTrial || false,
-                        subscription: {
-                            id: companyData.stripeSubscriptionId || companyId,
-                            subscriptionId: companyData.stripeSubscriptionId,
-                            status: companyData.subscriptionStatus,
-                            planName: companyData.plan || 'DMA Vállalati Előfizetés',
-                            currentPeriodStart: companyData.subscriptionStartDate?.toDate?.() || null,
-                            currentPeriodEnd: companyData.subscriptionEndDate?.toDate?.() || null,
-                            cancelAtPeriodEnd: false,
-                            createdAt: companyData.createdAt?.toDate?.() || null,
-                            trialEnd: companyData.trialEndDate?.toDate?.() || null,
-                            isTrialing: companyData.subscriptionStatus === 'trialing',
+                    let status = companyData.subscriptionStatus;
+                    let stripeVerified = false;
+                    // Verify against Stripe if we have a subscription ID
+                    const companyStripeId = companyData.stripeSubscriptionId;
+                    if (companyStripeId) {
+                        const verification = await verifyAndSyncStripeStatus(companyStripeId, companyData.subscriptionStatus, { collection: 'companies', docId: companyId });
+                        status = verification.status;
+                        stripeVerified = verification.verified;
+                        // If Stripe says not active/trialing, skip this priority
+                        if (status !== 'active' && status !== 'trialing') {
+                            v2_1.logger.info('🔍 [getSubscriptionStatus] PRIORITY 4 skipped - Stripe verified status is not active/trialing:', {
+                                userId,
+                                companyId,
+                                firestoreStatus: companyData.subscriptionStatus,
+                                stripeStatus: status,
+                            });
+                            // Continue to return no subscription
                         }
-                    };
+                    }
+                    // Only return if status is still active/trialing after verification
+                    if (status === 'active' || status === 'trialing') {
+                        return {
+                            success: true,
+                            hasSubscription: true,
+                            isActive: true,
+                            hasActiveSubscription: true,
+                            viaCompany: true,
+                            stripeVerified,
+                            hasUsedTrial: userData?.hasUsedTrial || false,
+                            subscription: {
+                                id: companyData.stripeSubscriptionId || companyId,
+                                subscriptionId: companyData.stripeSubscriptionId,
+                                status: status,
+                                planName: companyData.plan || 'DMA Vállalati Előfizetés',
+                                currentPeriodStart: companyData.subscriptionStartDate?.toDate?.() || null,
+                                currentPeriodEnd: companyData.subscriptionEndDate?.toDate?.() || null,
+                                cancelAtPeriodEnd: false,
+                                createdAt: companyData.createdAt?.toDate?.() || null,
+                                trialEnd: companyData.trialEndDate?.toDate?.() || null,
+                                isTrialing: status === 'trialing',
+                            }
+                        };
+                    }
                 }
                 // No active subscription - company needs to complete Stripe checkout
                 // Stripe handles 7-day trial period, not the app
@@ -614,6 +768,248 @@ exports.applyPromoCode = (0, https_1.onCall)({
     catch (error) {
         v2_1.logger.error('Apply promo code error:', error);
         throw new Error(error.message || 'Promóciós kód alkalmazása sikertelen');
+    }
+});
+/**
+ * Admin function to sync subscription status from Stripe
+ * Allows admins to manually fix status mismatches
+ */
+exports.syncSubscriptionFromStripe = (0, https_1.onCall)({
+    cors: true,
+    region: 'europe-west1',
+}, async (request) => {
+    try {
+        if (!request.auth) {
+            throw new Error('Hitelesítés szükséges');
+        }
+        const { targetUserId } = request.data;
+        if (!targetUserId) {
+            throw new Error('Target user ID is required');
+        }
+        // Check if caller is admin
+        const callerDoc = await firestore.collection('users').doc(request.auth.uid).get();
+        const callerData = callerDoc.data();
+        if (callerData?.role !== 'admin') {
+            throw new Error('Admin jogosultság szükséges');
+        }
+        v2_1.logger.info('[syncSubscriptionFromStripe] Starting sync', {
+            targetUserId,
+            calledBy: request.auth.uid,
+        });
+        const results = {
+            synced: [],
+            errors: [],
+            beforeStatus: null,
+            afterStatus: null,
+        };
+        // Get target user document
+        const targetUserDoc = await firestore.collection('users').doc(targetUserId).get();
+        if (!targetUserDoc.exists) {
+            throw new Error('Felhasználó nem található');
+        }
+        const userData = targetUserDoc.data();
+        results.beforeStatus = userData?.subscriptionStatus || 'none';
+        // 1. Check user's direct stripeSubscriptionId
+        if (userData?.stripeSubscriptionId) {
+            try {
+                const verification = await verifyAndSyncStripeStatus(userData.stripeSubscriptionId, userData.subscriptionStatus, { collection: 'users', docId: targetUserId });
+                results.synced.push(`users/${targetUserId}: ${userData.subscriptionStatus} → ${verification.status}`);
+                results.afterStatus = verification.status;
+            }
+            catch (err) {
+                results.errors.push(`users/${targetUserId}: ${err.message}`);
+            }
+        }
+        // 2. Check user's team subscription
+        if (userData?.teamId) {
+            const teamDoc = await firestore.collection('teams').doc(userData.teamId).get();
+            if (teamDoc.exists) {
+                const teamData = teamDoc.data();
+                if (teamData?.stripeSubscriptionId) {
+                    try {
+                        const verification = await verifyAndSyncStripeStatus(teamData.stripeSubscriptionId, teamData.subscriptionStatus, { collection: 'teams', docId: userData.teamId });
+                        results.synced.push(`teams/${userData.teamId}: ${teamData.subscriptionStatus} → ${verification.status}`);
+                        // Update user's status based on team
+                        if (verification.status !== results.afterStatus) {
+                            results.afterStatus = verification.status;
+                        }
+                    }
+                    catch (err) {
+                        results.errors.push(`teams/${userData.teamId}: ${err.message}`);
+                    }
+                }
+            }
+        }
+        // 3. Check user's company subscription
+        if (userData?.companyId) {
+            const companyDoc = await firestore.collection('companies').doc(userData.companyId).get();
+            if (companyDoc.exists) {
+                const companyData = companyDoc.data();
+                if (companyData?.stripeSubscriptionId) {
+                    try {
+                        const verification = await verifyAndSyncStripeStatus(companyData.stripeSubscriptionId, companyData.subscriptionStatus, { collection: 'companies', docId: userData.companyId });
+                        results.synced.push(`companies/${userData.companyId}: ${companyData.subscriptionStatus} → ${verification.status}`);
+                        // Update user's status based on company
+                        if (verification.status !== results.afterStatus) {
+                            results.afterStatus = verification.status;
+                        }
+                    }
+                    catch (err) {
+                        results.errors.push(`companies/${userData.companyId}: ${err.message}`);
+                    }
+                }
+            }
+        }
+        // 4. Check subscriptions collection for this user
+        const subscriptionsSnapshot = await firestore
+            .collection('subscriptions')
+            .where('userId', '==', targetUserId)
+            .get();
+        for (const subDoc of subscriptionsSnapshot.docs) {
+            const subData = subDoc.data();
+            if (subData.stripeSubscriptionId) {
+                try {
+                    const verification = await verifyAndSyncStripeStatus(subData.stripeSubscriptionId, subData.status, { collection: 'subscriptions', docId: subDoc.id });
+                    results.synced.push(`subscriptions/${subDoc.id}: ${subData.status} → ${verification.status}`);
+                }
+                catch (err) {
+                    results.errors.push(`subscriptions/${subDoc.id}: ${err.message}`);
+                }
+            }
+        }
+        v2_1.logger.info('[syncSubscriptionFromStripe] Completed', {
+            targetUserId,
+            synced: results.synced.length,
+            errors: results.errors.length,
+        });
+        return {
+            success: true,
+            message: `Sync completed. ${results.synced.length} updated, ${results.errors.length} errors.`,
+            results,
+        };
+    }
+    catch (error) {
+        v2_1.logger.error('[syncSubscriptionFromStripe] Error:', error);
+        throw new Error(error.message || 'Sync failed');
+    }
+});
+/**
+ * Scheduled daily reconciliation of subscription statuses
+ * Runs every day at 3 AM UTC to sync Firestore with Stripe
+ */
+exports.dailySubscriptionReconciliation = (0, scheduler_1.onSchedule)({
+    schedule: '0 3 * * *', // Every day at 3 AM UTC
+    region: 'europe-west1',
+    timeoutSeconds: 540, // 9 minutes max
+    memory: '512MiB',
+}, async () => {
+    v2_1.logger.info('[dailySubscriptionReconciliation] Starting daily reconciliation');
+    const stats = {
+        usersChecked: 0,
+        teamsChecked: 0,
+        companiesChecked: 0,
+        statusMismatches: 0,
+        syncedDocuments: 0,
+        errors: 0,
+    };
+    try {
+        // 1. Reconcile users with active/trialing subscriptions
+        const activeUsersSnapshot = await firestore
+            .collection('users')
+            .where('subscriptionStatus', 'in', ['active', 'trialing'])
+            .get();
+        v2_1.logger.info(`[dailySubscriptionReconciliation] Found ${activeUsersSnapshot.size} users with active/trialing status`);
+        for (const userDoc of activeUsersSnapshot.docs) {
+            stats.usersChecked++;
+            const userData = userDoc.data();
+            if (userData.stripeSubscriptionId) {
+                try {
+                    const verification = await verifyAndSyncStripeStatus(userData.stripeSubscriptionId, userData.subscriptionStatus, { collection: 'users', docId: userDoc.id });
+                    if (verification.status !== userData.subscriptionStatus) {
+                        stats.statusMismatches++;
+                        stats.syncedDocuments++;
+                        v2_1.logger.info('[dailySubscriptionReconciliation] User status synced', {
+                            userId: userDoc.id,
+                            from: userData.subscriptionStatus,
+                            to: verification.status,
+                        });
+                    }
+                }
+                catch (err) {
+                    stats.errors++;
+                    v2_1.logger.warn('[dailySubscriptionReconciliation] User verification failed', {
+                        userId: userDoc.id,
+                        error: err.message,
+                    });
+                }
+            }
+        }
+        // 2. Reconcile teams with active/trialing subscriptions
+        const activeTeamsSnapshot = await firestore
+            .collection('teams')
+            .where('subscriptionStatus', 'in', ['active', 'trialing'])
+            .get();
+        v2_1.logger.info(`[dailySubscriptionReconciliation] Found ${activeTeamsSnapshot.size} teams with active/trialing status`);
+        for (const teamDoc of activeTeamsSnapshot.docs) {
+            stats.teamsChecked++;
+            const teamData = teamDoc.data();
+            if (teamData.stripeSubscriptionId) {
+                try {
+                    const verification = await verifyAndSyncStripeStatus(teamData.stripeSubscriptionId, teamData.subscriptionStatus, { collection: 'teams', docId: teamDoc.id });
+                    if (verification.status !== teamData.subscriptionStatus) {
+                        stats.statusMismatches++;
+                        stats.syncedDocuments++;
+                        v2_1.logger.info('[dailySubscriptionReconciliation] Team status synced', {
+                            teamId: teamDoc.id,
+                            from: teamData.subscriptionStatus,
+                            to: verification.status,
+                        });
+                    }
+                }
+                catch (err) {
+                    stats.errors++;
+                    v2_1.logger.warn('[dailySubscriptionReconciliation] Team verification failed', {
+                        teamId: teamDoc.id,
+                        error: err.message,
+                    });
+                }
+            }
+        }
+        // 3. Reconcile companies with active/trialing subscriptions
+        const activeCompaniesSnapshot = await firestore
+            .collection('companies')
+            .where('subscriptionStatus', 'in', ['active', 'trialing'])
+            .get();
+        v2_1.logger.info(`[dailySubscriptionReconciliation] Found ${activeCompaniesSnapshot.size} companies with active/trialing status`);
+        for (const companyDoc of activeCompaniesSnapshot.docs) {
+            stats.companiesChecked++;
+            const companyData = companyDoc.data();
+            if (companyData.stripeSubscriptionId) {
+                try {
+                    const verification = await verifyAndSyncStripeStatus(companyData.stripeSubscriptionId, companyData.subscriptionStatus, { collection: 'companies', docId: companyDoc.id });
+                    if (verification.status !== companyData.subscriptionStatus) {
+                        stats.statusMismatches++;
+                        stats.syncedDocuments++;
+                        v2_1.logger.info('[dailySubscriptionReconciliation] Company status synced', {
+                            companyId: companyDoc.id,
+                            from: companyData.subscriptionStatus,
+                            to: verification.status,
+                        });
+                    }
+                }
+                catch (err) {
+                    stats.errors++;
+                    v2_1.logger.warn('[dailySubscriptionReconciliation] Company verification failed', {
+                        companyId: companyDoc.id,
+                        error: err.message,
+                    });
+                }
+            }
+        }
+        v2_1.logger.info('[dailySubscriptionReconciliation] Reconciliation completed', stats);
+    }
+    catch (error) {
+        v2_1.logger.error('[dailySubscriptionReconciliation] Fatal error:', error);
     }
 });
 //# sourceMappingURL=subscription.js.map

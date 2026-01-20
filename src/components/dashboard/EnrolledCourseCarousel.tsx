@@ -144,13 +144,13 @@ export function EnrolledCourseCarousel({
   // Show placeholder until carousel scrolls into view
   if (!isVisible) {
     return (
-      <section ref={visibilityRef} className="mb-8">
+      <section ref={visibilityRef} className="mb-12">
         <div className="flex items-center gap-2 mb-4">
           {icon}
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
           <span className="text-sm text-gray-500">({enrollments.length})</span>
         </div>
-        <div className="h-[300px] flex items-center justify-center bg-gray-50 rounded-xl">
+        <div className="h-[420px] flex items-center justify-center bg-gray-50 rounded-xl">
           <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
         </div>
       </section>
@@ -158,7 +158,7 @@ export function EnrolledCourseCarousel({
   }
 
   return (
-    <section ref={visibilityRef} className="mb-8">
+    <section ref={visibilityRef} className="mb-12">
       {/* Section Header */}
       <div className="flex items-center gap-2 mb-4">
         {icon}
@@ -205,7 +205,7 @@ export function EnrolledCourseCarousel({
               return (
                 <div
                   key={enrollment.id}
-                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]"
+                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[360px]"
                   style={{ scrollSnapAlign: 'start' }}
                   aria-hidden="true"
                 />
@@ -220,7 +220,7 @@ export function EnrolledCourseCarousel({
               return (
                 <div
                   key={enrollment.id}
-                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]"
+                  className="flex-shrink-0 w-[280px] md:w-[320px] h-[360px]"
                   style={{ scrollSnapAlign: 'start' }}
                   aria-hidden="true"
                 />
@@ -230,7 +230,7 @@ export function EnrolledCourseCarousel({
             return (
               <div
                 key={enrollment.id}
-                className="flex-shrink-0 w-[280px] md:w-[320px] h-[300px]"
+                className="flex-shrink-0 w-[280px] md:w-[320px] h-[360px]"
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <PremiumCourseCard

@@ -439,26 +439,33 @@ exports.executeAccountDeletion = (0, https_1.onCall)({
                 anonymizedAt: new Date().toISOString(),
             });
         });
-        // 8. Remove from company employees
-        const employeeSnapshot = await firestore
-            .collectionGroup('employees')
-            .where('userId', '==', userId)
-            .get();
-        employeeSnapshot.docs.forEach(doc => {
-            batch.delete(doc.ref);
-            deletedCount++;
-        });
+        // 8. Remove from company employees (skip if index not ready)
+        try {
+            const employeeSnapshot = await firestore
+                .collectionGroup('employees')
+                .where('userId', '==', userId)
+                .get();
+            employeeSnapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+                deletedCount++;
+            });
+        }
+        catch (employeeError) {
+            v2_1.logger.warn(`[GDPR] Could not query employees (index may not be ready): ${userId}`, employeeError);
+            // Continue with deletion - employees will be orphaned but user data is still removed
+        }
         // 9. Delete the user document
         const userDocRef = firestore.collection('users').doc(userId);
         batch.delete(userDocRef);
         deletedCount++;
-        // 10. Update deletion request record
+        // 10. Create/update deletion request record (use set with merge for direct deletions)
         const deletionRequestRef = firestore.collection('deletionRequests').doc(userId);
-        batch.update(deletionRequestRef, {
+        batch.set(deletionRequestRef, {
+            userId: userId,
             status: 'completed',
             completedAt: new Date().toISOString(),
             deletedDocuments: deletedCount,
-        });
+        }, { merge: true });
         // Commit all deletions
         await batch.commit();
         // 11. Delete Firebase Auth user

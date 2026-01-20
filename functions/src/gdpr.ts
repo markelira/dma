@@ -473,13 +473,14 @@ export const executeAccountDeletion = onCall({
     batch.delete(userDocRef);
     deletedCount++;
 
-    // 10. Update deletion request record
+    // 10. Create/update deletion request record (use set with merge for direct deletions)
     const deletionRequestRef = firestore.collection('deletionRequests').doc(userId);
-    batch.update(deletionRequestRef, {
+    batch.set(deletionRequestRef, {
+      userId: userId,
       status: 'completed',
       completedAt: new Date().toISOString(),
       deletedDocuments: deletedCount,
-    });
+    }, { merge: true });
 
     // Commit all deletions
     await batch.commit();
