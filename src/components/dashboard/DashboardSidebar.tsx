@@ -22,7 +22,8 @@ import {
   FolderOpen,
   Star,
   Video,
-  Mic
+  Mic,
+  X
 } from 'lucide-react'
 import { brandGradient } from '@/lib/design-tokens'
 
@@ -119,6 +120,7 @@ interface NavigationItemProps {
 
 interface DashboardSidebarProps {
   onNavigate?: () => void
+  onClose?: () => void
   companyLogoUrl?: string
 }
 
@@ -156,7 +158,7 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
   )
 }
 
-export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSidebarProps = {}) {
+export function DashboardSidebar({ onNavigate, onClose, companyLogoUrl }: DashboardSidebarProps = {}) {
   const pathname = usePathname()
   const { user, isLoading: loading, logout } = useAuthStore()
   const router = useRouter()
@@ -195,7 +197,7 @@ export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSideba
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header with logo */}
-      <div className="px-6 py-5 border-b border-gray-200">
+      <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
         <Link href="/dashboard" className="flex items-center group">
           <motion.div
             className="relative w-28 h-8 flex-shrink-0"
@@ -212,6 +214,16 @@ export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSideba
             />
           </motion.div>
         </Link>
+
+        {/* Close button - only visible on mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        )}
       </div>
 
       {/* Navigation Sections */}

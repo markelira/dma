@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
-import { Loader2, Menu, X } from 'lucide-react'
+import { Loader2, Menu } from 'lucide-react'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
@@ -125,26 +125,16 @@ export default function DashboardRouteGroupLayout({
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
-        <DashboardSidebar onNavigate={() => setSidebarOpen(false)} companyLogoUrl={companyLogoUrl} />
+        <DashboardSidebar onNavigate={() => setSidebarOpen(false)} onClose={() => setSidebarOpen(false)} companyLogoUrl={companyLogoUrl} />
       </aside>
 
-      {/* Mobile Menu Button - Floating */}
+      {/* Mobile Menu Button - Only shows hamburger when sidebar closed */}
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
           className="fixed top-4 left-4 z-[60] rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
         >
           <Menu className="h-6 w-6 text-gray-700" />
-        </button>
-      )}
-
-      {/* Close button inside sidebar header when open */}
-      {sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(false)}
-          className="fixed top-4 left-[200px] z-[60] rounded-lg bg-gray-100 border border-gray-200 p-2 hover:bg-gray-200 lg:hidden"
-        >
-          <X className="h-6 w-6 text-gray-700" />
         </button>
       )}
 
