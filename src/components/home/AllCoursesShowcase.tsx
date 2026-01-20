@@ -119,7 +119,7 @@ function CourseCarousel({ courses, categories, instructors, courseType, title }:
         {/* Scrollable Container */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-12"
+          className="flex gap-6 overflow-x-auto overflow-y-clip scrollbar-hide scroll-smooth"
           style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {courses.map((course, index) => (

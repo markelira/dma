@@ -232,7 +232,7 @@ export default function FeaturedCoursesCarousel() {
           {/* Scrollable Container */}
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth py-12 -my-12 pl-12"
+            className="flex gap-6 overflow-x-auto overflow-y-clip scrollbar-hide scroll-smooth"
             style={{
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
