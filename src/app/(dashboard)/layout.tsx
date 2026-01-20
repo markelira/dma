@@ -128,10 +128,12 @@ export default function DashboardRouteGroupLayout({
         <DashboardSidebar onNavigate={() => setSidebarOpen(false)} companyLogoUrl={companyLogoUrl} />
       </aside>
 
-      {/* Mobile Menu Button - Floating */}
+      {/* Mobile Menu Button - Floating, moves right when sidebar open */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
+        className={`fixed z-[60] rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden transition-all duration-300
+          ${sidebarOpen ? 'top-4 left-[220px]' : 'top-4 left-4'}
+        `}
       >
         {sidebarOpen ? (
           <X className="h-6 w-6 text-gray-700" />
@@ -141,7 +143,7 @@ export default function DashboardRouteGroupLayout({
       </button>
 
       {/* Main Content Area - offset by sidebar width on desktop */}
-      <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64">
+      <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-h-screen overflow-y-auto">
         <ErrorBoundary>
           {children}
         </ErrorBoundary>

@@ -240,7 +240,7 @@ export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSideba
       </div>
 
       {/* User Profile Section */}
-      <div className="border-t border-gray-200 p-4">
+      <div className="border-t border-gray-200 p-4 pb-8">
         <div className="flex items-center space-x-3 mb-4">
           {user?.role === 'COMPANY_EMPLOYEE' && companyLogoUrl ? (
             <div className="relative w-8 h-8 rounded-full overflow-hidden ring-2 ring-brand-secondary flex-shrink-0">
@@ -288,7 +288,7 @@ export function DashboardSidebar({ onNavigate, companyLogoUrl }: DashboardSideba
           <motion.div whileHover={{ x: 2 }} transition={{ duration: 0.2 }}>
             <button
               onClick={handleLogout}
-              className="flex items-center w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              className="flex items-center w-full px-3 py-3 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4 mr-3" />
               Kijelentkezés
