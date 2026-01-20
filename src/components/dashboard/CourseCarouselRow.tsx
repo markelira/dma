@@ -124,7 +124,7 @@ export function CourseCarouselRow({
 
   if (!courses || courses.length === 0) {
     return (
-      <section className="mb-12">
+      <section className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
         </div>
@@ -136,7 +136,7 @@ export function CourseCarouselRow({
   // Show placeholder until carousel scrolls into view
   if (!isVisible) {
     return (
-      <section ref={visibilityRef} className="mb-12">
+      <section ref={visibilityRef} className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
         </div>
@@ -148,7 +148,7 @@ export function CourseCarouselRow({
   }
 
   return (
-    <section ref={visibilityRef} className="mb-12">
+    <section ref={visibilityRef} className="mb-8">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-gray-900">{title}</h2>
