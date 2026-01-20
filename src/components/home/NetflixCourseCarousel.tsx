@@ -154,7 +154,7 @@ export function NetflixCourseCarousel() {
               Tartalmaink
             </h2>
           </div>
-          <div className="h-[420px] flex items-center justify-center bg-gray-100 rounded-xl">
+          <div className="h-[380px] flex items-center justify-center bg-gray-100 rounded-xl">
             <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
           </div>
         </div>
@@ -197,7 +197,7 @@ export function NetflixCourseCarousel() {
           {/* Scrollable Track */}
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto overflow-y-visible py-6 pl-4 scrollbar-hide scroll-smooth"
+            className="flex gap-6 overflow-x-auto overflow-y-visible py-3 pl-4 scrollbar-hide scroll-smooth"
             style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {loading ? (

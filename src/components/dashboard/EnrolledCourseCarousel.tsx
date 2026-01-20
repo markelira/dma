@@ -150,7 +150,7 @@ export function EnrolledCourseCarousel({
           <h2 className="text-xl font-bold text-gray-900">{title}</h2>
           <span className="text-sm text-gray-500">({enrollments.length})</span>
         </div>
-        <div className="h-[420px] flex items-center justify-center bg-gray-50 rounded-xl">
+        <div className="h-[380px] flex items-center justify-center bg-gray-50 rounded-xl">
           <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
         </div>
       </section>
@@ -193,7 +193,7 @@ export function EnrolledCourseCarousel({
         {/* Scrollable Container with Virtualization */}
         <div
           ref={scrollContainerRef}
-          className="flex gap-6 overflow-x-auto overflow-y-visible py-6 pl-4 scrollbar-hide scroll-smooth"
+          className="flex gap-6 overflow-x-auto overflow-y-visible py-3 pl-4 scrollbar-hide scroll-smooth"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {enrollments.map((enrollment, index) => {
