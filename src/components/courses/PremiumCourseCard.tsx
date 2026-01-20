@@ -314,7 +314,7 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
 
           {/* Dark Overlay + Play Button (NEW: Improved hover animation) */}
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform scale-75 group-hover:scale-100 duration-300">
+            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 ease-out">
               <Play className="w-7 h-7 text-gray-900 ml-1 fill-current" />
             </div>
           </div>
