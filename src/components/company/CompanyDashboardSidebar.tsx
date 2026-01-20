@@ -21,7 +21,8 @@ import {
   Star,
   Video,
   Mic,
-  CreditCard
+  CreditCard,
+  X
 } from 'lucide-react'
 
 /**
@@ -71,6 +72,7 @@ interface CompanyDashboardSidebarProps {
   companyName?: string
   companyLogoUrl?: string
   onNavigate?: () => void
+  onClose?: () => void
 }
 
 function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
@@ -107,7 +109,7 @@ function NavigationItem({ item, isActive, onNavigate }: NavigationItemProps) {
   )
 }
 
-export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigate }: CompanyDashboardSidebarProps) {
+export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigate, onClose }: CompanyDashboardSidebarProps) {
   const pathname = usePathname()
   const { user, isLoading: loading, logout } = useAuthStore()
   const router = useRouter()
@@ -140,7 +142,7 @@ export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigat
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header with logo */}
-      <div className="px-6 py-5 border-b border-gray-200">
+      <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
         <Link href="/company/dashboard" className="flex items-center group">
           <motion.div
             className="relative w-28 h-8 flex-shrink-0"
@@ -157,6 +159,16 @@ export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigat
             />
           </motion.div>
         </Link>
+
+        {/* Close button - only visible on mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="lg:hidden p-2 -mr-2 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <X className="h-5 w-5 text-gray-500" />
+          </button>
+        )}
       </div>
 
       {/* Company Name */}

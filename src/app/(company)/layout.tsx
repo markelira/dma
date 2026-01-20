@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/authStore'
-import { Loader2, Menu, X } from 'lucide-react'
+import { Loader2, Menu } from 'lucide-react'
 import { CompanyDashboardSidebar } from '@/components/company/CompanyDashboardSidebar'
 // REMOVED: Duplicate AuthProvider - already wrapped in root layout
 // import { AuthProvider } from '@/contexts/AuthContext'
@@ -145,20 +145,19 @@ export default function CompanyLayout({
           companyName={companyName}
           companyLogoUrl={companyLogoUrl}
           onNavigate={() => setSidebarOpen(false)}
+          onClose={() => setSidebarOpen(false)}
         />
       </aside>
 
-      {/* Mobile Menu Button - Floating */}
-      <button
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="fixed top-4 left-4 z-50 rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
-      >
-        {sidebarOpen ? (
-          <X className="h-6 w-6 text-gray-700" />
-        ) : (
+      {/* Mobile Menu Button - Only shows hamburger when sidebar closed */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-4 left-4 z-[60] rounded-lg bg-white border border-gray-200 p-2 hover:bg-gray-100 shadow-sm lg:hidden"
+        >
           <Menu className="h-6 w-6 text-gray-700" />
-        )}
-      </button>
+        </button>
+      )}
 
       {/* Main Content - with left margin for fixed sidebar on desktop */}
       <main className="bg-gray-50 p-4 lg:p-6 lg:ml-64 min-w-0 overflow-x-hidden">
