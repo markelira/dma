@@ -33,7 +33,7 @@ export async function sendPreRegistrationEmail(
   const content = `
     ${createHeading(`Szia ${firstName}!`, 2)}
     ${createParagraph('A regisztrációdat előkészítettük a DMA Masterclass platformon.')}
-    ${createParagraph(`A <strong>${companyName}</strong> cég admin fiókodat már létrehoztuk neked. Az adataid már ki vannak töltve, csak a jelszavadat kell megadnod a regisztráció befejezéséhez.`)}
+    ${createParagraph(`A <strong>${companyName}</strong> fiókodat már létrehoztuk neked. Az adataid már ki vannak töltve, csak a jelszavadat kell megadnod a regisztráció befejezéséhez.`)}
 
     ${createButtonRow({ text: 'REGISZTRÁCIÓ BEFEJEZÉSE', url: registerUrl, variant: 'primary' })}
 

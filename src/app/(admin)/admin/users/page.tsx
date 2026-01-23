@@ -428,15 +428,10 @@ export default function AdminUsersPage() {
         <div className="hidden lg:flex items-center gap-3">
           <Button
             onClick={() => setShowPreRegModal(true)}
-            variant="outline"
-            className="flex items-center gap-2"
+            className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2"
           >
             <UserPlus className="h-4 w-4" />
             Előregisztráció
-          </Button>
-          <Button className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Új Felhasználó
           </Button>
         </div>
       </div>

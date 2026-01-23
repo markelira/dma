@@ -48,7 +48,6 @@ const navigationSections = [
       { title: 'Kategóriák', href: '/admin/categories', icon: FolderTree },
       { title: 'Célközönségek', href: '/admin/target-audiences', icon: Users },
       { title: 'Oktatók', href: '/admin/instructors', icon: UserCog },
-      { title: 'Egyetemek', href: '/admin/universities', icon: Building2 },
     ]
   },
   {
