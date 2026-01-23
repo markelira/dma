@@ -117,27 +117,14 @@ export const removeEmployee = https.onCall(
 
       // 6. Handle based on employee status
       if (employeeStatus === 'invited') {
-        // Cancel invitation - just update status
-        await employeeRef.update({
-          status: 'left',
-          inviteToken: admin.firestore.FieldValue.delete(),
-          inviteExpiresAt: admin.firestore.FieldValue.delete(),
-          removedAt: admin.firestore.FieldValue.serverTimestamp(),
-          removedBy: adminUserId,
-        });
+        // Cancel invitation - delete the document entirely so the email can be re-invited
+        await employeeRef.delete();
 
-        logger.info('[removeEmployee] Invitation cancelled', { employeeId });
+        logger.info('[removeEmployee] Invitation cancelled - document deleted', { employeeId });
 
       } else if (employeeStatus === 'active') {
         // Remove active employee
         const userId = employeeData.userId;
-
-        // Update employee status
-        await employeeRef.update({
-          status: 'left',
-          removedAt: admin.firestore.FieldValue.serverTimestamp(),
-          removedBy: adminUserId,
-        });
 
         // Update user document if userId exists
         if (userId) {
@@ -173,7 +160,10 @@ export const removeEmployee = https.onCall(
           }
         }
 
-        logger.info('[removeEmployee] Active employee removed', { employeeId, userId });
+        // Delete employee document entirely so the email can be re-invited
+        await employeeRef.delete();
+
+        logger.info('[removeEmployee] Active employee removed - document deleted', { employeeId, userId });
 
       } else if (employeeStatus === 'left') {
         // Already removed

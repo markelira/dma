@@ -579,3 +579,147 @@ export async function sendInvitationEmail(
     throw new Error(`Failed to send invitation email: ${error.message}`);
   }
 }
+
+/**
+ * Resend Employee Invitation
+ * Allows admins to resend invitation email to employees with 'invited' status
+ */
+export const resendEmployeeInvite = https.onCall(
+  {
+    region: 'europe-west1',
+    memory: '256MiB',
+    cors: true,
+  },
+  async (request: CallableRequest<{ companyId: string; employeeId: string }>) => {
+    console.log('📧 [resendEmployeeInvite] Function called', {
+      hasAuth: !!request.auth,
+      userId: request.auth?.uid,
+      data: request.data,
+    });
+
+    // 1. Authentication check
+    if (!request.auth) {
+      console.log('❌ [resendEmployeeInvite] No auth - rejecting');
+      throw new HttpsError('unauthenticated', 'Must be logged in');
+    }
+
+    const { companyId, employeeId } = request.data;
+    const userId = request.auth.uid;
+
+    // 2. Validate input
+    if (!companyId || !employeeId) {
+      throw new HttpsError('invalid-argument', 'Missing required fields: companyId and employeeId');
+    }
+
+    try {
+      // 3. Verify admin permission
+      const adminDoc = await db
+        .collection('companies')
+        .doc(companyId)
+        .collection('admins')
+        .doc(userId)
+        .get();
+
+      if (!adminDoc.exists) {
+        throw new HttpsError('permission-denied', 'You are not an admin of this company');
+      }
+
+      const adminData = adminDoc.data();
+      if (!adminData?.permissions?.canManageEmployees) {
+        throw new HttpsError('permission-denied', 'No permission to manage employees');
+      }
+
+      // 4. Get employee document
+      const employeeRef = db
+        .collection('companies')
+        .doc(companyId)
+        .collection('employees')
+        .doc(employeeId);
+
+      const employeeDoc = await employeeRef.get();
+
+      if (!employeeDoc.exists) {
+        throw new HttpsError('not-found', 'Employee not found');
+      }
+
+      const employeeData = employeeDoc.data() as CompanyEmployee;
+
+      // 5. Check status is 'invited'
+      if (employeeData.status !== 'invited') {
+        throw new HttpsError(
+          'failed-precondition',
+          'Only pending invitations can be resent. This employee has already accepted their invitation.'
+        );
+      }
+
+      // 6. Generate new expiration date (7 days from now)
+      const newExpiresAt = new Date();
+      newExpiresAt.setDate(newExpiresAt.getDate() + 7);
+
+      // Use existing token or generate new one
+      let inviteToken = employeeData.inviteToken;
+      if (!inviteToken) {
+        inviteToken = crypto.randomBytes(32).toString('hex');
+      }
+
+      // 7. Update employee document with new expiration
+      await employeeRef.update({
+        inviteToken,
+        inviteExpiresAt: Timestamp.fromDate(newExpiresAt),
+        lastInviteResentAt: FieldValue.serverTimestamp(),
+        lastInviteResentBy: userId,
+      });
+
+      // 8. Get company name for email
+      const companyDoc = await db.collection('companies').doc(companyId).get();
+      const companyName = companyDoc.data()?.name || 'DMA';
+
+      // 9. Resend invitation email
+      const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(employeeData.email)}`;
+
+      console.log('📨 [resendEmployeeInvite] Resending invitation email...', {
+        to: employeeData.email,
+        companyName,
+      });
+
+      try {
+        await sendInvitationEmail(employeeData.email, {
+          firstName: employeeData.firstName,
+          companyName,
+          inviteUrl,
+        });
+        console.log('✅ [resendEmployeeInvite] Invitation email resent to', employeeData.email);
+      } catch (emailError: any) {
+        console.error('❌ [resendEmployeeInvite] Failed to resend invitation email:', emailError.message);
+        // Don't throw - the expiration was already extended
+      }
+
+      // 10. Log activity
+      await db.collection('companies').doc(companyId).collection('activity').add({
+        type: 'invitation_resent',
+        employeeId,
+        employeeName: `${employeeData.firstName} ${employeeData.lastName}`,
+        employeeEmail: employeeData.email,
+        performedBy: userId,
+        performedByEmail: request.auth.token.email,
+        timestamp: FieldValue.serverTimestamp(),
+      });
+
+      console.log('🎉 [resendEmployeeInvite] Complete - returning success');
+      return {
+        success: true,
+        message: `Meghívó újraküldve: ${employeeData.email}`,
+        newExpiresAt: newExpiresAt.toISOString(),
+      };
+
+    } catch (error: any) {
+      console.error('[resendEmployeeInvite] Error:', error);
+
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+
+      throw new HttpsError('internal', error.message || 'Failed to resend invitation');
+    }
+  }
+);

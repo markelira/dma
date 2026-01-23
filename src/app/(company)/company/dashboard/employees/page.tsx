@@ -20,7 +20,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
 import Link from 'next/link';
 import { Company, CompanyEmployee, AddEmployeeInput, EmployeeProgress, CompanyDashboardData } from '@/types/company';
-import { useRemoveEmployee } from '@/hooks/useCompanyActions';
+import { useRemoveEmployee, useResendEmployeeInvite } from '@/hooks/useCompanyActions';
 
 export default function EmployeesPage() {
   const router = useRouter();
@@ -36,6 +36,10 @@ export default function EmployeesPage() {
 
   // Remove employee mutation
   const removeEmployeeMutation = useRemoveEmployee();
+
+  // Resend invitation mutation
+  const resendInviteMutation = useResendEmployeeInvite();
+  const [resendingEmployeeId, setResendingEmployeeId] = useState<string | null>(null);
 
   // Pagination state
   const [lastDoc, setLastDoc] = useState<any>(null);
@@ -297,6 +301,38 @@ export default function EmployeesPage() {
     }
   };
 
+  const handleResendInvite = async (employee: CompanyEmployee) => {
+    if (!company?.id || !employee.id) return;
+
+    setResendingEmployeeId(employee.id);
+    setError('');
+
+    try {
+      await resendInviteMutation.mutateAsync({
+        companyId: company.id,
+        employeeId: employee.id,
+      });
+
+      // Update local state to reflect the new expiration (just refresh the data)
+      const db = getFirestore();
+      const employeeRef = doc(db, 'companies', company.id, 'employees', employee.id);
+      const employeeSnap = await getDoc(employeeRef);
+
+      if (employeeSnap.exists()) {
+        setEmployees(prev => prev.map(e =>
+          e.id === employee.id
+            ? { ...e, ...employeeSnap.data() as Partial<CompanyEmployee> }
+            : e
+        ));
+      }
+    } catch (err: any) {
+      console.error('Error resending invite:', err);
+      setError(err.message || 'Hiba történt a meghívó újraküldése során');
+    } finally {
+      setResendingEmployeeId(null);
+    }
+  };
+
   // Computed values for filters
   const uniqueEmployees = useMemo(() => {
     const seen = new Map<string, { id: string; name: string }>();
@@ -515,22 +551,40 @@ export default function EmployeesPage() {
                       {getStatusBadge(employee.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      {employee.status !== 'left' && (
-                        <button
-                          onClick={() => setShowRemoveConfirm(employee)}
-                          disabled={removingEmployeeId === employee.id}
-                          className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                        >
-                          {removingEmployeeId === employee.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            <>
-                              <UserMinus className="w-4 h-4 mr-1" />
-                              Eltávolítás
-                            </>
-                          )}
-                        </button>
-                      )}
+                      <div className="flex items-center justify-end gap-2">
+                        {employee.status === 'invited' && (
+                          <button
+                            onClick={() => handleResendInvite(employee)}
+                            disabled={resendingEmployeeId === employee.id}
+                            className="inline-flex items-center px-3 py-1.5 text-sm text-amber-600 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {resendingEmployeeId === employee.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Mail className="w-4 h-4 mr-1" />
+                                Újraküldés
+                              </>
+                            )}
+                          </button>
+                        )}
+                        {employee.status !== 'left' && (
+                          <button
+                            onClick={() => setShowRemoveConfirm(employee)}
+                            disabled={removingEmployeeId === employee.id}
+                            className="inline-flex items-center px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {removingEmployeeId === employee.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <>
+                                <UserMinus className="w-4 h-4 mr-1" />
+                                Eltávolítás
+                              </>
+                            )}
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))

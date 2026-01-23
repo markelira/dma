@@ -1632,6 +1632,7 @@ export {
   addEmployee,
   verifyEmployeeInvite,
   acceptEmployeeInvite,
+  resendEmployeeInvite,
 } from './company/employeeInvite';
 export { enrollEmployeesInMasterclass } from './company/enrollEmployees';
 export { createCompanyMasterclass } from './company/createMasterclass';

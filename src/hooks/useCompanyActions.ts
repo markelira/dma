@@ -151,6 +151,50 @@ export function useRemoveEmployee() {
   })
 }
 
+// ============================================
+// Resend Employee Invitation
+// ============================================
+
+interface ResendEmployeeInviteInput {
+  companyId: string
+  employeeId: string
+}
+
+interface ResendEmployeeInviteResponse {
+  success: boolean
+  message?: string
+  newExpiresAt?: string
+  error?: string
+}
+
+/**
+ * Hook for resending invitation to a pending employee
+ */
+export function useResendEmployeeInvite() {
+  const queryClient = useQueryClient()
+
+  return useMutation<ResendEmployeeInviteResponse, Error, ResendEmployeeInviteInput>({
+    mutationFn: async (data) => {
+      const resendEmployeeInvite = httpsCallable<ResendEmployeeInviteInput, ResendEmployeeInviteResponse>(
+        functions,
+        'resendEmployeeInvite'
+      )
+
+      const result = await resendEmployeeInvite(data)
+
+      if (!result.data.success) {
+        throw new Error(result.data.error || 'Nem sikerült újraküldeni a meghívót')
+      }
+
+      return result.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-dashboard'] })
+      queryClient.invalidateQueries({ queryKey: ['company-employees'] })
+    },
+  })
+}
+
 /**
  * Hook for getting company dashboard data (includes employees)
  */
