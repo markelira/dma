@@ -23,7 +23,8 @@ import {
   Star,
   Video,
   Mic,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react'
 import { brandGradient } from '@/lib/design-tokens'
 
@@ -58,6 +59,7 @@ const navigationSections = {
     {
       title: 'Egyéb',
       items: [
+        { title: 'Segítségkérés', href: '/dashboard/help-center', icon: MessageSquare },
         { title: 'Beállítások', href: '/dashboard/settings', icon: Settings },
       ]
     }
