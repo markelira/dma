@@ -77,7 +77,7 @@ export default function HelpPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-3xl space-y-6">
+      <div className="space-y-6">
 
         {/* Contact Support Cards */}
         <div className="grid md:grid-cols-2 gap-4 mb-8">
@@ -92,9 +92,9 @@ export default function HelpPage() {
             <Button
               variant="outline"
               className="w-full border-gray-300 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-              onClick={() => window.location.href = 'mailto:support@dma.hu'}
+              onClick={() => window.location.href = 'mailto:info@dma.hu'}
             >
-              support@dma.hu
+              info@dma.hu
             </Button>
           </div>
 

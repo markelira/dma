@@ -225,7 +225,7 @@ export default function CompanyHelpCenterPage() {
           </Button>
         </div>
 
-        <div className="max-w-2xl">
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function CompanyHelpCenterPage() {
           </Button>
         </div>
 
-        <div className="max-w-3xl">
+        <div>
           <Card>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -460,7 +460,7 @@ export default function CompanyHelpCenterPage() {
       </div>
 
       {/* Tickets list */}
-      <div className="max-w-4xl">
+      <div>
         {tickets.length === 0 ? (
           <Card>
             <CardContent className="py-12">
@@ -538,9 +538,9 @@ export default function CompanyHelpCenterPage() {
             <Button
               variant="outline"
               className="border-brand-secondary/30 text-brand-secondary hover:bg-brand-secondary/10"
-              onClick={() => window.location.href = 'mailto:support@dma.hu'}
+              onClick={() => window.location.href = 'mailto:info@dma.hu'}
             >
-              support@dma.hu
+              info@dma.hu
             </Button>
           </div>
         </div>
