@@ -62,6 +62,18 @@ service firebase.storage {
                       request.resource.contentType.matches('image/.*');
     }
 
+    // Support ticket attachments
+    match /support-tickets/{userId}/{fileName} {
+      // Admins can read all support ticket attachments
+      allow read: if request.auth != null;
+
+      // Users can upload to their own support-tickets folder
+      allow write: if request.auth != null &&
+                      request.auth.uid == userId &&
+                      request.resource.size < 5 * 1024 * 1024 && // 5MB limit
+                      request.resource.contentType.matches('image/.*');
+    }
+
     // Temporary uploads (for processing before moving to final location)
     match /temp/{userId}/{fileName} {
       // Only the uploader can read their temp files
