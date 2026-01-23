@@ -20,9 +20,13 @@ import {
   Calendar,
   AlertCircle,
   Loader2,
-  ChevronRight
+  ChevronRight,
+  Paperclip,
+  X,
+  Image as ImageIcon
 } from 'lucide-react'
-import { db } from '@/lib/firebase'
+import { db, storage } from '@/lib/firebase'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, arrayUnion } from 'firebase/firestore'
 import { useAuthStore } from '@/stores/authStore'
 import { format } from 'date-fns'
@@ -41,6 +45,7 @@ interface SupportTicket {
   createdAt: any
   updatedAt?: any
   hasUnreadResponse?: boolean
+  imageUrl?: string
   responses?: Array<{
     message: string
     adminId?: string
@@ -48,6 +53,7 @@ interface SupportTicket {
     userId?: string
     userName?: string
     isUserReply?: boolean
+    imageUrl?: string
     createdAt: any
   }>
 }
@@ -71,6 +77,13 @@ export default function HelpCenterPage() {
   // Reply state
   const [replyMessage, setReplyMessage] = useState('')
   const [sendingReply, setSendingReply] = useState(false)
+
+  // Image state
+  const [selectedImage, setSelectedImage] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [replyImage, setReplyImage] = useState<File | null>(null)
+  const [replyImagePreview, setReplyImagePreview] = useState<string | null>(null)
+  const [uploadingImage, setUploadingImage] = useState(false)
 
   // Fetch user's tickets
   useEffect(() => {
@@ -107,6 +120,51 @@ export default function HelpCenterPage() {
 
     return () => unsubscribe()
   }, [user?.uid, selectedTicket?.id])
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>, isReply: boolean = false) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Csak képfájlokat tölthetsz fel')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('A kép mérete maximum 5MB lehet')
+      return
+    }
+
+    if (isReply) {
+      setReplyImage(file)
+      setReplyImagePreview(URL.createObjectURL(file))
+    } else {
+      setSelectedImage(file)
+      setImagePreview(URL.createObjectURL(file))
+    }
+  }
+
+  const removeImage = (isReply: boolean = false) => {
+    if (isReply) {
+      setReplyImage(null)
+      if (replyImagePreview) URL.revokeObjectURL(replyImagePreview)
+      setReplyImagePreview(null)
+    } else {
+      setSelectedImage(null)
+      if (imagePreview) URL.revokeObjectURL(imagePreview)
+      setImagePreview(null)
+    }
+  }
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const timestamp = Date.now()
+    const fileName = `support-tickets/${user?.uid}/${timestamp}-${file.name}`
+    const storageRef = ref(storage, fileName)
+    await uploadBytes(storageRef, file)
+    return getDownloadURL(storageRef)
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -157,7 +215,16 @@ export default function HelpCenterPage() {
     setSubmitting(true)
 
     try {
-      const ticketData = {
+      let imageUrl: string | undefined
+
+      // Upload image if selected
+      if (selectedImage) {
+        setUploadingImage(true)
+        imageUrl = await uploadImage(selectedImage)
+        setUploadingImage(false)
+      }
+
+      const ticketData: any = {
         userId: user.uid,
         userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Felhasználó',
         userEmail: user.email || '',
@@ -170,6 +237,10 @@ export default function HelpCenterPage() {
         responses: []
       }
 
+      if (imageUrl) {
+        ticketData.imageUrl = imageUrl
+      }
+
       await addDoc(collection(db, 'supportTickets'), ticketData)
 
       toast.success('Jegy sikeresen elküldve!')
@@ -177,6 +248,7 @@ export default function HelpCenterPage() {
       // Reset form and go back to list
       setSubject('')
       setMessage('')
+      removeImage()
       setCategory('')
       setPriority('normal')
       setViewState('list')
@@ -206,20 +278,31 @@ export default function HelpCenterPage() {
   }
 
   const handleSendReply = async () => {
-    if (!selectedTicket || !replyMessage.trim() || !user) {
-      toast.error('Írj be egy üzenetet!')
+    if (!selectedTicket || (!replyMessage.trim() && !replyImage) || !user) {
+      toast.error('Írj be egy üzenetet vagy csatolj képet!')
       return
     }
 
     setSendingReply(true)
 
     try {
-      const newResponse = {
+      let imageUrl: string | undefined
+
+      // Upload reply image if selected
+      if (replyImage) {
+        imageUrl = await uploadImage(replyImage)
+      }
+
+      const newResponse: any = {
         message: replyMessage.trim(),
         userId: user.uid,
         userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Felhasználó',
         isUserReply: true,
         createdAt: new Date()
+      }
+
+      if (imageUrl) {
+        newResponse.imageUrl = imageUrl
       }
 
       await updateDoc(doc(db, 'supportTickets', selectedTicket.id), {
@@ -229,6 +312,7 @@ export default function HelpCenterPage() {
       })
 
       setReplyMessage('')
+      removeImage(true)
       toast.success('Válasz elküldve!')
     } catch (error) {
       console.error('Error sending reply:', error)
@@ -333,6 +417,38 @@ export default function HelpCenterPage() {
                   />
                 </div>
 
+                {/* Image upload */}
+                <div className="space-y-2">
+                  <Label>Kép csatolása (opcionális)</Label>
+                  {imagePreview ? (
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Előnézet"
+                        className="max-w-xs rounded-lg border border-gray-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage()}
+                        className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center gap-2 p-4 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-brand-secondary hover:bg-gray-50 transition-colors">
+                      <ImageIcon className="w-5 h-5 text-gray-400" />
+                      <span className="text-sm text-gray-600">Kattints a kép kiválasztásához (max 5MB)</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageSelect(e, false)}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
+                </div>
+
                 <div className="flex gap-3">
                   <Button
                     type="button"
@@ -415,6 +531,17 @@ export default function HelpCenterPage() {
                   </div>
                 </div>
                 <p className="text-gray-700 whitespace-pre-wrap">{selectedTicket.message}</p>
+                {selectedTicket.imageUrl && (
+                  <div className="mt-3">
+                    <a href={selectedTicket.imageUrl} target="_blank" rel="noopener noreferrer">
+                      <img
+                        src={selectedTicket.imageUrl}
+                        alt="Csatolt kép"
+                        className="max-w-md rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
+                      />
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Responses */}
@@ -454,6 +581,17 @@ export default function HelpCenterPage() {
                         </div>
                       </div>
                       <p className="text-gray-700 whitespace-pre-wrap">{response.message}</p>
+                      {response.imageUrl && (
+                        <div className="mt-3">
+                          <a href={response.imageUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={response.imageUrl}
+                              alt="Csatolt kép"
+                              className="max-w-xs rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
+                            />
+                          </a>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -501,9 +639,37 @@ export default function HelpCenterPage() {
                       onChange={(e) => setReplyMessage(e.target.value)}
                       rows={4}
                     />
+                    {/* Reply image upload */}
+                    {replyImagePreview ? (
+                      <div className="relative inline-block">
+                        <img
+                          src={replyImagePreview}
+                          alt="Előnézet"
+                          className="max-w-xs rounded-lg border border-gray-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(true)}
+                          className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg cursor-pointer hover:border-brand-secondary hover:bg-gray-50 transition-colors w-fit">
+                        <Paperclip className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-600">Kép csatolása</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleImageSelect(e, true)}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
                     <Button
                       onClick={handleSendReply}
-                      disabled={sendingReply || !replyMessage.trim()}
+                      disabled={sendingReply || (!replyMessage.trim() && !replyImage)}
                       className="gap-2"
                     >
                       {sendingReply ? (

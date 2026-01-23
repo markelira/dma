@@ -48,10 +48,15 @@ interface SupportTicket {
   status: 'open' | 'in-progress' | 'resolved' | 'closed'
   createdAt: any
   updatedAt?: any
+  imageUrl?: string
   responses?: Array<{
     message: string
-    adminId: string
-    adminName: string
+    adminId?: string
+    adminName?: string
+    userId?: string
+    userName?: string
+    isUserReply?: boolean
+    imageUrl?: string
     createdAt: any
   }>
 }
@@ -537,6 +542,17 @@ export default function AdminReportsPage() {
                       <p className="text-gray-700 whitespace-pre-wrap">
                         {selectedTicket.message}
                       </p>
+                      {selectedTicket.imageUrl && (
+                        <div className="mt-3">
+                          <a href={selectedTicket.imageUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={selectedTicket.imageUrl}
+                              alt="Csatolt kép"
+                              className="max-w-md rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
+                            />
+                          </a>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -548,10 +564,22 @@ export default function AdminReportsPage() {
                       </h4>
                       <div className="space-y-3">
                         {selectedTicket.responses.map((response, index) => (
-                          <div key={index} className="bg-teal-50 rounded-lg p-4">
+                          <div
+                            key={index}
+                            className={response.isUserReply
+                              ? "bg-blue-50 rounded-lg p-4 border border-blue-100"
+                              : "bg-teal-50 rounded-lg p-4"
+                            }
+                          >
                             <div className="flex items-center justify-between mb-2">
-                              <span className="font-bold text-teal-700">
-                                {response.adminName}
+                              <span className={response.isUserReply
+                                ? "font-bold text-blue-700"
+                                : "font-bold text-teal-700"
+                              }>
+                                {response.isUserReply ? response.userName : response.adminName}
+                                {response.isUserReply && (
+                                  <span className="ml-2 text-xs font-normal text-blue-500">(felhasználó)</span>
+                                )}
                               </span>
                               <span className="text-xs text-gray-500">
                                 {formatDate(response.createdAt)}
@@ -560,6 +588,17 @@ export default function AdminReportsPage() {
                             <p className="text-gray-700">
                               {response.message}
                             </p>
+                            {response.imageUrl && (
+                              <div className="mt-3">
+                                <a href={response.imageUrl} target="_blank" rel="noopener noreferrer">
+                                  <img
+                                    src={response.imageUrl}
+                                    alt="Csatolt kép"
+                                    className="max-w-xs rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
+                                  />
+                                </a>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
