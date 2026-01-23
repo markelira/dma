@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { HelpCircle, ChevronDown, Mail, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -17,49 +18,30 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'Hogyan kezdjem el az első tartalmamat?',
-    answer: 'Miután bejelentkezett, látogasson el a "Beiratkozásaim" vagy "Böngészés" oldalra. Válassza ki a kívánt tartalmat, és kattintson a "Beiratkozás" gombra. A tartalom azonnal elérhető lesz az Ön számára.'
+    question: 'Miben más a DMA Masterclass?',
+    answer: 'A DMA Masterclasson 20 év tapasztalatából összerakott, működő és azonnal alkalmazható cégépítési rendszereket kapsz szakértő Mentoroktól.'
   },
   {
-    question: 'Mit tartalmaz az előfizetésem?',
-    answer: 'Az előfizetés korlátlan hozzáférést biztosít az összes tartalomhoz, beleértve az új tartalmakat is. Csapattagokat korlátlanul hívhat meg, és minden befejezett tartalomhoz tanúsítványt kap.'
+    question: 'Tényleg kipróbálhatom 7 napig ingyen?',
+    answer: 'Igen. Sikeres regisztráció után 7 napig teljesen ingyenesen tudod felfedezni a tartalmakat. 7 nap után, ha nem mondod le az előfizetést, akkor 14.990 Ft-ért tudod folytatni a kalandozást.'
   },
   {
-    question: 'Hogyan működik a 7 napos ingyenes próbaidőszak?',
-    answer: 'Az első 7 napban ingyenesen használhatja a platformot. A 7. nap után automatikusan megterheljük a bankkártyáját, kivéve ha korábban lemondja az előfizetést. Lemondás esetén nem számítunk fel díjat.'
+    question: 'Munkatársakat is hozzá tudok adni az oldalhoz?',
+    answer: 'Igen, teljesen ingyenesen hozzá tudsz adni 5 munkatársat is, akik veled együtt kalandozhatnak a különböző tematikájú tartalmak között.'
   },
   {
-    question: 'Hogyan adhatok hozzá csapattagokat?',
-    answer: 'Látogasson el a "Vállalat" menüpontra, ahol meghívhat csapattagokat e-mail címük megadásával. Ők automatikusan hozzáférést kapnak az összes tartalomhoz, amíg az Ön előfizetése aktív.'
+    question: 'Mit nézhetek a DMA Masterclasson?',
+    answer: 'A 150+ cégépítési rendszer elérhető az oldalon. Felfedzheted az Ügyvezetés, a HR, a Marketing, az Értékesítés és a Működés területeihez tartozó több, mint 200 órányi tartalmat.'
   },
   {
-    question: 'Milyen fizetési módokat fogadnak el?',
-    answer: 'Elfogadunk minden fontosabb bankkártyát (Visa, Mastercard, American Express). A fizetés biztonságos, titkosított kapcsolaton keresztül történik a Stripe segítségével.'
-  },
-  {
-    question: 'Hogyan tudom lemondani az előfizetésemet?',
-    answer: 'Az "Előfizetés" menüpontban bármikor lemondhatja előfizetését. A lemondás után a következő fizetési ciklusig még hozzáférhet a tartalmakhoz.'
-  },
-  {
-    question: 'Kaphatok számlát?',
-    answer: 'Igen, minden fizetésről automatikusan számlát állítunk ki, amelyeket a "Számlák" menüpontban érhet el és tölthet le.'
-  },
-  {
-    question: 'Van pénzvisszafizetési garancia?',
-    answer: 'Igen, 30 napos pénzvisszafizetési garanciát biztosítunk. Ha nem elégedett, kérdések nélkül visszatérítjük a díjat.'
-  },
-  {
-    question: 'Hogyan érem el a tanúsítványaimat?',
-    answer: 'Miután befejez egy tartalmat (az összes leckét megtekinti és a vizsgát sikeresen teljesíti), a tanúsítvány automatikusan elérhető lesz a tartalom oldalán.'
-  },
-  {
-    question: 'Mi történik, ha lejár az előfizetésem?',
-    answer: 'Az előfizetés lejárta után elveszíti a hozzáférést a tartalmakhoz. Azonban a tanulási előrehaladása és a megszerzett tanúsítványai megmaradnak, és újra hozzáférhet hozzájuk, ha megújítja az előfizetést.'
+    question: 'Hogyan mondhatom le?',
+    answer: 'A profilodon a Számlázás menüpontban találod az előfizetés lemondását. Ha lemondtad az előfizetésed, akkor a fordulónapjáig természetesen továbbra is elérhetőek lesznek a tartalmak, viszont után nem újul meg az előfizetés és elveszted a hozzáférést.'
   }
 ]
 
 export default function HelpPage() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<number | null>(0)
+  const router = useRouter()
 
   return (
     <div className="space-y-6">
@@ -101,13 +83,16 @@ export default function HelpPage() {
           <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <MessageCircle className="w-8 h-8 text-brand-secondary mb-3" />
             <h3 className="text-lg font-bold text-gray-900 mb-2">
-              Élő chat
+              Segítségkérés
             </h3>
             <p className="text-sm text-gray-500 mb-4">
-              Beszéljen egy támogatási munkatárssal
+              Küldj egy jegyet a támogatási csapatunknak
             </p>
-            <Button className="w-full bg-brand-secondary hover:bg-brand-secondary-hover">
-              Chat indítása
+            <Button
+              className="w-full bg-brand-secondary hover:bg-brand-secondary-hover"
+              onClick={() => router.push('/dashboard/help-center')}
+            >
+              Jegy küldése
             </Button>
           </div>
         </div>
@@ -152,14 +137,17 @@ export default function HelpPage() {
         {/* Additional Resources */}
         <div className="bg-brand-secondary/5 border border-brand-secondary/20 rounded-xl p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-3">
-            Nem találja amit keres?
+            Még mindig van kérdésed?
           </h3>
           <p className="text-gray-600 mb-4">
-            Látogasson el a teljes tudásbázisunkba, ahol részletes útmutatókat és videókat talál
-            a platform használatához.
+            Írj nekünk, és segítünk megtalálni a választ.
           </p>
-          <Button variant="outline" className="border-brand-secondary/30 text-brand-secondary hover:bg-brand-secondary/10">
-            Tudásbázis megtekintése
+          <Button
+            variant="outline"
+            className="border-brand-secondary/30 text-brand-secondary hover:bg-brand-secondary/10"
+            onClick={() => window.location.href = 'mailto:info@dma.hu'}
+          >
+            Kapcsolatfelvétel
           </Button>
         </div>
       </div>
