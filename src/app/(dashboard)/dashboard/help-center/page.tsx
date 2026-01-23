@@ -23,7 +23,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc } from 'firebase/firestore'
+import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, arrayUnion } from 'firebase/firestore'
 import { useAuthStore } from '@/stores/authStore'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -43,8 +43,11 @@ interface SupportTicket {
   hasUnreadResponse?: boolean
   responses?: Array<{
     message: string
-    adminId: string
-    adminName: string
+    adminId?: string
+    adminName?: string
+    userId?: string
+    userName?: string
+    isUserReply?: boolean
     createdAt: any
   }>
 }
@@ -64,6 +67,10 @@ export default function HelpCenterPage() {
   const [message, setMessage] = useState('')
   const [category, setCategory] = useState('')
   const [priority, setPriority] = useState('normal')
+
+  // Reply state
+  const [replyMessage, setReplyMessage] = useState('')
+  const [sendingReply, setSendingReply] = useState(false)
 
   // Fetch user's tickets
   useEffect(() => {
@@ -184,6 +191,7 @@ export default function HelpCenterPage() {
   const handleViewTicket = async (ticket: SupportTicket) => {
     setSelectedTicket(ticket)
     setViewState('detail')
+    setReplyMessage('')
 
     // Mark responses as read
     if (ticket.hasUnreadResponse) {
@@ -194,6 +202,39 @@ export default function HelpCenterPage() {
       } catch (error) {
         console.error('Error marking ticket as read:', error)
       }
+    }
+  }
+
+  const handleSendReply = async () => {
+    if (!selectedTicket || !replyMessage.trim() || !user) {
+      toast.error('Írj be egy üzenetet!')
+      return
+    }
+
+    setSendingReply(true)
+
+    try {
+      const newResponse = {
+        message: replyMessage.trim(),
+        userId: user.uid,
+        userName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || 'Felhasználó',
+        isUserReply: true,
+        createdAt: new Date()
+      }
+
+      await updateDoc(doc(db, 'supportTickets', selectedTicket.id), {
+        responses: arrayUnion(newResponse),
+        status: 'open', // Reopen ticket if it was resolved
+        updatedAt: serverTimestamp()
+      })
+
+      setReplyMessage('')
+      toast.success('Válasz elküldve!')
+    } catch (error) {
+      console.error('Error sending reply:', error)
+      toast.error('Hiba történt a válasz küldésekor')
+    } finally {
+      setSendingReply(false)
     }
   }
 
@@ -384,13 +425,31 @@ export default function HelpCenterPage() {
                     Válaszok ({selectedTicket.responses.length})
                   </h3>
                   {selectedTicket.responses.map((response, index) => (
-                    <div key={index} className="bg-green-50 border border-green-100 rounded-lg p-4">
+                    <div
+                      key={index}
+                      className={response.isUserReply
+                        ? "bg-gray-50 border border-gray-200 rounded-lg p-4"
+                        : "bg-green-50 border border-green-100 rounded-lg p-4"
+                      }
+                    >
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                        <div className={response.isUserReply
+                          ? "w-8 h-8 bg-brand-secondary/10 rounded-full flex items-center justify-center"
+                          : "w-8 h-8 bg-green-100 rounded-full flex items-center justify-center"
+                        }>
+                          {response.isUserReply ? (
+                            <User className="w-4 h-4 text-brand-secondary" />
+                          ) : (
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                          )}
                         </div>
                         <div>
-                          <p className="font-medium text-sm text-green-700">{response.adminName}</p>
+                          <p className={response.isUserReply
+                            ? "font-medium text-sm text-gray-900"
+                            : "font-medium text-sm text-green-700"
+                          }>
+                            {response.isUserReply ? response.userName : response.adminName}
+                          </p>
                           <p className="text-xs text-gray-500">{formatDate(response.createdAt)}</p>
                         </div>
                       </div>
@@ -427,6 +486,33 @@ export default function HelpCenterPage() {
                   <div>
                     <p className="font-medium text-gray-700">Lezárva</p>
                     <p className="text-sm text-gray-600">Ez a jegy le lett zárva. Ha további segítségre van szükséged, nyiss új jegyet.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Reply form - only show if ticket is not closed */}
+              {selectedTicket.status !== 'closed' && (
+                <div className="border-t pt-6">
+                  <h3 className="font-semibold text-gray-900 mb-3">Válasz küldése</h3>
+                  <div className="space-y-3">
+                    <Textarea
+                      placeholder="Írd ide a válaszodat..."
+                      value={replyMessage}
+                      onChange={(e) => setReplyMessage(e.target.value)}
+                      rows={4}
+                    />
+                    <Button
+                      onClick={handleSendReply}
+                      disabled={sendingReply || !replyMessage.trim()}
+                      className="gap-2"
+                    >
+                      {sendingReply ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                      Küldés
+                    </Button>
                   </div>
                 </div>
               )}

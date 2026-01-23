@@ -31,7 +31,7 @@ import {
   Activity
 } from 'lucide-react'
 import { db } from '@/lib/firebase'
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, arrayUnion, where, addDoc } from 'firebase/firestore'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, serverTimestamp, arrayUnion, where, addDoc, deleteDoc } from 'firebase/firestore'
 import { useAuth } from '@/hooks/useAuth'
 import { format } from 'date-fns'
 import { hu } from 'date-fns/locale'
@@ -202,7 +202,7 @@ export default function AdminReportsPage() {
       const newResponse = {
         message: adminResponse,
         adminId: user.uid,
-        adminName: `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Admin Team',
+        adminName: 'DMA Support',
         createdAt: new Date() // Use regular Date instead of serverTimestamp()
       }
 
@@ -237,6 +237,46 @@ export default function AdminReportsPage() {
     } catch (error) {
       console.error('Error sending response:', error)
       toast.error('Hiba történt a válasz küldésekor')
+    }
+  }
+
+  const handleDeleteTicket = async (ticketId: string) => {
+    if (!confirm('Biztosan törölni szeretnéd ezt a jegyet? Ez a művelet nem visszavonható.')) {
+      return
+    }
+
+    try {
+      const ticket = tickets.find(t => t.id === ticketId)
+
+      await deleteDoc(doc(db, 'supportTickets', ticketId))
+
+      // Create audit log entry
+      await addDoc(collection(db, 'auditLogs'), {
+        userId: user?.uid || '',
+        userEmail: user?.email || '',
+        userName: `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.email || 'Admin',
+        action: 'DELETE_TICKET',
+        resource: 'SupportTicket',
+        resourceId: ticketId,
+        details: JSON.stringify({
+          ticketSubject: ticket?.subject,
+          ticketUser: ticket?.userName
+        }),
+        severity: 'HIGH',
+        ipAddress: 'N/A',
+        userAgent: navigator.userAgent,
+        createdAt: new Date()
+      })
+
+      // Clear selection if this ticket was selected
+      if (selectedTicket?.id === ticketId) {
+        setSelectedTicket(null)
+      }
+
+      toast.success('Jegy törölve')
+    } catch (error) {
+      console.error('Error deleting ticket:', error)
+      toast.error('Hiba történt a jegy törlésekor')
     }
   }
 
@@ -563,6 +603,14 @@ export default function AdminReportsPage() {
                         <Button onClick={handleSendResponse} className="gap-2">
                           <Reply className="w-4 h-4" />
                           Válasz küldése
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => handleDeleteTicket(selectedTicket.id)}
+                          className="gap-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Törlés
                         </Button>
                     </div>
                   </div>
