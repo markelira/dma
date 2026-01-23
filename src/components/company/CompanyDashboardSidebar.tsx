@@ -54,7 +54,7 @@ const navigationSections = [
     items: [
       { title: 'Munkatársaim', href: '/company/dashboard/employees', icon: Users },
       { title: 'Számláim', href: '/company/dashboard/billing', icon: CreditCard },
-      { title: 'Segítségkérés', href: '/dashboard/help-center', icon: MessageSquare },
+      { title: 'Segítségkérés', href: '/company/dashboard/help-center', icon: MessageSquare },
       { title: 'Beállítások', href: '/company/dashboard/settings', icon: Settings },
     ]
   }
