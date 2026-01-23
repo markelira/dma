@@ -20,7 +20,7 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu'
-import { 
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -31,6 +31,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
 import {
   Users,
   Search,
@@ -52,7 +61,10 @@ import {
   Phone,
   Building2,
   CreditCard,
-  Clock
+  Clock,
+  UserPlus,
+  Loader2,
+  X
 } from 'lucide-react'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
@@ -148,6 +160,26 @@ const toggleUserStatus = async ({ userId, isActive }: { userId: string; isActive
   return { success: true }
 }
 
+// Pre-registration form interface
+interface PreRegistrationForm {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  companyName: string
+}
+
+const createPreRegistration = async (data: PreRegistrationForm) => {
+  const createPreRegFn = httpsCallable(functions, 'createPreRegistration')
+  const result: any = await createPreRegFn(data)
+
+  if (!result.data.success) {
+    throw new Error(result.data.error || 'Hiba az előregisztráció létrehozásakor')
+  }
+
+  return result.data
+}
+
 export default function AdminUsersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
@@ -156,6 +188,18 @@ export default function AdminUsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [selectedRole, setSelectedRole] = useState<string>('')
   const queryClient = useQueryClient()
+
+  // Pre-registration state
+  const [showPreRegModal, setShowPreRegModal] = useState(false)
+  const [preRegForm, setPreRegForm] = useState<PreRegistrationForm>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    companyName: '',
+  })
+  const [preRegError, setPreRegError] = useState('')
+  const [preRegSuccess, setPreRegSuccess] = useState('')
 
   const { data: users, isLoading: usersLoading, error: usersError } = useQuery<User[]>({
     queryKey: ['adminUsers'],
@@ -205,6 +249,81 @@ export default function AdminUsersPage() {
       queryClient.invalidateQueries({ queryKey: ['adminUserStats'] })
     },
   })
+
+  // Pre-registration mutation
+  const preRegMutation = useMutation({
+    mutationFn: createPreRegistration,
+    onSuccess: (data) => {
+      setPreRegSuccess(data.message || 'Előregisztráció sikeresen létrehozva!')
+      setPreRegError('')
+      // Reset form
+      setPreRegForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        companyName: '',
+      })
+      // Close modal after 3 seconds
+      setTimeout(() => {
+        setShowPreRegModal(false)
+        setPreRegSuccess('')
+      }, 3000)
+    },
+    onError: (error: any) => {
+      setPreRegError(error.message || 'Hiba történt az előregisztráció létrehozásakor')
+      setPreRegSuccess('')
+    },
+  })
+
+  const handlePreRegSubmit = () => {
+    setPreRegError('')
+    setPreRegSuccess('')
+
+    // Validation
+    if (!preRegForm.firstName.trim()) {
+      setPreRegError('A keresztnév megadása kötelező')
+      return
+    }
+    if (!preRegForm.lastName.trim()) {
+      setPreRegError('A vezetéknév megadása kötelező')
+      return
+    }
+    if (!preRegForm.email.trim()) {
+      setPreRegError('Az email cím megadása kötelező')
+      return
+    }
+    if (!preRegForm.phone.trim()) {
+      setPreRegError('A telefonszám megadása kötelező')
+      return
+    }
+    if (!preRegForm.companyName.trim()) {
+      setPreRegError('A cégnév megadása kötelező')
+      return
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(preRegForm.email.trim())) {
+      setPreRegError('Érvénytelen email cím formátum')
+      return
+    }
+
+    preRegMutation.mutate(preRegForm)
+  }
+
+  const handlePreRegModalClose = () => {
+    setShowPreRegModal(false)
+    setPreRegError('')
+    setPreRegSuccess('')
+    setPreRegForm({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      companyName: '',
+    })
+  }
 
   const filteredUsers = users?.filter(user => {
     const matchesSearch = 
@@ -306,7 +425,15 @@ export default function AdminUsersPage() {
             Platform felhasználók áttekintése és adminisztrációja
           </p>
         </div>
-        <div className="hidden lg:block">
+        <div className="hidden lg:flex items-center gap-3">
+          <Button
+            onClick={() => setShowPreRegModal(true)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <UserPlus className="h-4 w-4" />
+            Előregisztráció
+          </Button>
           <Button className="bg-[#112a4b] text-white hover:bg-[#1a3d6e] flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Új Felhasználó
@@ -732,6 +859,144 @@ export default function AdminUsersPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Pre-Registration Modal */}
+      <Dialog open={showPreRegModal} onOpenChange={handlePreRegModalClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <UserPlus className="h-5 w-5" />
+              Előregisztráció létrehozása
+            </DialogTitle>
+            <DialogDescription>
+              Hozz létre egy előregisztrációt egy új cég adminisztrátor számára. A felhasználó emailben kapja meg a regisztrációs linket.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* Success message */}
+            {preRegSuccess && (
+              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  {preRegSuccess}
+                </p>
+              </div>
+            )}
+
+            {/* Error message */}
+            {preRegError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">{preRegError}</p>
+              </div>
+            )}
+
+            {/* Form fields */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="preRegLastName">Vezetéknév *</Label>
+                <Input
+                  id="preRegLastName"
+                  placeholder="Kovács"
+                  value={preRegForm.lastName}
+                  onChange={(e) => setPreRegForm({ ...preRegForm, lastName: e.target.value })}
+                  disabled={preRegMutation.isPending}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="preRegFirstName">Keresztnév *</Label>
+                <Input
+                  id="preRegFirstName"
+                  placeholder="János"
+                  value={preRegForm.firstName}
+                  onChange={(e) => setPreRegForm({ ...preRegForm, firstName: e.target.value })}
+                  disabled={preRegMutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="preRegCompanyName">Cégnév *</Label>
+              <div className="relative">
+                <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="preRegCompanyName"
+                  className="pl-10"
+                  placeholder="Kovács Kft."
+                  value={preRegForm.companyName}
+                  onChange={(e) => setPreRegForm({ ...preRegForm, companyName: e.target.value })}
+                  disabled={preRegMutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="preRegEmail">Email cím *</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="preRegEmail"
+                  type="email"
+                  className="pl-10"
+                  placeholder="pelda@email.com"
+                  value={preRegForm.email}
+                  onChange={(e) => setPreRegForm({ ...preRegForm, email: e.target.value })}
+                  disabled={preRegMutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="preRegPhone">Telefonszám *</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="preRegPhone"
+                  type="tel"
+                  className="pl-10"
+                  placeholder="+36 30 123 4567"
+                  value={preRegForm.phone}
+                  onChange={(e) => setPreRegForm({ ...preRegForm, phone: e.target.value })}
+                  disabled={preRegMutation.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              * Kötelező mezők. A felhasználó 7 napig érvényes linket kap emailben.
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={handlePreRegModalClose}
+              disabled={preRegMutation.isPending}
+            >
+              Mégse
+            </Button>
+            <Button
+              onClick={handlePreRegSubmit}
+              disabled={preRegMutation.isPending}
+              className="bg-[#112a4b] text-white hover:bg-[#1a3d6e]"
+            >
+              {preRegMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Küldés...
+                </>
+              ) : (
+                <>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Előregisztráció küldése
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

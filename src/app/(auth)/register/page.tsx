@@ -29,6 +29,16 @@ interface InviteData {
   expired?: boolean;
 }
 
+interface PreRegistrationData {
+  valid: boolean;
+  preRegistrationId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+}
+
 // Interfaces for Cloud Functions
 interface GetPendingRegistrationResponse {
   found: boolean;
@@ -84,11 +94,17 @@ function RegisterPageContent() {
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteError, setInviteError] = useState('');
 
+  // Pre-registration handling
+  const [preRegData, setPreRegData] = useState<PreRegistrationData | null>(null);
+  const [preRegLoading, setPreRegLoading] = useState(false);
+  const [preRegError, setPreRegError] = useState('');
+
   // Payment recovery state
   const [isProcessingPaymentReturn, setIsProcessingPaymentReturn] = useState(false);
 
   // Get params from URL
   const inviteToken = searchParams?.get('invite');
+  const preregisterToken = searchParams?.get('preregister');
   const paymentComplete = searchParams?.get('payment_complete');
 
   // Verify invite token when present
@@ -129,6 +145,42 @@ function RegisterPageContent() {
 
     verifyInvite();
   }, [inviteToken]);
+
+  // Verify pre-registration token when present
+  useEffect(() => {
+    const verifyPreRegistration = async () => {
+      if (!preregisterToken) return;
+
+      setPreRegLoading(true);
+      setPreRegError('');
+
+      try {
+        const verify = httpsCallable<{ token: string }, PreRegistrationData>(
+          functions,
+          'verifyPreRegistration'
+        );
+        const result = await verify({ token: preregisterToken });
+
+        if (result.data.valid) {
+          setPreRegData(result.data);
+          console.log('[Register] Valid pre-registration for:', result.data.email);
+        }
+      } catch (err: any) {
+        console.error('[Register] Error verifying pre-registration:', err);
+        if (err.code === 'not-found') {
+          setPreRegError('Érvénytelen vagy lejárt előregisztrációs link');
+        } else if (err.code === 'failed-precondition') {
+          setPreRegError(err.message || 'Ez az előregisztráció már fel lett használva vagy lejárt');
+        } else {
+          setPreRegError('Hiba történt az előregisztráció ellenőrzésekor');
+        }
+      } finally {
+        setPreRegLoading(false);
+      }
+    };
+
+    verifyPreRegistration();
+  }, [preregisterToken]);
 
   // Complete registration helper
   const completeRegistrationFromPending = useCallback(async (pendingData: GetPendingRegistrationResponse['data']) => {
@@ -284,15 +336,16 @@ function RegisterPageContent() {
   // The form calls getPendingRegistration and handles recovery/redirect appropriately
   // We removed the duplicate check here to prevent race conditions and double API calls
 
-  // Only show loading on initial mount for invite loading or payment processing
+  // Only show loading on initial mount for invite/pre-registration loading or payment processing
   // Don't show loading for authLoading after initial mount - this prevents form remounting
   // Also show loading immediately when URL has payment_complete=true (before effect runs)
-  if (inviteLoading || isProcessingPaymentReturn || paymentComplete === 'true') {
+  if (inviteLoading || preRegLoading || isProcessingPaymentReturn || paymentComplete === 'true') {
     return (
       <div className="flex flex-col items-center justify-center min-h-[300px]">
         <Loader2 className="w-8 h-8 animate-spin text-brand-secondary mb-4" />
         <p className="text-sm text-gray-600">
           {inviteLoading ? 'Meghívó ellenőrzése...' :
+           preRegLoading ? 'Előregisztráció ellenőrzése...' :
            'Fizetés ellenőrzése...'}
         </p>
       </div>
@@ -324,14 +377,42 @@ function RegisterPageContent() {
     );
   }
 
+  // Show pre-registration error if present
+  if (preRegError) {
+    return (
+      <div className="text-center">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-700">{preRegError}</p>
+        </div>
+        <p className="text-gray-600 mb-4">
+          Továbbra is regisztrálhatsz:
+        </p>
+        <button
+          onClick={() => setPreRegError('')}
+          className="btn bg-gray-900 text-white px-6 py-2"
+        >
+          Regisztráció folytatása
+        </button>
+        <div className="mt-4">
+          <Link href="/login" className="text-gray-600 hover:text-gray-900 text-sm">
+            Vissza a bejelentkezéshez
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   // Show unified registration form
   const isInvitedEmployee = !!inviteData;
+
+  // For pre-registration: similar to invite flow (simplified)
+  const isPreRegistration = !!preRegData;
 
   // For invited employees: simple single-column layout
   if (isInvitedEmployee) {
     return (
       <div>
-        <UnifiedRegisterForm inviteData={inviteData} />
+        <UnifiedRegisterForm inviteData={inviteData} preRegistrationData={null} />
 
         {/* Bottom links */}
         <div className="mt-6 text-center">
@@ -386,7 +467,7 @@ function RegisterPageContent() {
       </div>
 
       {/* CENTER: Form - stays in original centered position */}
-      <UnifiedRegisterForm inviteData={inviteData} />
+      <UnifiedRegisterForm inviteData={inviteData} preRegistrationData={preRegData} />
 
       {/* Bottom links */}
       <div className="mt-6 text-center">

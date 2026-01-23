@@ -72,6 +72,16 @@ interface UnifiedRegistrationData {
   companyName: string;
 }
 
+interface PreRegistrationData {
+  valid: boolean;
+  preRegistrationId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  companyName: string;
+}
+
 interface UnifiedRegisterFormProps {
   inviteData?: {
     valid: boolean;
@@ -79,6 +89,7 @@ interface UnifiedRegisterFormProps {
     employeeEmail: string;
     employeeName: string;
   } | null;
+  preRegistrationData?: PreRegistrationData | null;
   onRegistrationComplete?: (userId: string, email: string) => void;
 }
 
@@ -89,6 +100,7 @@ interface UnifiedRegistrationInput {
   phone: string;
   companyName?: string;
   billingEmail?: string;
+  preRegistrationId?: string;
 }
 
 interface UnifiedRegistrationResponse {
@@ -340,6 +352,7 @@ export function ValuePropositionSection({ collapsible = false }: ValuePropositio
 
 export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   inviteData,
+  preRegistrationData,
   // onRegistrationComplete is reserved for future use (e.g., analytics callbacks)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onRegistrationComplete: _onRegistrationComplete
@@ -382,13 +395,13 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
-    firstName: inviteData?.employeeName.split(' ')[0] || '',
-    lastName: inviteData?.employeeName.split(' ').slice(1).join(' ') || '',
-    email: inviteData?.employeeEmail || '',
-    phone: '',
+    firstName: preRegistrationData?.firstName || inviteData?.employeeName.split(' ')[0] || '',
+    lastName: preRegistrationData?.lastName || inviteData?.employeeName.split(' ').slice(1).join(' ') || '',
+    email: preRegistrationData?.email || inviteData?.employeeEmail || '',
+    phone: preRegistrationData?.phone || '',
     password: '',
     confirmPassword: '',
-    companyName: ''
+    companyName: preRegistrationData?.companyName || ''
   });
 
   // Get auth context for checking logged-in user
@@ -616,8 +629,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       return false;
     }
 
-    // Check if email is already in use (unless coming from invite)
-    if (!inviteData) {
+    // Check if email is already in use (unless coming from invite or pre-registration)
+    if (!inviteData && !preRegistrationData) {
       setCheckingEmail(true);
       try {
         const checkEmail = httpsCallable<{ email: string }, { available: boolean; error?: string }>(
@@ -831,7 +844,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         email: registrationData.email,
         phone: registrationData.phone,
         companyName: registrationData.companyName,
-        billingEmail: registrationData.email
+        billingEmail: registrationData.email,
+        preRegistrationId: preRegistrationData?.preRegistrationId
       });
 
       console.log('[Registration] Registration completed:', result.data);
@@ -969,6 +983,25 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         </div>
       )}
 
+      {/* Pre-Registration Banner */}
+      {preRegistrationData && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-full">
+              <CheckCircle className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-blue-800">
+                Előregisztráció: {preRegistrationData.companyName}
+              </p>
+              <p className="text-xs text-blue-600">
+                Az adataid már ki vannak töltve - csak a jelszót kell megadnod
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Error Display */}
       {error && (
@@ -989,10 +1022,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
           >
               <div className="mb-6">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                {inviteData ? 'Regisztráció és csatlakozás' : 'Kezdjünk bele a kalandba'}
+                {preRegistrationData ? 'Regisztráció befejezése' : inviteData ? 'Regisztráció és csatlakozás' : 'Kezdjünk bele a kalandba'}
               </h1>
               <p className="mt-2 text-sm text-gray-600">
-                {inviteData ? 'Töltsd ki az adataidat' : ''}
+                {preRegistrationData ? 'Add meg a jelszavadat a regisztráció befejezéséhez' : inviteData ? 'Töltsd ki az adataidat' : ''}
               </p>
             </div>
 
@@ -1000,7 +1033,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               {/* Last Name */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="lastName">
-                  Vezetéknév
+                  Vezetéknév {preRegistrationData && <span className="text-gray-500 text-xs">(előkitöltve)</span>}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1009,11 +1042,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   <input
                     id="lastName"
                     type="text"
-                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${preRegistrationData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="Kovács"
                     value={formData.lastName}
                     onChange={(e) => updateField('lastName', e.target.value)}
-                    disabled={loading}
+                    disabled={loading || !!preRegistrationData}
+                    readOnly={!!preRegistrationData}
                   />
                 </div>
               </div>
@@ -1021,7 +1055,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               {/* First Name */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="firstName">
-                  Keresztnév
+                  Keresztnév {preRegistrationData && <span className="text-gray-500 text-xs">(előkitöltve)</span>}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1030,20 +1064,21 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                   <input
                     id="firstName"
                     type="text"
-                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${preRegistrationData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="János"
                     value={formData.firstName}
                     onChange={(e) => updateField('firstName', e.target.value)}
-                    disabled={loading}
+                    disabled={loading || !!preRegistrationData}
+                    readOnly={!!preRegistrationData}
                   />
                 </div>
               </div>
 
-              {/* Company Name - Hidden for invited employees */}
+              {/* Company Name - Hidden for invited employees, pre-filled for pre-registration */}
               {!inviteData && (
                 <div>
                   <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="companyName">
-                    Cégnév <span className="text-gray-400 font-normal">(opcionális)</span>
+                    Cégnév {preRegistrationData ? <span className="text-gray-500 text-xs">(előkitöltve)</span> : <span className="text-gray-400 font-normal">(opcionális)</span>}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1052,11 +1087,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     <input
                       id="companyName"
                       type="text"
-                      className="form-input w-full py-3 sm:py-2.5 pl-10"
+                      className={`form-input w-full py-3 sm:py-2.5 pl-10 ${preRegistrationData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                       placeholder="Ha üresen hagyod, a neved lesz használva"
                       value={formData.companyName}
                       onChange={(e) => updateField('companyName', e.target.value)}
-                      disabled={loading}
+                      disabled={loading || !!preRegistrationData}
+                      readOnly={!!preRegistrationData}
                     />
                   </div>
                 </div>
@@ -1065,7 +1101,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               {/* Email */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="email">
-                  Email cím {inviteData && <span className="text-gray-500 text-xs">(meghívóból)</span>}
+                  Email cím {inviteData && <span className="text-gray-500 text-xs">(meghívóból)</span>}{preRegistrationData && <span className="text-gray-500 text-xs">(előkitöltve)</span>}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1076,12 +1112,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     type="email"
                     inputMode="email"
                     autoComplete="email"
-                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${inviteData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${(inviteData || preRegistrationData) ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="pelda@email.com"
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    disabled={loading || !!inviteData}
-                    readOnly={!!inviteData}
+                    disabled={loading || !!inviteData || !!preRegistrationData}
+                    readOnly={!!inviteData || !!preRegistrationData}
                   />
                 </div>
               </div>
@@ -1089,7 +1125,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
               {/* Phone */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="phone">
-                  Telefonszám
+                  Telefonszám {preRegistrationData && <span className="text-gray-500 text-xs">(előkitöltve)</span>}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1100,11 +1136,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                     type="tel"
                     inputMode="tel"
                     autoComplete="tel"
-                    className="form-input w-full py-3 sm:py-2.5 pl-10"
+                    className={`form-input w-full py-3 sm:py-2.5 pl-10 ${preRegistrationData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     placeholder="+36 30 123 4567"
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    disabled={loading}
+                    disabled={loading || !!preRegistrationData}
+                    readOnly={!!preRegistrationData}
                   />
                 </div>
               </div>

@@ -41,6 +41,7 @@ const https_1 = require("firebase-functions/v2/https");
 const linkEmployeeByEmail_1 = require("./linkEmployeeByEmail");
 const welcome_1 = require("../email/templates/welcome");
 const employeeWelcome_1 = require("../email/templates/employeeWelcome");
+const preRegistration_1 = require("../admin/preRegistration");
 /**
  * Complete unified registration - creates company and user for all new registrations
  * Everyone gets COMPANY_ADMIN role with a Company document
@@ -64,7 +65,7 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         throw new https_1.HttpsError('unauthenticated', 'User must be authenticated');
     }
     const userId = request.auth.uid;
-    const { firstName, lastName, email, phone, companyName, billingEmail, industry, companySize } = request.data;
+    const { firstName, lastName, email, phone, companyName, billingEmail, industry, companySize, preRegistrationId } = request.data;
     // Idempotency check - prevent duplicate registration
     // If user already has a companyId, return existing registration data
     const existingUser = await db.collection('users').doc(userId).get();
@@ -222,6 +223,17 @@ exports.completeUnifiedRegistration = v2_1.https.onCall({
         console.log(`   User ID: ${userId}`);
         console.log(`   Company: ${finalCompanyName}`);
         console.log(`   Linked to invite: ${linkedToInvite}`);
+        // Step 6: Mark pre-registration as completed (if applicable)
+        if (preRegistrationId) {
+            try {
+                await (0, preRegistration_1.markPreRegistrationCompleted)(preRegistrationId, userId);
+                console.log(`✅ [completeUnifiedRegistration] Pre-registration ${preRegistrationId} marked as completed`);
+            }
+            catch (preRegError) {
+                console.warn(`⚠️ [completeUnifiedRegistration] Failed to mark pre-registration as completed:`, preRegError.message);
+                // Don't throw - user registration was successful
+            }
+        }
         // Send welcome email (fire-and-forget, non-blocking)
         // Use employee welcome email for employees (no trial CTA), regular for company admins
         const emailData = {

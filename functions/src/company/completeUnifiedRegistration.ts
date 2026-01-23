@@ -6,6 +6,7 @@ import { Company, CompanyAdmin } from '../types/company';
 import { linkEmployeeByEmail } from './linkEmployeeByEmail';
 import { sendWelcomeEmail } from '../email/templates/welcome';
 import { sendEmployeeWelcomeEmail } from '../email/templates/employeeWelcome';
+import { markPreRegistrationCompleted } from '../admin/preRegistration';
 
 interface UnifiedRegistrationInput {
   // Required fields
@@ -19,6 +20,9 @@ interface UnifiedRegistrationInput {
   billingEmail?: string;
   industry?: string;
   companySize?: string;
+
+  // Pre-registration ID (if registering via pre-registration link)
+  preRegistrationId?: string;
 }
 
 interface UnifiedRegistrationResponse {
@@ -56,7 +60,7 @@ export const completeUnifiedRegistration = https.onCall(
     }
 
     const userId = request.auth.uid;
-    const { firstName, lastName, email, phone, companyName, billingEmail, industry, companySize } = request.data;
+    const { firstName, lastName, email, phone, companyName, billingEmail, industry, companySize, preRegistrationId } = request.data;
 
     // Idempotency check - prevent duplicate registration
     // If user already has a companyId, return existing registration data
@@ -238,6 +242,17 @@ export const completeUnifiedRegistration = https.onCall(
       console.log(`   User ID: ${userId}`);
       console.log(`   Company: ${finalCompanyName}`);
       console.log(`   Linked to invite: ${linkedToInvite}`);
+
+      // Step 6: Mark pre-registration as completed (if applicable)
+      if (preRegistrationId) {
+        try {
+          await markPreRegistrationCompleted(preRegistrationId, userId);
+          console.log(`✅ [completeUnifiedRegistration] Pre-registration ${preRegistrationId} marked as completed`);
+        } catch (preRegError: any) {
+          console.warn(`⚠️ [completeUnifiedRegistration] Failed to mark pre-registration as completed:`, preRegError.message);
+          // Don't throw - user registration was successful
+        }
+      }
 
       // Send welcome email (fire-and-forget, non-blocking)
       // Use employee welcome email for employees (no trial CTA), regular for company admins

@@ -2663,3 +2663,10 @@ export {
 
 // Export admin analytics function
 export { getAdminAnalytics } from './admin/getAdminAnalytics';
+
+// ============================================
+// PRE-REGISTRATION
+// ============================================
+
+// Export pre-registration functions for platform admin use
+export { createPreRegistration, verifyPreRegistration } from './admin/preRegistration';
