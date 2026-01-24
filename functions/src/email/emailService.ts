@@ -42,7 +42,6 @@ export interface EmailResult {
 
 const DEFAULT_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'noreply@dma.hu';
 const DEFAULT_FROM_NAME = 'DMA Masterclass';
-const BCC_EMAIL = 'info@dma.hu';
 
 /**
  * Sends an email via SendGrid
@@ -62,7 +61,6 @@ export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
         email: DEFAULT_FROM_EMAIL,
         name: fromName,
       },
-      bcc: BCC_EMAIL,
       subject,
       html,
       text: text || stripHtml(html),
