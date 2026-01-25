@@ -179,8 +179,8 @@ export function PreviewVideoPlayer({
           borderRadius: '0.5rem',
           '--media-primary-color': '#FFFFFF',
           '--media-secondary-color': 'transparent',
-          '--media-range-bar-color': '#E5484D',
-          '--media-range-thumb-background': '#E5484D',
+          '--media-range-bar-color': '#E72B36',
+          '--media-range-thumb-background': '#E72B36',
           '--media-control-background': 'transparent',
           '--media-control-hover-background': 'rgba(255,255,255,0.1)',
           '--media-control-bar-background': 'transparent',
@@ -192,7 +192,7 @@ export function PreviewVideoPlayer({
       {/* Preview progress bar */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50">
         <div
-          className="h-full bg-brand-primary transition-all duration-300"
+          className="h-full bg-brand-secondary transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -208,7 +208,7 @@ export function PreviewVideoPlayer({
       {isPreviewEnded && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
           <div className="text-center max-w-sm mx-4">
-            <div className="w-20 h-20 bg-brand-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-primary/30">
+            <div className="w-20 h-20 bg-brand-secondary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-secondary/30">
               <Play className="w-10 h-10 text-white ml-1" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">
@@ -226,7 +226,7 @@ export function PreviewVideoPlayer({
               </button>
               <button
                 onClick={onStartCourse}
-                className="px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white font-bold rounded-xl transition-colors shadow-lg shadow-brand-primary/20"
+                className="px-6 py-3 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-bold rounded-xl transition-colors shadow-lg shadow-brand-secondary/20"
               >
                 {buttonLabel} indítása
               </button>
