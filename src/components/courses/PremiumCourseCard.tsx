@@ -1,13 +1,14 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { BookOpen, Bookmark, BookmarkCheck, Play, CheckCircle } from "lucide-react";
+import { BookOpen, Bookmark, BookmarkCheck, Play, CheckCircle, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useEnrollInCourse } from "@/hooks/useCourseQueries";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
 import { calculateCourseDuration, formatDurationHungarian } from "@/lib/carouselUtils";
+import { CoursePreviewModal } from "@/components/course-preview";
 
 // Move utility functions OUTSIDE component to prevent recreation on every render
 const getCourseTypeLabel = (courseType?: string): string | null => {
@@ -110,6 +111,7 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
   const { user } = useAuthStore();
   const enrollMutation = useEnrollInCourse();
   const [imageError, setImageError] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   // Check if user is enrolled (NEW: Universal enrollment detection)
   const userEnrollment = useMemo(() => {
@@ -231,6 +233,24 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
     }
   };
 
+  // Handle Play button click - go directly to player
+  const handlePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const lessonId = currentLessonId || enrollment?.firstLessonId;
+    if (lessonId) {
+      router.push(`/courses/${course.id}/player/${lessonId}`);
+    } else {
+      // No lesson ID available, go to course detail page
+      router.push(`/courses/${course.id}`);
+    }
+  };
+
+  // Handle More Info / Preview button click
+  const handleOpenPreview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPreviewModal(true);
+  };
+
   // Memoize category names to prevent recalculation on every render
   const categoryNames = useMemo(() => {
     if (!categories || categories.length === 0) return [];
@@ -312,11 +332,27 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
             )}
           </div>
 
-          {/* Dark Overlay + Play Button (NEW: Improved hover animation) */}
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
-            <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 ease-out">
-              <Play className="w-7 h-7 text-gray-900 ml-1 fill-current" />
-            </div>
+          {/* Hover Action Bar - Netflix style */}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            {/* Play button - navigate to first lesson */}
+            <button
+              onClick={handlePlay}
+              className="w-10 h-10 rounded-full bg-white hover:bg-gray-100 flex items-center justify-center transition-all hover:scale-110 shadow-lg"
+              title="Lejátszás"
+              aria-label="Kurzus indítása"
+            >
+              <Play className="w-5 h-5 text-gray-900 ml-0.5 fill-gray-900" />
+            </button>
+
+            {/* More Info button - open preview modal */}
+            <button
+              onClick={handleOpenPreview}
+              className="w-10 h-10 rounded-full border-2 border-white/70 hover:border-white bg-black/30 hover:bg-black/50 flex items-center justify-center transition-all hover:scale-110"
+              title="Részletek"
+              aria-label="Részletek megtekintése"
+            >
+              <ChevronDown className="w-5 h-5 text-white" />
+            </button>
           </div>
 
           {/* Enrollment Button */}
@@ -392,6 +428,16 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
         </div>
         </div>
       </div>
+
+      {/* Course Preview Modal */}
+      <CoursePreviewModal
+        courseId={course.id}
+        open={showPreviewModal}
+        onOpenChange={setShowPreviewModal}
+        isEnrolled={isEnrolled}
+        currentLessonId={currentLessonId}
+        firstLessonId={enrollment?.firstLessonId}
+      />
     </div>
   );
 }, (prevProps, nextProps) => {
