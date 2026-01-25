@@ -197,9 +197,9 @@ export function PreviewVideoPlayer({
         />
       </div>
 
-      {/* Preview time indicator */}
+      {/* Preview time indicator - top left */}
       {hasStarted && !isPreviewEnded && (
-        <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
+        <div className="absolute top-3 left-3 bg-brand-secondary/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium">
           Előnézet: {formatTime(Math.max(0, previewDuration - currentTime))}
         </div>
       )}
