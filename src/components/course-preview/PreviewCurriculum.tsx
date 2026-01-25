@@ -112,7 +112,7 @@ function ModuleSection({
             {moduleIndex + 1}. {title}
           </h4>
           <div className={`flex items-center gap-2 text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-            <span>{publishedLessons.length} lecke</span>
+            <span>{publishedLessons.length} videó</span>
             {totalDuration > 0 && (
               <>
                 <span className={darkMode ? 'text-gray-700' : 'text-gray-300'}>|</span>
@@ -144,7 +144,7 @@ function ModuleSection({
               }}
               className="w-full text-center text-sm text-brand-secondary hover:text-brand-secondary-hover py-2 font-medium"
             >
-              + {publishedLessons.length - maxLessonsInitial} további lecke
+              + {publishedLessons.length - maxLessonsInitial} további videó
             </button>
           )}
         </div>
@@ -173,7 +173,7 @@ export function PreviewCurriculum({
     if (publishedLessons.length === 0) {
       return (
         <div className={`text-center py-8 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-          Nincs elérhető lecke
+          Nincs elérhető videó
         </div>
       );
     }
@@ -186,7 +186,7 @@ export function PreviewCurriculum({
     return (
       <div className="space-y-4">
         <div className={`flex items-center justify-between text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-          <span className="font-medium">{publishedLessons.length} lecke</span>
+          <span className="font-medium">{publishedLessons.length} videó</span>
           {totalDuration > 0 && (
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
@@ -208,7 +208,7 @@ export function PreviewCurriculum({
               className={`w-full p-3 text-center ${darkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}
             >
               <span className="text-sm text-brand-secondary hover:text-brand-secondary-hover font-medium">
-                + {publishedLessons.length - maxLessonsInitial} további lecke
+                + {publishedLessons.length - maxLessonsInitial} további videó
               </span>
             </button>
           )}

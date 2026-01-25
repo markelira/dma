@@ -69,9 +69,22 @@ function getLessonsTitle(courseType?: CourseType): string {
   switch (courseType) {
     case 'ACADEMIA':
     case 'MASTERCLASS':
-      return 'Leckék';
+      return 'Videók';
     default:
       return 'Tartalom';
+  }
+}
+
+/**
+ * Get course type label (nominative form)
+ */
+function getCourseTypeLabel(courseType?: CourseType): string {
+  switch (courseType) {
+    case 'WEBINAR': return 'webinár';
+    case 'ACADEMIA': return 'akadémia';
+    case 'MASTERCLASS': return 'masterclass';
+    case 'PODCAST': return 'podcast';
+    default: return 'kurzus';
   }
 }
 
@@ -167,7 +180,7 @@ export function CoursePreviewModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#0a0a0a] border-gray-800">
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">
-          {data?.course?.title || 'Kurzus előnézet'}
+          {data?.course?.title || `${getCourseTypeLabel(data?.course?.courseType).charAt(0).toUpperCase() + getCourseTypeLabel(data?.course?.courseType).slice(1)} előnézet`}
         </DialogTitle>
 
         {/* Loading state */}
@@ -194,6 +207,7 @@ export function CoursePreviewModal({
                 playbackId={data.previewVideo?.playbackId || ''}
                 poster={data.course.thumbnailUrl || undefined}
                 courseTitle={data.course.title}
+                courseType={data.course.courseType}
                 onStartCourse={handleStartCourse}
               />
 
@@ -281,7 +295,7 @@ export function CoursePreviewModal({
                 {data.stats.totalLessons > 0 && (
                   <div className="flex items-center gap-1.5">
                     <BookOpen className="w-4 h-4" />
-                    <span>{data.stats.totalLessons} lecke</span>
+                    <span>{data.stats.totalLessons} videó</span>
                   </div>
                 )}
               </div>
@@ -348,7 +362,7 @@ export function CoursePreviewModal({
                   onClick={handleViewDetails}
                   className="text-brand-secondary hover:text-brand-secondary-hover font-medium text-sm"
                 >
-                  Teljes kurzus oldal megtekintése
+                  Teljes {getCourseTypeLabel(data.course.courseType)} oldal megtekintése
                 </button>
               </div>
             </div>

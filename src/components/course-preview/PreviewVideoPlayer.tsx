@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Loader2, Play, BookOpen } from 'lucide-react';
+import type { CourseType } from '@/types';
 
 // Dynamically import MuxPlayer to avoid SSR issues
 const MuxPlayer = dynamic(
@@ -29,10 +30,46 @@ interface PreviewVideoPlayerProps {
   previewDuration?: number;
   /** Course title for display */
   courseTitle?: string;
+  /** Course type for dynamic labels */
+  courseType?: CourseType;
   /** Callback when user clicks to start full course */
   onStartCourse?: () => void;
   /** Callback when preview ends */
   onPreviewEnd?: () => void;
+}
+
+/**
+ * Get course type label in Hungarian (accusative form for "Kezdd el a...")
+ */
+function getCourseTypeLabel(courseType?: CourseType): string {
+  switch (courseType) {
+    case 'WEBINAR': return 'webinárt';
+    case 'ACADEMIA': return 'akadémiát';
+    case 'MASTERCLASS': return 'masterclasst';
+    case 'PODCAST': return 'podcastot';
+    default: return 'kurzust';
+  }
+}
+
+/**
+ * Get course type label for button (nominative form for "X indítása")
+ */
+function getCourseTypeButtonLabel(courseType?: CourseType): string {
+  switch (courseType) {
+    case 'WEBINAR': return 'Webinár';
+    case 'ACADEMIA': return 'Akadémia';
+    case 'MASTERCLASS': return 'Masterclass';
+    case 'PODCAST': return 'Podcast';
+    default: return 'Kurzus';
+  }
+}
+
+/**
+ * Get no preview message based on course type
+ */
+function getNoPreviewMessage(courseType?: CourseType): string {
+  const type = getCourseTypeButtonLabel(courseType).toLowerCase();
+  return `A ${type} nem tartalmaz előnézeti videót`;
 }
 
 /**
@@ -44,6 +81,7 @@ export function PreviewVideoPlayer({
   poster,
   previewDuration = 60,
   courseTitle,
+  courseType,
   onStartCourse,
   onPreviewEnd,
 }: PreviewVideoPlayerProps) {
@@ -111,11 +149,14 @@ export function PreviewVideoPlayer({
             <BookOpen className="w-8 h-8 text-gray-400" />
           </div>
           <p className="text-white font-medium">Nincs elérhető előnézet</p>
-          <p className="text-gray-400 text-sm mt-1">A kurzus nem tartalmaz előnézeti videót</p>
+          <p className="text-gray-400 text-sm mt-1">{getNoPreviewMessage(courseType)}</p>
         </div>
       </div>
     );
   }
+
+  const courseTypeLabel = getCourseTypeLabel(courseType);
+  const buttonLabel = getCourseTypeButtonLabel(courseType);
 
   return (
     <div className="w-full rounded-lg overflow-hidden relative bg-black">
@@ -130,7 +171,7 @@ export function PreviewVideoPlayer({
         onPlay={handlePlay}
         onPause={handlePause}
         metadata={{
-          video_title: courseTitle || 'Kurzus előnézet',
+          video_title: courseTitle || `${buttonLabel} előnézet`,
         }}
         style={{
           width: '100%',
@@ -138,8 +179,8 @@ export function PreviewVideoPlayer({
           borderRadius: '0.5rem',
           '--media-primary-color': '#FFFFFF',
           '--media-secondary-color': 'transparent',
-          '--media-range-bar-color': '#3B82F6',
-          '--media-range-thumb-background': '#3B82F6',
+          '--media-range-bar-color': '#E5484D',
+          '--media-range-thumb-background': '#E5484D',
           '--media-control-background': 'transparent',
           '--media-control-hover-background': 'rgba(255,255,255,0.1)',
           '--media-control-bar-background': 'transparent',
@@ -151,7 +192,7 @@ export function PreviewVideoPlayer({
       {/* Preview progress bar */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gray-800/50">
         <div
-          className="h-full bg-blue-500 transition-all duration-300"
+          className="h-full bg-brand-primary transition-all duration-300"
           style={{ width: `${progressPercent}%` }}
         />
       </div>
@@ -167,14 +208,14 @@ export function PreviewVideoPlayer({
       {isPreviewEnded && (
         <div className="absolute inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 rounded-lg">
           <div className="text-center max-w-sm mx-4">
-            <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30">
+            <div className="w-20 h-20 bg-brand-primary rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-brand-primary/30">
               <Play className="w-10 h-10 text-white ml-1" />
             </div>
             <h3 className="text-2xl font-bold text-white mb-2">
               Előnézet vége
             </h3>
             <p className="text-gray-300 mb-6">
-              Kezdd el a kurzust, hogy megnézhesd a teljes tartalmat!
+              Kezdd el a {courseTypeLabel}, hogy megnézhesd a teljes tartalmat!
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
@@ -185,9 +226,9 @@ export function PreviewVideoPlayer({
               </button>
               <button
                 onClick={onStartCourse}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/20"
+                className="px-6 py-3 bg-brand-primary hover:bg-brand-primary-hover text-white font-bold rounded-xl transition-colors shadow-lg shadow-brand-primary/20"
               >
-                Kurzus indítása
+                {buttonLabel} indítása
               </button>
             </div>
           </div>
