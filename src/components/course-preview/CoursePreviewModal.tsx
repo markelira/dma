@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { X, Clock, BookOpen, Award, Globe, Star, Play, Heart, Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
+import { X, Clock, BookOpen, Star, Play, Bookmark, BookmarkCheck, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import { useCoursePreview } from '@/hooks/useCoursePreview';
 import { useEnrollInCourse } from '@/hooks/useCourseQueries';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
-import { COURSE_TYPE_LABELS } from '@/types';
+import { COURSE_TYPE_LABELS, CourseType } from '@/types';
 
 interface CoursePreviewModalProps {
   /** Course ID to preview */
@@ -50,21 +50,41 @@ function formatDuration(seconds: number): string {
 }
 
 /**
- * Get difficulty label in Hungarian
+ * Get "About" section title based on course type
  */
-function getDifficultyLabel(difficulty?: string): string {
-  switch (difficulty) {
-    case 'BEGINNER': return 'Kezdő';
-    case 'INTERMEDIATE': return 'Középhaladó';
-    case 'ADVANCED': return 'Haladó';
-    case 'EXPERT': return 'Szakértő';
-    default: return '';
+function getAboutTitle(courseType?: CourseType): string {
+  switch (courseType) {
+    case 'WEBINAR': return 'A webinárról';
+    case 'ACADEMIA': return 'Az akadémiáról';
+    case 'MASTERCLASS': return 'A masterclassról';
+    case 'PODCAST': return 'A podcastról';
+    default: return 'A kurzusról';
   }
 }
 
 /**
+ * Get lessons section title based on course type
+ */
+function getLessonsTitle(courseType?: CourseType): string {
+  switch (courseType) {
+    case 'ACADEMIA':
+    case 'MASTERCLASS':
+      return 'Leckék';
+    default:
+      return 'Tartalom';
+  }
+}
+
+/**
+ * Check if course type should show lessons list
+ */
+function shouldShowLessons(courseType?: CourseType): boolean {
+  return courseType === 'ACADEMIA' || courseType === 'MASTERCLASS';
+}
+
+/**
  * CoursePreviewModal - Netflix-style course preview modal
- * Shows video preview, course details, curriculum, instructor, and reviews
+ * Dark mode with brand colors
  */
 export function CoursePreviewModal({
   courseId,
@@ -122,8 +142,8 @@ export function CoursePreviewModal({
   const getFirstLessonId = (course: any): string | null => {
     if (course.lessons?.length > 0) {
       const sorted = [...course.lessons]
-        .filter((l: any) => l.status === 'PUBLISHED')
-        .sort((a: any, b: any) => a.order - b.order);
+        .filter((l: any) => l.status === 'PUBLISHED' || !l.status)
+        .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
       return sorted[0]?.id || null;
     }
     if (course.modules?.length > 0) {
@@ -131,8 +151,8 @@ export function CoursePreviewModal({
       for (const module of sortedModules) {
         if (module.lessons?.length > 0) {
           const sorted = [...module.lessons]
-            .filter((l: any) => l.status === 'PUBLISHED')
-            .sort((a: any, b: any) => a.order - b.order);
+            .filter((l: any) => l.status === 'PUBLISHED' || !l.status)
+            .sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
           if (sorted[0]) return sorted[0].id;
         }
       }
@@ -144,7 +164,7 @@ export function CoursePreviewModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-white">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-[#0a0a0a] border-gray-800">
         {/* Hidden title for accessibility */}
         <DialogTitle className="sr-only">
           {data?.course?.title || 'Kurzus előnézet'}
@@ -153,14 +173,14 @@ export function CoursePreviewModal({
         {/* Loading state */}
         {isLoading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <Loader2 className="w-8 h-8 animate-spin text-brand-secondary" />
           </div>
         )}
 
         {/* Error state */}
         {error && (
           <div className="text-center py-20 px-6">
-            <p className="text-red-500 font-medium">Hiba történt a betöltéskor</p>
+            <p className="text-red-400 font-medium">Hiba történt a betöltéskor</p>
             <p className="text-gray-500 text-sm mt-1">Kérjük, próbáld újra később</p>
           </div>
         )}
@@ -180,7 +200,7 @@ export function CoursePreviewModal({
               {/* Close button */}
               <button
                 onClick={handleClose}
-                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors z-10"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-colors z-10"
                 aria-label="Bezárás"
               >
                 <X className="w-5 h-5" />
@@ -194,12 +214,12 @@ export function CoursePreviewModal({
                 {/* Course type badge */}
                 <div className="flex items-center gap-2 mb-2">
                   {data.course.courseType && (
-                    <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-medium">
+                    <span className="px-2.5 py-1 rounded-full bg-brand-secondary/20 text-brand-secondary text-xs font-medium">
                       {COURSE_TYPE_LABELS[data.course.courseType] || data.course.courseType}
                     </span>
                   )}
                   {data.course.averageRating && data.course.averageRating > 0 && (
-                    <span className="flex items-center gap-1 text-sm text-gray-600">
+                    <span className="flex items-center gap-1 text-sm text-gray-400">
                       <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                       {data.course.averageRating.toFixed(1)}
                     </span>
@@ -207,7 +227,7 @@ export function CoursePreviewModal({
                 </div>
 
                 {/* Title */}
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   {data.course.title}
                 </h2>
 
@@ -215,7 +235,7 @@ export function CoursePreviewModal({
                 <div className="flex flex-wrap gap-3">
                   <button
                     onClick={handleStartCourse}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-blue-500/20"
+                    className="flex items-center gap-2 px-6 py-3 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-bold rounded-xl transition-colors shadow-lg shadow-brand-secondary/20"
                   >
                     <Play className="w-5 h-5" />
                     {currentLessonId ? 'Folytatás' : 'Kezdés'}
@@ -226,8 +246,8 @@ export function CoursePreviewModal({
                     disabled={isEnrolled || enrollMutation.isPending}
                     className={`flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors border ${
                       isEnrolled
-                        ? 'bg-green-50 border-green-200 text-green-700 cursor-default'
-                        : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                        ? 'bg-brand-secondary/20 border-brand-secondary/30 text-brand-secondary cursor-default'
+                        : 'bg-transparent border-gray-600 text-gray-300 hover:bg-gray-800 hover:border-gray-500'
                     }`}
                   >
                     {isEnrolled ? (
@@ -250,8 +270,8 @@ export function CoursePreviewModal({
                 </div>
               </div>
 
-              {/* Stats row */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 py-4 border-y border-gray-100">
+              {/* Stats row - only show duration and lessons */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 py-4 border-y border-gray-800">
                 {data.stats.totalDuration > 0 && (
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-4 h-4" />
@@ -264,55 +284,45 @@ export function CoursePreviewModal({
                     <span>{data.stats.totalLessons} lecke</span>
                   </div>
                 )}
-                {data.course.difficulty && (
-                  <div className="flex items-center gap-1.5">
-                    <Award className="w-4 h-4" />
-                    <span>{getDifficultyLabel(data.course.difficulty)}</span>
-                  </div>
-                )}
-                {data.course.language && (
-                  <div className="flex items-center gap-1.5">
-                    <Globe className="w-4 h-4" />
-                    <span>{data.course.language}</span>
-                  </div>
-                )}
-                {data.course.certificateEnabled && (
-                  <div className="flex items-center gap-1.5 text-green-600">
-                    <Award className="w-4 h-4" />
-                    <span>Tanúsítvány</span>
-                  </div>
-                )}
               </div>
 
               {/* Description */}
               {data.course.description && (
                 <section>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">A kurzusról</h3>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line">
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    {getAboutTitle(data.course.courseType)}
+                  </h3>
+                  <p className="text-gray-400 leading-relaxed whitespace-pre-line">
                     {data.course.description}
                   </p>
                 </section>
               )}
 
-              {/* Curriculum */}
-              <section>
-                <h3 className="text-lg font-semibold text-gray-900 mb-3">Tematika</h3>
-                <PreviewCurriculum
-                  lessons={data.course.lessons}
-                  modules={data.course.modules}
-                  maxLessonsInitial={5}
-                />
-              </section>
+              {/* Lessons - only for ACADEMIA and MASTERCLASS */}
+              {shouldShowLessons(data.course.courseType) && (data.course.lessons?.length > 0 || data.course.modules?.length > 0) && (
+                <section>
+                  <h3 className="text-lg font-semibold text-white mb-3">
+                    {getLessonsTitle(data.course.courseType)}
+                  </h3>
+                  <PreviewCurriculum
+                    lessons={data.course.lessons}
+                    modules={data.course.modules}
+                    maxLessonsInitial={5}
+                    darkMode={true}
+                  />
+                </section>
+              )}
 
               {/* Instructor */}
               {data.instructors.length > 0 && (
                 <section>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <h3 className="text-lg font-semibold text-white mb-3">
                     {data.course.courseType === 'PODCAST' ? 'Szereplő' : 'Mentor'}
                   </h3>
                   <PreviewInstructor
                     instructors={data.instructors}
                     courseType={data.course.courseType}
+                    darkMode={true}
                   />
                 </section>
               )}
@@ -320,22 +330,23 @@ export function CoursePreviewModal({
               {/* Reviews */}
               {(data.reviews.length > 0 || (data.course.averageRating && data.course.averageRating > 0)) && (
                 <section>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                  <h3 className="text-lg font-semibold text-white mb-3">
                     Értékelések {data.course.reviewCount ? `(${data.course.reviewCount})` : ''}
                   </h3>
                   <PreviewReviews
                     reviews={data.reviews}
                     averageRating={data.course.averageRating}
                     reviewCount={data.course.reviewCount}
+                    darkMode={true}
                   />
                 </section>
               )}
 
               {/* View full details link */}
-              <div className="pt-4 border-t border-gray-100 text-center">
+              <div className="pt-4 border-t border-gray-800 text-center">
                 <button
                   onClick={handleViewDetails}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="text-brand-secondary hover:text-brand-secondary-hover font-medium text-sm"
                 >
                   Teljes kurzus oldal megtekintése
                 </button>

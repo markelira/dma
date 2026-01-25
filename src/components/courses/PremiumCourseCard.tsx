@@ -253,10 +253,8 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
 
   // Memoize category names to prevent recalculation on every render
   const categoryNames = useMemo(() => {
-    if (!categories || categories.length === 0) return [];
-
     // Check for multiple categories first (new system)
-    if (course.categoryIds && course.categoryIds.length > 0) {
+    if (course.categoryIds && course.categoryIds.length > 0 && categories && categories.length > 0) {
       const names = course.categoryIds
         .map(catId => categories.find(c => c.id === catId)?.name)
         .filter((name): name is string => !!name);
@@ -264,9 +262,14 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
     }
 
     // Fallback to single category ID
-    if (course.categoryId) {
+    if (course.categoryId && categories && categories.length > 0) {
       const category = categories.find(cat => cat.id === course.categoryId);
       if (category?.name) return [category.name];
+    }
+
+    // Fallback to category object (embedded category with name)
+    if (course.category && typeof course.category === 'object' && (course.category as any).name) {
+      return [(course.category as any).name];
     }
 
     // Fallback to category string (legacy)

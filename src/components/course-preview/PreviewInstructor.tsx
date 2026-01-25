@@ -3,7 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { User } from 'lucide-react';
-import type { Instructor, InstructorRole } from '@/types';
+import type { Instructor } from '@/types';
 
 interface PreviewInstructorProps {
   /** Single instructor or array of instructors */
@@ -12,6 +12,8 @@ interface PreviewInstructorProps {
   roleLabel?: string;
   /** Course type for determining default role label */
   courseType?: 'ACADEMIA' | 'WEBINAR' | 'MASTERCLASS' | 'PODCAST';
+  /** Dark mode styling */
+  darkMode?: boolean;
 }
 
 /**
@@ -41,17 +43,21 @@ function InstructorCard({
   instructor,
   courseType,
   roleLabel,
+  darkMode,
 }: {
   instructor: Instructor;
   courseType?: string;
   roleLabel?: string;
+  darkMode?: boolean;
 }) {
   const displayRole = roleLabel || getRoleLabel(instructor, courseType);
 
   return (
     <div className="flex gap-4 items-start">
       {/* Profile picture */}
-      <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
+      <div className={`w-16 h-16 rounded-full overflow-hidden flex-shrink-0 ${
+        darkMode ? 'bg-gray-800' : 'bg-gray-100'
+      }`}>
         {instructor.profilePictureUrl ? (
           <Image
             src={instructor.profilePictureUrl}
@@ -61,29 +67,33 @@ function InstructorCard({
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-blue-100">
-            <User className="w-8 h-8 text-blue-600" />
+          <div className={`w-full h-full flex items-center justify-center ${
+            darkMode ? 'bg-brand-secondary/20' : 'bg-blue-100'
+          }`}>
+            <User className={`w-8 h-8 ${darkMode ? 'text-brand-secondary' : 'text-blue-600'}`} />
           </div>
         )}
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-0.5">
+        <div className={`text-xs font-medium uppercase tracking-wide mb-0.5 ${
+          darkMode ? 'text-brand-secondary' : 'text-blue-600'
+        }`}>
           {displayRole}
         </div>
-        <h4 className="font-semibold text-gray-900 line-clamp-1">
+        <h4 className={`font-semibold line-clamp-1 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           {instructor.name}
         </h4>
         {(instructor.title || instructor.company) && (
-          <p className="text-sm text-gray-600 line-clamp-1">
+          <p className={`text-sm line-clamp-1 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             {instructor.company && instructor.title
               ? `${instructor.company}, ${instructor.title}`
               : instructor.title || instructor.company}
           </p>
         )}
         {instructor.bio && (
-          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+          <p className={`text-sm mt-2 leading-relaxed ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
             {truncateBio(instructor.bio)}
           </p>
         )}
@@ -99,6 +109,7 @@ export function PreviewInstructor({
   instructors,
   roleLabel,
   courseType,
+  darkMode = false,
 }: PreviewInstructorProps) {
   if (!instructors || instructors.length === 0) {
     return null;
@@ -111,6 +122,7 @@ export function PreviewInstructor({
         instructor={instructors[0]}
         courseType={courseType}
         roleLabel={roleLabel}
+        darkMode={darkMode}
       />
     );
   }
@@ -124,6 +136,7 @@ export function PreviewInstructor({
           instructor={instructor}
           courseType={courseType}
           roleLabel={roleLabel}
+          darkMode={darkMode}
         />
       ))}
     </div>

@@ -82,9 +82,9 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
         }];
       }
 
-      // Fetch only the instructors we need
+      // Fetch only the instructors we need from instructors collection
       const instructorDocs = await Promise.all(
-        instructorIds.map(instId => getDoc(doc(db, 'users', instId)))
+        instructorIds.map(instId => getDoc(doc(db, 'instructors', instId)))
       );
 
       const fetchedInstructors = instructorDocs

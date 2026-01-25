@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { doc, getDoc, collection, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { Course, Instructor, Review, Lesson, Module } from '@/types';
@@ -24,32 +24,15 @@ export interface CoursePreviewData {
  * Get the first video lesson for preview
  * Follows the priority: first lesson with muxPlaybackId
  */
-function getPreviewVideo(course: Course): { playbackId: string; startTime: number } | null {
-  // Check flat lessons array first (preferred structure)
-  if (course.lessons && course.lessons.length > 0) {
-    const videoLessons = course.lessons
-      .filter((l: Lesson) => l.status === 'PUBLISHED' && l.muxPlaybackId)
-      .sort((a: Lesson, b: Lesson) => a.order - b.order);
+function getPreviewVideo(lessons: Lesson[]): { playbackId: string; startTime: number } | null {
+  if (!lessons || lessons.length === 0) return null;
 
-    if (videoLessons.length > 0) {
-      return { playbackId: videoLessons[0].muxPlaybackId!, startTime: 0 };
-    }
-  }
+  const videoLessons = lessons
+    .filter((l: Lesson) => (l.status === 'PUBLISHED' || !l.status) && l.muxPlaybackId)
+    .sort((a: Lesson, b: Lesson) => (a.order || 0) - (b.order || 0));
 
-  // Fallback: check modules (legacy structure)
-  if (course.modules && course.modules.length > 0) {
-    const sortedModules = [...course.modules].sort((a: Module, b: Module) => a.order - b.order);
-    for (const module of sortedModules) {
-      if (module.lessons && module.lessons.length > 0) {
-        const videoLesson = module.lessons
-          .filter((l: Lesson) => l.status === 'PUBLISHED' && l.muxPlaybackId)
-          .sort((a: Lesson, b: Lesson) => a.order - b.order)[0];
-
-        if (videoLesson) {
-          return { playbackId: videoLesson.muxPlaybackId!, startTime: 0 };
-        }
-      }
-    }
+  if (videoLessons.length > 0) {
+    return { playbackId: videoLessons[0].muxPlaybackId!, startTime: 0 };
   }
 
   return null;
@@ -58,26 +41,83 @@ function getPreviewVideo(course: Course): { playbackId: string; startTime: numbe
 /**
  * Calculate course stats from lessons
  */
-function calculateStats(course: Course): CoursePreviewData['stats'] {
-  let allLessons: Lesson[] = [];
+function calculateStats(lessons: Lesson[], moduleCount: number): CoursePreviewData['stats'] {
+  const publishedLessons = lessons.filter((l: Lesson) => l.status === 'PUBLISHED' || !l.status);
 
-  if (course.lessons && course.lessons.length > 0) {
-    allLessons = course.lessons.filter((l: Lesson) => l.status === 'PUBLISHED');
-  } else if (course.modules && course.modules.length > 0) {
-    allLessons = course.modules.flatMap((m: Module) =>
-      (m.lessons || []).filter((l: Lesson) => l.status === 'PUBLISHED')
-    );
-  }
-
-  const totalDuration = allLessons.reduce((sum, lesson) => {
+  const totalDuration = publishedLessons.reduce((sum, lesson) => {
     return sum + (lesson.muxDuration || lesson.duration || 0);
   }, 0);
 
   return {
-    totalLessons: allLessons.length,
+    totalLessons: publishedLessons.length,
     totalDuration,
-    moduleCount: course.modules?.length || 1,
+    moduleCount: moduleCount || 1,
   };
+}
+
+/**
+ * Fetch lessons from subcollection
+ */
+async function fetchLessonsFromSubcollection(courseId: string): Promise<Lesson[]> {
+  try {
+    const lessonsQuery = query(
+      collection(db, 'courses', courseId, 'lessons'),
+      orderBy('order', 'asc')
+    );
+    const lessonsSnapshot = await getDocs(lessonsQuery);
+    return lessonsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as Lesson[];
+  } catch (error) {
+    console.warn('Could not fetch lessons from subcollection:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch modules from subcollection (for ACADEMIA courses)
+ */
+async function fetchModulesFromSubcollection(courseId: string): Promise<Module[]> {
+  try {
+    const modulesQuery = query(
+      collection(db, 'courses', courseId, 'modules'),
+      orderBy('order', 'asc')
+    );
+    const modulesSnapshot = await getDocs(modulesQuery);
+
+    const modules: Module[] = [];
+    for (const moduleDoc of modulesSnapshot.docs) {
+      const moduleData = moduleDoc.data();
+
+      // Check if lessons are embedded in module or in subcollection
+      let lessons: Lesson[] = moduleData.lessons || [];
+
+      if (lessons.length === 0) {
+        // Try fetching from subcollection
+        const lessonsQuery = query(
+          collection(db, 'courses', courseId, 'modules', moduleDoc.id, 'lessons'),
+          orderBy('order', 'asc')
+        );
+        const lessonsSnapshot = await getDocs(lessonsQuery);
+        lessons = lessonsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        })) as Lesson[];
+      }
+
+      modules.push({
+        id: moduleDoc.id,
+        ...moduleData,
+        lessons
+      } as Module);
+    }
+
+    return modules;
+  } catch (error) {
+    console.warn('Could not fetch modules from subcollection:', error);
+    return [];
+  }
 }
 
 /**
@@ -92,7 +132,42 @@ async function fetchCoursePreview(courseId: string): Promise<CoursePreviewData> 
     throw new Error('Course not found');
   }
 
-  const course = { id: courseDoc.id, ...courseDoc.data() } as Course;
+  const courseData = courseDoc.data();
+  const course = { id: courseDoc.id, ...courseData } as Course;
+
+  // Determine lessons - check embedded first, then subcollections
+  let allLessons: Lesson[] = [];
+  let moduleCount = 1;
+
+  // 1. Check embedded lessons array (flat structure)
+  if (course.lessons && course.lessons.length > 0) {
+    allLessons = course.lessons;
+    moduleCount = 1;
+  }
+  // 2. Check embedded modules array (legacy structure)
+  else if (course.modules && course.modules.length > 0) {
+    allLessons = course.modules.flatMap((m: Module) => m.lessons || []);
+    moduleCount = course.modules.length;
+  }
+  // 3. Fetch from lessons subcollection (WEBINAR, PODCAST, MASTERCLASS)
+  else {
+    const subcollectionLessons = await fetchLessonsFromSubcollection(courseId);
+    if (subcollectionLessons.length > 0) {
+      allLessons = subcollectionLessons;
+      // Update course object with fetched lessons for display
+      course.lessons = subcollectionLessons;
+    }
+    // 4. Fetch from modules subcollection (ACADEMIA)
+    else {
+      const subcollectionModules = await fetchModulesFromSubcollection(courseId);
+      if (subcollectionModules.length > 0) {
+        allLessons = subcollectionModules.flatMap((m: Module) => m.lessons || []);
+        moduleCount = subcollectionModules.length;
+        // Update course object with fetched modules for display
+        course.modules = subcollectionModules;
+      }
+    }
+  }
 
   // Fetch instructors if instructorIds exist
   let instructors: Instructor[] = [];
@@ -116,7 +191,7 @@ async function fetchCoursePreview(courseId: string): Promise<CoursePreviewData> 
   try {
     const reviewsQuery = query(
       collection(db, 'reviews'),
-      where('course.id', '==', courseId),
+      where('courseId', '==', courseId),
       where('approved', '==', true),
       orderBy('createdAt', 'desc')
     );
@@ -127,14 +202,28 @@ async function fetchCoursePreview(courseId: string): Promise<CoursePreviewData> 
     })) as Review[];
   } catch (error) {
     // Reviews collection might not exist or have different structure
-    console.warn('Could not fetch reviews:', error);
+    // Try alternative query structure
+    try {
+      const reviewsQuery2 = query(
+        collection(db, 'reviews'),
+        where('course.id', '==', courseId),
+        where('approved', '==', true)
+      );
+      const reviewsSnapshot2 = await getDocs(reviewsQuery2);
+      reviews = reviewsSnapshot2.docs.slice(0, 5).map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as Review[];
+    } catch {
+      // Silently fail - reviews are optional
+    }
   }
 
   // Get preview video info
-  const previewVideo = getPreviewVideo(course);
+  const previewVideo = getPreviewVideo(allLessons);
 
   // Calculate stats
-  const stats = calculateStats(course);
+  const stats = calculateStats(allLessons, moduleCount);
 
   return {
     course,
@@ -163,7 +252,7 @@ export function useCoursePreview(courseId: string | null) {
  * Prefetch course preview data (for hover intent)
  */
 export function usePrefetchCoursePreview() {
-  const queryClient = require('@tanstack/react-query').useQueryClient();
+  const queryClient = useQueryClient();
 
   return (courseId: string) => {
     queryClient.prefetchQuery({

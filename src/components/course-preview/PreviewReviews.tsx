@@ -13,12 +13,14 @@ interface PreviewReviewsProps {
   reviewCount?: number;
   /** Maximum reviews to display */
   maxReviews?: number;
+  /** Dark mode styling */
+  darkMode?: boolean;
 }
 
 /**
  * Render star rating
  */
-function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }) {
+function StarRating({ rating, size = 'sm', darkMode = false }: { rating: number; size?: 'sm' | 'md'; darkMode?: boolean }) {
   const sizeClass = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 >= 0.5;
@@ -33,7 +35,7 @@ function StarRating({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md
               ? 'text-yellow-400 fill-yellow-400'
               : idx === fullStars && hasHalfStar
               ? 'text-yellow-400 fill-yellow-400/50'
-              : 'text-gray-300'
+              : darkMode ? 'text-gray-600' : 'text-gray-300'
           }`}
         />
       ))}
@@ -60,25 +62,27 @@ function formatDate(dateString: string): string {
 /**
  * Single review card
  */
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ review, darkMode }: { review: Review; darkMode: boolean }) {
   const userName = review.user
     ? `${review.user.firstName} ${review.user.lastName}`
     : 'Anonim';
 
   return (
-    <div className="bg-gray-50 rounded-xl p-4">
+    <div className={`rounded-xl p-4 ${darkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
       <div className="flex items-start gap-3">
         {/* Quote icon */}
-        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-          <Quote className="w-4 h-4 text-blue-600" />
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+          darkMode ? 'bg-brand-secondary/20' : 'bg-blue-100'
+        }`}>
+          <Quote className={`w-4 h-4 ${darkMode ? 'text-brand-secondary' : 'text-blue-600'}`} />
         </div>
 
         <div className="flex-1 min-w-0">
           {/* Rating and date */}
           <div className="flex items-center justify-between gap-2 mb-2">
-            <StarRating rating={review.rating} />
+            <StarRating rating={review.rating} darkMode={darkMode} />
             {review.createdAt && (
-              <span className="text-xs text-gray-400">
+              <span className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
                 {formatDate(review.createdAt)}
               </span>
             )}
@@ -86,13 +90,15 @@ function ReviewCard({ review }: { review: Review }) {
 
           {/* Comment */}
           {review.comment && (
-            <p className="text-sm text-gray-700 leading-relaxed line-clamp-3 mb-2">
+            <p className={`text-sm leading-relaxed line-clamp-3 mb-2 ${
+              darkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>
               "{review.comment}"
             </p>
           )}
 
           {/* Author */}
-          <p className="text-sm text-gray-500">
+          <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
             — {userName}
           </p>
         </div>
@@ -109,6 +115,7 @@ export function PreviewReviews({
   averageRating,
   reviewCount,
   maxReviews = 3,
+  darkMode = false,
 }: PreviewReviewsProps) {
   // Calculate average from reviews if not provided
   const calculatedAverage = averageRating ??
@@ -121,8 +128,8 @@ export function PreviewReviews({
   // No reviews available
   if ((!reviews || reviews.length === 0) && !averageRating) {
     return (
-      <div className="text-center py-6 text-gray-500">
-        <Star className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+      <div className={`text-center py-6 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+        <Star className={`w-8 h-8 mx-auto mb-2 ${darkMode ? 'text-gray-600' : 'text-gray-300'}`} />
         <p className="text-sm">Még nincsenek értékelések</p>
       </div>
     );
@@ -135,12 +142,12 @@ export function PreviewReviews({
       {/* Average rating header */}
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-3xl font-bold text-gray-900">
+          <span className={`text-3xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             {calculatedAverage.toFixed(1)}
           </span>
           <div>
-            <StarRating rating={calculatedAverage} size="md" />
-            <p className="text-xs text-gray-500 mt-0.5">
+            <StarRating rating={calculatedAverage} size="md" darkMode={darkMode} />
+            <p className={`text-xs mt-0.5 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
               {totalCount} értékelés
             </p>
           </div>
@@ -153,11 +160,11 @@ export function PreviewReviews({
       {displayReviews.length > 0 && (
         <div className="space-y-3">
           {displayReviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
+            <ReviewCard key={review.id} review={review} darkMode={darkMode} />
           ))}
 
           {reviews.length > maxReviews && (
-            <p className="text-sm text-center text-gray-500">
+            <p className={`text-sm text-center ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
               + {reviews.length - maxReviews} további értékelés
             </p>
           )}
