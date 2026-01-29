@@ -43,7 +43,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com data:",
               "img-src 'self' data: blob: https: http://127.0.0.1:*",
-              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://firestore.googleapis.com https://*.cloudfunctions.net https://api.stripe.com https://*.mux.com https://*.litix.io wss://*.firebaseio.com https://www.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com",
+              "connect-src 'self' https://*.firebaseio.com https://*.googleapis.com https://firestore.googleapis.com https://*.cloudfunctions.net https://api.stripe.com https://*.mux.com https://*.litix.io wss://*.firebaseio.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
               "frame-src 'self' https://js.stripe.com https://*.firebaseapp.com",
               "media-src 'self' https://*.mux.com blob:",
               "worker-src 'self' blob:",
