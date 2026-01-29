@@ -30,10 +30,11 @@ export function ConditionalAnalytics() {
     };
   }, []);
 
-  const gaId = process.env.NEXT_PUBLIC_GA_ID;
+  // Use env var with hardcoded fallback for production
+  const gaId = process.env.NEXT_PUBLIC_GA_ID || 'G-XB7ESESYVS';
 
-  // Don't load if no consent or no GA ID
-  if (!hasConsent || !gaId) {
+  // Don't load if no consent
+  if (!hasConsent) {
     return null;
   }
 
