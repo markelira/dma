@@ -104,9 +104,9 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
         />
+        {/* Google Analytics - loaded conditionally after cookie consent */}
+        <ConditionalAnalytics />
       </head>
-      {/* Analytics loaded conditionally after cookie consent */}
-      <ConditionalAnalytics />
       <body className={`${inter.variable} bg-gray-50 font-sans tracking-tight text-gray-900 antialiased min-h-screen`}>
         <ErrorBoundary>
           <ReactQueryProvider>
