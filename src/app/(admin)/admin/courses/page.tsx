@@ -174,15 +174,16 @@ export default function CoursesPage() {
                   {course.status === "PENDING_REVIEW" && (
                     <Button variant="outline" size="sm" onClick={async () => {
                       try {
-                        const publishCallableFn = httpsCallable(functions, 'publishCourseCallable');
+                        const publishCallableFn = httpsCallable(functions, 'publishCourse');
                         const result: any = await publishCallableFn({ courseId: course.id });
                         if (result.data.success) {
-                          toast.success("Course published");
+                          toast.success("Tartalom publikálva");
+                          refetch();
                         } else {
-                          toast.error(result.data.error || "Publish failed");
+                          toast.error(result.data.error || "Publikálás sikertelen");
                         }
                       } catch (err: any) {
-                        toast.error(err?.response?.data?.message || "Publish failed");
+                        toast.error(err?.message || "Publikálás sikertelen");
                       }
                     }}>
                       Approve
