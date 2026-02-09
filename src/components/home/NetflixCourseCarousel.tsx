@@ -43,10 +43,16 @@ export function NetflixCourseCarousel() {
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
   const [isVisible, setIsVisible] = useState(false)
+  const [shuffleKey, setShuffleKey] = useState(0) // Forces re-shuffle on mount
   const scrollRef = useRef<HTMLDivElement>(null)
   const visibilityRef = useRef<HTMLDivElement>(null)
 
   const { data: instructors = [] } = useInstructors()
+
+  // Force re-shuffle on every mount by updating shuffleKey
+  useEffect(() => {
+    setShuffleKey(Date.now())
+  }, [])
 
   // Lazy loading: only fetch and render when carousel is near viewport
   useEffect(() => {
@@ -112,6 +118,13 @@ export function NetflixCourseCarousel() {
 
     return () => unsubscribe()
   }, [isVisible])
+
+  // Re-shuffle courses when shuffleKey changes (on mount)
+  useEffect(() => {
+    if (courses.length > 0 && shuffleKey > 0) {
+      setCourses(prev => shuffleArray([...prev]))
+    }
+  }, [shuffleKey])
 
   // Scroll navigation
   const scroll = (direction: 'left' | 'right') => {

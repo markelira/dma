@@ -55,6 +55,12 @@ export default function CompanyDashboardPage() {
     instructorIds: [],
   });
 
+  // Shuffle seed - changes on each mount to force re-shuffle even with cached data
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+  useEffect(() => {
+    setShuffleSeed(Date.now());
+  }, []);
+
   // Welcome popup after successful checkout
   const [showWelcome, setShowWelcome] = useState(false);
 
@@ -157,7 +163,7 @@ export default function CompanyDashboardPage() {
       isEnrolled: false,
       firstLessonId: getFirstLessonId(course),
     }));
-  }, [courses, enrollments]);
+  }, [filteredCourses, enrollments, shuffleSeed]);
 
   // Build enrolled courses list (Saját listám)
   const enrolledCourses = useMemo(() => {
@@ -222,13 +228,13 @@ export default function CompanyDashboardPage() {
         };
       })
       .filter(row => row.courses.length > 0);
-  }, [categories, filteredCourses]);
+  }, [categories, filteredCourses, shuffleSeed]);
 
   // Always prepare a "Felkapott" section with courses (fully shuffled for variety)
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
     return shuffleArray([...filteredCourses]).slice(0, MAX_CAROUSEL_CARDS);
-  }, [filteredCourses]);
+  }, [filteredCourses, shuffleSeed]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
@@ -262,7 +268,7 @@ export default function CompanyDashboardPage() {
       .sort((a, b) => b.count - a.count)
       .filter(row => row.count > 0)
       .slice(0, 2);
-  }, [targetAudiences, filteredCourses]);
+  }, [targetAudiences, filteredCourses, shuffleSeed]);
 
   // Memoize course type rows to prevent re-shuffling on every render
   const courseTypeRows = useMemo(() => {
@@ -285,7 +291,7 @@ export default function CompanyDashboardPage() {
         };
       })
       .filter(row => row.courses.length > 0);
-  }, [filteredCourses]);
+  }, [filteredCourses, shuffleSeed]);
 
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
@@ -368,11 +374,11 @@ export default function CompanyDashboardPage() {
         />
       ))}
 
-      {/* Fallback: All Courses if no categories matched */}
+      {/* Fallback: All Courses if no categories matched - shuffled for variety */}
       {showFallbackSection && filteredCourses.length > 0 && (
         <CourseCarouselRow
           title="Felfedezés"
-          courses={filteredCourses.slice(0, MAX_CAROUSEL_CARDS)}
+          courses={shuffleArray([...filteredCourses]).slice(0, MAX_CAROUSEL_CARDS)}
           categories={categories || []}
           instructors={instructors || []}
           enrollments={enrollments || []}

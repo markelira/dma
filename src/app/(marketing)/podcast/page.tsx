@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { FramerNavbarWrapper } from '@/components/navigation/framer-navbar-wrapper';
@@ -43,6 +43,12 @@ export default function PodcastPage() {
     courseTypes: [],
     instructorIds: [],
   });
+
+  // Shuffle seed - changes on each mount to force re-shuffle even with cached data
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+  useEffect(() => {
+    setShuffleSeed(Date.now());
+  }, []);
 
   // Filter courses by PODCAST type and user filters
   const filteredCourses = useMemo(() => {
@@ -136,7 +142,7 @@ export default function PodcastPage() {
         firstLessonId: enrollment?.firstLessonId || getFirstLessonId(course),
       };
     });
-  }, [filteredCourses, instructors, enrollments]);
+  }, [filteredCourses, instructors, enrollments, shuffleSeed]);
 
   // Build category rows - shuffled for variety
   const categoryRows = useMemo(() => {
@@ -153,13 +159,13 @@ export default function PodcastPage() {
         return { category, courses: shuffleArray(categoryCourses) };
       })
       .filter(row => row.courses.length > 0);
-  }, [categories, filteredCourses]);
+  }, [categories, filteredCourses, shuffleSeed]);
 
   // Popular courses - shuffled for variety
   const popularCourses = useMemo(() => {
     if (!filteredCourses.length) return [];
     return shuffleArray([...filteredCourses]).slice(0, 10);
-  }, [filteredCourses]);
+  }, [filteredCourses, shuffleSeed]);
 
   // Newest courses
   const newestCourses = useMemo(() => {

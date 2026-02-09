@@ -158,7 +158,13 @@ export function AllCoursesShowcase() {
   });
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [shuffleKey, setShuffleKey] = useState(0); // Forces re-shuffle on mount
   const { data: instructors = [] } = useInstructors();
+
+  // Force re-shuffle on every mount
+  useEffect(() => {
+    setShuffleKey(Date.now());
+  }, []);
 
   // Fetch categories
   useEffect(() => {
@@ -216,6 +222,26 @@ export function AllCoursesShowcase() {
       unsubscribes.forEach((unsubscribe) => unsubscribe());
     };
   }, []);
+
+  // Re-shuffle courses when shuffleKey changes (on mount)
+  useEffect(() => {
+    if (shuffleKey > 0) {
+      setCoursesByType((prev) => {
+        const reshuffled: Record<CourseType, Course[]> = {
+          MASTERCLASS: [],
+          WEBINAR: [],
+          ACADEMIA: [],
+          PODCAST: [],
+        };
+        (Object.keys(prev) as CourseType[]).forEach((type) => {
+          if (prev[type].length > 0) {
+            reshuffled[type] = shuffleArray([...prev[type]]);
+          }
+        });
+        return reshuffled;
+      });
+    }
+  }, [shuffleKey]);
 
   if (loading) {
     return (

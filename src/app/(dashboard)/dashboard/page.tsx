@@ -75,6 +75,12 @@ export default function DashboardPage() {
     instructorIds: [],
   });
 
+  // Shuffle seed - changes on each mount to force re-shuffle even with cached data
+  const [shuffleSeed, setShuffleSeed] = useState(0);
+  useEffect(() => {
+    setShuffleSeed(Date.now());
+  }, []);
+
   // Check if user is company employee
   const isCompanyEmployee = user?.companyId && user?.companyRole === 'employee';
 
@@ -218,7 +224,7 @@ export default function DashboardPage() {
         firstLessonId: getFirstLessonId(course),
       };
     });
-  }, [courses, enrollments]);
+  }, [courses, enrollments, shuffleSeed]);
 
   // Build enrolled courses list (Saját listám)
   const enrolledCourses = useMemo(() => {
@@ -283,13 +289,13 @@ export default function DashboardPage() {
         };
       })
       .filter(row => row.courses.length > 0);
-  }, [categories, courses]);
+  }, [categories, courses, shuffleSeed]);
 
   // Always prepare a "Felkapott" section with courses (fully shuffled for variety)
   const popularCourses = useMemo(() => {
     if (!courses) return [];
     return shuffleArray([...courses]).slice(0, MAX_CAROUSEL_CARDS);
-  }, [courses]);
+  }, [courses, shuffleSeed]);
 
   // Newest courses (for "Legújabb tartalmak" section)
   const newestCourses = useMemo(() => {
@@ -321,7 +327,7 @@ export default function DashboardPage() {
       .sort((a, b) => b.count - a.count)
       .filter(row => row.count > 0)
       .slice(0, 2);
-  }, [targetAudiences, courses]);
+  }, [targetAudiences, courses, shuffleSeed]);
 
   // Memoize course type rows to prevent re-shuffling on every render
   const courseTypeRows = useMemo(() => {
@@ -344,7 +350,7 @@ export default function DashboardPage() {
         };
       })
       .filter(row => row.courses.length > 0);
-  }, [courses]);
+  }, [courses, shuffleSeed]);
 
   const isLoading = enrollmentsLoading || coursesLoading || categoriesLoading || audiencesLoading || instructorsLoading;
 
