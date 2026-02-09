@@ -92,6 +92,29 @@ export function FramerNavbarWrapper() {
                     >
                       Podcast
                     </Link>
+                    {/* Demo Call Section */}
+                    <div className="h-px bg-gray-100 my-2 mx-4" />
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Foglalj demo hívást
+                    </div>
+                    <a
+                      href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0WDMeHgQ6wnoSeA4BwFB_d7HZmY7MH5LKDh34jFBub-e_IS-P80UwEt45pIhZivl5Teqohq4fW"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Több mint 10 munkatársam van
+                    </a>
+                    <a
+                      href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0HsL5YiflB-dp9Uws8SJi8MLV20PtubjFtSuhefRwXtjTbW-ABbBl7DPenQ5_I_YFjv7DHaanq"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Kevesebb mint 10 munkatársam van
+                    </a>
                   </>
                 ) : (
                   <>
@@ -136,6 +159,29 @@ export function FramerNavbarWrapper() {
                     >
                       Területek
                     </Link>
+                    {/* Demo Call Section */}
+                    <div className="h-px bg-gray-100 my-2 mx-4" />
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Foglalj demo hívást
+                    </div>
+                    <a
+                      href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0WDMeHgQ6wnoSeA4BwFB_d7HZmY7MH5LKDh34jFBub-e_IS-P80UwEt45pIhZivl5Teqohq4fW"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Több mint 10 munkatársam van
+                    </a>
+                    <a
+                      href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0HsL5YiflB-dp9Uws8SJi8MLV20PtubjFtSuhefRwXtjTbW-ABbBl7DPenQ5_I_YFjv7DHaanq"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={closeMobileMenu}
+                      className="flex items-center px-4 py-3 text-gray-900 font-semibold hover:bg-blue-50 hover:text-blue-600 rounded-xl transition-colors min-h-[48px]"
+                    >
+                      Kevesebb mint 10 munkatársam van
+                    </a>
                   </>
                 )}
 

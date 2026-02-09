@@ -7,6 +7,7 @@ import { getDashboardPath } from '@/lib/routing'
 import { Button } from '@/components/ui/button'
 import { CourseTypeDropdown } from './CourseTypeDropdown'
 import { CategoryDropdown } from './CategoryDropdown'
+import { DemoCallDropdown } from './DemoCallDropdown'
 import { CourseType } from '@/types'
 
 interface FramerNavbarUnifiedProps {
@@ -152,6 +153,32 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
                 </button>
 
                 <CategoryDropdown isOpen={openDropdown === 'categories'} />
+              </div>
+
+              {/* Demo Call Dropdown */}
+              <div
+                className="relative"
+                onMouseEnter={() => handleDropdownEnter('demo')}
+                onMouseLeave={handleDropdownLeave}
+              >
+                <button
+                  className="text-gray-700 hover:text-blue-600 font-bold font-inter transition-all duration-200 px-3 py-2 rounded-full hover:bg-white/40 flex items-center gap-1"
+                  style={{
+                    fontSize: scrolled ? '13px' : '14px',
+                  }}
+                >
+                  Foglalj demo hívást
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform duration-200 ${openDropdown === 'demo' ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                <DemoCallDropdown isOpen={openDropdown === 'demo'} />
               </div>
             </div>
 
