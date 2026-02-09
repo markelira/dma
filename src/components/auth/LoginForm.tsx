@@ -120,7 +120,7 @@ export default function LoginForm() {
 
           <p className="text-center text-sm text-gray-600">
             Még nincs fiókod?{' '}
-            <Link href="/register" className="text-brand-secondary hover:underline font-medium">
+            <Link href="/regisztracio" className="text-brand-secondary hover:underline font-medium">
               Regisztrálj itt
             </Link>
           </p>

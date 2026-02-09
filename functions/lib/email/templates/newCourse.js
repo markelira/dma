@@ -84,7 +84,7 @@ async function sendNewCourseEmail(data) {
         ].filter(Boolean),
         ctaText: 'Megnézem',
         ctaUrl: contentUrl,
-        signOff: 'Üdvözlettel, A DMA csapat',
+        signOff: 'Üdvözlettel, A DMA csapata',
     });
     try {
         const result = await (0, emailService_1.sendEmail)({

@@ -27,7 +27,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   // Authentication redirect logic (enhanced by middleware)
   useEffect(() => {
     if (!isLoading && !user) {
-      router.replace('/login')
+      router.replace('/bejelentkezes')
     }
   }, [user, isLoading, router])
 

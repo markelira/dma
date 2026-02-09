@@ -88,7 +88,7 @@ function VerifyEmailContent() {
                 Most már bejelentkezhet a fiókjába.
               </p>
               <Button 
-                onClick={() => router.push('/login')} 
+                onClick={() => router.push('/bejelentkezes')}
                 className="w-full"
               >
                 Tovább a bejelentkezéshez
@@ -107,14 +107,14 @@ function VerifyEmailContent() {
               </Alert>
               <div className="space-y-2 w-full">
                 <Button 
-                  onClick={() => router.push('/login')} 
+                  onClick={() => router.push('/bejelentkezes')}
                   className="w-full"
                   variant="outline"
                 >
                   Vissza a bejelentkezéshez
                 </Button>
                 <Button 
-                  onClick={() => router.push('/register')} 
+                  onClick={() => router.push('/regisztracio')}
                   className="w-full"
                 >
                   Új regisztráció

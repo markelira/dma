@@ -176,7 +176,7 @@ export const addEmployee = https.onCall(
 
       // 6. Send invitation email via SendGrid (non-blocking)
       // Link directly to registration with email prefilled - user gets auto-linked when registering
-      const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(email.toLowerCase())}`;
+      const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/regisztracio?invite=${inviteToken}&email=${encodeURIComponent(email.toLowerCase())}`;
       console.log('📨 [addEmployee] Attempting to send email...', {
         to: email,
         companyName,
@@ -675,7 +675,7 @@ export const resendEmployeeInvite = https.onCall(
       const companyName = companyDoc.data()?.name || 'DMA';
 
       // 9. Resend invitation email
-      const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/register?invite=${inviteToken}&email=${encodeURIComponent(employeeData.email)}`;
+      const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/regisztracio?invite=${inviteToken}&email=${encodeURIComponent(employeeData.email)}`;
 
       console.log('📨 [resendEmployeeInvite] Resending invitation email...', {
         to: employeeData.email,

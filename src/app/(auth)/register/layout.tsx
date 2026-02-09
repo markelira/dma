@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Regisztráció | DMA Masterclass',
     description: 'Regisztrálj és kezdd el a 7 napos ingyenes próbaidőszakot.',
-    url: 'https://masterclass.dma.hu/register',
+    url: 'https://masterclass.dma.hu/regisztracio',
   },
   robots: {
     index: true,

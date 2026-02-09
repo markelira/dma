@@ -21,7 +21,7 @@ export default function PricingPage() {
 
   const handleStartTrial = () => {
     if (!isAuthenticated) {
-      router.push('/register')
+      router.push('/regisztracio')
     } else {
       router.push('/subscribe/start?plan=monthly')
     }

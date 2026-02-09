@@ -5,6 +5,7 @@ import { Play, Clock } from 'lucide-react'
 
 import { useInProgressCourses } from '@/hooks/useInProgressCourses'
 import { useAuthStore } from '@/stores/authStore'
+import { getCourseUrl } from '@/lib/routing'
 
 export const ContinueSection: React.FC = () => {
   const { isAuthenticated } = useAuthStore()
@@ -51,7 +52,7 @@ export const ContinueSection: React.FC = () => {
 
   return (
             <Link
-              href={`/courses/${course.courseId}/learn`}
+              href={`${getCourseUrl({ id: course.courseId, courseType: course.courseType, slug: course.slug })}/learn`}
         className="continue-card relative bg-white rounded-lg shadow-sm p-4 group transform-gpu transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:scale-[1.03]"
             >
               <div className="relative h-32 bg-gray-200 rounded-lg mb-4 overflow-hidden">

@@ -44,6 +44,7 @@ const v2_1 = require("firebase-functions/v2");
 const z = __importStar(require("zod"));
 const newContentAvailable_1 = require("./email/templates/newContentAvailable");
 const maskPii_1 = require("./utils/maskPii");
+const slugify_1 = require("./utils/slugify");
 const firestore = admin.firestore();
 // Validation schema for course data
 const CourseSchema = z.object({
@@ -100,10 +101,7 @@ exports.createCourse = (0, https_1.onCall)({
         // Validate input data
         const validatedData = CourseSchema.parse(request.data);
         // Generate slug from title
-        const slug = validatedData.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
+        const slug = (0, slugify_1.slugify)(validatedData.title);
         // Check if slug already exists
         const existingSlugQuery = await firestore
             .collection('courses')
@@ -278,10 +276,7 @@ exports.updateCourse = (0, https_1.onCall)({
             updates.featured = updateData.featured;
         // Update slug if title changed
         if (updateData.title && updateData.title !== courseData?.title) {
-            const newSlug = updateData.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-+|-+$/g, '');
+            const newSlug = (0, slugify_1.slugify)(updateData.title);
             // Check if new slug already exists
             const existingSlugQuery = await firestore
                 .collection('courses')
@@ -344,10 +339,7 @@ exports.publishCourse = (0, https_1.onCall)({
         // Auto-generate slug if not exists
         let slug = courseData?.slug;
         if (!slug || slug.trim() === '') {
-            slug = (courseData?.title || 'course')
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/^-+|-+$/g, '');
+            slug = (0, slugify_1.slugify)(courseData?.title || 'course');
             // Check for uniqueness
             const existingSlugQuery = await firestore
                 .collection('courses')
@@ -374,38 +366,36 @@ exports.publishCourse = (0, https_1.onCall)({
             updatedAt: new Date().toISOString(),
         });
         v2_1.logger.info(`Course published: ${courseId} by user ${userId}`);
-        // Notify all registered users about new content (fire-and-forget)
+        // Notify all registered users about new content
         const courseTitle = courseData?.title || 'Új tartalom';
-        (async () => {
-            try {
-                // Get all users with email
-                const usersSnapshot = await firestore.collection('users').get();
-                let sentCount = 0;
-                for (const userDoc of usersSnapshot.docs) {
-                    const userData = userDoc.data();
-                    if (userData.email) {
-                        const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
-                        (0, newContentAvailable_1.sendNewContentAvailableEmail)({
-                            firstName,
-                            email: userData.email,
-                            courseTitle,
-                            courseId,
-                        }).then((result) => {
-                            if (!result.success) {
-                                v2_1.logger.warn(`Failed to send new content email to ${(0, maskPii_1.maskEmail)(userData.email)}:`, result.error);
-                            }
-                        }).catch((err) => {
-                            v2_1.logger.warn(`Error sending new content email to ${(0, maskPii_1.maskEmail)(userData.email)}:`, err.message);
-                        });
-                        sentCount++;
-                    }
+        try {
+            const usersSnapshot = await firestore.collection('users').get();
+            const emailPromises = [];
+            for (const userDoc of usersSnapshot.docs) {
+                const userData = userDoc.data();
+                if (userData.email) {
+                    const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
+                    emailPromises.push((0, newContentAvailable_1.sendNewContentAvailableEmail)({
+                        firstName,
+                        email: userData.email,
+                        courseTitle,
+                        courseId,
+                    }).catch((err) => {
+                        v2_1.logger.warn(`Error sending new content email to ${(0, maskPii_1.maskEmail)(userData.email)}:`, err.message);
+                        return { success: false, error: err.message };
+                    }));
                 }
-                v2_1.logger.info(`New content notification sent to ${sentCount} users for course ${courseId}`);
             }
-            catch (notifyError) {
-                v2_1.logger.warn('Error sending new content notifications:', notifyError.message);
-            }
-        })();
+            // Wait for all emails to complete (with individual error handling)
+            const results = await Promise.all(emailPromises);
+            const successCount = results.filter(r => r.success).length;
+            const failCount = results.filter(r => !r.success).length;
+            v2_1.logger.info(`New content notification: ${successCount} sent, ${failCount} failed for course ${courseId}`);
+        }
+        catch (notifyError) {
+            // Don't fail the publish if notifications fail
+            v2_1.logger.error('Error sending new content notifications:', notifyError.message);
+        }
         return {
             success: true,
             message: 'Kurzus sikeresen publikálva'

@@ -124,7 +124,7 @@ async function checkAndCompletePendingRegistration(userId) {
                         });
                         v2_1.logger.info(`[checkAndCompletePendingRegistration] Employee invite created: ${employee.email}`);
                         // Send invitation email
-                        const inviteUrl = `${baseUrl}/register?invite=${inviteToken}&email=${encodeURIComponent(employee.email.toLowerCase())}`;
+                        const inviteUrl = `${baseUrl}/regisztracio?invite=${inviteToken}&email=${encodeURIComponent(employee.email.toLowerCase())}`;
                         try {
                             await (0, employeeInvite_1.sendInvitationEmail)(employee.email.toLowerCase(), {
                                 firstName: employee.firstName,

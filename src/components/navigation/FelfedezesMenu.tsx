@@ -5,6 +5,7 @@ import { useCategories } from '@/hooks/useCategoryQueries'
 import { useCourseList } from '@/hooks/useCourseQueries'
 import { useUserProgress } from '@/hooks/useUserProgress'
 import { ChevronRight, Minus, X, Star, Users, CheckCircle, Globe, BookOpen, TrendingUp, Award, Play, Building2 } from 'lucide-react'
+import { getCourseUrl } from '@/lib/routing'
 
 interface FelfedezesMenuProps {
   onClose?: () => void
@@ -309,7 +310,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     : newCourses.map((course: any) => (
                         <Link
                           key={course.id}
-                          href={`/courses/${course.id}`}
+                          href={getCourseUrl(course)}
                           className="flex items-center justify-between p-4 rounded-lg hover:bg-white/10 transition-all duration-200 hover:scale-[1.01] group"
                         >
                           <span className="font-medium truncate">{course.title}</span>
@@ -343,7 +344,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     : popularCourses.map((course: any) => (
                         <Link
                           key={course.id}
-                          href={`/courses/${course.id}`}
+                          href={getCourseUrl(course)}
                           className="flex items-center justify-between p-4 rounded-lg hover:bg-white/10 transition-all duration-200 hover:scale-[1.01] group"
                         >
                           <span className="font-medium truncate">{course.title}</span>
@@ -446,7 +447,7 @@ const FelfedezesMenu: React.FC<FelfedezesMenuProps> = ({ onClose }) => {
                     ? progressCourses.slice(0, 4).map((course: any) => (
                         <Link
                           key={course.id}
-                          href={`/courses/${course.id}`}
+                          href={getCourseUrl(course)}
                           className="flex items-center justify-between p-4 rounded-lg hover:bg-white/10 transition-all duration-200 hover:scale-[1.01] group"
                         >
                           <span className="font-medium truncate">{course.title}</span>

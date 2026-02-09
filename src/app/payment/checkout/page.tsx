@@ -51,7 +51,7 @@ function CheckoutPageContent() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button onClick={() => router.push('/login')} className="w-full">
+            <Button onClick={() => router.push('/bejelentkezes')} className="w-full">
               Bejelentkezés
             </Button>
           </CardContent>

@@ -81,7 +81,7 @@ export function StripeEmbeddedCheckout({
         priceId: MONTHLY_PRICE_ID,
         mode: 'subscription',
         uiMode: 'embedded',
-        returnUrl: `${window.location.origin}/register?payment_complete=true`,
+        returnUrl: `${window.location.origin}/regisztracio?payment_complete=true`,
         metadata: {
           userId,
           email,

@@ -24,7 +24,7 @@ async function sendTrialEndingEmail(data) {
     const { firstName, email, planName, trialEndDate, daysRemaining, amount, currency, cancelUrl } = data;
     const subject = `Próbaidőszakod ${daysRemaining} nap múlva lejár`;
     const formattedAmount = formatAmount(amount, currency);
-    const managementUrl = cancelUrl || `${APP_URL}/company/dashboard/billing`;
+    const managementUrl = cancelUrl || `${APP_URL}/vallalkozas/kezdolap/billing`;
     const content = `
     ${(0, base_1.createHeading)(`Még ${daysRemaining} nap a próbaidőszakodból!`, 2)}
     ${(0, base_1.createParagraph)(`Szia <strong>${firstName}</strong>,`)}
@@ -48,7 +48,7 @@ async function sendTrialEndingEmail(data) {
 
     ${(0, base_1.createParagraph)('Folytasd a tartalmak felfedezését:')}
 
-    ${(0, base_1.createButtonRow)({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'Megnézem a tartalmakat', url: `${APP_URL}/vallalkozas/kezdolap`, variant: 'primary' })}
 
     ${(0, base_1.createParagraph)(`Ha mégsem szeretnéd folytatni, <a href="${managementUrl}" style="color: #252F5B;">itt mondhatod le</a> a próbaidőszak lejárta előtt.`, { muted: true })}
   `;
@@ -69,7 +69,7 @@ async function sendTrialEndingEmail(data) {
             `Ha mégsem szeretnéd folytatni, itt mondhatod le: ${managementUrl}`,
         ],
         ctaText: 'Megnézem a tartalmakat',
-        ctaUrl: `${APP_URL}/company/dashboard`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

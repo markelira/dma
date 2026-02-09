@@ -15,6 +15,7 @@ import {
   Flame,
   BookOpen
 } from 'lucide-react'
+import { getCourseUrl } from '@/lib/routing'
 import { db } from '@/lib/firebase'
 import { collection, query, orderBy, limit, onSnapshot } from 'firebase/firestore'
 import { shuffleArray } from '@/lib/utils'
@@ -219,7 +220,7 @@ export function TrendingCourses() {
                         className="gap-1 group-hover:text-primary"
                         asChild
                       >
-                        <Link href={`/courses/${course.id}`}>
+                        <Link href={getCourseUrl(course)}>
                           <Play className="w-4 h-4" />
                           Kezdés
                         </Link>

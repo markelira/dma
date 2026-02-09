@@ -20,7 +20,7 @@ async function sendRegistrationReminderEmail(data) {
     ${(0, base_1.createParagraph)('Pedig 150+ cégépítési tartalom vár rád, olyan módszerek és rendszerek, amik holnaptól már működnének a cégedben. 7 napig ingyen kipróbálhatod és ha hozzáadsz 5 munkatársat, akkor fejenként 2.500 Ft-ért juthattok hozzá a struktúraépítési tartalmainkhoz.')}
     ${(0, base_1.createParagraph)('Tudod mi a különbség közted és azok között, akik már elindultak? Ők 7 nappal járnak előtted. Ne hagyd, hogy ez a különbség még nagyobb legyen.')}
 
-    ${(0, base_1.createButtonRow)({ text: 'VÁGJ BELE MOST', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'VÁGJ BELE MOST', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -34,7 +34,7 @@ async function sendRegistrationReminderEmail(data) {
             'Tudod mi a különbség közted és azok között, akik már elindultak? Ők 7 nappal járnak előtted. Ne hagyd, hogy ez a különbség még nagyobb legyen.',
         ],
         ctaText: 'VÁGJ BELE MOST',
-        ctaUrl: `${APP_URL}/company/dashboard/billing`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

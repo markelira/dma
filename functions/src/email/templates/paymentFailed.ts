@@ -46,7 +46,7 @@ export async function sendPaymentFailedEmail(
   const subject = 'Fizetési hiba - intézkedés szükséges';
   const formattedAmount = formatAmount(amount, currency);
 
-  const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/company/dashboard/billing`;
+  const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/vallalkozas/kezdolap/billing`;
 
   const content = `
     ${createHeading('Fizetési hiba', 2)}

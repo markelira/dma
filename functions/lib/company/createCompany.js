@@ -42,16 +42,13 @@ const v2_1 = require("firebase-functions/v2");
 const https_1 = require("firebase-functions/v2/https");
 const admin = __importStar(require("firebase-admin"));
 const company_1 = require("../types/company");
+const slugify_1 = require("../utils/slugify");
 const db = admin.firestore();
 /**
- * Generate URL-friendly slug from company name
+ * Generate URL-friendly slug from company name (with length limit)
  */
 function generateSlug(name) {
-    return name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
-        .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-        .substring(0, 50); // Limit to 50 characters
+    return (0, slugify_1.slugify)(name).substring(0, 50);
 }
 /**
  * Ensure slug is unique by appending number if needed
@@ -156,7 +153,7 @@ exports.createCompany = v2_1.https.onCall({
         // 6. Send welcome email (plain text for MVP)
         await sendWelcomeEmail(billingEmail, {
             companyName: name,
-            dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/dashboard`,
+            dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/vallalkozas/kezdolap`,
         });
         return {
             success: true,

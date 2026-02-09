@@ -9,6 +9,7 @@ import { useTargetAudiences } from '@/hooks/useTargetAudienceQueries';
 import { useInstructors } from '@/hooks/useInstructorQueries';
 import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown';
 import { cn } from '@/lib/utils';
+import { getCourseUrl } from '@/lib/routing';
 
 const COURSE_TYPE_OPTIONS = [
   { value: 'WEBINAR', label: 'Webinár' },
@@ -165,10 +166,10 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
     return results.slice(0, 8); // Limit to 8 results
   }, [courses, query, selectedCategories, selectedAudiences, selectedCourseTypes, selectedInstructors, courseType]);
 
-  const handleSelect = (courseId: string) => {
+  const handleSelect = (course: { id: string; courseType?: string; slug?: string }) => {
     setIsOpen(false);
     setQuery('');
-    router.push(`/courses/${courseId}`);
+    router.push(getCourseUrl(course));
   };
 
   const handleSearch = () => {
@@ -364,7 +365,7 @@ export function DashboardSearch({ className, onFilterChange, courseType, hideCou
                 {filteredCourses.map((course) => (
                   <li key={course.id}>
                     <button
-                      onClick={() => handleSelect(course.id)}
+                      onClick={() => handleSelect(course)}
                       className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors"
                     >
                       {/* Thumbnail */}

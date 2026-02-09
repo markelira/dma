@@ -44,7 +44,7 @@ export default function CompanyLayout({
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [CompanyLayout] No user found, redirecting to login')
-        router.replace('/login?redirect_to=/company/dashboard')
+        router.replace('/bejelentkezes?redirect_to=/vallalkozas/kezdolap')
       } else if (isCompanyEmployee) {
         // Employee safety net: redirect to student dashboard
         console.log('ℹ️ [CompanyLayout] Employee detected, redirecting to student dashboard')

@@ -67,7 +67,7 @@ export function FramerNavbarScroll({ onMobileMenuToggle }: FramerNavbarScrollPro
                   </Button>
                 </Link>
               ) : (
-                <Link href="/login">
+                <Link href="/bejelentkezes">
                   <Button
                     size="sm"
                     className="bg-gray-900 hover:bg-gray-800 text-white px-5 py-2 text-sm rounded-full font-medium transition-all duration-200"

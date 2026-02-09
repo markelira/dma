@@ -3,6 +3,7 @@
 import { motion } from 'motion/react'
 import { Play, Video, BookOpen, GraduationCap, Mic } from 'lucide-react'
 import Link from 'next/link'
+import { getCourseUrl } from '@/lib/routing'
 
 interface FeaturedHeroBannerProps {
   course: {
@@ -106,7 +107,7 @@ export function FeaturedHeroBanner({
 
             {/* CTA Button */}
             <Link
-              href={`/courses/${course.id}`}
+              href={getCourseUrl(course)}
               className="inline-flex items-center gap-2 px-6 py-3 bg-white text-gray-900 rounded-lg font-medium hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
               <Play className="w-5 h-5" />

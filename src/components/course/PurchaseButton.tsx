@@ -137,7 +137,7 @@ const PurchaseButton: React.FC<PurchaseButtonProps> = ({
     // After auth, user will be redirected back and purchase will be triggered
     if (!user) {
       const currentUrl = window.location.pathname + window.location.search;
-      const authUrl = `/login?redirect_to=${encodeURIComponent(currentUrl)}&courseId=${currentCourseId}&purchaseIntent=true`;
+      const authUrl = `/bejelentkezes?redirect_to=${encodeURIComponent(currentUrl)}&courseId=${currentCourseId}&purchaseIntent=true`;
       console.log('[PurchaseButton - Handler] User not authenticated, redirecting to:', authUrl);
       router.push(authUrl);
       return;

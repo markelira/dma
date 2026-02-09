@@ -44,7 +44,7 @@ export function StripeCheckoutButton({
 
   const handleCheckout = async () => {
     if (!user) {
-      window.location.href = '/login';
+      window.location.href = '/bejelentkezes';
       return;
     }
 

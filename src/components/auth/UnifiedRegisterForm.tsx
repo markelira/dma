@@ -486,7 +486,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         if (result.data.alreadyCompleted) {
           // User already completed registration - redirect
           console.log('[Registration] User already completed registration, redirecting...');
-          router.push('/company/dashboard');
+          router.push('/vallalkozas/kezdolap');
           return;
         }
 
@@ -889,7 +889,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
         if (inviteData) {
           router.push('/dashboard');
         } else {
-          router.push('/company/dashboard');
+          router.push('/vallalkozas/kezdolap');
         }
       }
     } catch (err: any) {

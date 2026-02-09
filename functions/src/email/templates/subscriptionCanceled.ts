@@ -38,7 +38,7 @@ export async function sendSubscriptionCanceledEmail(
     ${createParagraph('Sajnáljuk, hogy elhagyod a fedélzetet. Előfizetésed a Struktúraépítő streaming platformon lejárt, így a fordulónapod után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.')}
     ${createParagraph('Ha mégis folytatnád, akkor kattints a gombra.')}
 
-    ${createButtonRow({ text: 'FOLYTATOM', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${createButtonRow({ text: 'FOLYTATOM', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -54,7 +54,7 @@ export async function sendSubscriptionCanceledEmail(
       'Ha mégis folytatnád, akkor kattints a gombra.',
     ],
     ctaText: 'FOLYTATOM',
-    ctaUrl: `${APP_URL}/company/dashboard/billing`,
+    ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

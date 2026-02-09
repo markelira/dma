@@ -46,7 +46,7 @@ export async function sendCompanySubscriptionCanceledEmail(
   const textContent = generatePlainText({
     greeting: `Szia ${employeeFirstName}!`,
     paragraphs: [
-      `A ${companyName} törölte a Struktúraépítő streaming platformon az előfizetést, így a fordulónapotok után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.`,
+      `A ${companyName} törölte a DMA Masterclass struktúraépítő streaming platformon az előfizetést, így a fordulónapotok után több kalandba már nem tudsz belevágni és elveszíted a Saját listás tartalmaidat is.`,
       'Ha mégis folytatnád, akkor győzd meg a főnöködet.',
     ],
     ctaText: 'MEGGYŐZÖM',

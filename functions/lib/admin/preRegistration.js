@@ -144,7 +144,7 @@ exports.createPreRegistration = (0, https_1.onCall)({
     console.log(`[createPreRegistration] Created pre-registration ${docRef.id} for ${normalizedEmail}`);
     // 8. Send pre-registration email
     const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
-    const registerUrl = `${APP_URL}/register?preregister=${token}`;
+    const registerUrl = `${APP_URL}/regisztracio?preregister=${token}`;
     try {
         const emailResult = await (0, preRegistration_1.sendPreRegistrationEmail)({
             firstName: firstName.trim(),

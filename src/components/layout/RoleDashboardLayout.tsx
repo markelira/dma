@@ -45,7 +45,7 @@ export function RoleDashboardLayout({ children, className }: Props) {
   // Redirect when unauthenticated (edge-case: hydration versus client) – the
   // navbar guard will normally handle this but we keep a safety net here.
   if (!isLoading && !isAuthenticated) {
-    if (typeof window !== 'undefined') router.push('/login')
+    if (typeof window !== 'undefined') router.push('/bejelentkezes')
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Redirecting…</p>

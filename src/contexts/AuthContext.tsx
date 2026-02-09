@@ -240,16 +240,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // Check if user needs to complete registration (pending payment)
         if ((enrichedUser as any)._needsRegistrationCompletion) {
           // Only redirect if not already on /register to avoid infinite loop
-          const isOnRegisterPage = typeof window !== 'undefined' && window.location.pathname === '/register';
+          const isOnRegisterPage = typeof window !== 'undefined' && (window.location.pathname === '/register' || window.location.pathname === '/regisztracio');
 
           if (!isOnRegisterPage) {
-            console.log('🔄 [AuthContext] User needs to complete registration, redirecting to /register...');
+            console.log('🔄 [AuthContext] User needs to complete registration, redirecting to /regisztracio...');
             setLoading(false);
             // Don't set user in state - redirect to register instead
-            router.push('/register');
+            router.push('/regisztracio');
             return;
           } else {
-            console.log('🔄 [AuthContext] User needs to complete registration, already on /register - setting user for recovery');
+            console.log('🔄 [AuthContext] User needs to complete registration, already on /regisztracio - setting user for recovery');
             // Remove the _needsRegistrationCompletion flag and set the user
             // so UnifiedRegisterForm can detect logged-in user and trigger recovery
             const cleanUser = { ...enrichedUser };
@@ -301,7 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         case UserRole.COMPANY_ADMIN:
         case UserRole.COMPANY_EMPLOYEE:
           // Company users go to dedicated company dashboard
-          router.push('/company/dashboard');
+          router.push('/vallalkozas/kezdolap');
           break;
         default:
           router.push('/dashboard');

@@ -345,11 +345,11 @@ export function CoursePaymentSection({
         {!user && (
           <div className="text-center text-sm text-muted-foreground p-3 bg-muted/50 rounded-lg">
             A vásárláshoz{' '}
-            <a href="/login" className="font-medium text-primary underline">
+            <a href="/bejelentkezes" className="font-medium text-primary underline">
               jelentkezzen be
             </a>
             {' '}vagy{' '}
-            <a href="/register" className="font-medium text-primary underline">
+            <a href="/regisztracio" className="font-medium text-primary underline">
               regisztráljon
             </a>
           </div>

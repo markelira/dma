@@ -73,14 +73,26 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 /**
- * Generate URL-friendly slugs from text
+ * Hungarian character transliteration map.
+ * Applied BEFORE NFD normalization since ő/ű (double-acute) don't decompose cleanly via NFD.
+ */
+const HUNGARIAN_CHAR_MAP: Record<string, string> = {
+  'á': 'a', 'Á': 'A', 'é': 'e', 'É': 'E', 'í': 'i', 'Í': 'I',
+  'ó': 'o', 'Ó': 'O', 'ö': 'o', 'Ö': 'O', 'ő': 'o', 'Ő': 'O',
+  'ú': 'u', 'Ú': 'U', 'ü': 'u', 'Ü': 'U', 'ű': 'u', 'Ű': 'U',
+};
+
+/**
+ * Generate URL-friendly slugs from text with proper Hungarian character support
  */
 export function slugify(text: string): string {
   return text
     .toString()
-    .toLowerCase()
     .trim()
-    // Remove accents/diacritics
+    // Transliterate Hungarian characters first (before NFD which fails on ő/ű)
+    .replace(/[áÁéÉíÍóÓöÖőŐúÚüÜűŰ]/g, (ch) => HUNGARIAN_CHAR_MAP[ch] || ch)
+    .toLowerCase()
+    // Remove remaining accents/diacritics via NFD
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     // Replace spaces and underscores with hyphens

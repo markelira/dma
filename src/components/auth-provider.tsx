@@ -95,10 +95,10 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
 
                 if (pendingResult.data.found && pendingResult.data.data) {
                   // Only redirect if not already on /register to avoid infinite loop
-                  const isOnRegisterPage = typeof window !== 'undefined' && window.location.pathname === '/register'
+                  const isOnRegisterPage = typeof window !== 'undefined' && (window.location.pathname === '/register' || window.location.pathname === '/regisztracio')
 
                   if (!isOnRegisterPage) {
-                    console.log('🔄 [AuthProvider] User has pending registration, redirecting to /register...')
+                    console.log('🔄 [AuthProvider] User has pending registration, redirecting to /regisztracio...')
                     // Set minimal auth for redirect
                     const userData: User = {
                       id: fbUser.uid,
@@ -111,10 +111,10 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
                     setAuth(userData, idToken)
                     setAuthReady(true)
                     // Redirect to register to complete registration
-                    window.location.href = '/register'
+                    window.location.href = '/regisztracio'
                     return
                   } else {
-                    console.log('🔄 [AuthProvider] User has pending registration, already on /register - no redirect needed')
+                    console.log('🔄 [AuthProvider] User has pending registration, already on /regisztracio - no redirect needed')
                   }
                 }
               } catch (pendingError) {

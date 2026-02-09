@@ -7,8 +7,8 @@ export const API_BASE_URL =
 
 export const ROUTES = {
   HOME: '/',
-  LOGIN: '/login',
-  REGISTER: '/register',
+  LOGIN: '/bejelentkezes',
+  REGISTER: '/regisztracio',
   DASHBOARD: '/dashboard',
   COURSES: '/courses',
   COURSE_DETAILS: '/courses/:id',

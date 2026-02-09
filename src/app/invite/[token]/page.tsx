@@ -31,13 +31,13 @@ export default function TeamInviteAcceptancePage() {
   // If user is not logged in, redirect to login with return URL
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push(`/login?redirect_to=/invite/${token}`);
+      router.push(`/bejelentkezes?redirect_to=/invite/${token}`);
     }
   }, [authLoading, user, router, token]);
 
   const handleAcceptInvite = async () => {
     if (!user) {
-      router.push(`/login?redirect_to=/invite/${token}`);
+      router.push(`/bejelentkezes?redirect_to=/invite/${token}`);
       return;
     }
 
@@ -70,7 +70,7 @@ export default function TeamInviteAcceptancePage() {
       console.error('Error accepting team invite:', err);
 
       if (err.code === 'functions/unauthenticated') {
-        router.push(`/login?redirect_to=/invite/${token}`);
+        router.push(`/bejelentkezes?redirect_to=/invite/${token}`);
       } else if (err.message?.includes('expired')) {
         setError('Ez a meghívó lejárt. Kérj új meghívót a csapat tulajdonosától.');
       } else if (err.message?.includes('not found') || err.message?.includes('No member found')) {

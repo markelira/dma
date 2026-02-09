@@ -9,6 +9,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { toast } from "sonner";
 import { calculateCourseDuration, formatDurationHungarian } from "@/lib/carouselUtils";
 import { CoursePreviewModal } from "@/components/course-preview";
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 
 // Move utility functions OUTSIDE component to prevent recreation on every render
 const getCourseTypeLabel = (courseType?: string): string | null => {
@@ -209,9 +210,9 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
   // Handle card click - subscribers with started courses go to player
   const handleCardClick = () => {
     if (isSubscriber && hasStarted && currentLessonId) {
-      router.push(`/courses/${course.id}/player/${currentLessonId}`);
+      router.push(getCoursePlayerUrl(course, currentLessonId));
     } else {
-      router.push(`/courses/${course.id}`);
+      router.push(getCourseUrl(course));
     }
   };
 
@@ -219,7 +220,7 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
     e.stopPropagation(); // Prevent card click navigation
 
     if (!user) {
-      router.push('/login');
+      router.push('/bejelentkezes');
       return;
     }
 
@@ -238,10 +239,10 @@ export const PremiumCourseCard = React.memo(function PremiumCourseCard({
     e.stopPropagation();
     const lessonId = currentLessonId || enrollment?.firstLessonId;
     if (lessonId) {
-      router.push(`/courses/${course.id}/player/${lessonId}`);
+      router.push(getCoursePlayerUrl(course, lessonId));
     } else {
       // No lesson ID available, go to course detail page
-      router.push(`/courses/${course.id}`);
+      router.push(getCourseUrl(course));
     }
   };
 

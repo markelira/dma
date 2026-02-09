@@ -107,7 +107,7 @@ export async function sendNewCourseEmail(
     ].filter(Boolean),
     ctaText: 'Megnézem',
     ctaUrl: contentUrl,
-    signOff: 'Üdvözlettel, A DMA csapat',
+    signOff: 'Üdvözlettel, A DMA csapata',
   });
 
   try {

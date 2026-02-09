@@ -164,7 +164,7 @@ export default function CompanyInvoicesPage() {
               Az előfizetéshez kapcsolódó számlák itt fognak megjelenni
             </p>
             <Link
-              href="/company/dashboard/subscription"
+              href="/vallalkozas/kezdolap/subscription"
               className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary-hover transition-colors"
             >
               Előfizetés kezelése

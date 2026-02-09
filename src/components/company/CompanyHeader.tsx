@@ -13,7 +13,7 @@ interface CompanyHeaderProps {
 export function CompanyHeader({
   companyName,
   showBackButton = false,
-  backHref = '/company/dashboard',
+  backHref = '/vallalkozas/kezdolap',
   title,
   subtitle,
   actions

@@ -19,6 +19,7 @@ import {
   Filter,
   ChevronDown
 } from 'lucide-react'
+import { getCourseUrl } from '@/lib/routing'
 import { db } from '@/lib/firebase'
 import { collection, query, orderBy, onSnapshot, limit } from 'firebase/firestore'
 
@@ -316,7 +317,7 @@ export default function TrendingPage() {
                       className="gap-1 group-hover:text-primary"
                       asChild
                     >
-                      <Link href={`/courses/${course.id}`}>
+                      <Link href={getCourseUrl(course)}>
                         <Play className="w-4 h-4" />
                         Kezdés
                       </Link>

@@ -77,7 +77,7 @@ export default function CompanyVezerlopultPage() {
   useEffect(() => {
     const fetchCompanyData = async () => {
       if (!user) {
-        router.push('/login?redirect_to=/company/dashboard');
+        router.push('/bejelentkezes?redirect_to=/vallalkozas/kezdolap');
         return;
       }
 
@@ -212,8 +212,8 @@ export default function CompanyVezerlopultPage() {
     try {
       const result = await subscribeToPlan(
         COMPANY_SUBSCRIPTION_PRICE_ID,
-        `${window.location.origin}/company/dashboard?subscription=success`,
-        `${window.location.origin}/company/dashboard?subscription=cancelled`,
+        `${window.location.origin}/vallalkozas/kezdolap?subscription=success`,
+        `${window.location.origin}/vallalkozas/kezdolap?subscription=cancelled`,
         {
           companyId: company?.id || '',
           subscriptionType: 'company'
@@ -256,7 +256,7 @@ export default function CompanyVezerlopultPage() {
             Úgy tűnik, még nincs vállalati fiókod, vagy nem vagy admin.
           </p>
           <Link
-            href="/register"
+            href="/regisztracio"
             className="inline-flex items-center justify-center px-6 py-3 bg-brand-secondary text-white rounded-lg font-medium hover:bg-brand-secondary-hover transition-colors"
           >
             Vállalat regisztrálása
@@ -401,7 +401,7 @@ export default function CompanyVezerlopultPage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link
-            href="/company/dashboard/employees"
+            href="/vallalkozas/kezdolap/employees"
             className="group flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-brand-secondary/5 hover:border-brand-secondary/20 transition-all"
           >
             <div className="w-10 h-10 rounded-lg bg-brand-secondary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-brand-secondary/20 transition-colors">
@@ -414,7 +414,7 @@ export default function CompanyVezerlopultPage() {
           </Link>
 
           <Link
-            href="/company/dashboard/courses"
+            href="/vallalkozas/kezdolap/courses"
             className="group flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-purple-50 hover:border-purple-200 transition-all"
           >
             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0 group-hover:bg-purple-200 transition-colors">
@@ -427,7 +427,7 @@ export default function CompanyVezerlopultPage() {
           </Link>
 
           <Link
-            href="/company/dashboard/progress"
+            href="/vallalkozas/kezdolap/progress"
             className="group flex items-center space-x-3 p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-green-50 hover:border-green-200 transition-all"
           >
             <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-200 transition-colors">

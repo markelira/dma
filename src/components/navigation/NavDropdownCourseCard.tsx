@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Course, Instructor } from '@/types';
+import { getCourseUrl } from '@/lib/routing';
 
 interface NavDropdownCourseCardProps {
   course: Course;
@@ -11,7 +12,7 @@ interface NavDropdownCourseCardProps {
 }
 
 export function NavDropdownCourseCard({ course, variant }: NavDropdownCourseCardProps) {
-  const courseUrl = `/courses/${course.id}`;
+  const courseUrl = getCourseUrl(course);
 
   if (variant === 'featured') {
     return (

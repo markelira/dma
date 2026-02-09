@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react'
 import { Search, X, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { MultiSelectDropdown } from '@/components/ui/MultiSelectDropdown'
+import { getCourseUrl } from '@/lib/routing'
 
 interface Course {
   id: string
@@ -168,7 +169,7 @@ export function AdvancedFilterBar({
                 {suggestions.map((course) => (
                   <Link
                     key={course.id}
-                    href={`/courses/${course.id}`}
+                    href={getCourseUrl(course)}
                     onClick={() => {
                       setShowSuggestions(false)
                       setSearchQuery('')

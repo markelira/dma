@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { usePersonalizedRecommendations, useTrendingCourses, useCoursesCatalog, CatalogCourse, CourseCatalogFilters } from '@/hooks/useCoursesCatalog'
 import { brandGradient, buttonStyles, cardStyles } from '@/lib/design-tokens'
+import { getCourseUrl } from '@/lib/routing'
 
 /**
  * Browse Courses Section - Hybrid Discovery Interface
@@ -381,7 +382,7 @@ function CourseCard({
             <Badge className={getDifficultyColor(course.difficulty)}>
               {getDifficultyLabel(course.difficulty)}
             </Badge>
-            <Link href={`/courses/${course.id}`}>
+            <Link href={getCourseUrl(course)}>
               <Button size="sm" className="bg-gray-900 hover:bg-[#466C95] text-white transition-colors">
                 {course.isEnrolled ? 'Folytatás' : 'Részletek'}
               </Button>

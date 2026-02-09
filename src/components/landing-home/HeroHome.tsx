@@ -83,7 +83,7 @@ export default function HeroHome() {
                 >
                   <a
                     className="btn group mb-4 w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
-                    href="/register"
+                    href="/regisztracio"
                   >
                     <span className="relative inline-flex items-center">
                       Ingyenes próba{" "}

@@ -390,7 +390,7 @@ export function withAuth<P extends object>(
 ) {
   return function AuthenticatedComponent(props: P) {
     const { user, userContext, loading, hasRole } = useAuth();
-    const { requireAuth = true, requiredRole, fallbackPath = '/login' } = options;
+    const { requireAuth = true, requiredRole, fallbackPath = '/bejelentkezes' } = options;
 
     // Show loading state
     if (loading) {

@@ -98,7 +98,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
               <li>
                 <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="/login"
+                  href="/bejelentkezes"
                 >
                   Bejelentkezés
                 </Link>
@@ -106,7 +106,7 @@ export default function Footer({ border = false }: { border?: boolean }) {
               <li>
                 <Link
                   className="text-gray-600 transition hover:text-gray-900"
-                  href="/register"
+                  href="/regisztracio"
                 >
                   Regisztráció
                 </Link>

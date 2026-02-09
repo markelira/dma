@@ -92,7 +92,7 @@ export default function CompanyCoursesPage() {
   // Redirect if not logged in
   useEffect(() => {
     if (authReady && !authLoading && !user) {
-      router.push('/login?redirect_to=/company/dashboard/courses');
+      router.push('/bejelentkezes?redirect_to=/vallalkozas/kezdolap/courses');
     }
   }, [user, authLoading, authReady, router]);
 
@@ -292,7 +292,7 @@ export default function CompanyCoursesPage() {
             onClick={() => {
               setSelectedCategoryId(null);
               setSelectedAudienceId(null);
-              router.push('/company/dashboard/courses');
+              router.push('/vallalkozas/kezdolap/courses');
             }}
             className="text-brand-secondary hover:text-brand-secondary/80 font-medium"
           >

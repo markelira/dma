@@ -222,7 +222,7 @@ exports.completeCompanyOnboarding = v2_1.https.onCall({
                 batch.set(employeeRef, employeeData);
                 employeesInvited++;
                 // Send invitation email (non-blocking)
-                const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/invite/${inviteToken}`;
+                const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/vallalkozas/meghivo/${inviteToken}`;
                 try {
                     await (0, employeeInvite_1.sendInvitationEmail)(employee.email.trim().toLowerCase(), {
                         firstName: employee.firstName.trim(),

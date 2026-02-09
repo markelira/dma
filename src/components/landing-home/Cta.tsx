@@ -38,7 +38,7 @@ export default function Cta() {
             <div className="mx-auto max-w-xs sm:flex sm:max-w-none sm:justify-center sm:gap-4">
               <a
                 className="btn group mb-4 w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] sm:mb-0 sm:w-auto"
-                href="/register"
+                href="/regisztracio"
               >
                 <span className="relative inline-flex items-center">
                   Ingyenes próba indítása{" "}

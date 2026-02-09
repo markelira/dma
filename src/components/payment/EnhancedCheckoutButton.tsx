@@ -89,7 +89,7 @@ export function EnhancedCheckoutButton({
 
     if (!user) {
       console.log('❌ [CHECKOUT] No user, redirecting to login');
-      window.location.href = '/login';
+      window.location.href = '/bejelentkezes';
       return;
     }
 
@@ -334,11 +334,11 @@ export function EnhancedCheckoutButton({
           <Alert>
             <AlertDescription className="text-center">
               A vásárláshoz először{' '}
-              <a href="/login" className="font-medium underline">
+              <a href="/bejelentkezes" className="font-medium underline">
                 jelentkezzen be
               </a>
               {' '}vagy{' '}
-              <a href="/register" className="font-medium underline">
+              <a href="/regisztracio" className="font-medium underline">
                 regisztráljon
               </a>
               .

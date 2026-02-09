@@ -17,6 +17,7 @@ import { useEnrollInCourse } from '@/hooks/useCourseQueries';
 import { useAuthStore } from '@/stores/authStore';
 import { toast } from 'sonner';
 import { COURSE_TYPE_LABELS, CourseType } from '@/types';
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 
 interface CoursePreviewModalProps {
   /** Course ID to preview */
@@ -121,23 +122,23 @@ export function CoursePreviewModal({
 
     const lessonId = currentLessonId || firstLessonId || getFirstLessonId(data.course);
     if (lessonId) {
-      router.push(`/courses/${data.course.id}/player/${lessonId}`);
+      router.push(getCoursePlayerUrl(data.course, lessonId));
       handleClose();
     } else {
-      router.push(`/courses/${data.course.id}`);
+      router.push(getCourseUrl(data.course));
       handleClose();
     }
   };
 
   const handleViewDetails = () => {
     if (!data?.course) return;
-    router.push(`/courses/${data.course.id}`);
+    router.push(getCourseUrl(data.course));
     handleClose();
   };
 
   const handleEnroll = async () => {
     if (!user) {
-      router.push('/login');
+      router.push('/bejelentkezes');
       return;
     }
 

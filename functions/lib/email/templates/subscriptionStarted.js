@@ -19,7 +19,7 @@ async function sendSubscriptionStartedEmail(data) {
     ${(0, base_1.createParagraph)('Vásárlásod sikeres volt.')}
     ${(0, base_1.createParagraph)('A Struktúraépítő streaming platform több mint 150 cégépítési tartalma megnyílt számodra. Egy izgalmas kaland egyedül nem is olyan jó. Hívj meg 5 munkatársat teljesen ingyen, hogy együtt építsetek struktúrált és önjáró vállalkozást.')}
 
-    ${(0, base_1.createButtonRow)({ text: 'MEGHÍVÁS', url: `${APP_URL}/company/dashboard/employees`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'MEGHÍVÁS', url: `${APP_URL}/vallalkozas/kezdolap/employees`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -32,7 +32,7 @@ async function sendSubscriptionStartedEmail(data) {
             'A Struktúraépítő streaming platform több mint 150 cégépítési tartalma megnyílt számodra. Egy izgalmas kaland egyedül nem is olyan jó. Hívj meg 5 munkatársat teljesen ingyen, hogy együtt építsetek struktúrált és önjáró vállalkozást.',
         ],
         ctaText: 'MEGHÍVÁS',
-        ctaUrl: `${APP_URL}/company/dashboard/employees`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap/employees`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

@@ -4,6 +4,7 @@ import React from 'react'
 import Link from 'next/link'
 import { Star, Users, Clock } from 'lucide-react'
 import { useRecommendedCourses } from '@/hooks/useRecommendedCourses'
+import { getCourseUrl } from '@/lib/routing'
 
 /**
  * Recommended Courses Component
@@ -57,7 +58,7 @@ export function RecommendedCourses() {
           courses.map((course) => (
             <Link
               key={course.id}
-              href={`/courses/${course.id}`}
+              href={getCourseUrl(course)}
               className="block rounded-lg border border-gray-800 p-4 transition-all hover:border-gray-700 hover:bg-gray-800/50"
             >
               {/* Course Title */}

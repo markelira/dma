@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Bejelentkezés | DMA Masterclass',
     description: 'Jelentkezz be a DMA Masterclass fiókodba.',
-    url: 'https://masterclass.dma.hu/login',
+    url: 'https://masterclass.dma.hu/bejelentkezes',
   },
   robots: {
     index: false,

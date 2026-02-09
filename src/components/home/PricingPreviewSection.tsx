@@ -193,7 +193,7 @@ export function PricingPreviewSection() {
                           ? 'bg-gradient-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary'
                           : 'bg-gray-900 hover:bg-gray-800'
                       } text-white font-bold py-6 text-base`}
-                      onClick={() => router.push('/register')}
+                      onClick={() => router.push('/regisztracio')}
                     >
                       Kezdd el most
                     </Button>
@@ -216,7 +216,7 @@ export function PricingPreviewSection() {
             variant="outline"
             size="lg"
             className="group border-2 border-primary text-primary hover:bg-gray-50 font-bold px-8 py-6 text-base"
-            onClick={() => router.push('/register')}
+            onClick={() => router.push('/regisztracio')}
           >
             Részletes árazás megtekintése
             <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

@@ -96,7 +96,7 @@ export default function LessonPage() {
   }
   
   if (!isAuthenticated || !user) {
-    router.push('/login')
+    router.push('/bejelentkezes')
     return null
   }
 

@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
+import { getCourseUrl } from '@/lib/routing';
 
 export default function PurchaseCoursePage() {
   const params = useParams();
@@ -126,7 +127,7 @@ export default function PurchaseCoursePage() {
             Hozzáférése van az összes tartalomhoz.
           </p>
           <Button asChild>
-            <Link href={`/courses/${course.id}/learn`}>
+            <Link href={`${getCourseUrl(course)}/learn`}>
               Tartalom folytatása
             </Link>
           </Button>
@@ -168,7 +169,7 @@ export default function PurchaseCoursePage() {
       <div className="container mx-auto px-4 py-8">
         {/* Back Button */}
         <Link 
-          href={`/courses/${course.id}`}
+          href={getCourseUrl(course)}
           className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -356,12 +357,12 @@ export default function PurchaseCoursePage() {
                       </p>
                       <div className="space-y-3">
                         <Button asChild className="w-full">
-                          <Link href={`/login?redirect=${encodeURIComponent(`/courses/${course.id}/purchase`)}`}>
+                          <Link href={`/bejelentkezes?redirect=${encodeURIComponent(`${getCourseUrl(course)}/purchase`)}`}>
                             Bejelentkezés
                           </Link>
                         </Button>
                         <Button asChild variant="outline" className="w-full">
-                          <Link href={`/register?redirect=${encodeURIComponent(`/courses/${course.id}/purchase`)}`}>
+                          <Link href={`/regisztracio?redirect=${encodeURIComponent(`${getCourseUrl(course)}/purchase`)}`}>
                             Regisztráció
                           </Link>
                         </Button>

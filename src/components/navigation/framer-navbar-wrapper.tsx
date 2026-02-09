@@ -213,7 +213,7 @@ export function FramerNavbarWrapper() {
                     Kijelentkezés
                   </Button>
                 ) : (
-                  <Link href="/login" onClick={closeMobileMenu} className="block">
+                  <Link href="/bejelentkezes" onClick={closeMobileMenu} className="block">
                     <Button
                       className="w-full bg-[#E72B36] hover:bg-[#d42530] text-white py-3 rounded-xl font-medium min-h-[48px]"
                     >

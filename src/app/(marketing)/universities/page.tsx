@@ -273,7 +273,7 @@ export default async function UniversitiesPage() {
               Tartalmak böngészése
             </a>
             <a
-              href="/register"
+              href="/regisztracio"
               className="bg-primary-dark text-white px-8 py-3 rounded-lg font-bold hover:bg-primary transition-colors border border-white/20"
             >
               Regisztráció

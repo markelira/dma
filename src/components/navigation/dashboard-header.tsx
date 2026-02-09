@@ -58,7 +58,7 @@ export function DashboardHeader() {
       await signOut(auth)
       clearAuth()
       toast.success('Sikeres kijelentkezés')
-      router.push('/login')
+      router.push('/bejelentkezes')
     } catch (error) {
       console.error('Logout error:', error)
       toast.error('Hiba történt a kijelentkezés során')

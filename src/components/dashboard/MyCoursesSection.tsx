@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress'
 import { UserProgressData, EnrolledCourse, CourseState, CourseFilter, CourseFilterOption } from '@/types'
 import { CourseCard } from './CourseCard'
 import { brandGradient, buttonStyles } from '@/lib/design-tokens'
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing'
 
 /**
  * My Courses Section
@@ -68,7 +69,7 @@ export function MyCoursesSection({ data, isLoading = false }: MyCoursesProps) {
     const identifier = course?.slug || courseId
     // Navigate to the first lesson directly
     // Assuming lessons start with lesson-1 or similar pattern
-    window.location.href = `/courses/${identifier}/learn`
+    window.location.href = `${getCourseUrl({ id: courseId, courseType: course?.courseType, slug: course?.slug })}/learn`
   }
 
   const handleContinueCourse = (courseId: string) => {
@@ -77,7 +78,7 @@ export function MyCoursesSection({ data, isLoading = false }: MyCoursesProps) {
     const identifier = course?.slug || courseId
     // If there's a last accessed lesson, go there, otherwise go to first lesson
     const lastLessonId = course?.lastAccessedLessonId || 'lesson-1'
-    window.location.href = `/courses/${identifier}/player/${lastLessonId}`
+    window.location.href = `${getCoursePlayerUrl({ id: courseId, courseType: course?.courseType, slug: course?.slug }, lastLessonId)}`
   }
 
   const handleViewCertificate = (certificateUrl: string) => {

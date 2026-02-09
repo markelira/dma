@@ -4,6 +4,7 @@ import { useCourse } from '@/hooks/useCourseQueries'
 import { useRouter, useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import { getCourseUrl } from '@/lib/routing'
 
 export default function CourseEnrollPage() {
   const params = useParams<{ courseId: string }>()
@@ -22,11 +23,11 @@ export default function CourseEnrollPage() {
   const handleMockPay = () => {
     toast.success('Redirecting to payment processor... (mock)')
     // Simulate redirect back with success param
-    router.push(`/courses/${courseId}?success=1`)
+    router.push(`${getCourseUrl(course)}?success=1`)
   }
 
   const handleCancel = () => {
-    router.push(`/courses/${courseId}?canceled=1`)
+    router.push(`${getCourseUrl(course)}?canceled=1`)
   }
 
   return (

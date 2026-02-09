@@ -161,7 +161,7 @@ export const useAuthErrorHandling = () => {
       
       // Redirect to login after short delay
       setTimeout(() => {
-        router.push('/auth/login?redirect=' + encodeURIComponent(window.location.pathname))
+        router.push('/bejelentkezes?redirect=' + encodeURIComponent(window.location.pathname))
       }, 2000)
       
       return appError

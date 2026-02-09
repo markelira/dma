@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { UserProgressData, EnrolledCourse } from '@/types'
 import { brandGradient, buttonStyles, cardStyles } from '@/lib/design-tokens'
 import { COURSE_COMPLETION_THRESHOLD } from '@/lib/progress'
+import { getCourseUrl } from '@/lib/routing'
 
 /**
  * Continue Learning Section
@@ -213,7 +214,7 @@ export function ContinueLearningSection({ data, isLoading = false }: ContinueLea
               )}
 
               {/* Continue Button */}
-              <Link href={`/courses/${course.slug || course.courseId}/player`} className="block">
+              <Link href={`${getCourseUrl({ id: course.courseId, courseType: course.courseType, slug: course.slug })}/player`} className="block">
                 <button className={`w-full ${buttonStyles.primaryLight} !rounded-lg !py-2.5`}>
                   <Play className="w-4 h-4" />
                   <span>Tanulás folytatása</span>

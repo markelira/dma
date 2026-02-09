@@ -16,10 +16,12 @@ const TRIAL_RETURN_URL_KEY = 'trialReturnTo';
  */
 export function useTrialPopup() {
   const { user, isLoading: authLoading, authReady } = useAuthStore();
-  const { data: subscription, isLoading: subLoading } = useSubscriptionStatus();
+  const { data: subscription, isLoading: subLoading, isFetched: subFetched } = useSubscriptionStatus();
 
   const isAuthenticated = !!user;
-  const isLoading = authLoading || subLoading || !authReady;
+  // Also check isFetched to prevent race condition where isLoading becomes false
+  // before data arrives (causes modal flash for active subscribers)
+  const isLoading = authLoading || subLoading || !authReady || (isAuthenticated && !subFetched);
   const hasUsedTrial = subscription?.hasUsedTrial || false;
 
   // Check if popup was dismissed this session
@@ -71,6 +73,7 @@ export function useTrialPopup() {
     isAuthenticated,
     hasActiveSubscription: subscription?.isActive ?? false,
     hasUsedTrial,
+    subscriptionFetched: subFetched,
 
     // Actions
     dismiss,

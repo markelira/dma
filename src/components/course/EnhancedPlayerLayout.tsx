@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -118,12 +119,12 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
           break
         case 'ArrowLeft':
           if (e.shiftKey && prevLesson) {
-            router.push(`/courses/${course.id}/player/${prevLesson.id}`)
+            router.push(getCoursePlayerUrl(course, prevLesson.id))
           }
           break
         case 'ArrowRight':
           if (e.shiftKey && nextLesson) {
-            router.push(`/courses/${course.id}/player/${nextLesson.id}`)
+            router.push(getCoursePlayerUrl(course, nextLesson.id))
           }
           break
         case 'f':
@@ -145,7 +146,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
   }, [sidebarOpen, prevLesson, nextLesson, course.id, router, isFullscreen, showHelp])
 
   const handleLessonSelect = useCallback((lessonId: string) => {
-    router.push(`/courses/${course.id}/player/${lessonId}`)
+    router.push(getCoursePlayerUrl(course, lessonId))
   }, [course.id, router])
 
   const handleToggleFullscreen = () => {
@@ -347,7 +348,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                 variant="ghost"
                 size="sm"
                 disabled={!prevLesson}
-                onClick={() => prevLesson && router.push(`/courses/${course.id}/player/${prevLesson.id}`)}
+                onClick={() => prevLesson && router.push(getCoursePlayerUrl(course, prevLesson.id))}
               >
                 Előző
               </Button>
@@ -355,7 +356,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                 variant="ghost"
                 size="sm"
                 disabled={!nextLesson}
-                onClick={() => nextLesson && router.push(`/courses/${course.id}/player/${nextLesson.id}`)}
+                onClick={() => nextLesson && router.push(getCoursePlayerUrl(course, nextLesson.id))}
               >
                 Következő
               </Button>
@@ -375,7 +376,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                 <p className="text-gray-300 mb-6">
                   Ez a lecke csak előfizetőknek érhető el. Kezdje el az előfizetést a teljes tartalom eléréséhez.
                 </p>
-                <Button onClick={() => router.push(`/courses/${course.id}`)}>
+                <Button onClick={() => router.push(getCourseUrl(course))}>
                   Előfizetés indítása
                 </Button>
               </div>
@@ -425,7 +426,7 @@ export const EnhancedPlayerLayout: React.FC<EnhancedPlayerLayoutProps> = ({
                 </Button>
 
                 {nextLesson && (
-                  <Button onClick={() => router.push(`/courses/${course.id}/player/${nextLesson.id}`)}>
+                  <Button onClick={() => router.push(getCoursePlayerUrl(course, nextLesson.id))}>
                     Következő lecke
                     <ChevronLeft className="w-4 h-4 ml-2 rotate-180" />
                   </Button>

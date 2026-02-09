@@ -2,6 +2,7 @@
 
 import { CourseCardProps, EnrolledCourse, CourseState } from '@/types'
 import { UniversalCourseCard } from '@/components/ui/UniversalCourseCard'
+import { getCourseUrl } from '@/lib/routing'
 
 /**
  * Dashboard Course Card Component
@@ -27,7 +28,7 @@ export function CourseCard({
         onStart?.(course.courseId)
         break
       case 'details':
-        window.location.href = `/courses/${course.slug || course.courseId}`
+        window.location.href = getCourseUrl({ id: course.courseId, courseType: course.courseType, slug: course.slug })
         break
       case 'certificate':
         if (course.certificateUrl) {

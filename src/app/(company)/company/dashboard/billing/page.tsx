@@ -112,7 +112,7 @@ export default function CompanyBillingPage() {
       const result = await createCheckoutSessionFn({
         priceId: 'price_1SdoIlGe8tBqGEXM2uyTAihs',  // Monthly subscription price ID (14,990 HUF/mo)
         successUrl: `${window.location.origin}/payment/success?subscription_success=true`,
-        cancelUrl: `${window.location.origin}/company/dashboard/billing`
+        cancelUrl: `${window.location.origin}/vallalkozas/kezdolap/billing`
       }) as { data: { success?: boolean; data?: { url?: string } } }
 
       console.log('[Billing] Checkout session result:', result)

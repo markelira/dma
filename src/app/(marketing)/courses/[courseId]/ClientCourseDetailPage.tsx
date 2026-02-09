@@ -28,6 +28,7 @@ import { useSubscriptionStatus } from '@/hooks/useSubscriptionStatus';
 import { motion } from "motion/react";
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { getCourseTypeTerminology, getDefaultInstructorRole } from '@/lib/terminology';
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 import { CourseType } from '@/types';
 
 export default function ClientCourseDetailPage({ id }: { id: string }) {
@@ -255,10 +256,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     if (success) {
       toast.success('Sikeres beiratkozás! A tartalomhoz hozzáférsz.');
       queryClient.invalidateQueries({ queryKey: ['course', id] });
-      router.replace(`/courses/${id}`);
+      router.replace(course ? getCourseUrl(course) : `/courses/${id}`);
     } else if (canceled) {
       toast.error('A fizetés megszakítva.');
-      router.replace(`/courses/${id}`);
+      router.replace(course ? getCourseUrl(course) : `/courses/${id}`);
     }
   }, [searchParams, id, queryClient, router]);
 
@@ -389,9 +390,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
 
     // SCENARIO 3: Has subscription - proceed to player
     const firstLessonId = await getFirstLessonId(id);
+    const courseObj = course || { id, courseType: undefined, slug: undefined };
     const playerUrl = firstLessonId
-      ? `/courses/${id}/player/${firstLessonId}`
-      : `/courses/${id}`;
+      ? getCoursePlayerUrl(courseObj, firstLessonId)
+      : getCourseUrl(courseObj);
 
     // Redirect immediately to player
     router.push(playerUrl);
@@ -421,11 +423,13 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
   const handleTrialStart = () => {
     if (trialVariant === 'course-unauth') {
       // Store return URL, redirect to auth with trial flag
-      sessionStorage.setItem('trialReturnTo', `/courses/${id}`);
-      router.push(`/login?redirect_to=${encodeURIComponent(`/courses/${id}`)}&trial=true`);
+      const courseUrl = course ? getCourseUrl(course) : `/courses/${id}`;
+      sessionStorage.setItem('trialReturnTo', courseUrl);
+      router.push(`/bejelentkezes?redirect_to=${encodeURIComponent(courseUrl)}&trial=true`);
     } else {
       // Authenticated user - go to Stripe checkout
-      router.push(`/subscribe/start?plan=monthly&returnTo=${encodeURIComponent(`/courses/${id}`)}`);
+      const courseUrl = course ? getCourseUrl(course) : `/courses/${id}`;
+      router.push(`/subscribe/start?plan=monthly&returnTo=${encodeURIComponent(courseUrl)}`);
     }
   };
 
@@ -695,7 +699,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
             open={showSubscriptionModal}
             onOpenChange={setShowSubscriptionModal}
             courseName={c.title}
-            returnTo={`/courses/${id}`}
+            returnTo={course ? getCourseUrl(course) : `/courses/${id}`}
           />
         )}
 

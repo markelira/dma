@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Users, BookOpen, ChevronDown } from 'lucide-react'
+import { getCourseUrl } from '@/lib/routing'
 
 interface PublicCourse {
   id: string
@@ -32,7 +33,7 @@ interface InteractiveCourseSectionProps {
 function CourseCardSmall({ course }: { course: PublicCourse }) {
   return (
     <Link
-      href={`/courses/${course.id}`}
+      href={getCourseUrl(course)}
       className="bg-white rounded-lg shadow-card hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col group"
     >
       <div className="relative h-40 bg-gray-200 rounded-t-lg overflow-hidden">

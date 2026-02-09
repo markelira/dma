@@ -12,18 +12,15 @@ import {
   CompanyAdmin,
   OWNER_PERMISSIONS,
 } from '../types/company';
+import { slugify } from '../utils/slugify';
 
 const db = admin.firestore();
 
 /**
- * Generate URL-friendly slug from company name
+ * Generate URL-friendly slug from company name (with length limit)
  */
 function generateSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-') // Replace non-alphanumeric with hyphens
-    .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-    .substring(0, 50); // Limit to 50 characters
+  return slugify(name).substring(0, 50);
 }
 
 /**
@@ -163,7 +160,7 @@ export const createCompany = https.onCall(
       // 6. Send welcome email (plain text for MVP)
       await sendWelcomeEmail(billingEmail, {
         companyName: name,
-        dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/dashboard`,
+        dashboardUrl: `${process.env.APP_URL || 'https://masterclass.dma.hu'}/vallalkozas/kezdolap`,
       });
 
       return {

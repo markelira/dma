@@ -35,7 +35,7 @@ export function CourseraHero() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <Link
-              href="/register"
+              href="/regisztracio"
               className="inline-block px-8 py-3 text-base font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors shadow-md hover:shadow-lg"
             >
               Join for Free

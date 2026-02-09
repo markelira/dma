@@ -115,8 +115,8 @@ export default function ForgotPasswordPage() {
               <div className="text-center text-sm space-y-2">
                 <div>
                   <span className="text-gray-600">Emlékszel a jelszavadra? </span>
-                  <Link 
-                    href="/login" 
+                  <Link
+                    href="/bejelentkezes"
                     className="text-purple-600 hover:text-purple-800 hover:underline"
                   >
                     Bejelentkezés
@@ -124,8 +124,8 @@ export default function ForgotPasswordPage() {
                 </div>
                 <div>
                   <span className="text-gray-600">Még nincs fiókod? </span>
-                  <Link 
-                    href="/register" 
+                  <Link
+                    href="/regisztracio"
                     className="text-purple-600 hover:text-purple-800 hover:underline"
                   >
                     Regisztráció
@@ -184,7 +184,7 @@ export default function ForgotPasswordPage() {
                     Új link kérése
                   </Button>
                   
-                  <Link href="/login" className="block">
+                  <Link href="/bejelentkezes" className="block">
                     <Button variant="ghost" className="w-full">
                       Vissza a bejelentkezéshez
                     </Button>

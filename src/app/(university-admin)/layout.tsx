@@ -22,7 +22,7 @@ export default function UniversityAdminLayout({ children }: UniversityAdminLayou
       // Check if user is authenticated and has university_admin or UNIVERSITY_ADMIN role
       if (!user || (user.role !== 'UNIVERSITY_ADMIN' && user.role !== 'university_admin')) {
         console.log('❌ [UniversityAdminLayout] Unauthorized access, redirecting to login');
-        router.replace('/login?redirect_to=/university-admin/dashboard');
+        router.replace('/bejelentkezes?redirect_to=/university-admin/dashboard');
       }
     }
   }, [user, isLoading, authReady, router]);

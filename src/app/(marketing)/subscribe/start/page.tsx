@@ -28,7 +28,7 @@ export default function SubscribeStartPage() {
     if (!user) {
       console.log('[SubscribeStart] User not authenticated, redirecting to login');
       const returnUrl = encodeURIComponent('/subscribe/start');
-      router.push(`/login?redirect_to=${returnUrl}&subscribeIntent=true`);
+      router.push(`/bejelentkezes?redirect_to=${returnUrl}&subscribeIntent=true`);
       return;
     }
 

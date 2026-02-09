@@ -22,6 +22,7 @@ import {
   Zap
 } from 'lucide-react'
 import { brandGradient, glassMorphism, buttonStyles, cardStyles, animations } from '@/lib/design-tokens-premium'
+import { getCourseUrl } from '@/lib/routing'
 
 /**
  * Welcome Hero Section - Dynamic First Experience
@@ -355,7 +356,7 @@ export function WelcomeHero({ userName, hasEnrolledCourses = false, isNewUser = 
               }
 
               return (
-                <Link key={courseData.id} href={`/courses/${courseData.slug || courseData.id}`}>
+                <Link key={courseData.id} href={getCourseUrl(courseData)}>
                   <motion.div
                     className="rounded-xl bg-white border border-gray-200 cursor-pointer group overflow-hidden hover:border-gray-300 hover:shadow-lg transition-all h-full flex flex-col shadow-sm"
                     initial={{ opacity: 0, y: 20 }}

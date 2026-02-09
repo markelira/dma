@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, BookOpen, Video, GraduationCap, Mic, Clock } from 'lucide-react';
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 
 interface HeroSlide {
   id: string;
@@ -117,12 +118,12 @@ export function DashboardHeroCarousel({ slides }: DashboardHeroCarouselProps) {
     if (currentSlide.isEnrolled) {
       const lessonId = currentSlide.currentLessonId || currentSlide.firstLessonId;
       if (lessonId) {
-        router.push(`/courses/${currentSlide.id}/player/${lessonId}`);
+        router.push(getCoursePlayerUrl(currentSlide, lessonId));
         return;
       }
     }
     // Fallback to course detail page
-    router.push(`/courses/${currentSlide.id}`);
+    router.push(getCourseUrl(currentSlide));
   };
 
   return (

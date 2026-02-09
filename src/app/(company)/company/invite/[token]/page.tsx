@@ -68,7 +68,7 @@ export default function InviteAcceptancePage() {
           if (!authLoading && !user) {
             console.log('🔄 [INVITE PAGE] User not logged in, redirecting to registration...');
             const email = result.data.employeeEmail;
-            router.push(`/register?invite=${token}&email=${encodeURIComponent(email)}`);
+            router.push(`/regisztracio?invite=${token}&email=${encodeURIComponent(email)}`);
             return;
           }
         } else if (result.data.expired) {
@@ -199,7 +199,7 @@ export default function InviteAcceptancePage() {
     if (!user) {
       console.log('⚠️ [INVITE PAGE] No user, redirecting to login with redirect_to');
       // Redirect to login with return URL
-      router.push(`/login?redirect_to=/company/invite/${token}`);
+      router.push(`/bejelentkezes?redirect_to=/vallalkozas/meghivo/${token}`);
       return;
     }
 
@@ -252,7 +252,7 @@ export default function InviteAcceptancePage() {
       console.error('❌ [INVITE PAGE] Error accepting invite:', err);
 
       if (err.code === 'unauthenticated') {
-        router.push(`/login?redirect_to=/company/invite/${token}`);
+        router.push(`/bejelentkezes?redirect_to=/vallalkozas/meghivo/${token}`);
       } else if (err.code === 'failed-precondition') {
         setError('Ez a meghívó már fel lett használva');
       } else if (err.code === 'not-found') {

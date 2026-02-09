@@ -138,7 +138,7 @@ export const testAllEmails = https.onCall(
       const result = await sendInvitationEmail(TEST_EMAIL, {
         firstName: TEST_FIRST_NAME,
         companyName: 'Teszt Cég Kft.',
-        inviteUrl: 'https://masterclass.dma.hu/register?invite=test-token',
+        inviteUrl: 'https://masterclass.dma.hu/regisztracio?invite=test-token',
       });
       results.push({ email: '7. Employee Invite', subject: 'Meghívód érkezett', success: result.success });
     } catch (error: any) {

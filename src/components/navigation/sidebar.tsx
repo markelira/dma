@@ -39,7 +39,7 @@ async function handleLogout() {
   } catch (_) {}
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth-storage')
-    window.location.href = '/login'
+    window.location.href = '/bejelentkezes'
   }
 }
 

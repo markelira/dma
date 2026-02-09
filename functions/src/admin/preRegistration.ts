@@ -150,7 +150,7 @@ export const createPreRegistration = onCall({
 
   // 8. Send pre-registration email
   const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
-  const registerUrl = `${APP_URL}/register?preregister=${token}`;
+  const registerUrl = `${APP_URL}/regisztracio?preregister=${token}`;
 
   try {
     const emailResult = await sendPreRegistrationEmail({

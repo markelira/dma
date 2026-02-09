@@ -82,7 +82,7 @@ export default function ResetPasswordPage() {
         setSuccess(true)
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          router.push('/login')
+          router.push('/bejelentkezes')
         }, 3000)
       } else {
         setError(result.data.message || 'Hiba történt a jelszó visszaállítása során.')
@@ -158,7 +158,7 @@ export default function ResetPasswordPage() {
                     <p className="text-sm text-gray-600 text-center">
                       Kérj új jelszó visszaállítási linket.
                     </p>
-                    <Link href="/login">
+                    <Link href="/bejelentkezes">
                       <button className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
                         Vissza a bejelentkezéshez
                       </button>
@@ -206,7 +206,7 @@ export default function ResetPasswordPage() {
                   </div>
 
                   {/* Action */}
-                  <Link href="/login">
+                  <Link href="/bejelentkezes">
                     <button className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%] transition-all duration-200">
                       Bejelentkezés
                     </button>
@@ -339,7 +339,7 @@ export default function ResetPasswordPage() {
 
                 {/* Footer links */}
                 <div className="mt-6 text-center text-sm text-gray-600">
-                  <Link href="/login" className="text-brand-secondary hover:text-brand-secondary-hover hover:underline font-medium">
+                  <Link href="/bejelentkezes" className="text-brand-secondary hover:text-brand-secondary-hover hover:underline font-medium">
                     Vissza a bejelentkezéshez
                   </Link>
                 </div>

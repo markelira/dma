@@ -13,7 +13,7 @@ const APP_URL = process.env.APP_URL || 'https://masterclass.dma.hu';
  */
 async function sendEmployeeWelcomeEmail(data) {
     const { firstName, email } = data;
-    const subject = 'Üdv a Struktúraépítők között - DMA Masterclass';
+    const subject = 'Üdv a struktúraépítők között - DMA Masterclass';
     const content = `
     ${(0, base_1.createHeading)(`Szia ${firstName}!`, 2)}
     ${(0, base_1.createParagraph)('A Struktúra építő streaming platformon több mint 150 cégépítési tartalmat fedezhetsz fel.')}

@@ -20,7 +20,7 @@ async function sendRegistrationReminder1DayEmail(data) {
     ${(0, base_1.createParagraph)('Lehet csak egy kis biztatásra van szükséged. A 150+ cégépítési tartalmat 20 év tapasztalatából raktuk össze, hogy olyan módszereket és rendszereket kaphass, amik már holnaptól működnek. 7 napig ingyen kipróbálhatod és ha hozzáadsz 5 munkatársat, akkor fejenként 2.500 Ft-ért juthattok hozzá a struktúraépítési tartalmainkhoz.')}
     ${(0, base_1.createParagraph)('Vágj bele még ma!')}
 
-    ${(0, base_1.createButtonRow)({ text: 'BELEVÁGOK', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'BELEVÁGOK', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -34,7 +34,7 @@ async function sendRegistrationReminder1DayEmail(data) {
             'Vágj bele még ma!',
         ],
         ctaText: 'BELEVÁGOK',
-        ctaUrl: `${APP_URL}/company/dashboard/billing`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

@@ -121,7 +121,7 @@ export function NewFramerNavbar() {
                   </Button>
                 </Link>
               ) : (
-                <Link href="/login">
+                <Link href="/bejelentkezes">
                   <Button
                     size="sm"
                     className="bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium px-6 py-2"
@@ -266,7 +266,7 @@ export function NewFramerNavbar() {
                     Kijelentkezés
                   </Button>
                 ) : (
-                  <Link href="/login" onClick={closeMobileMenu}>
+                  <Link href="/bejelentkezes" onClick={closeMobileMenu}>
                     <Button
                       size="lg"
                       className="w-full bg-white hover:bg-gray-100 text-gray-900 px-8 py-6 text-sm font-medium transition-all duration-200 min-h-[44px]"

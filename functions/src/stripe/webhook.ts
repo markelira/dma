@@ -118,7 +118,7 @@ async function checkAndCompletePendingRegistration(userId: string): Promise<void
             logger.info(`[checkAndCompletePendingRegistration] Employee invite created: ${employee.email}`);
 
             // Send invitation email
-            const inviteUrl = `${baseUrl}/register?invite=${inviteToken}&email=${encodeURIComponent(employee.email.toLowerCase())}`;
+            const inviteUrl = `${baseUrl}/regisztracio?invite=${inviteToken}&email=${encodeURIComponent(employee.email.toLowerCase())}`;
             try {
               await sendInvitationEmail(employee.email.toLowerCase(), {
                 firstName: employee.firstName,

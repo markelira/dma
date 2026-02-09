@@ -32,7 +32,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<{ succes
     ${createParagraph('A Struktúra építő streaming platformon több mint 150 cégépítési tartalmat fedezhetsz fel, hogy vállalkozásod végre strukturált és önjáró legyen.')}
     ${createParagraph('Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.')}
 
-    ${createButtonRow({ text: 'KEZD EL 7 NAPIG INGYEN', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${createButtonRow({ text: 'KEZD EL 7 NAPIG INGYEN', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -47,7 +47,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<{ succes
       'Webinárok, Akadémiák, Masterclassok és Podcastek között kalandozhatsz, amik olyan konkrét rendszereket adnak, amiket már holnap használni tudtok. Nincs bullshit. Félrebeszélés nélkül, csak konkrét cégépítési tartalmakat kapsz.',
     ],
     ctaText: 'KEZD EL 7 NAPIG INGYEN',
-    ctaUrl: `${APP_URL}/company/dashboard/billing`,
+    ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

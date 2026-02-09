@@ -56,7 +56,7 @@ export default function DashboardPage() {
   const savePreferences = useSaveUserPreferences();
 
   // Trial popup state
-  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial, isLoading: subscriptionLoading } = useTrialPopup();
+  const { shouldShowForAuthUser, dismiss: dismissTrial, hasActiveSubscription, hasUsedTrial, isLoading: subscriptionLoading, subscriptionFetched } = useTrialPopup();
   const [showTrialModal, setShowTrialModal] = useState(false);
   const [showCompanyNoAccessModal, setShowCompanyNoAccessModal] = useState(false);
 
@@ -119,9 +119,12 @@ export default function DashboardPage() {
   // Company employees see different modal if company has no subscription
   // IMPORTANT: Wait for BOTH authReady AND subscription status to avoid race condition
   // (authReady ensures companyId is loaded from Firestore before showing modal)
+  // Also wait for subscriptionFetched to prevent modal flash when isLoading becomes false
+  // before data arrives (fixes "subscription not active" flash for active subscribers)
   useEffect(() => {
     // Don't show any modals while auth or subscription status is still loading
-    if (!authReady || subscriptionLoading) return;
+    // subscriptionFetched ensures we have actually received data from the Cloud Function
+    if (!authReady || subscriptionLoading || !subscriptionFetched) return;
 
     if (!showWelcomePopup && !hasActiveSubscription) {
       if (isCompanyEmployee) {
@@ -132,7 +135,7 @@ export default function DashboardPage() {
         setShowTrialModal(true);
       }
     }
-  }, [authReady, shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading]);
+  }, [authReady, shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading, subscriptionFetched]);
 
   // Check if onboarding is needed (only if trial modal not showing)
   useEffect(() => {

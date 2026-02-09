@@ -243,7 +243,7 @@ export const completeCompanyOnboarding = https.onCall(
           employeesInvited++;
 
           // Send invitation email (non-blocking)
-          const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/company/invite/${inviteToken}`;
+          const inviteUrl = `${process.env.APP_URL || 'https://masterclass.dma.hu'}/vallalkozas/meghivo/${inviteToken}`;
           try {
             await sendInvitationEmail(employee.email.trim().toLowerCase(), {
               firstName: employee.firstName.trim(),

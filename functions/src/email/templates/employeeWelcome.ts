@@ -28,7 +28,7 @@ export async function sendEmployeeWelcomeEmail(
 ): Promise<{ success: boolean; error?: string }> {
   const { firstName, email } = data;
 
-  const subject = 'Üdv a Struktúraépítők között - DMA Masterclass';
+  const subject = 'Üdv a struktúraépítők között - DMA Masterclass';
 
   const content = `
     ${createHeading(`Szia ${firstName}!`, 2)}

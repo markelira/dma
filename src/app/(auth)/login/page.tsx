@@ -53,7 +53,7 @@ export default function LoginPage() {
         userId: user.id,
         email: user.email
       }));
-      router.push('/register');
+      router.push('/regisztracio');
       return;
     }
 
@@ -366,8 +366,8 @@ export default function LoginPage() {
         <Link
           className="font-medium text-gray-900 underline hover:no-underline"
           href={redirectToParam
-            ? `/register?redirect_to=${encodeURIComponent(redirectToParam)}${isTrialFlow ? '&trial=true' : ''}`
-            : '/register'}
+            ? `/regisztracio?redirect_to=${encodeURIComponent(redirectToParam)}${isTrialFlow ? '&trial=true' : ''}`
+            : '/regisztracio'}
         >
           Regisztrálj itt
         </Link>

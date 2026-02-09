@@ -27,7 +27,7 @@ export function AdminDashboardLayout({ children }: DashboardLayoutProps) {
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [AdminLayout] No user found, redirecting to login')
-        router.replace('/login?redirect_to=/admin/dashboard')
+        router.replace('/bejelentkezes?redirect_to=/admin/dashboard')
       } else if (user.role !== 'admin') {
         console.log('❌ [AdminLayout] User role is not admin:', user.role, 'redirecting to dashboard')
         router.replace('/dashboard')

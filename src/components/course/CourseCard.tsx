@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react'
 import { Course } from '@/types'
 import { UniversalCourseCard } from '@/components/ui/UniversalCourseCard'
+import { getCourseUrl } from '@/lib/routing'
 import { useAuthStore } from '@/stores/authStore'
 import { useEnrollInCourse } from '@/hooks/useCourseQueries'
 import { useEnrollmentStatus } from '@/hooks/useEnrollmentStatus'
@@ -61,7 +62,7 @@ export const CourseCard: React.FC<Props> = ({
         await handleEnroll()
         break
       case 'details':
-        const urlPath = course.slug ? `/courses/${course.slug}` : `/courses/${course.id}`
+        const urlPath = getCourseUrl(course)
         const href = trialMode ? `${urlPath}?trial=true` : urlPath
         window.location.href = href
         break
@@ -70,7 +71,7 @@ export const CourseCard: React.FC<Props> = ({
           navigator.share({
             title: course.title,
             text: course.description,
-            url: window.location.origin + `/courses/${course.slug || course.id}`
+            url: window.location.origin + getCourseUrl(course)
           })
         } else {
           toast.info('Megosztás funkció hamarosan elérhető')

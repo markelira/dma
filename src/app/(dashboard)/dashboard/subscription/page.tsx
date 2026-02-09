@@ -166,7 +166,7 @@ export default function SubscriptionPage() {
                 Indítson el egy előfizetést az összes tartalomhoz való hozzáféréshez
               </p>
               <Button
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/regisztracio')}
                 className="bg-primary hover:bg-primary-hover"
               >
                 Előfizetés indítása

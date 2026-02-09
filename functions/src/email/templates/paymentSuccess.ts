@@ -77,11 +77,11 @@ export async function sendPaymentSuccessEmail(
       </td>
     </tr>
 
-    ${createButtonRow({ text: 'Számla megtekintése', url: `${APP_URL}/company/dashboard/billing`, variant: 'secondary' })}
+    ${createButtonRow({ text: 'Számla megtekintése', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'secondary' })}
 
     ${createParagraph('Az előfizetésed továbbra is aktív. Folytasd a tartalmak felfedezését:')}
 
-    ${createButtonRow({ text: 'Tovább a platformra', url: `${APP_URL}/company/dashboard`, variant: 'primary' })}
+    ${createButtonRow({ text: 'Tovább a platformra', url: `${APP_URL}/vallalkozas/kezdolap`, variant: 'primary' })}
 
     ${createParagraph('Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.', { muted: true })}
   `;
@@ -102,7 +102,7 @@ export async function sendPaymentSuccessEmail(
       'Ha bármilyen kérdésed van a számlázással kapcsolatban, írj nekünk a support@dma.hu címre.',
     ].filter(Boolean),
     ctaText: 'Tovább a platformra',
-    ctaUrl: `${APP_URL}/company/dashboard`,
+    ctaUrl: `${APP_URL}/vallalkozas/kezdolap`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

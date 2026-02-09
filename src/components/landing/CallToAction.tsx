@@ -167,7 +167,7 @@ export const CallToAction: React.FC = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/regisztracio')}
                 className="group bg-white text-primary px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center justify-center space-x-2"
               >
                 <span>Ingyenes próba indítása</span>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Play, CheckCircle } from 'lucide-react';
 import { formatDurationHungarian } from '@/lib/carouselUtils';
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 
 interface EnrolledCourseCardProps {
   enrollment: {
@@ -28,9 +29,10 @@ export function EnrolledCourseCard({ enrollment, index = 0 }: EnrolledCourseCard
 
   // Determine target lesson: resume from last watched, or start from first lesson
   const targetLessonId = enrollment.currentLessonId || enrollment.firstLessonId;
+  const courseRef = { id: enrollment.courseId, courseType: enrollment.courseType };
   const href = targetLessonId
-    ? `/courses/${enrollment.courseId}/player/${targetLessonId}`
-    : `/courses/${enrollment.courseId}`;
+    ? getCoursePlayerUrl(courseRef, targetLessonId)
+    : getCourseUrl(courseRef);
 
   return (
     <Link

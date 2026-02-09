@@ -19,7 +19,7 @@ export function ProtectedRoute({
   children,
   requiredRoles,
   requiredPermission,
-  redirectTo = '/login'
+  redirectTo = '/bejelentkezes'
 }: ProtectedRouteProps) {
   const { user, loading, hasRole, hasPermission } = useAuth();
   const router = useRouter();

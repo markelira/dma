@@ -21,6 +21,7 @@ import {
   Award
 } from 'lucide-react'
 import { brandGradient, cardStyles, buttonStyles } from '@/lib/design-tokens'
+import { getCourseUrl } from '@/lib/routing'
 import { shuffleForUser } from '@/lib/carouselUtils'
 
 /**
@@ -418,7 +419,7 @@ export function TrendingCoursesSection() {
                     <div className="text-sm font-bold text-gray-900">
                       {course.price}
                     </div>
-                    <Link href={`/courses/${course.slug || course.id}`}>
+                    <Link href={getCourseUrl(course)}>
                       <button className={`${buttonStyles.primaryLight} !rounded-lg !py-2 !px-4 text-xs w-full`}>
                         <Play className="w-3 h-3" />
                         <span>Kezdés</span>

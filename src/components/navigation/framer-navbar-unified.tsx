@@ -198,7 +198,7 @@ export function FramerNavbarUnified({ onMobileMenuToggle, isMobileMenuOpen = fal
                   </Button>
                 </Link>
               ) : (
-                <Link href="/login">
+                <Link href="/bejelentkezes">
                   <Button
                     size="sm"
                     className="bg-brand-secondary hover:bg-brand-secondary-hover text-white rounded-full font-medium font-inter transition-all duration-200"

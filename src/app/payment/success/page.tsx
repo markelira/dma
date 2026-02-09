@@ -26,7 +26,7 @@ function PaymentSuccessPageContent() {
   useEffect(() => {
     if (!ready) return;
     const timer = setTimeout(() => {
-      router.push('/company/dashboard');
+      router.push('/vallalkozas/kezdolap');
     }, 3000);
     return () => clearTimeout(timer);
   }, [ready, router]);

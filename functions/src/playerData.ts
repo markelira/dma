@@ -253,6 +253,17 @@ async function resolveCourse(courseId: string): Promise<{ success: boolean; cour
     return { success: true, courseDoc: slugQuery.docs[0] };
   }
 
+  // Try legacySlug (old broken slugs from before Hungarian fix)
+  const legacySlugQuery = await firestore
+    .collection('courses')
+    .where('legacySlug', '==', courseId)
+    .limit(1)
+    .get();
+
+  if (!legacySlugQuery.empty) {
+    return { success: true, courseDoc: legacySlugQuery.docs[0] };
+  }
+
   // Try direct ID lookup
   const directDoc = await firestore.collection('courses').doc(courseId).get();
   if (directDoc.exists) {

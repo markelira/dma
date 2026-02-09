@@ -36,26 +36,26 @@ const navigationSections = [
   {
     title: null, // No section header for main navigation
     items: [
-      { title: 'Kezdőlap', href: '/company/dashboard', icon: Home },
-      { title: 'Saját listám', href: '/company/dashboard/my-courses', icon: BookOpen },
+      { title: 'Kezdőlap', href: '/vallalkozas/kezdolap', icon: Home },
+      { title: 'Saját listám', href: '/vallalkozas/kezdolap/my-courses', icon: BookOpen },
     ]
   },
   {
     title: 'Kategóriák',
     items: [
-      { title: 'Webinár', href: '/company/dashboard/webinar', icon: Video },
-      { title: 'Akadémia', href: '/company/dashboard/academia', icon: GraduationCap },
-      { title: 'Masterclass', href: '/company/dashboard/masterclass', icon: Star },
-      { title: 'Podcast', href: '/company/dashboard/podcast', icon: Mic },
+      { title: 'Webinár', href: '/vallalkozas/kezdolap/webinar', icon: Video },
+      { title: 'Akadémia', href: '/vallalkozas/kezdolap/academia', icon: GraduationCap },
+      { title: 'Masterclass', href: '/vallalkozas/kezdolap/masterclass', icon: Star },
+      { title: 'Podcast', href: '/vallalkozas/kezdolap/podcast', icon: Mic },
     ]
   },
   {
     title: 'EGYÉB',
     items: [
-      { title: 'Munkatársaim', href: '/company/dashboard/employees', icon: Users },
-      { title: 'Számláim', href: '/company/dashboard/billing', icon: CreditCard },
-      { title: 'Segítségkérés', href: '/company/dashboard/help-center', icon: MessageSquare },
-      { title: 'Beállítások', href: '/company/dashboard/settings', icon: Settings },
+      { title: 'Munkatársaim', href: '/vallalkozas/kezdolap/employees', icon: Users },
+      { title: 'Számláim', href: '/vallalkozas/kezdolap/billing', icon: CreditCard },
+      { title: 'Segítségkérés', href: '/vallalkozas/kezdolap/help-center', icon: MessageSquare },
+      { title: 'Beállítások', href: '/vallalkozas/kezdolap/settings', icon: Settings },
     ]
   }
 ]
@@ -119,7 +119,7 @@ export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigat
   const handleLogout = async () => {
     try {
       await logout()
-      router.push('/login')
+      router.push('/bejelentkezes')
     } catch (error) {
       console.error('Logout error:', error)
     }
@@ -145,7 +145,7 @@ export function CompanyDashboardSidebar({ companyName, companyLogoUrl, onNavigat
     <div className="h-full flex flex-col bg-white">
       {/* Header with logo */}
       <div className="px-6 py-5 border-b border-gray-200 flex items-center justify-between">
-        <Link href="/company/dashboard" className="flex items-center group">
+        <Link href="/vallalkozas/kezdolap" className="flex items-center group">
           <motion.div
             className="relative w-28 h-8 flex-shrink-0"
             whileHover={{ scale: 1.02 }}

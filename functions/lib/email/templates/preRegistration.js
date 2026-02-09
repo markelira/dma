@@ -16,7 +16,7 @@ async function sendPreRegistrationEmail(data) {
     const content = `
     ${(0, base_1.createHeading)(`Szia ${firstName}!`, 2)}
     ${(0, base_1.createParagraph)('A regisztrációdat előkészítettük a DMA Masterclass platformon.')}
-    ${(0, base_1.createParagraph)(`A <strong>${companyName}</strong> cég admin fiókodat már létrehoztuk neked. Az adataid már ki vannak töltve, csak a jelszavadat kell megadnod a regisztráció befejezéséhez.`)}
+    ${(0, base_1.createParagraph)(`A <strong>${companyName}</strong> céges fiókodat már létrehoztuk neked. Az adataid már ki vannak töltve, csak a jelszavadat kell megadnod a regisztráció befejezéséhez.`)}
 
     ${(0, base_1.createButtonRow)({ text: 'REGISZTRÁCIÓ BEFEJEZÉSE', url: registerUrl, variant: 'primary' })}
 

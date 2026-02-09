@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { BookOpen, Users, Clock, CheckCircle2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { getCourseUrl } from '@/lib/routing';
 
 // Helper function to format date in Hungarian locale
 const formatHungarianDate = (dateString: string): string => {
@@ -62,7 +63,7 @@ export function CarouselCourseCard({
   const [imageError, setImageError] = useState(false);
 
   return (
-    <Link href={`/courses/${id}`}>
+    <Link href={getCourseUrl({ id, courseType })}>
       <div className="group relative rounded-xl bg-white shadow-md border border-gray-100 overflow-hidden hover:shadow-lg hover:border-gray-200 transition-all duration-300 h-full flex flex-col">
         <div className="absolute top-3 right-3 z-10">
           <Badge

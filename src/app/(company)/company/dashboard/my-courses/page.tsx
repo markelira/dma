@@ -113,7 +113,7 @@ export default function CompanyMyCoursesPage() {
           Még nincs tartalom a saját listádon
         </h3>
         <Link
-          href="/company/dashboard"
+          href="/vallalkozas/kezdolap"
           className="rounded-lg bg-brand-secondary px-6 py-2.5 text-sm font-medium text-white hover:bg-brand-secondary/90 transition-colors"
         >
           Tartalmak felfedezése

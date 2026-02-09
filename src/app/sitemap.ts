@@ -69,13 +69,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     {
-      url: `${baseUrl}/login`,
+      url: `${baseUrl}/bejelentkezes`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/register`,
+      url: `${baseUrl}/regisztracio`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.3,
@@ -92,13 +92,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .where('status', '==', 'PUBLISHED')
       .get()
 
+    const courseTypePrefixMap: Record<string, string> = {
+      WEBINAR: 'webinar',
+      MASTERCLASS: 'masterclass',
+      ACADEMIA: 'akademia',
+      PODCAST: 'podcast',
+    }
+
     coursePages = coursesSnapshot.docs.map((doc) => {
       const data = doc.data()
       const slug = data.slug || doc.id
       const updatedAt = data.updatedAt?.toDate?.() || new Date()
+      const prefix = courseTypePrefixMap[data.courseType] || 'courses'
 
       return {
-        url: `${baseUrl}/courses/${slug}`,
+        url: `${baseUrl}/${prefix}/${slug}`,
         lastModified: updatedAt,
         changeFrequency: 'weekly' as const,
         priority: 0.8,

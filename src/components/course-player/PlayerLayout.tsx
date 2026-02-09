@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { getCoursePlayerUrl } from '@/lib/routing'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { httpsCallable } from 'firebase/functions'
 import { functions } from '@/lib/firebase'
@@ -98,7 +99,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
   const locked = !hasSubscription && lesson?.subscriptionTier === 'PREMIUM'
 
   const handleLessonClick = (lessonId: string) => {
-    router.push(`/courses/${course.id}/player/${lessonId}`)
+    router.push(getCoursePlayerUrl(course, lessonId))
   }
 
   const handleMarkComplete = async () => {
@@ -287,7 +288,7 @@ export const PlayerLayout: React.FC<PlayerLayoutProps> = ({
                   <p className="text-gray-600 mb-6">
                     {t('subscription.message')}
                   </p>
-                  <Button onClick={() => router.push('/register')}>
+                  <Button onClick={() => router.push('/regisztracio')}>
                     {t('subscription.viewPlans')}
                   </Button>
                 </div>

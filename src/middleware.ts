@@ -20,25 +20,25 @@ const protectedRoutes: RouteConfig[] = [
   {
     path: '/admin',
     requiredRole: UserRole.ADMIN,
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   {
     path: '/admin/:path*',
     requiredRole: UserRole.ADMIN,
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   
   // University admin routes
   {
     path: '/university-admin',
     requiredRole: [UserRole.ADMIN, UserRole.UNIVERSITY_ADMIN],
-    redirect: '/login',
+    redirect: '/bejelentkezes',
     universityScope: true
   },
   {
     path: '/university-admin/:path*',
     requiredRole: [UserRole.ADMIN, UserRole.UNIVERSITY_ADMIN],
-    redirect: '/login',
+    redirect: '/bejelentkezes',
     universityScope: true
   },
   
@@ -46,29 +46,29 @@ const protectedRoutes: RouteConfig[] = [
   {
     path: '/instructor',
     requiredRole: [UserRole.ADMIN, UserRole.INSTRUCTOR],
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   {
     path: '/instructor/:path*',
     requiredRole: [UserRole.ADMIN, UserRole.INSTRUCTOR],
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   
   // Dashboard (authenticated users only)
   {
     path: '/dashboard',
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   {
     path: '/dashboard/:path*',
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   
   // Course management
   {
     path: '/courses/create',
     requiredRole: [UserRole.ADMIN, UserRole.INSTRUCTOR],
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   {
     path: '/courses/:courseId/edit',
@@ -76,17 +76,17 @@ const protectedRoutes: RouteConfig[] = [
       resource: 'courses',
       action: 'update'
     },
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   
   // Profile routes (authenticated only)
   {
     path: '/profile',
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   {
     path: '/me',
-    redirect: '/login'
+    redirect: '/bejelentkezes'
   },
   
   // Public routes (no protection)
@@ -100,6 +100,14 @@ const protectedRoutes: RouteConfig[] = [
   },
   {
     path: '/register',
+    allowPublic: true
+  },
+  {
+    path: '/bejelentkezes',
+    allowPublic: true
+  },
+  {
+    path: '/regisztracio',
     allowPublic: true
   },
   {
@@ -218,7 +226,7 @@ export async function middleware(request: NextRequest) {
   
   // If no authentication found and route requires authentication
   if (!claims && !routeConfig.allowPublic) {
-    const redirectUrl = new URL(routeConfig.redirect || '/login', request.url);
+    const redirectUrl = new URL(routeConfig.redirect || '/bejelentkezes', request.url);
     redirectUrl.searchParams.set('from', pathname);
     return NextResponse.redirect(redirectUrl);
   }

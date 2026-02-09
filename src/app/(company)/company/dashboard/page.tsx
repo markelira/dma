@@ -332,7 +332,7 @@ export default function CompanyDashboardPage() {
           instructors={instructors || []}
           enrollments={enrollments || []}
           isSubscribed={isSubscribed}
-          viewAllLink="/company/dashboard/courses"
+          viewAllLink="/vallalkozas/kezdolap/courses"
         />
       )}
 
@@ -370,7 +370,7 @@ export default function CompanyDashboardPage() {
           instructors={instructors || []}
           enrollments={enrollments || []}
           isSubscribed={isSubscribed}
-          viewAllLink={`/company/dashboard/courses?category=${category.id}`}
+          viewAllLink={`/vallalkozas/kezdolap/courses?category=${category.id}`}
         />
       ))}
 
@@ -383,7 +383,7 @@ export default function CompanyDashboardPage() {
           instructors={instructors || []}
           enrollments={enrollments || []}
           isSubscribed={isSubscribed}
-          viewAllLink="/company/dashboard/courses"
+          viewAllLink="/vallalkozas/kezdolap/courses"
         />
       )}
 
@@ -397,7 +397,7 @@ export default function CompanyDashboardPage() {
           instructors={instructors || []}
           enrollments={enrollments || []}
           isSubscribed={isSubscribed}
-          viewAllLink={`/company/dashboard/courses?audience=${audience.id}`}
+          viewAllLink={`/vallalkozas/kezdolap/courses?audience=${audience.id}`}
         />
       ))}
 
@@ -411,7 +411,7 @@ export default function CompanyDashboardPage() {
           instructors={instructors || []}
           enrollments={enrollments || []}
           isSubscribed={isSubscribed}
-          viewAllLink={`/company/dashboard/${type.toLowerCase()}`}
+          viewAllLink={`/vallalkozas/kezdolap/${type.toLowerCase()}`}
         />
       ))}
 

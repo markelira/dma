@@ -35,7 +35,7 @@ export async function sendNotifyBossEmail(
     ${createParagraph(`${employeeFullName} munkatársad szeretné, ha előfizetnél a Struktúraépítő streaming platformon, hogy tovább tudja folytatni a kalandjait. Ne vedd el tőlük a lehetőséget, hogy hozzájáruljanak ahhoz, hogy struktúrált és önjáró vállalkozásotok legyen.`)}
     ${createParagraph('Itt a fizetésnap, irány a DMA Masterclass!')}
 
-    ${createButtonRow({ text: 'ELŐFIZETEK', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${createButtonRow({ text: 'ELŐFIZETEK', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -50,7 +50,7 @@ export async function sendNotifyBossEmail(
       'Itt a fizetésnap, irány a DMA Masterclass!',
     ],
     ctaText: 'ELŐFIZETEK',
-    ctaUrl: `${APP_URL}/company/dashboard/billing`,
+    ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 

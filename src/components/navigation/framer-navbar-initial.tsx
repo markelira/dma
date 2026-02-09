@@ -57,7 +57,7 @@ export function FramerNavbarInitial({ onMobileMenuToggle }: FramerNavbarInitialP
                 </Button>
               </Link>
             ) : (
-              <Link href="/login">
+              <Link href="/bejelentkezes">
                 <Button
                   size="sm"
                   className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-2.5 rounded-full font-medium transition-all duration-200"

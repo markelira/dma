@@ -123,7 +123,7 @@ export function useLogin() {
               // Store flag to indicate recovery redirect (for UI feedback on register page)
               sessionStorage.setItem('pendingRegistrationRecovery', 'true');
               // Redirect to register page to complete payment
-              window.location.href = '/register';
+              window.location.href = '/regisztracio';
               // Return a response to prevent further processing
               return { success: false, needsRegistrationCompletion: true } as any;
             }
@@ -160,7 +160,7 @@ export function useLogin() {
                   email: email
                 }));
                 // Redirect to register page which will show verification modal
-                window.location.href = '/register';
+                window.location.href = '/regisztracio';
                 // Return a response to prevent further processing
                 return { success: false, needsVerification: true } as any;
               }

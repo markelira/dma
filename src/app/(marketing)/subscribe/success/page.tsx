@@ -41,7 +41,7 @@ function SubscribeSuccessContent() {
     const timer = setTimeout(() => {
       // Set flag to show welcome popup on dashboard
       sessionStorage.setItem('showWelcomePopup', 'true')
-      router.push('/company/dashboard')
+      router.push('/vallalkozas/kezdolap')
     }, 3000)
     return () => clearTimeout(timer)
   }, [ready, router])

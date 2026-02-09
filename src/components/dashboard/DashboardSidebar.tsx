@@ -168,7 +168,7 @@ export function DashboardSidebar({ onNavigate, onClose, companyLogoUrl }: Dashbo
   const handleLogout = async () => {
     try {
       await logout()
-      router.push('/login')
+      router.push('/bejelentkezes')
     } catch (error) {
       console.error('Logout error:', error)
     }

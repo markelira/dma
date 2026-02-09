@@ -38,7 +38,7 @@ export default function DashboardRouteGroupLayout({
       const pendingVerification = sessionStorage.getItem('pendingEmailVerification')
       if (pendingVerification) {
         console.log('⚠️ [DIAGNOSTIC] DashboardLayout: Found pending email verification, redirecting to register')
-        router.replace('/register')
+        router.replace('/regisztracio')
         return
       }
     }
@@ -47,16 +47,16 @@ export default function DashboardRouteGroupLayout({
       if (!user) {
         console.log('❌ [DIAGNOSTIC] DashboardLayout: authReady && !isLoading && !user - REDIRECTING TO LOGIN', {
           pathname: typeof window !== 'undefined' ? window.location.pathname : 'unknown',
-          willRedirect: typeof window !== 'undefined' && !window.location.pathname.startsWith('/login'),
+          willRedirect: typeof window !== 'undefined' && !window.location.pathname.startsWith('/bejelentkezes'),
           timestamp: Date.now()
         })
         // Only redirect if we're not already on the login page to prevent loops
-        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
-          router.replace('/login?redirect_to=/dashboard')
+        if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/bejelentkezes')) {
+          router.replace('/bejelentkezes?redirect_to=/dashboard')
         }
       } else if (user.role?.toUpperCase() === 'COMPANY_ADMIN') {
         console.log('🏢 [DIAGNOSTIC] DashboardLayout: COMPANY_ADMIN user, redirecting to company dashboard')
-        router.replace('/company/dashboard')
+        router.replace('/vallalkozas/kezdolap')
       } else {
         console.log('✅ [DIAGNOSTIC] DashboardLayout: User present, rendering dashboard', {
           userId: user.id,

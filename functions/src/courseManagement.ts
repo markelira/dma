@@ -8,6 +8,7 @@ import { logger } from 'firebase-functions/v2';
 import * as z from 'zod';
 import { sendNewContentAvailableEmail } from './email/templates/newContentAvailable';
 import { maskEmail } from './utils/maskPii';
+import { slugify } from './utils/slugify';
 
 const firestore = admin.firestore();
 
@@ -77,10 +78,7 @@ export const createCourse = onCall({
     const validatedData = CourseSchema.parse(request.data);
 
     // Generate slug from title
-    const slug = validatedData.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
+    const slug = slugify(validatedData.title);
 
     // Check if slug already exists
     const existingSlugQuery = await firestore
@@ -263,10 +261,7 @@ export const updateCourse = onCall({
 
     // Update slug if title changed
     if (updateData.title && updateData.title !== courseData?.title) {
-      const newSlug = updateData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+      const newSlug = slugify(updateData.title);
 
       // Check if new slug already exists
       const existingSlugQuery = await firestore
@@ -344,10 +339,7 @@ export const publishCourse = onCall({
     // Auto-generate slug if not exists
     let slug = courseData?.slug;
     if (!slug || slug.trim() === '') {
-      slug = (courseData?.title || 'course')
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+      slug = slugify(courseData?.title || 'course');
 
       // Check for uniqueness
       const existingSlugQuery = await firestore
@@ -380,41 +372,41 @@ export const publishCourse = onCall({
 
     logger.info(`Course published: ${courseId} by user ${userId}`);
 
-    // Notify all registered users about new content (fire-and-forget)
+    // Notify all registered users about new content
     const courseTitle = courseData?.title || 'Új tartalom';
-    (async () => {
-      try {
-        // Get all users with email
-        const usersSnapshot = await firestore.collection('users').get();
-        let sentCount = 0;
+    try {
+      const usersSnapshot = await firestore.collection('users').get();
+      const emailPromises: Promise<{ success: boolean; error?: string }>[] = [];
 
-        for (const userDoc of usersSnapshot.docs) {
-          const userData = userDoc.data();
-          if (userData.email) {
-            const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
+      for (const userDoc of usersSnapshot.docs) {
+        const userData = userDoc.data();
+        if (userData.email) {
+          const firstName = userData.firstName || userData.displayName?.split(' ')[0] || 'Felhasználó';
 
+          emailPromises.push(
             sendNewContentAvailableEmail({
               firstName,
               email: userData.email,
               courseTitle,
               courseId,
-            }).then((result) => {
-              if (!result.success) {
-                logger.warn(`Failed to send new content email to ${maskEmail(userData.email)}:`, result.error);
-              }
             }).catch((err) => {
               logger.warn(`Error sending new content email to ${maskEmail(userData.email)}:`, err.message);
-            });
-
-            sentCount++;
-          }
+              return { success: false, error: err.message };
+            })
+          );
         }
-
-        logger.info(`New content notification sent to ${sentCount} users for course ${courseId}`);
-      } catch (notifyError: any) {
-        logger.warn('Error sending new content notifications:', notifyError.message);
       }
-    })();
+
+      // Wait for all emails to complete (with individual error handling)
+      const results = await Promise.all(emailPromises);
+      const successCount = results.filter(r => r.success).length;
+      const failCount = results.filter(r => !r.success).length;
+
+      logger.info(`New content notification: ${successCount} sent, ${failCount} failed for course ${courseId}`);
+    } catch (notifyError: any) {
+      // Don't fail the publish if notifications fail
+      logger.error('Error sending new content notifications:', notifyError.message);
+    }
 
     return {
       success: true,

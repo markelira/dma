@@ -8,6 +8,7 @@ import { Play, Clock, BookOpen, ChevronRight } from 'lucide-react'
 import { useEnrollments } from '@/hooks/useEnrollments'
 import { doc, getDoc, collection, getDocs, query, orderBy } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing'
 
 /**
  * Continue Course Preview Component
@@ -100,9 +101,10 @@ export function ContinueCoursePreview() {
 
   // Determine the lesson URL
   const lessonId = currentCourse?.currentLessonId || firstLessonId
+  const courseRef = currentCourse ? { id: currentCourse.courseId, courseType: currentCourse.courseType } : { id: '' };
   const playerUrl = lessonId
-    ? `/courses/${currentCourse?.courseId}/player/${lessonId}`
-    : `/courses/${currentCourse?.courseId}`
+    ? getCoursePlayerUrl(courseRef, lessonId)
+    : getCourseUrl(courseRef)
 
   // If no in-progress courses, show empty state
   if (!currentCourse) {

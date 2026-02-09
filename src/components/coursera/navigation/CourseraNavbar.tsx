@@ -108,13 +108,13 @@ export function CourseraNavbar() {
           {/* Auth Buttons - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
             <Link
-              href="/login"
+              href="/bejelentkezes"
               className="px-4 py-2 text-sm font-medium text-coursera-text-primary hover:text-coursera-blue transition-colors"
             >
               Log In
             </Link>
             <Link
-              href="/register"
+              href="/regisztracio"
               className="px-4 py-2 text-sm font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover transition-colors"
             >
               Join for Free
@@ -162,13 +162,13 @@ export function CourseraNavbar() {
               ))}
               <div className="pt-4 border-t border-coursera-border space-y-2">
                 <Link
-                  href="/login"
+                  href="/bejelentkezes"
                   className="block px-4 py-2 text-sm font-medium text-coursera-text-primary hover:bg-coursera-bg-light rounded-md"
                 >
                   Log In
                 </Link>
                 <Link
-                  href="/register"
+                  href="/regisztracio"
                   className="block px-4 py-2 text-sm font-bold text-white bg-coursera-blue rounded-md hover:bg-coursera-blue-hover text-center"
                 >
                   Join for Free

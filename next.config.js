@@ -90,6 +90,59 @@ const nextConfig = {
       { protocol: 'https', hostname: '*.framerusercontent.com', pathname: '/**' },
     ],
   },
+  // Hungarian URL rewrites: new Hungarian URLs → existing route files
+  async rewrites() {
+    return [
+      // Phase 2: Auth routes
+      { source: '/bejelentkezes', destination: '/login' },
+      { source: '/regisztracio', destination: '/register' },
+      // Phase 3: Company dashboard routes
+      { source: '/vallalkozas/kezdolap', destination: '/company/dashboard' },
+      { source: '/vallalkozas/kezdolap/:path*', destination: '/company/dashboard/:path*' },
+      { source: '/vallalkozas/meghivo/:token', destination: '/company/invite/:token' },
+      // Phase 4: Course type prefixed routes
+      { source: '/webinar/:slug', destination: '/courses/:slug' },
+      { source: '/webinar/:slug/player/:lessonId', destination: '/courses/:slug/player/:lessonId' },
+      { source: '/webinar/:slug/enroll', destination: '/courses/:slug/enroll' },
+      { source: '/webinar/:slug/purchase', destination: '/courses/:slug/purchase' },
+      { source: '/webinar/:slug/learn', destination: '/courses/:slug/learn' },
+      { source: '/webinar/:slug/preview', destination: '/courses/:slug/preview' },
+      { source: '/webinar/:slug/preview/lesson/:lessonId', destination: '/courses/:slug/preview/lesson/:lessonId' },
+      { source: '/masterclass/:slug', destination: '/courses/:slug' },
+      { source: '/masterclass/:slug/player/:lessonId', destination: '/courses/:slug/player/:lessonId' },
+      { source: '/masterclass/:slug/enroll', destination: '/courses/:slug/enroll' },
+      { source: '/masterclass/:slug/purchase', destination: '/courses/:slug/purchase' },
+      { source: '/masterclass/:slug/learn', destination: '/courses/:slug/learn' },
+      { source: '/masterclass/:slug/preview', destination: '/courses/:slug/preview' },
+      { source: '/masterclass/:slug/preview/lesson/:lessonId', destination: '/courses/:slug/preview/lesson/:lessonId' },
+      { source: '/akademia/:slug', destination: '/courses/:slug' },
+      { source: '/akademia/:slug/player/:lessonId', destination: '/courses/:slug/player/:lessonId' },
+      { source: '/akademia/:slug/enroll', destination: '/courses/:slug/enroll' },
+      { source: '/akademia/:slug/purchase', destination: '/courses/:slug/purchase' },
+      { source: '/akademia/:slug/learn', destination: '/courses/:slug/learn' },
+      { source: '/akademia/:slug/preview', destination: '/courses/:slug/preview' },
+      { source: '/akademia/:slug/preview/lesson/:lessonId', destination: '/courses/:slug/preview/lesson/:lessonId' },
+      { source: '/podcast/:slug', destination: '/courses/:slug' },
+      { source: '/podcast/:slug/player/:lessonId', destination: '/courses/:slug/player/:lessonId' },
+      { source: '/podcast/:slug/enroll', destination: '/courses/:slug/enroll' },
+      { source: '/podcast/:slug/purchase', destination: '/courses/:slug/purchase' },
+      { source: '/podcast/:slug/learn', destination: '/courses/:slug/learn' },
+      { source: '/podcast/:slug/preview', destination: '/courses/:slug/preview' },
+      { source: '/podcast/:slug/preview/lesson/:lessonId', destination: '/courses/:slug/preview/lesson/:lessonId' },
+    ];
+  },
+  // Hungarian URL redirects: old English URLs → new Hungarian URLs (301)
+  async redirects() {
+    return [
+      // Phase 2: Auth redirects
+      { source: '/login', destination: '/bejelentkezes', permanent: true },
+      { source: '/register', destination: '/regisztracio', permanent: true },
+      // Phase 3: Company dashboard redirects
+      { source: '/company/dashboard', destination: '/vallalkozas/kezdolap', permanent: true },
+      { source: '/company/dashboard/:path*', destination: '/vallalkozas/kezdolap/:path*', permanent: true },
+      { source: '/company/invite/:token', destination: '/vallalkozas/meghivo/:token', permanent: true },
+    ];
+  },
   eslint: {
     ignoreDuringBuilds: true,
   },

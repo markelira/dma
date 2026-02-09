@@ -229,7 +229,7 @@ export const HeroSection: React.FC = () => {
               <Button
                 size="default"
                 className="flex-1 font-bold text-base sm:text-lg"
-                onClick={() => router.push('/register')}
+                onClick={() => router.push('/regisztracio')}
               >
                 Próbálja ki ingyen most
               </Button>

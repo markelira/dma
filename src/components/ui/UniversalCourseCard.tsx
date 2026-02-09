@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Star, Users, Clock, BookOpen, Play, Award, TrendingUp, Share, ExternalLink, DollarSign, GraduationCap, Heart } from 'lucide-react'
+import { getCourseUrl } from '@/lib/routing'
 
 // Enhanced Course interface for Universal Card
 interface Course {
@@ -133,7 +134,7 @@ export function UniversalCourseCard({
     onAction?.(action, course)
   }
 
-  const courseUrl = `/courses/${course.id}`
+  const courseUrl = getCourseUrl(course)
   const hasDiscount = course.originalPrice && course.price && course.originalPrice > course.price
 
   // Common elements used across variants
@@ -180,7 +181,7 @@ export function UniversalCourseCard({
               e.preventDefault()
               e.stopPropagation()
               // Navigate to first lesson
-              window.location.href = `/courses/${course.slug || course.id}/learn`
+              window.location.href = `${getCourseUrl(course)}/learn`
             }}
             className="w-12 h-12 bg-brand-secondary/50/30 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-brand-secondary/50/50 transition-all hover:scale-110 cursor-pointer">
             <Play className="w-5 h-5 text-white ml-1" />

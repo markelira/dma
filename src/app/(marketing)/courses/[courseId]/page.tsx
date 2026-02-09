@@ -5,6 +5,7 @@ import { Metadata } from 'next'
 import { initializeApp, getApps } from 'firebase/app'
 import { getFirestore, doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore'
 import ClientCourseDetailPage from './ClientCourseDetailPage'
+import { getCourseUrl } from '@/lib/routing'
 
 // Firebase config for server-side metadata fetching
 const firebaseConfig = {
@@ -54,6 +55,19 @@ async function getCourseData(courseId: string) {
       return { id: docSnap.id, ...docSnap.data() }
     }
 
+    // Try by legacySlug (old broken slugs from before Hungarian fix)
+    const legacySlugQuery = query(
+      collection(db, 'courses'),
+      where('legacySlug', '==', courseId),
+      limit(1)
+    )
+    const legacySlugSnap = await getDocs(legacySlugQuery)
+
+    if (!legacySlugSnap.empty) {
+      const docSnap = legacySlugSnap.docs[0]
+      return { id: docSnap.id, ...docSnap.data() }
+    }
+
     return null
   } catch (error) {
     console.error('Error fetching course for metadata:', error)
@@ -80,14 +94,20 @@ export async function generateMetadata({
   const description = course.description || course.shortDescription || 'Fedezd fel ezt a tartalmat a DMA Masterclass platformon.'
   const thumbnailUrl = course.thumbnailUrl || course.imageUrl || '/og-image.png'
 
+  const canonicalPath = getCourseUrl({ id: course.id, courseType: course.courseType, slug: course.slug })
+  const canonicalUrl = `https://masterclass.dma.hu${canonicalPath}`
+
   return {
     title,
     description,
+    alternates: {
+      canonical: canonicalUrl,
+    },
     openGraph: {
       title,
       description,
       type: 'website',
-      url: `https://masterclass.dma.hu/courses/${course.slug || courseId}`,
+      url: canonicalUrl,
       images: [
         {
           url: thumbnailUrl,

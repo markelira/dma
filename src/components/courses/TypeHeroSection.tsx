@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, X, BookOpen, Video, GraduationCap, Mic, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { getCourseUrl } from '@/lib/routing';
 
 interface Course {
   id: string;
@@ -168,7 +169,7 @@ export function TypeHeroSection({
                   {suggestions.map((course) => (
                     <Link
                       key={course.id}
-                      href={`/courses/${course.id}`}
+                      href={getCourseUrl(course)}
                       onClick={() => {
                         setShowSuggestions(false);
                         onSearchChange('');

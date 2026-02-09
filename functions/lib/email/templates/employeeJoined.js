@@ -19,7 +19,7 @@ async function sendEmployeeJoinedEmail(data) {
     ${(0, base_1.createParagraph)(`<strong>${employeeFullName}</strong> sikeresen beregisztrált a DMA Masterclassra.`)}
     ${(0, base_1.createParagraph)('Kalandozásait nyomon tudod követni a profilodban, a Munkatársaim menüpontban.')}
 
-    ${(0, base_1.createButtonRow)({ text: 'MEGNÉZEM', url: `${APP_URL}/company/dashboard/employees`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'MEGNÉZEM', url: `${APP_URL}/vallalkozas/kezdolap/employees`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -32,7 +32,7 @@ async function sendEmployeeJoinedEmail(data) {
             'Kalandozásait nyomon tudod követni a profilodban, a Munkatársaim menüpontban.',
         ],
         ctaText: 'MEGNÉZEM',
-        ctaUrl: `${APP_URL}/company/dashboard/employees`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap/employees`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

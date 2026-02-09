@@ -69,7 +69,7 @@ export default function EmployeesPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) {
-        router.push('/login?redirect_to=/company/dashboard/employees');
+        router.push('/bejelentkezes?redirect_to=/vallalkozas/kezdolap/employees');
         return;
       }
 
@@ -459,7 +459,7 @@ export default function EmployeesPage() {
         <div className="text-center max-w-md">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{error}</h2>
-          <Link href="/company/dashboard" className="text-brand-secondary hover:underline">
+          <Link href="/vallalkozas/kezdolap" className="text-brand-secondary hover:underline">
             Vissza a vezérlőpultra
           </Link>
         </div>

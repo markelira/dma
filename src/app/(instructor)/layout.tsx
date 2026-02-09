@@ -17,7 +17,7 @@ export default function InstructorLayout({ children }: { children: React.ReactNo
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [InstructorLayout] No user found, redirecting to login')
-        router.replace('/login?redirect_to=/instructor/dashboard')
+        router.replace('/bejelentkezes?redirect_to=/instructor/dashboard')
       } else if (user.role?.toUpperCase() !== 'INSTRUCTOR') {
         console.log('❌ [InstructorLayout] User is not instructor, redirecting')
         router.replace('/dashboard')

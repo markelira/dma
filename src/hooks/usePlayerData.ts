@@ -99,18 +99,24 @@ async function fetchPlayerDataFromCloudFunction(courseId: string, lessonId: stri
  * Fetch player data using direct Firestore queries (fallback)
  */
 async function fetchPlayerDataFromFirestore(courseId: string, lessonId: string): Promise<PlayerData> {
-  // Resolve course by slug or ID
+  // Resolve course by slug, legacySlug, or ID
   let courseDoc;
   const coursesBySlug = await getDocs(query(collection(db, 'courses'), where('slug', '==', courseId)));
 
   if (!coursesBySlug.empty) {
     courseDoc = coursesBySlug.docs[0];
   } else {
-    const docSnap = await getDoc(doc(db, 'courses', courseId));
-    if (!docSnap.exists()) {
-      throw new Error('Tartalom nem található');
+    // Try legacySlug (old broken slugs from before Hungarian fix)
+    const coursesByLegacySlug = await getDocs(query(collection(db, 'courses'), where('legacySlug', '==', courseId)));
+    if (!coursesByLegacySlug.empty) {
+      courseDoc = coursesByLegacySlug.docs[0];
+    } else {
+      const docSnap = await getDoc(doc(db, 'courses', courseId));
+      if (!docSnap.exists()) {
+        throw new Error('Tartalom nem található');
+      }
+      courseDoc = docSnap;
     }
-    courseDoc = docSnap;
   }
 
   const courseData = courseDoc.data();

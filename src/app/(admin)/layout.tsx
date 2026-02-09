@@ -19,7 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     if (authReady && !isLoading) {
       if (!user) {
         console.log('❌ [AdminLayout] No user found, redirecting to login')
-        router.replace('/login?redirect_to=/admin')
+        router.replace('/bejelentkezes?redirect_to=/admin')
       } else if (user.role !== 'admin' && user.role !== 'ADMIN') {
         console.log('❌ [AdminLayout] User is not admin, redirecting. User role:', user.role)
         router.replace('/dashboard')

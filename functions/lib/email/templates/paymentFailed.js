@@ -24,7 +24,7 @@ async function sendPaymentFailedEmail(data) {
     const { firstName, email, amount, currency, planName, updatePaymentUrl, retryDate } = data;
     const subject = 'Fizetési hiba - intézkedés szükséges';
     const formattedAmount = formatAmount(amount, currency);
-    const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/company/dashboard/billing`;
+    const paymentUpdateUrl = updatePaymentUrl || `${APP_URL}/vallalkozas/kezdolap/billing`;
     const content = `
     ${(0, base_1.createHeading)('Fizetési hiba', 2)}
     ${(0, base_1.createParagraph)(`Szia <strong>${firstName}</strong>,`)}

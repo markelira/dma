@@ -21,7 +21,7 @@ import { useCourseCompletion } from '@/hooks/useCourseCompletion';
 import { CourseCompletionModal } from '@/components/course-player/CourseCompletionModal';
 import { useAuthStore } from '@/stores/authStore';
 import { fetchLesson } from '@/hooks/useLessonQueries';
-import { getDashboardPath } from '@/lib/routing';
+import { getDashboardPath, getCourseUrl, getCoursePlayerUrl } from '@/lib/routing';
 import { Module, Lesson, CourseType } from '@/types';
 
 /**
@@ -167,10 +167,13 @@ export default function CoursePlayerPage() {
   // Handlers
   const handleLessonClick = useCallback((newLessonId: string) => {
     setCurrentLessonId(newLessonId);
-    router.push(`/courses/${courseId}/player/${newLessonId}`);
+    const playerUrl = course
+      ? getCoursePlayerUrl(course, newLessonId)
+      : `/courses/${courseId}/player/${newLessonId}`;
+    router.push(playerUrl);
     setMobileTab('video');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [courseId, router]);
+  }, [courseId, course, router]);
 
   const handlePreviousLesson = useCallback(() => {
     if (previousLesson) {
@@ -318,14 +321,14 @@ export default function CoursePlayerPage() {
 
   // Redirect if not authenticated
   if (!isAuthenticated || !user) {
-    router.push('/login');
+    router.push('/bejelentkezes');
     return null;
   }
 
   // Check subscription status
   if (subStatus && !hasSub) {
     const returnUrl = `/courses/${courseId}/player/${lessonId}`;
-    router.push(`/register?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
+    router.push(`/regisztracio?reason=subscription_required&returnTo=${encodeURIComponent(returnUrl)}`);
     return (
       <div className="fixed inset-0 bg-background flex items-center justify-center">
         <div className="text-center text-foreground">
@@ -360,7 +363,7 @@ export default function CoursePlayerPage() {
             {playerError?.message || 'A tartalom vagy lecke nem található.'}
           </p>
           <Link
-            href={`/courses/${courseId}`}
+            href={course ? getCourseUrl(course) : `/courses/${courseId}`}
             className="inline-flex items-center gap-2 text-brand-secondary hover:text-brand-secondary-hover font-medium"
           >
             <ArrowLeftIcon size={20} />

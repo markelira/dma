@@ -19,7 +19,7 @@ async function sendNotifyBossEmail(data) {
     ${(0, base_1.createParagraph)(`${employeeFullName} munkatársad szeretné, ha előfizetnél a Struktúraépítő streaming platformon, hogy tovább tudja folytatni a kalandjait. Ne vedd el tőlük a lehetőséget, hogy hozzájáruljanak ahhoz, hogy struktúrált és önjáró vállalkozásotok legyen.`)}
     ${(0, base_1.createParagraph)('Itt a fizetésnap, irány a DMA Masterclass!')}
 
-    ${(0, base_1.createButtonRow)({ text: 'ELŐFIZETEK', url: `${APP_URL}/company/dashboard/billing`, variant: 'primary' })}
+    ${(0, base_1.createButtonRow)({ text: 'ELŐFIZETEK', url: `${APP_URL}/vallalkozas/kezdolap/billing`, variant: 'primary' })}
   `;
     const htmlContent = (0, base_1.wrapInBaseTemplate)(content, {
         showUnsubscribe: true,
@@ -32,7 +32,7 @@ async function sendNotifyBossEmail(data) {
             'Itt a fizetésnap, irány a DMA Masterclass!',
         ],
         ctaText: 'ELŐFIZETEK',
-        ctaUrl: `${APP_URL}/company/dashboard/billing`,
+        ctaUrl: `${APP_URL}/vallalkozas/kezdolap/billing`,
         signOff: 'Üdvözlettel, A DMA csapat',
     });
     try {

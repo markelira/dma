@@ -291,7 +291,7 @@ function RegisterPageContent() {
           // Set popup flags
           sessionStorage.setItem('showWelcomePopup', 'true');
           sessionStorage.setItem('trialPopupDismissed', 'true');
-          router.push('/company/dashboard');
+          router.push('/vallalkozas/kezdolap');
           return;
         }
 
@@ -315,7 +315,7 @@ function RegisterPageContent() {
             console.log('[Register] Payment verified, completing registration...');
             const success = await completeRegistrationFromPending(pendingData);
             if (success) {
-              router.push('/company/dashboard');
+              router.push('/vallalkozas/kezdolap');
               return;
             }
           } else {
@@ -369,7 +369,7 @@ function RegisterPageContent() {
           Regisztráció folytatása
         </button>
         <div className="mt-4">
-          <Link href="/login" className="text-gray-600 hover:text-gray-900 text-sm">
+          <Link href="/bejelentkezes" className="text-gray-600 hover:text-gray-900 text-sm">
             Vissza a bejelentkezéshez
           </Link>
         </div>
@@ -394,7 +394,7 @@ function RegisterPageContent() {
           Regisztráció folytatása
         </button>
         <div className="mt-4">
-          <Link href="/login" className="text-gray-600 hover:text-gray-900 text-sm">
+          <Link href="/bejelentkezes" className="text-gray-600 hover:text-gray-900 text-sm">
             Vissza a bejelentkezéshez
           </Link>
         </div>
@@ -440,7 +440,7 @@ function RegisterPageContent() {
           Már van fiókod?{' '}
           <Link
             className="font-medium text-gray-900 underline hover:no-underline"
-            href="/login"
+            href="/bejelentkezes"
           >
             Bejelentkezés
           </Link>
@@ -495,7 +495,7 @@ function RegisterPageContent() {
         Már van fiókod?{' '}
         <Link
           className="font-medium text-gray-900 underline hover:no-underline"
-          href="/login"
+          href="/bejelentkezes"
         >
           Bejelentkezés
         </Link>

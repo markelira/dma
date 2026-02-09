@@ -4,6 +4,7 @@
 import React, { useEffect } from 'react'
 import { useCourse } from '@/hooks/useCourseQueries'
 import { useParams, useRouter } from 'next/navigation'
+import { getCourseUrl, getCoursePlayerUrl } from '@/lib/routing'
 
 export default function CourseLearnPage() {
   const params = useParams()
@@ -29,10 +30,10 @@ export default function CourseLearnPage() {
 
       if (firstLesson) {
         // Redirect to the specific lesson page using the player route
-        router.replace(`/courses/${courseId}/player/${firstLesson.id}`)
+        router.replace(getCoursePlayerUrl(course, firstLesson.id))
       } else {
         // No lessons found, redirect to course detail page
-        router.replace(`/courses/${courseId}`)
+        router.replace(getCourseUrl(course))
       }
     }
   }, [course, isLoading, courseId, router])

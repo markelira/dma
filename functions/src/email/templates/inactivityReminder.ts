@@ -31,7 +31,7 @@ export async function sendInactivityReminderEmail(data: InactivityReminderEmailD
     ${createHeading(`Szia ${firstName}!`, 2)}
     ${createParagraph('Már egy ideje nem léptél be a Struktúraépítő streaming platformodra. Hiányoznak a közös kalandok. Ne hagyd elveszni a több mint 150 cégépítési tartalmat, vágj bele még ma egy új kalandba.')}
 
-    ${createButtonRow({ text: 'BELEVÁGOK', url: `${APP_URL}/login`, variant: 'primary' })}
+    ${createButtonRow({ text: 'BELEVÁGOK', url: `${APP_URL}/bejelentkezes`, variant: 'primary' })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -42,10 +42,10 @@ export async function sendInactivityReminderEmail(data: InactivityReminderEmailD
   const textContent = generatePlainText({
     greeting: `Szia ${firstName}!`,
     paragraphs: [
-      'Már egy ideje nem léptél be a Struktúraépítő streaming platformodra. Hiányoznak a közös kalandok. Ne hagyd elveszni a több mint 150 cégépítési tartalmat, vágj bele még ma egy új kalandba.',
+      'Már egy ideje nem léptél be a DMA Masterclass struktúraépítő streaming platformodra. Hiányoznak a közös kalandok. Ne hagyd elveszni a több mint 150 cégépítési tartalmat, vágj bele még ma egy új kalandba.',
     ],
     ctaText: 'BELEVÁGOK',
-    ctaUrl: `${APP_URL}/login`,
+    ctaUrl: `${APP_URL}/bejelentkezes`,
     signOff: 'Üdvözlettel, A DMA csapat',
   });
 
