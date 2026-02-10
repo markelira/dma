@@ -218,9 +218,7 @@ export const createCheckoutSession = onCall({
         quantity: 1
       }];
 
-      // Add trial period (7 days)
       sessionParams.subscription_data = {
-        trial_period_days: 7,
         metadata: {
           userId
         }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Check, Copy, Gift, ChevronDown } from 'lucide-react';
+import { Check, Copy, ChevronDown } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface RiddleDiscountCardProps {
@@ -15,7 +15,7 @@ const ANSWERS = [
   { label: 'Attila', code: 'ATTILA' },
   { label: 'kecske', code: 'KECSKE' },
   { label: 'asztal', code: 'ASZTAL' },
-  { label: 'sz\u00e9k', code: 'SZEK' },
+  { label: 'szék', code: 'SZEK' },
 ] as const;
 
 const SESSION_KEY = 'riddle_coupon_code';
@@ -54,7 +54,7 @@ export function RiddleDiscountCard({ onSkip }: RiddleDiscountCardProps) {
       ticks: 50,
       zIndex: 100,
       origin: { x, y },
-      colors: ['#f59e0b', '#10b981', '#3b82f6', '#ef4444', '#8b5cf6'],
+      colors: ['#C8A96E', '#8B6F4E', '#D4B896', '#A67C52', '#E8D5B7'],
     });
   }, []);
 
@@ -101,54 +101,51 @@ export function RiddleDiscountCard({ onSkip }: RiddleDiscountCardProps) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8, transition: { duration: 0.2 } }}
-            className="relative overflow-hidden rounded-2xl border-2 border-dashed border-amber-300 bg-gradient-to-br from-amber-50 via-orange-50/50 to-yellow-50 p-5 sm:p-6"
+            className="relative rounded-xl border border-stone-200 bg-stone-50 p-5 sm:p-6"
           >
-            {/* Decorative corner sparkle */}
-            <div className="absolute -top-1 -right-1 text-amber-300/40">
-              <Sparkles className="w-16 h-16" />
+            {/* Discount badge */}
+            <div className="absolute -top-2.5 right-4">
+              <span className="inline-block px-2.5 py-0.5 bg-stone-800 text-white text-[11px] font-semibold tracking-wide uppercase rounded">
+                -67%
+              </span>
             </div>
 
-            {/* Icon + Question */}
-            <div className="relative flex items-start gap-3 mb-4">
-              <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center shadow-sm">
-                <Gift className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-amber-900 leading-tight">
-                  {`4 l\u00e1ba van, asztal, de nem sz\u00e9k. Mi az?`}
-                </h3>
-                <p className="text-sm text-amber-700/80 mt-1">
-                  {`V\u00e1lassz egy v\u00e1laszt \u00e9s szerezz kedvezm\u00e9nyt!`}
-                </p>
-              </div>
+            {/* Question */}
+            <div className="mb-4">
+              <p className="text-[13px] font-medium text-stone-400 uppercase tracking-wider mb-1.5">
+                Találós kérdés
+              </p>
+              <h3 className="text-lg font-bold text-stone-900 leading-snug">
+                4 lába van, asztal, de nem szék. Mi az?
+              </h3>
+              <p className="text-sm text-stone-500 mt-1.5">
+                Válaszolj helyesen és kapj 67% kedvezményt az első hónapról!
+              </p>
             </div>
 
             {/* Answer Grid */}
-            <div className="grid grid-cols-2 gap-2.5 mb-4">
+            <div className="grid grid-cols-2 gap-2 mb-4">
               {ANSWERS.map((answer) => (
                 <motion.button
                   key={answer.code}
                   type="button"
                   onClick={() => handleAnswer(answer.code, answer.label)}
-                  whileHover={{ scale: 1.03 }}
                   whileTap={{ scale: 0.97 }}
-                  className="relative min-h-[44px] px-4 py-2.5 rounded-xl border-2 border-amber-200 bg-white/80 hover:bg-white hover:border-amber-400 text-amber-900 font-medium text-sm transition-colors shadow-sm hover:shadow-md cursor-pointer"
+                  className="min-h-[44px] px-4 py-2.5 rounded-lg border border-stone-200 bg-white text-stone-800 font-medium text-sm transition-all hover:border-stone-400 hover:bg-stone-800 hover:text-white cursor-pointer"
                 >
                   {answer.label}
                 </motion.button>
               ))}
             </div>
 
-            {/* Skip link */}
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={onSkip}
-                className="text-xs text-amber-600/60 hover:text-amber-700 transition-colors cursor-pointer"
-              >
-                Kihagyom
-              </button>
-            </div>
+            {/* Skip */}
+            <button
+              type="button"
+              onClick={onSkip}
+              className="text-xs text-stone-400 hover:text-stone-600 transition-colors cursor-pointer"
+            >
+              Kihagyom
+            </button>
           </motion.div>
         )}
 
@@ -159,33 +156,35 @@ export function RiddleDiscountCard({ onSkip }: RiddleDiscountCardProps) {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98, transition: { duration: 0.2 } }}
-            className="relative overflow-hidden rounded-2xl border-2 border-emerald-300 bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 p-5 sm:p-6"
+            className="relative rounded-xl border border-stone-200 bg-stone-50 p-5 sm:p-6"
           >
-            <div className="flex flex-col items-center text-center py-2">
+            <div className="flex flex-col items-center text-center py-3">
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', damping: 12, stiffness: 200 }}
-                className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mb-3 shadow-lg shadow-emerald-200"
+                className="w-10 h-10 rounded-full bg-stone-800 flex items-center justify-center mb-3"
               >
-                <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                <Check className="w-5 h-5 text-white" strokeWidth={3} />
               </motion.div>
               <motion.p
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15 }}
-                className="text-lg font-bold text-emerald-800"
+                className="text-lg font-bold text-stone-900"
               >
-                {`Szuper! Megtal\u00e1ltad a kedvezm\u00e9nyt!`}
+                Szuper! Megtaláltad a kedvezményt!
               </motion.p>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-sm text-emerald-600 mt-1"
-              >
-                {selectedAnswer ? `V\u00e1lasz: ${selectedAnswer}` : ''}
-              </motion.p>
+              {selectedAnswer && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-sm text-stone-500 mt-1"
+                >
+                  Válasz: {selectedAnswer}
+                </motion.p>
+              )}
             </div>
           </motion.div>
         )}
@@ -197,44 +196,52 @@ export function RiddleDiscountCard({ onSkip }: RiddleDiscountCardProps) {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35 }}
-            className="relative overflow-hidden rounded-2xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-green-50/60 p-5 sm:p-6"
+            className="relative rounded-xl border border-stone-200 bg-stone-50 p-5 sm:p-6"
           >
+            {/* Discount badge */}
+            <div className="absolute -top-2.5 right-4">
+              <span className="inline-block px-2.5 py-0.5 bg-stone-800 text-white text-[11px] font-semibold tracking-wide uppercase rounded">
+                -67%
+              </span>
+            </div>
+
             <div className="flex flex-col items-center text-center">
-              {/* Header */}
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center">
-                  <Gift className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="text-lg font-bold text-emerald-800">
-                  {`Gratul\u00e1lunk!`}
-                </h3>
+              {/* Headline */}
+              <p className="text-sm font-semibold text-stone-900 mb-1">
+                67% kedvezmény az első hónapról
+              </p>
+
+              {/* Pricing */}
+              <div className="flex items-baseline gap-2 mb-4">
+                <span className="text-2xl font-bold text-stone-900">4.946 Ft</span>
+                <span className="text-sm text-stone-400 line-through">14.990 Ft</span>
               </div>
 
-              {/* Coupon code box */}
+              {/* Coupon code */}
               <div className="w-full max-w-xs mb-3">
-                <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl border-2 border-dashed border-emerald-300 bg-white">
-                  <span className="text-xl font-bold tracking-widest text-emerald-700 font-mono">
+                <div className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-stone-200 bg-white">
+                  <span className="text-base font-bold tracking-[0.2em] text-stone-800 font-mono">
                     {couponCode}
                   </span>
                   <motion.button
                     type="button"
                     onClick={handleCopy}
                     whileTap={{ scale: 0.9 }}
-                    className={`flex-shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-all cursor-pointer ${
                       copied
-                        ? 'bg-emerald-100 text-emerald-700'
-                        : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-600'
+                        ? 'bg-stone-800 text-white'
+                        : 'bg-stone-100 hover:bg-stone-200 text-stone-600'
                     }`}
                   >
                     {copied ? (
                       <>
                         <Check className="w-3 h-3" />
-                        {`M\u00e1solva!`}
+                        Másolva
                       </>
                     ) : (
                       <>
                         <Copy className="w-3 h-3" />
-                        {`M\u00e1sol\u00e1s`}
+                        Másolás
                       </>
                     )}
                   </motion.button>
@@ -242,9 +249,9 @@ export function RiddleDiscountCard({ onSkip }: RiddleDiscountCardProps) {
               </div>
 
               {/* Instruction */}
-              <p className="text-sm text-emerald-600/80 flex items-center gap-1">
-                {`Illeszd be lent a kuponk\u00f3d mez\u0151be`}
-                <ChevronDown className="w-3.5 h-3.5" />
+              <p className="text-xs text-stone-400 flex items-center gap-1">
+                Illeszd be a kuponkódot a fizetésnél
+                <ChevronDown className="w-3 h-3" />
               </p>
             </div>
           </motion.div>
