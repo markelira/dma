@@ -8,7 +8,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '@/lib/firebase';
-import { Loader2, AlertCircle, Shield, Lock, CheckCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Shield, Lock } from 'lucide-react';
 
 // Monthly subscription price ID (14,990 HUF/mo with 7-day trial)
 const MONTHLY_PRICE_ID = 'price_1SdoIlGe8tBqGEXM2uyTAihs';
@@ -186,21 +186,6 @@ export function StripeEmbeddedCheckout({
 
   return (
     <div className="space-y-6">
-      {/* Trial info banner */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-4">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-            <CheckCircle className="w-5 h-5 text-green-600" />
-          </div>
-          <div>
-            <h4 className="font-semibold text-green-800">7 napos ingyenes próbaidőszak</h4>
-            <p className="text-sm text-green-700 mt-1">
-              Az első 7 napban nem vonunk le összeget. Bármikor lemondható a próbaidőszak alatt.
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Stripe Embedded Checkout */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <EmbeddedCheckoutProvider

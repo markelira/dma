@@ -9,7 +9,6 @@ const features = [
   '5 munkatárs díjmentes hozzáadása',
   'Hetente frissülő tartalmak',
   'Bármikor lemondható',
-  '7 napos ingyenes kipróbálás',
 ]
 
 export function PricingEditorial() {
@@ -24,9 +23,7 @@ export function PricingEditorial() {
               Hozzáférés
             </span>
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-[1.1] tracking-[-0.01em]">
-              Fedezd fel 7 napig
-              <br />
-              <span className="text-[#E72B36]">teljesen ingyen</span>
+              Fedezd fel
             </h2>
           </div>
           <div className="lg:col-span-5 flex items-end">
@@ -82,7 +79,7 @@ export function PricingEditorial() {
                   onClick={handleTrialClick}
                   className="block w-full py-4 px-6 bg-white text-gray-900 font-semibold text-center rounded-xl hover:bg-gray-100 transition-colors"
                 >
-                  Kezdd el ingyen
+                  Kezdd el
                 </button>
               </div>
             </div>

@@ -230,7 +230,7 @@ export function ValuePropositionSection({ collapsible = false }: ValuePropositio
 
       {/* Headline */}
       <h2 className="text-xl lg:text-2xl font-bold mb-2 text-gray-800">
-        Fedezd fel 7 napig teljesen ingyen
+        Vágj bele a kalandba
       </h2>
 
       {/* Collapsible toggle button (mobile only) */}
@@ -255,7 +255,7 @@ export function ValuePropositionSection({ collapsible = false }: ValuePropositio
       <ul className="space-y-2.5 sm:space-y-3 mb-6">
         <li className="flex items-start gap-2.5 sm:gap-3">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
-          <span className="text-xs sm:text-sm lg:text-base text-gray-600">7 napos ingyenes kipróbálás</span>
+          <span className="text-xs sm:text-sm lg:text-base text-gray-600">14.990 Ft/hó</span>
         </li>
         <li className="flex items-start gap-2.5 sm:gap-3">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-brand-secondary flex-shrink-0 mt-0.5" />
@@ -278,11 +278,6 @@ export function ValuePropositionSection({ collapsible = false }: ValuePropositio
           <span className="text-xs sm:text-sm lg:text-base text-gray-600">Bármikor lemondható</span>
         </li>
       </ul>
-
-      {/* Pricing - subtle */}
-      <div className="text-xs sm:text-sm text-gray-400 mb-5 sm:mb-6 pb-5 sm:pb-6 border-b border-gray-200">
-        Utána: <span className="text-gray-700 font-medium">14.990 Ft/hó</span>
-      </div>
 
       {/* Testimonial Carousel */}
       <div>
@@ -395,13 +390,8 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   // Skip payment state
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
 
-  // Riddle discount state
-  const [riddleDismissed, setRiddleDismissed] = useState<boolean>(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('riddle_dismissed') === 'true';
-    }
-    return false;
-  });
+  // Riddle discount state (not persisted — always show on fresh Step 3)
+  const [riddleDismissed, setRiddleDismissed] = useState(false);
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: preRegistrationData?.firstName || inviteData?.employeeName.split(' ')[0] || '',
@@ -789,7 +779,10 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
       // Continue anyway - webhook can still complete registration
     }
 
-    // Move to Step 3 (Payment)
+    // Move to Step 3 (Payment) — reset riddle so it always shows
+    setRiddleDismissed(false);
+    sessionStorage.removeItem('riddle_dismissed');
+    sessionStorage.removeItem('riddle_coupon_code');
     setCurrentStep(3);
     setTimeout(() => {
       step3Ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -813,7 +806,6 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   // Skip payment and complete registration without subscription
   const handleRiddleSkip = () => {
     setRiddleDismissed(true);
-    sessionStorage.setItem('riddle_dismissed', 'true');
   };
 
   const handleSkipPayment = async () => {
@@ -1467,7 +1459,7 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 Fizetés
               </h2>
               <p className="mt-2 text-sm text-gray-600">
-                7 napos ingyenes próbaidőszak, utána 14.990 Ft/hó
+                14.990 Ft/hó
               </p>
             </div>
 

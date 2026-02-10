@@ -27,11 +27,6 @@ export default function HomepageFAQ() {
         "A DMA Masterclasson 20 év tapasztalatából összerakott, működő és azonnal alkalmazható cégépítési rendszereket kapsz szakértő Mentoroktól.",
     },
     {
-      question: "Tényleg kipróbálhatom 7 napig ingyen?",
-      answer:
-        "Igen. Sikeres regisztráció után 7 napig teljesen ingyenesen tudod felfedezni a tartalmakat. 7 nap után, ha nem mondod le az előfizetést, akkor 14.990 Ft-ért tudod folytatni a kalandozást.",
-    },
-    {
       question: "Munkatársakat is hozzá tudok adni az oldalhoz?",
       answer:
         "Igen, teljesen ingyenesen hozzá tudsz adni 5 munkatársat is, akik veled együtt kalandozhatnak a különböző tematikájú tartalmak között.",

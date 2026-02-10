@@ -27,7 +27,6 @@ const offerFeatures = [
   '5 munkatárs díjmentes hozzáadása',
   'Hetente frissülő tartalmak',
   'Bármikor lemondható',
-  '7 napos ingyenes kipróbálás',
 ];
 
 export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }: CourseFeaturesSectionProps) {
@@ -55,10 +54,10 @@ export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }
       transition={{ duration: 0.5, delay: 0.1 }}
     >
       <h2 className={`text-2xl font-bold ${headingClass} mb-2`}>
-        Fedezd fel 7 napig teljesen ingyen
+        Vágj bele a kalandba
       </h2>
       <p className={`${textClass} mb-6`}>
-        Vágj bele a kalandba és fedezd fel a 150+ cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.
+        Fedezd fel a 150+ cégépítési tartalmat, hogy vállalkozásod végre strukturált és önjáró legyen.
       </p>
 
       <div className="flex items-baseline gap-1 mb-6">
@@ -82,7 +81,7 @@ export function CourseFeaturesSection({ darkMode = false, isSubscriber = false }
         onClick={handleTrialClick}
         className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-secondary text-white rounded-lg font-semibold hover:bg-brand-secondary/90 transition-colors"
       >
-        Fedezd fel 7 napig ingyen
+        Fedezd fel
       </button>
     </motion.section>
   );
