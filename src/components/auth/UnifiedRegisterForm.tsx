@@ -57,6 +57,7 @@ interface GetPendingRegistrationResponse {
 }
 import { RegistrationProgressBar } from './RegistrationProgressBar';
 import { StripeEmbeddedCheckout } from './StripeEmbeddedCheckout';
+import { RiddleDiscountCard } from './RiddleDiscountCard';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -393,6 +394,14 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
 
   // Skip payment state
   const [isSkippingPayment, setIsSkippingPayment] = useState(false);
+
+  // Riddle discount state
+  const [riddleDismissed, setRiddleDismissed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('riddle_dismissed') === 'true';
+    }
+    return false;
+  });
 
   const [formData, setFormData] = useState<UnifiedRegistrationData>({
     firstName: preRegistrationData?.firstName || inviteData?.employeeName.split(' ')[0] || '',
@@ -802,6 +811,11 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
   };
 
   // Skip payment and complete registration without subscription
+  const handleRiddleSkip = () => {
+    setRiddleDismissed(true);
+    sessionStorage.setItem('riddle_dismissed', 'true');
+  };
+
   const handleSkipPayment = async () => {
     if (!firebaseUserId) return;
 
@@ -1456,6 +1470,12 @@ export const UnifiedRegisterForm: React.FC<UnifiedRegisterFormProps> = ({
                 7 napos ingyenes próbaidőszak, utána 14.990 Ft/hó
               </p>
             </div>
+
+            {!riddleDismissed && (
+              <div className="mb-6">
+                <RiddleDiscountCard onSkip={handleRiddleSkip} />
+              </div>
+            )}
 
             <StripeEmbeddedCheckout
               userId={firebaseUserId}
