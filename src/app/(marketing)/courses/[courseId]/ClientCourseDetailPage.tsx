@@ -389,8 +389,10 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     }
 
     // SCENARIO 3: Has subscription - proceed to player
-    const firstLessonId = await getFirstLessonId(id);
-    const courseObj = course || { id, courseType: undefined, slug: undefined };
+    // Use course.id (Firestore document ID), not id (URL slug)
+    const courseDocId = course?.id || id;
+    const firstLessonId = await getFirstLessonId(courseDocId);
+    const courseObj = course || { id: courseDocId, courseType: undefined, slug: undefined };
     const playerUrl = firstLessonId
       ? getCoursePlayerUrl(courseObj, firstLessonId)
       : getCourseUrl(courseObj);
@@ -399,7 +401,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
     router.push(playerUrl);
 
     // Enroll in background (don't await)
-    enrollMutation.mutate(id, {
+    enrollMutation.mutate(courseDocId, {
       onSuccess: (data) => {
         if (!data.alreadyEnrolled) {
           toast.success('Sikeres beiratkozás!');
@@ -413,7 +415,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           setShowSubscriptionModal(true);
         } else {
           // Silent retry on other errors
-          setTimeout(() => enrollMutation.mutate(id), 2000);
+          setTimeout(() => enrollMutation.mutate(courseDocId), 2000);
         }
       }
     });
