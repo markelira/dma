@@ -1138,7 +1138,7 @@ var Component = /* @__PURE__ */ React.forwardRef(function (props, ref) {
 											scopeId={"S5FkFcOiX"}
 										>
 											{_jsx(stdin_default3, {
-												bL9DUTLS5: "Kipróbálom 7 napig ingyen",
+												bL9DUTLS5: "Kipróbálom",
 												height: "100%",
 												id: "q03oD5D7d",
 												kI0zFLUtw:

@@ -93,7 +93,7 @@ export function TaskFlowHome() {
         <BenefitsEditorial />
         {/* Categories Section - "A Struktúraépítő streaming platform" */}
         <CategoriesEditorial />
-        {/* Pricing Section - "Fedezd fel 7 napig teljesen ingyen" */}
+        {/* Pricing Section */}
         <PricingEditorial />
         {/* Testimonials Section - Google Reviews */}
         <TestimonialsEditorial />

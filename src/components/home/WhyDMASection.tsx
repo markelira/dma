@@ -83,7 +83,7 @@ export function WhyDMASection() {
             onClick={handleTrialClick}
             className="group inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 text-sm sm:text-base md:text-lg font-medium sm:font-semibold text-white bg-[#E53935] hover:bg-[#C62828] rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] whitespace-nowrap"
           >
-            Fedezd fel 7 napig ingyen
+            Fedezd fel
             <svg
               className="w-5 h-5 transition-transform group-hover:translate-x-1"
               fill="none"

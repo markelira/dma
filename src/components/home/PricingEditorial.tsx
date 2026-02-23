@@ -8,7 +8,6 @@ const features = [
   'Több mint 200 órányi azonnal alkalmazható, működő rendszer',
   '5 munkatárs díjmentes hozzáadása',
   'Hetente frissülő tartalmak',
-  'Bármikor lemondható',
 ]
 
 export function PricingEditorial() {
