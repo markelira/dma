@@ -460,6 +460,7 @@ export default function ClientCourseDetailPage({ id }: { id: string }) {
           courseType={c.courseType}
           instructors={courseInstructors}
           modules={modulesData}
+          courseId={c.id}
           onEnroll={handleEnroll}
           onScrollToDetails={scrollToDetails}
         />

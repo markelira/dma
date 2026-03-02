@@ -4,6 +4,7 @@ import React, { useMemo, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'motion/react';
 import { Play, Clock, BookOpen, Video, GraduationCap, Mic, ChevronDown } from 'lucide-react';
+import { CoursePreviewModal } from '@/components/course-preview/CoursePreviewModal';
 
 interface Instructor {
   id: string;
@@ -34,6 +35,7 @@ interface NetflixStyleHeroProps {
   courseType?: 'WEBINAR' | 'ACADEMIA' | 'MASTERCLASS' | 'PODCAST';
   instructors?: Instructor[];
   modules?: Module[];
+  courseId?: string;
   onEnroll?: () => void;
   onScrollToDetails?: () => void;
 }
@@ -96,12 +98,14 @@ export function NetflixStyleHero({
   courseType,
   instructors = [],
   modules = [],
+  courseId,
   onEnroll,
   onScrollToDetails,
 }: NetflixStyleHeroProps) {
   const config = getCourseTypeConfig(courseType);
   const Icon = config.icon;
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   // Calculate total duration and lesson count
   const stats = useMemo(() => {
@@ -264,7 +268,7 @@ export function NetflixStyleHero({
               )}
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Buttons */}
             <div className="flex items-center gap-3">
               <button
                 onClick={onEnroll}
@@ -273,10 +277,28 @@ export function NetflixStyleHero({
                 <Play className="w-5 h-5 fill-current" />
                 {config.ctaLabel}
               </button>
+              {courseId && (
+                <button
+                  onClick={() => setShowPreviewModal(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white/10 border border-white/20 text-white rounded-lg font-semibold hover:bg-white/20 transition-colors"
+                >
+                  <Play className="w-5 h-5" />
+                  Előnézet
+                </button>
+              )}
             </div>
           </motion.div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {courseId && (
+        <CoursePreviewModal
+          courseId={showPreviewModal ? courseId : null}
+          open={showPreviewModal}
+          onOpenChange={setShowPreviewModal}
+        />
+      )}
     </div>
   );
 }
