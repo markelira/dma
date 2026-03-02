@@ -128,8 +128,11 @@ export default function DashboardPage() {
 
     if (!showWelcomePopup && !hasActiveSubscription) {
       if (isCompanyEmployee) {
-        // Company employee without company subscription - show contact admin modal
-        setShowCompanyNoAccessModal(true);
+        // Company employee without company subscription - show contact admin modal (once per session)
+        const dismissed = sessionStorage.getItem('companyNoAccessDismissed') === 'true';
+        if (!dismissed) {
+          setShowCompanyNoAccessModal(true);
+        }
       } else if (shouldShowForAuthUser) {
         // Regular user - show trial modal
         setShowTrialModal(true);
@@ -457,7 +460,12 @@ export default function DashboardPage() {
       {/* Company Employee No Access Modal - for company employees without company subscription */}
       <CompanyEmployeeNoAccessModal
         open={showCompanyNoAccessModal}
-        onOpenChange={setShowCompanyNoAccessModal}
+        onOpenChange={(open) => {
+          setShowCompanyNoAccessModal(open);
+          if (!open) {
+            sessionStorage.setItem('companyNoAccessDismissed', 'true');
+          }
+        }}
         companyId={user?.companyId}
         employeeName={user?.firstName ? `${user.lastName || ''} ${user.firstName}`.trim() : undefined}
       />
