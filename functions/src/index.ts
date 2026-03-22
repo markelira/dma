@@ -347,6 +347,7 @@ export const requestPasswordReset = onCall({
       ${createHeading(`Szia ${firstName}!`, 2)}
       ${createParagraph('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
       ${createButtonRow({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetLink, variant: 'primary' })}
+      ${createParagraph(`Vagy kattints ide: <a href="${resetLink}" style="color: #252F5B; word-break: break-all;">${resetLink}</a>`, { muted: true })}
       ${createParagraph('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
     `;
 
