@@ -20,6 +20,8 @@ import { handlePaymentSuccess } from '../payment/handlePaymentSuccess';
 // Email templates
 import { sendSubscriptionStartedEmail } from '../email/templates/subscriptionStarted';
 import { sendSubscriptionCanceledEmail } from '../email/templates/subscriptionCanceled';
+import { sendCompanySubscriptionCanceledEmail } from '../email/templates/companySubscriptionCanceled';
+import { clearUserProgressData } from '../utils/deleteUserData';
 import { sendPaymentSuccessEmail } from '../email/templates/paymentSuccess';
 import { sendPaymentFailedEmail } from '../email/templates/paymentFailed';
 
@@ -938,6 +940,63 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
       }
     } catch (emailError: any) {
       logger.error('[handleSubscriptionDeleted] Failed to send email:', emailError.message);
+    }
+
+    // Clear progress data for the subscription owner + company employees
+    try {
+      if (!subscriptionsSnapshot.empty) {
+        const subscriptionData = subscriptionsSnapshot.docs[0].data();
+        const ownerId = subscriptionData.userId;
+
+        if (ownerId) {
+          // Collect all userIds to clear (owner + employees)
+          const userIdsToClear: string[] = [ownerId];
+
+          // Check if owner has a company — if so, clear all employee data too
+          const ownerDoc = await firestore.collection('users').doc(ownerId).get();
+          const ownerData = ownerDoc.data();
+          const companyId = ownerData?.companyId;
+
+          if (companyId) {
+            const employeesSnapshot = await firestore
+              .collection('companies')
+              .doc(companyId)
+              .collection('employees')
+              .get();
+
+            for (const empDoc of employeesSnapshot.docs) {
+              const empData = empDoc.data();
+              if (empData.userId && empData.userId !== ownerId) {
+                userIdsToClear.push(empData.userId);
+
+                // Send cancellation email to employee (non-blocking)
+                if (empData.email) {
+                  sendCompanySubscriptionCanceledEmail({
+                    employeeFirstName: empData.firstName || 'Kollega',
+                    employeeEmail: empData.email,
+                    companyName: ownerData?.companyName || 'a vállalat',
+                  }).catch((err) => {
+                    logger.warn(`[handleSubscriptionDeleted] Failed to send employee cancel email:`, err.message);
+                  });
+                }
+              }
+            }
+
+            logger.info(`[handleSubscriptionDeleted] Clearing progress for ${userIdsToClear.length} users (owner + ${userIdsToClear.length - 1} employees)`);
+          }
+
+          // Clear progress data for all users
+          for (const uid of userIdsToClear) {
+            try {
+              await clearUserProgressData(uid);
+            } catch (clearErr: any) {
+              logger.error(`[handleSubscriptionDeleted] Failed to clear progress for ${uid}:`, clearErr.message);
+            }
+          }
+        }
+      }
+    } catch (clearError: any) {
+      logger.error('[handleSubscriptionDeleted] Failed to clear progress data:', clearError.message);
     }
 
   } catch (error: any) {
