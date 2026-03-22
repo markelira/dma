@@ -87,8 +87,6 @@ export async function sendNewCourseEmail(
     </tr>
 
     ${createButtonRow({ text: 'Megnézem', url: contentUrl, variant: 'primary' })}
-
-    ${createParagraph('Ne hagyd ki - a legjobb tartalmak most érhetők el!', { muted: true })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -103,7 +101,6 @@ export async function sendNewCourseEmail(
       `Cím: ${contentTitle}`,
       instructorName ? `Előadó: ${instructorName}` : '',
       description || '',
-      'Ne hagyd ki - a legjobb tartalmak most érhetők el!',
     ].filter(Boolean),
     ctaText: 'Megnézem',
     ctaUrl: contentUrl,
