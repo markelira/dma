@@ -19,6 +19,11 @@ import { sendInactivityReminderEmail } from './email/templates/inactivityReminde
 import { sendSubscriptionCanceledEmail } from './email/templates/subscriptionCanceled';
 import { sendCompanySubscriptionCanceledEmail } from './email/templates/companySubscriptionCanceled';
 import { sendNotifyBossEmail } from './email/templates/notifyBossEmail';
+import { sendPreRegistrationEmail } from './email/templates/preRegistration';
+import { sendPaymentSuccessEmail } from './email/templates/paymentSuccess';
+import { sendPaymentFailedEmail } from './email/templates/paymentFailed';
+import { sendTrialEndingEmail } from './email/templates/trialEnding';
+import { sendNewCourseEmail } from './email/templates/newCourse';
 import { sendInvitationEmail } from './company/employeeInvite';
 import {
   wrapInBaseTemplate,
@@ -26,6 +31,8 @@ import {
   createParagraph,
   createCodeDisplay,
   createAlertBox,
+  createButtonRow,
+  generatePlainText,
 } from './email/templates/base';
 
 const TEST_EMAIL = 'info@dma.hu';
@@ -88,16 +95,16 @@ export const testAllEmails = https.onCall(
       results.push({ email: '2. Welcome (Boss)', subject: 'Üdv a Struktúraépítők között', success: false, error: error.message });
     }
 
-    // 3. Welcome Email (Employee) - "Üdv a Struktúraépítők között"
+    // 3. Welcome Email (Employee) - "Üdv a struktúraépítők között"
     try {
       const result = await sendEmployeeWelcomeEmail({
         firstName: TEST_FIRST_NAME,
         email: TEST_EMAIL,
         companyName: 'Teszt Cég Kft.',
       });
-      results.push({ email: '3. Welcome (Employee)', subject: 'Üdv a Struktúraépítők között', success: result.success, error: result.error });
+      results.push({ email: '3. Welcome (Employee)', subject: 'Üdv a struktúraépítők között', success: result.success, error: result.error });
     } catch (error: any) {
-      results.push({ email: '3. Welcome (Employee)', subject: 'Üdv a Struktúraépítők között', success: false, error: error.message });
+      results.push({ email: '3. Welcome (Employee)', subject: 'Üdv a struktúraépítők között', success: false, error: error.message });
     }
 
     // 4. Registration Reminder 1 Day - "RE: Üdv a Struktúraépítők között"
@@ -110,14 +117,14 @@ export const testAllEmails = https.onCall(
       results.push({ email: '4. Reminder 1-Day', subject: 'RE: Üdv a Struktúraépítők között', success: false, error: error.message });
     }
 
-    // 5. Registration Reminder 7 Days - "7 nap telt el, és kezdünk aggódni"
+    // 5. Registration Reminder 7 Days - "Hét nap telt el, és kezdünk aggódni"
     try {
       const result = await sendRegistrationReminderEmail({
         email: TEST_EMAIL,
       });
-      results.push({ email: '5. Reminder 7-Day', subject: '7 nap telt el, és kezdünk aggódni', success: result.success, error: result.error });
+      results.push({ email: '5. Reminder 7-Day', subject: 'Hét nap telt el, és kezdünk aggódni', success: result.success, error: result.error });
     } catch (error: any) {
-      results.push({ email: '5. Reminder 7-Day', subject: '7 nap telt el, és kezdünk aggódni', success: false, error: error.message });
+      results.push({ email: '5. Reminder 7-Day', subject: 'Hét nap telt el, és kezdünk aggódni', success: false, error: error.message });
     }
 
     // 6. Subscription Started - "Sikeres fizetés"
@@ -157,17 +164,22 @@ export const testAllEmails = https.onCall(
       results.push({ email: '8. Employee Joined', subject: 'Munkatársad csatlakozott', success: false, error: error.message });
     }
 
-    // 9. New Content Available - "Új tartalom elérhető"
+    // 9. New Content Available - "Új tartalom elérhető" (with full card data)
     try {
       const result = await sendNewContentAvailableEmail({
         firstName: TEST_FIRST_NAME,
         email: TEST_EMAIL,
         courseTitle: 'Teszt Kurzus - Hogyan Építs Struktúrát',
         courseId: 'test-course-id',
+        courseType: 'MASTERCLASS',
+        instructorName: 'Kovács János',
+        description: 'Ebben a masterclassban megtanulod a struktúraépítés alapjait és hogyan alkalmazd a mindennapi munkádban. 20 év tapasztalatát sűrítettük bele ebbe a tartalomba.',
+        thumbnailUrl: 'https://firebasestorage.googleapis.com/v0/b/dmaapp-477d4.appspot.com/o/courses%2Fdefault-thumbnail.jpg?alt=media',
+        duration: '45 perc',
       });
-      results.push({ email: '9. New Content', subject: 'Új tartalom elérhető', success: result.success, error: result.error });
+      results.push({ email: '9. New Content', subject: 'Új masterclass elérhető', success: result.success, error: result.error });
     } catch (error: any) {
-      results.push({ email: '9. New Content', subject: 'Új tartalom elérhető', success: false, error: error.message });
+      results.push({ email: '9. New Content', subject: 'Új masterclass elérhető', success: false, error: error.message });
     }
 
     // 10. Inactivity Reminder - "Hiányzol..."
@@ -187,7 +199,7 @@ export const testAllEmails = https.onCall(
         firstName: TEST_FIRST_NAME,
         email: TEST_EMAIL,
         planName: 'Struktúraépítő Előfizetés',
-        accessUntil: '2024-12-31',
+        accessUntil: '2026-04-30',
       });
       results.push({ email: '11. Sub Canceled (Boss)', subject: 'Itt a vége', success: result.success, error: result.error });
     } catch (error: any) {
@@ -218,30 +230,115 @@ export const testAllEmails = https.onCall(
       results.push({ email: '13. Notify Boss', subject: 'Fizetésnap', success: false, error: error.message });
     }
 
-    // 14. Password Reset - Note: Firebase Auth handles this automatically
-    // Creating a custom template to match the style
+    // 14. Pre-Registration - "Regisztrációd elő lett készítve"
     try {
-      const resetUrl = 'https://masterclass.dma.hu/reset-password?token=test';
+      const result = await sendPreRegistrationEmail({
+        firstName: TEST_FIRST_NAME,
+        email: TEST_EMAIL,
+        companyName: 'Teszt Cég Kft.',
+        registerUrl: 'https://masterclass.dma.hu/regisztracio?invite=test-token',
+      });
+      results.push({ email: '14. Pre-Registration', subject: 'Regisztrációd elő lett készítve', success: result.success, error: result.error });
+    } catch (error: any) {
+      results.push({ email: '14. Pre-Registration', subject: 'Regisztrációd elő lett készítve', success: false, error: error.message });
+    }
+
+    // 15. Payment Success - "Sikeres fizetés"
+    try {
+      const result = await sendPaymentSuccessEmail({
+        firstName: TEST_FIRST_NAME,
+        email: TEST_EMAIL,
+        amount: 14990,
+        currency: 'huf',
+        planName: 'Struktúraépítő Előfizetés',
+        periodEnd: '2026-04-22',
+      });
+      results.push({ email: '15. Payment Success', subject: 'Sikeres fizetés', success: result.success, error: result.error });
+    } catch (error: any) {
+      results.push({ email: '15. Payment Success', subject: 'Sikeres fizetés', success: false, error: error.message });
+    }
+
+    // 16. Payment Failed - "Fizetési hiba, cselekedj gyorsan"
+    try {
+      const result = await sendPaymentFailedEmail({
+        firstName: TEST_FIRST_NAME,
+        email: TEST_EMAIL,
+        amount: 14990,
+        currency: 'huf',
+        planName: 'Struktúraépítő Előfizetés',
+      });
+      results.push({ email: '16. Payment Failed', subject: 'Fizetési hiba, cselekedj gyorsan', success: result.success, error: result.error });
+    } catch (error: any) {
+      results.push({ email: '16. Payment Failed', subject: 'Fizetési hiba, cselekedj gyorsan', success: false, error: error.message });
+    }
+
+    // 17. Trial Ending - "Próbaidőszakod lejár"
+    try {
+      const result = await sendTrialEndingEmail({
+        firstName: TEST_FIRST_NAME,
+        email: TEST_EMAIL,
+        planName: 'Struktúraépítő Előfizetés',
+        trialEndDate: '2026-03-25',
+        daysRemaining: 3,
+        amount: 14990,
+        currency: 'huf',
+      });
+      results.push({ email: '17. Trial Ending', subject: 'Próbaidőszakod 3 nap múlva lejár', success: result.success, error: result.error });
+    } catch (error: any) {
+      results.push({ email: '17. Trial Ending', subject: 'Próbaidőszakod lejár', success: false, error: error.message });
+    }
+
+    // 18. New Course - "Új webinár elérhető"
+    try {
+      const result = await sendNewCourseEmail({
+        firstName: TEST_FIRST_NAME,
+        email: TEST_EMAIL,
+        contentTitle: 'Teszt Webinár - Struktúraépítés alapjai',
+        contentType: 'webinar',
+        description: 'Ebben a webinárban megtanulod a struktúraépítés alapjait és hogyan alkalmazd a mindennapi munkádban.',
+        instructorName: 'Kovács János',
+        contentUrl: 'https://masterclass.dma.hu/webinar/teszt-webinar',
+      });
+      results.push({ email: '18. New Course', subject: 'Új webinár elérhető', success: result.success, error: result.error });
+    } catch (error: any) {
+      results.push({ email: '18. New Course', subject: 'Új webinár elérhető', success: false, error: error.message });
+    }
+
+    // 19. Password Reset - actual template as used in requestPasswordReset
+    try {
+      const resetUrl = 'https://masterclass.dma.hu/reset-password?token=test-token-1234';
       const resetContent = `
-        ${createHeading('Jelszó visszaállítása', 2)}
-        ${createParagraph('Jelszó visszaállítási kérelmet kaptunk a fiókoddal kapcsolatban.')}
-        ${createParagraph('Kattints az alábbi gombra az új jelszavad beállításához:')}
-        ${createAlertBox('Ez a link <strong>1 óráig</strong> érvényes.', 'info')}
-        ${createParagraph('Ha nem te kezdeményezted ezt a kérést, kérjük hagyd figyelmen kívül ezt az emailt.', { muted: true })}
+        ${createHeading(`Szia ${TEST_FIRST_NAME}!`, 2)}
+        ${createParagraph('Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát. Állíts be újat!')}
+        ${createButtonRow({ text: 'ÚJ JELSZÓ BEÁLLÍTÁSA', url: resetUrl, variant: 'primary' })}
+        ${createParagraph(`Vagy kattints ide: <a href="${resetUrl}" style="color: #252F5B; word-break: break-all;">${resetUrl}</a>`, { muted: true })}
+        ${createParagraph('Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt. Fiókja biztonságban van.', { muted: true })}
       `;
       const htmlContent = wrapInBaseTemplate(resetContent, {
         showUnsubscribe: false,
-        preheader: 'Jelszó visszaállítási kérelem',
+        preheader: 'Jelszó visszaállítás a DMA Masterclass platformon',
+      });
+
+      const textContent = generatePlainText({
+        greeting: `Szia ${TEST_FIRST_NAME}!`,
+        paragraphs: [
+          'Hiba történt a mátrixban és véletlenül elfelejtetted a kedvenc Struktúraépítő streaming platformod jelszavát.',
+          'Ha nem Ön kérte a jelszó visszaállítást, kérjük hagyja figyelmen kívül ezt az emailt.',
+        ],
+        ctaText: 'ÚJ JELSZÓ BEÁLLÍTÁSA',
+        ctaUrl: resetUrl,
+        signOff: 'Üdvözlettel, A DMA Masterclass csapata',
       });
 
       const result = await sendEmail({
         to: TEST_EMAIL,
         subject: 'Jelszó visszaállítása - DMA Masterclass',
         html: htmlContent,
+        text: textContent,
       });
-      results.push({ email: '14. Password Reset', subject: 'Jelszó visszaállítása', success: result.success, error: result.error });
+      results.push({ email: '19. Password Reset', subject: 'Jelszó visszaállítása', success: result.success, error: result.error });
     } catch (error: any) {
-      results.push({ email: '14. Password Reset', subject: 'Jelszó visszaállítása', success: false, error: error.message });
+      results.push({ email: '19. Password Reset', subject: 'Jelszó visszaállítása', success: false, error: error.message });
     }
 
     // Summary
