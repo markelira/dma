@@ -8,7 +8,6 @@
 import * as admin from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import { CompanyEmployee } from '../types/company';
-import { sendEmployeeWelcomeEmail } from '../email/templates/employeeWelcome';
 import { sendEmployeeJoinedEmail } from '../email/templates/employeeJoined';
 
 const db = admin.firestore();
@@ -148,22 +147,10 @@ export async function linkEmployeeByEmail(
       timestamp: FieldValue.serverTimestamp(),
     }).catch(() => { /* Non-critical */ });
 
-    // 7. Send employee welcome email (fire-and-forget, non-blocking)
-    const employeeFirstName = employeeData.firstName || employeeData.fullName?.split(' ')[0] || 'Kollega';
+    // 7. Welcome email is NOT sent here — callers (completeUnifiedRegistration,
+    //    completeRegistrationInternal) already send it based on linkedToInvite flag.
+
     const employeeFullName = employeeData.fullName || `${employeeData.lastName} ${employeeData.firstName}`;
-    sendEmployeeWelcomeEmail({
-      firstName: employeeFirstName,
-      email: email.toLowerCase(),
-      companyName,
-    }).then((result) => {
-      if (result.success) {
-        console.log('📧 [linkEmployeeByEmail] Employee welcome email sent');
-      } else {
-        console.warn('⚠️ [linkEmployeeByEmail] Failed to send welcome email:', result.error);
-      }
-    }).catch((err) => {
-      console.warn('⚠️ [linkEmployeeByEmail] Error sending welcome email:', err.message);
-    });
 
     // 8. Notify admin that employee joined (fire-and-forget, non-blocking)
     if (employeeData.invitedBy) {
