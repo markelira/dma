@@ -168,8 +168,6 @@ export async function sendNewContentAvailableEmail(
     ${contentCard}
 
     ${createButtonRow({ text: 'MEGNÉZEM', url: courseUrl, variant: 'primary' })}
-
-    ${createParagraph('Ne hagyd ki a lehetőséget, hogy fejlődj és építsd a vállalkozásodat!', { muted: true })}
   `;
 
   const htmlContent = wrapInBaseTemplate(content, {
@@ -203,9 +201,6 @@ export async function sendNewContentAvailableEmail(
   if (duration) {
     textParagraphs.push(`⏱️ Időtartam: ${duration}`);
   }
-
-  textParagraphs.push('');
-  textParagraphs.push('Ne hagyd ki a lehetőséget, hogy fejlődj és építsd a vállalkozásodat!');
 
   const textContent = generatePlainText({
     greeting: `Szia ${firstName}!`,

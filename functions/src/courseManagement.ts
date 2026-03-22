@@ -374,6 +374,21 @@ export const publishCourse = onCall({
 
     // Notify all registered users about new content
     const courseTitle = courseData?.title || 'Új tartalom';
+
+    // Look up instructor name for email card
+    let instructorName: string | undefined;
+    if (courseData?.instructorId) {
+      try {
+        const instructorDoc = await firestore.collection('users').doc(courseData.instructorId).get();
+        if (instructorDoc.exists) {
+          const instrData = instructorDoc.data();
+          instructorName = instrData?.displayName || `${instrData?.lastName || ''} ${instrData?.firstName || ''}`.trim() || undefined;
+        }
+      } catch (e) {
+        // Non-critical, continue without instructor name
+      }
+    }
+
     try {
       const usersSnapshot = await firestore.collection('users').get();
       const emailPromises: Promise<{ success: boolean; error?: string }>[] = [];
@@ -389,6 +404,11 @@ export const publishCourse = onCall({
               email: userData.email,
               courseTitle,
               courseId,
+              courseType: courseData?.courseType,
+              instructorName,
+              description: courseData?.description,
+              thumbnailUrl: courseData?.thumbnailUrl,
+              duration: courseData?.duration,
             }).catch((err) => {
               logger.warn(`Error sending new content email to ${maskEmail(userData.email)}:`, err.message);
               return { success: false, error: err.message };
