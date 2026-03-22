@@ -26,7 +26,7 @@ export async function sendRegistrationReminder1DayEmail(
 ): Promise<{ success: boolean; error?: string }> {
   const { email } = data;
 
-  const subject = 'Tegnap regisztráltál - ideje belevágni! - DMA Masterclass';
+  const subject = 'RE: Üdv a Struktúraépítők között - DMA Masterclass';
 
   const content = `
     ${createHeading('Hé Struktúraépítő!', 2)}
@@ -39,7 +39,7 @@ export async function sendRegistrationReminder1DayEmail(
 
   const htmlContent = wrapInBaseTemplate(content, {
     showUnsubscribe: true,
-    preheader: 'Tegnap regisztráltál - ideje belevágni!',
+    preheader: 'Még nem vágtál bele - itt az ideje!',
   });
 
   const textContent = generatePlainText({
