@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/stores/authStore';
 import { Loader2, Building2, Star, Play } from 'lucide-react';
 import { DashboardHeroCarousel } from '@/components/dashboard/DashboardHeroCarousel';
@@ -41,6 +42,7 @@ const MAX_CAROUSEL_CARDS = 6;
 export default function DashboardPage() {
   const { user, authReady } = useAuthStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   // Data hooks
   const { data: enrollments, isLoading: enrollmentsLoading } = useEnrollments();
@@ -115,6 +117,9 @@ export default function DashboardPage() {
     }
   }, []);
 
+  // Track whether we've already done the delayed refetch for company employees
+  const employeeRefetchDone = useRef(false);
+
   // Check if trial popup should show (AFTER welcome popup is dismissed)
   // Company employees see different modal if company has no subscription
   // IMPORTANT: Wait for BOTH authReady AND subscription status to avoid race condition
@@ -128,7 +133,17 @@ export default function DashboardPage() {
 
     if (!showWelcomePopup && !hasActiveSubscription) {
       if (isCompanyEmployee) {
-        // Company employee without company subscription - show contact admin modal (once per session)
+        // Company employee without company subscription
+        // Race condition fix: Stripe webhook may not have updated Firestore yet.
+        // Wait 5 seconds and refetch subscription status before showing modal.
+        if (!employeeRefetchDone.current) {
+          employeeRefetchDone.current = true;
+          const timer = setTimeout(() => {
+            queryClient.invalidateQueries({ queryKey: ['subscription-status'] });
+          }, 5000);
+          return () => clearTimeout(timer);
+        }
+        // After refetch, if still no subscription, show modal (once per session)
         const dismissed = sessionStorage.getItem('companyNoAccessDismissed') === 'true';
         if (!dismissed) {
           setShowCompanyNoAccessModal(true);
@@ -138,7 +153,7 @@ export default function DashboardPage() {
         setShowTrialModal(true);
       }
     }
-  }, [authReady, shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading, subscriptionFetched]);
+  }, [authReady, shouldShowForAuthUser, isCompanyEmployee, hasActiveSubscription, showWelcomePopup, subscriptionLoading, subscriptionFetched, queryClient]);
 
   // Check if onboarding is needed (only if trial modal not showing)
   useEffect(() => {

@@ -54,10 +54,6 @@ export function WelcomePopup({ onDismiss }: WelcomePopupProps) {
                 már te is a struktúraépítők közé tartozol!
               </p>
 
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Most 7 napig ingyen hozzáférsz minden tartalomhoz és utána is csak 14.990 Ft-ért tudod folytatni a kalandot!
-              </p>
-
               <button
                 onClick={handleClose}
                 className="btn w-full bg-gradient-to-t from-brand-secondary to-brand-secondary/50 bg-[length:100%_100%] bg-[bottom] text-white shadow-sm hover:bg-[length:100%_150%]"

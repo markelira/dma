@@ -32,7 +32,7 @@ export function CompanyEmployeeNoAccessModal({
     '5 munkatárs díjmentes hozzáadása',
     'Hetente frissülő tartalmak',
     'Bármikor lemondható',
-    '7 napos ingyenes kipróbálás'
+    'Havi 14.990 Ft'
   ];
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export function CompanyEmployeeNoAccessModal({
                     transition={{ delay: 0.1 }}
                     className="text-2xl font-bold text-white tracking-tight"
                   >
-                    Fedezd fel 7 napig ingyen
+                    Vágj bele a kalandba
                   </motion.h2>
                 </div>
 
@@ -200,18 +200,6 @@ export function CompanyEmployeeNoAccessModal({
                       </Button>
                     </motion.div>
                   )}
-
-                  {/* Pricing preview */}
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="text-center pt-4 border-t border-gray-100"
-                  >
-                    <p className="text-sm text-gray-500">
-                      A próba után: <span className="font-semibold text-gray-700">14 990 Ft/hó</span>
-                    </p>
-                  </motion.div>
                 </div>
               </div>
             </motion.div>
