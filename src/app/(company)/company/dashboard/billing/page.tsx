@@ -230,7 +230,9 @@ export default function CompanyBillingPage() {
     if (!timestamp) return '-'
     // Handle both milliseconds (from Stripe) and Firestore timestamps
     const ms = typeof timestamp === 'number' ? timestamp : timestamp._seconds * 1000
-    return format(new Date(ms), 'yyyy. MMMM dd.', { locale: hu })
+    const date = new Date(ms)
+    if (isNaN(date.getTime())) return '-'
+    return format(date, 'yyyy. MMMM dd.', { locale: hu })
   }
 
   if (subscriptionLoading) {
@@ -460,24 +462,30 @@ export default function CompanyBillingPage() {
             </div>
 
             <div className="border-t border-gray-200 pt-4 space-y-3">
-              {subscription?.currentPeriodEnd && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">
-                    {cancelAtPeriodEnd ? 'Hozzáférés eddig' : 'Következő fizetés'}
-                  </span>
-                  <span className="font-medium text-gray-900">
-                    {format(new Date(subscription.currentPeriodEnd), 'yyyy. MMMM dd.', { locale: hu })}
-                  </span>
-                </div>
-              )}
-              {subscription?.currentPeriodStart && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Előfizetés kezdete</span>
-                  <span className="font-medium text-gray-900">
-                    {format(new Date(subscription.currentPeriodStart), 'yyyy. MMMM dd.', { locale: hu })}
-                  </span>
-                </div>
-              )}
+              {(() => {
+                const periodEnd = subscription?.currentPeriodEnd ? new Date(subscription.currentPeriodEnd) : null
+                return periodEnd && !isNaN(periodEnd.getTime()) ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">
+                      {cancelAtPeriodEnd ? 'Hozzáférés eddig' : 'Következő fizetés'}
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {format(periodEnd, 'yyyy. MMMM dd.', { locale: hu })}
+                    </span>
+                  </div>
+                ) : null
+              })()}
+              {(() => {
+                const periodStart = subscription?.currentPeriodStart ? new Date(subscription.currentPeriodStart) : null
+                return periodStart && !isNaN(periodStart.getTime()) ? (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Előfizetés kezdete</span>
+                    <span className="font-medium text-gray-900">
+                      {format(periodStart, 'yyyy. MMMM dd.', { locale: hu })}
+                    </span>
+                  </div>
+                ) : null
+              })()}
             </div>
 
             {/* Action Buttons */}
